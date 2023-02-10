@@ -18,10 +18,12 @@ private:
 public:
 	POINT GetPos();
 	DWORD GetKey(DWORD dwKey);
+	void Update();
 public:
-	bool Init();
-	bool Update();
-	bool Release();
+	InputSystem();
+	~InputSystem();
+
+	
 };
 
 #define _InputSystem Singleton<InputSystem>::GetInstance()

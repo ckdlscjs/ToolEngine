@@ -1,5 +1,10 @@
 #include "EntrySystem.h"
 
+void EntrySystem::CreateRenderSystem()
+{
+
+}
+
 void EntrySystem::OnCreate()
 {
     std::cout << "onCreate" << std::endl;
@@ -70,7 +75,7 @@ LRESULT EntrySystem::MessageHandler(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM l
 
 EntrySystem::EntrySystem()
 {
-    _InputSystem.Init();
+    _InputSystem;
 
 }
 

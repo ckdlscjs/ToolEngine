@@ -25,6 +25,9 @@
     <Filter Include="InputSystem">
       <UniqueIdentifier>{9167c0f8-64ce-4e65-8ab1-65eb9e2bc6b6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="EngineSystem\RenderySystem\SwapChain">
+      <UniqueIdentifier>{f49033b0-a7f2-43fd-87ea-61348a6d67f2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="WindowSystem.h">
@@ -67,6 +70,9 @@
     <ClInclude Include="RenderSystem.h">
       <Filter>EngineSystem\RenderySystem</Filter>
     </ClInclude>
+    <ClInclude Include="SwapChain.h">
+      <Filter>EngineSystem\RenderySystem\SwapChain</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WindowSystem.cpp">
@@ -105,6 +111,9 @@
     </ClCompile>
     <ClCompile Include="RenderSystem.cpp">
       <Filter>EngineSystem\RenderySystem</Filter>
+    </ClCompile>
+    <ClCompile Include="SwapChain.cpp">
+      <Filter>EngineSystem\RenderySystem\SwapChain</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

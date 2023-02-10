@@ -9,21 +9,14 @@ DWORD InputSystem::GetKey(DWORD dwKey)
 {
 	return m_dwKeyState[dwKey];
 }
-bool InputSystem::Init()
-{
-	ZeroMemory(m_dwKeyState, sizeof(DWORD) * 256);
-	m_ptPos.x = m_ptPos.y = 0;
-	m_ptPrePos = m_ptPos;
-	return true;
-}
 
-bool InputSystem::Update()
+void InputSystem::Update()
 {
 	if (!GetCursorPos(&m_ptPos)) 
-		return false;
+		throw std::exception("");
 
 	if (!ScreenToClient(g_hWnd, &m_ptPos)) 
-		return false;
+		throw std::exception("");
 
 	m_ptOffSet.x = m_ptPos.x - m_ptPrePos.x;
 	m_ptOffSet.y = m_ptPos.y - m_ptPrePos.y;
@@ -43,11 +36,15 @@ bool InputSystem::Update()
 		}
 	}
 	m_ptPrePos = m_ptPos;
-
-	return true;
 }
 
-bool InputSystem::Release()
+InputSystem::InputSystem()
 {
-	return true;
+	ZeroMemory(m_dwKeyState, sizeof(DWORD) * 256);
+	m_ptPos.x = m_ptPos.y = 0;
+	m_ptPrePos = m_ptPos;
+}
+InputSystem::~InputSystem()
+{
+
 }
