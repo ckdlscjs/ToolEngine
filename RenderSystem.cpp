@@ -71,7 +71,7 @@ void RenderSystem::ReloadBuffer(unsigned int iWidth, unsigned int iHeight)
 		throw std::exception("DepthStencilBuffer not create successfully");
 	}
 	hr = m_pCDevice->m_pDevice->CreateDepthStencilView(buffer, NULL, &m_pCDevice->m_pDetphStenilView); //해당버퍼를 이용하여 깊이스텐실 뷰를 생성
-	buffer->Release();											//임의의 사용한 버퍼를 제거
+	buffer->Release();								// Backbuffer Release
 	if (FAILED(hr))
 	{
 		throw std::exception("DepthStenilView not create successfully");

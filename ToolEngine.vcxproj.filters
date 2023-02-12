@@ -100,7 +100,7 @@
     <ClInclude Include="ImguiSystem.h">
       <Filter>ImguiSystem</Filter>
     </ClInclude>
-    <ClInclude Include="VetexBuffer.h">
+    <ClInclude Include="VertexBuffer.h">
       <Filter>EngineSystem\RenderySystem\VertexBuffer</Filter>
     </ClInclude>
   </ItemGroup>
@@ -151,7 +151,7 @@
     <ClCompile Include="ImguiSystem.cpp">
       <Filter>ImguiSystem</Filter>
     </ClCompile>
-    <ClCompile Include="VetexBuffer.cpp">
+    <ClCompile Include="VertexBuffer.cpp">
       <Filter>EngineSystem\RenderySystem\VertexBuffer</Filter>
     </ClCompile>
   </ItemGroup>
