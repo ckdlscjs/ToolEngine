@@ -1,98 +1,131 @@
 #include "RenderSystem.h"
+#include "WindowSystem.h"
+
+void RenderSystem::SetImguiAttributes(ID3D11Device** pDevice, ID3D11DeviceContext** pDeviceContext, IDXGISwapChain** pSwapChain, ID3D11RenderTargetView** pRederTargetView)
+{
+	*pDevice = m_pCDevice->m_pDevice;
+	*pDeviceContext = m_pCDevice->m_pImmediateContext;
+	*pSwapChain = m_pCSwapChain->m_pSwapChain;
+	*pRederTargetView = m_pCDevice->m_pRenderTargetView;
+}
 
 bool RenderSystem::CompileShader(const wchar_t* szFilePath, const char* entryPointName, const char* shaderVersion, void** shaderCode, size_t* shaderSize)
 {
-    ID3DBlob* codeBlob;
-    ID3DBlob* errBlob;
+    ID3DBlob* codeBlob = nullptr;
+    ID3DBlob* errBlob = nullptr;
     if (FAILED(D3DCompileFromFile(szFilePath, nullptr, nullptr, entryPointName, entryPointName, NULL, NULL, &codeBlob, &errBlob)))
     {
         OutputDebugStringA((char*)errBlob->GetBufferPointer());
         if (errBlob) errBlob->Release();
+        if (codeBlob) codeBlob->Release();
         return false;
     }
     *shaderCode = codeBlob->GetBufferPointer();
     *shaderSize = codeBlob->GetBufferSize();
+    errBlob->Release();
+    codeBlob->Release();
     return true;
+}
+
+void RenderSystem::SetFullScreen(bool bFullscreen, unsigned int iWidth, unsigned int iHeight)
+{
+	Resize(iWidth, iHeight);
+	m_pCSwapChain->m_pSwapChain->SetFullscreenState(bFullscreen, nullptr);
+}
+
+void RenderSystem::Resize(unsigned int iWidth, unsigned int iHeight)
+{
+	if (m_pCDevice->m_pRenderTargetView) m_pCDevice->m_pRenderTargetView->Release();
+	if (m_pCDevice->m_pDetphStenilView) m_pCDevice->m_pDetphStenilView->Release();
+
+	m_pCSwapChain->m_pSwapChain->ResizeBuffers(1, iWidth, iHeight, DXGI_FORMAT_R8G8B8A8_UNORM, 0);
+	ReloadBuffer(iWidth, iHeight);
+}
+
+void RenderSystem::ReloadBuffer(unsigned int iWidth, unsigned int iHeight)
+{
+	//Get the BackBuffer and view's
+	ID3D11Texture2D* buffer;
+	HRESULT hr = m_pCSwapChain->m_pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&buffer);	//스왑체인에서 사용하는 버퍼를 받아옴
+	if (FAILED(hr))
+	{
+		throw std::exception("BackBuffer not create successfully");
+	}
+
+	hr = m_pCDevice->m_pDevice->CreateRenderTargetView(buffer, NULL, &m_pCDevice->m_pRenderTargetView); //해당버퍼를 이용하여 렌더타겟뷰를 생성
+	buffer->Release();											//임의의 사용한 버퍼를 제거
+	if (FAILED(hr))
+	{
+		throw std::exception("RenderTargetView not create successfully");
+	}
+
+	D3D11_TEXTURE2D_DESC tex_desc;
+	ZeroMemory(&tex_desc, sizeof(D3D11_TEXTURE2D_DESC));
+	tex_desc.Width = iWidth;
+	tex_desc.Height = iHeight;
+	tex_desc.MipLevels = 1;
+	tex_desc.ArraySize = 1;
+	tex_desc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	tex_desc.SampleDesc.Count = 1;
+	tex_desc.Usage = D3D11_USAGE_DEFAULT;
+	tex_desc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+	tex_desc.CPUAccessFlags = 0;					// AccessFlag 값의 조합
+	tex_desc.MiscFlags = 0;							// 텍스처의 다양한 속성(큐브맵, 배열 등을 제어하는 기타플래그)
+
+	hr = m_pCDevice->m_pDevice->CreateTexture2D(&tex_desc, nullptr, &buffer);
+	if (FAILED(hr))
+	{
+		throw std::exception("DepthStencilBuffer not create successfully");
+	}
+	hr = m_pCDevice->m_pDevice->CreateDepthStencilView(buffer, NULL, &m_pCDevice->m_pDetphStenilView); //해당버퍼를 이용하여 깊이스텐실 뷰를 생성
+	buffer->Release();											//임의의 사용한 버퍼를 제거
+	if (FAILED(hr))
+	{
+		throw std::exception("DepthStenilView not create successfully");
+	}
 }
 
 void RenderSystem::CreateDevice()
 {
-    std::cout << "Initialize : RenderSystem" << std::endl;
-    //드라이버타입종류
-    D3D_DRIVER_TYPE dirver_types[] =
-    {
-        D3D_DRIVER_TYPE_HARDWARE,   //best performence
-        D3D_DRIVER_TYPE_WARP,       //
-        D3D_DRIVER_TYPE_REFERENCE   //worst one, slow performence
-    };
-    UINT num_driver_types = ARRAYSIZE(dirver_types);
-
-    //피처레벨종류
-    D3D_FEATURE_LEVEL feature_levles[] =
-    {
-        D3D_FEATURE_LEVEL_11_0
-    };
-    UINT num_feature_levels = ARRAYSIZE(feature_levles);
-    D3D_FEATURE_LEVEL featureLevel;
-
-    HRESULT hResult = 0;
-
-    for (UINT driver_type_index = 0; driver_type_index < num_driver_types;)
-    {
-        //d3d device생성
-      
-        hResult = D3D11CreateDevice(
-            NULL,
-            dirver_types[driver_type_index],
-            NULL,
-            NULL,
-            feature_levles,
-            num_feature_levels,
-            D3D11_SDK_VERSION,
-            &m_pDevice,                  //ouput, device
-            &featureLevel,               //output, featureLevel
-            &m_pDeviceContext);      //output, deviceContext
-
-        if (SUCCEEDED(hResult))
-            break;
-
-        ++driver_type_index;
-    }
-
-    if (FAILED(hResult))
-        throw std::exception("RenderSystem not create successfully");
-
-    //m_imm_device_context = std::make_shared<DeviceContext>(m_d3d_immediate_context, this);
-
-  
-
-
-    //initRasterizerState();
+    m_pCDevice = new Device();
 }
 
 void RenderSystem::CreateSwapChain()
 {
-    m_pCSwapChain = new SwapChain(m_pDevice, m_pSwapChain);
+    m_pCSwapChain = new SwapChain(m_pCDevice->m_pDevice);
 }
 
-ID3D11Device* RenderSystem::GetDevice()
+void RenderSystem::Frame()
 {
-    return m_pDevice;
+	// ClearRenderTarget
+	m_pCDevice->ClearRenderTargetColor(0, 0.3f, 0.4f, 1);	//렌터타겟을 지정한 컬러로 초기화
+
+	// Set viewport of rendertarget in which we have draw
+	RECT rt = g_pWindow->GetClientWindowRect();
+	m_pCDevice->SetViewport(rt.right - rt.left, rt.bottom - rt.top);
+
 }
 
-ID3D11DeviceContext* RenderSystem::GetDeviceContext()
+void RenderSystem::Render()
 {
-    return m_pDeviceContext;
-}
+	
 
+}
 
 RenderSystem::RenderSystem()
 {
+	std::cout << "Initialize : RenderSystem" << std::endl;
     CreateDevice();
-    CreateSwapChain();
+	CreateSwapChain();
+	RECT rt = g_pWindow->GetClientWindowRect();
+	ReloadBuffer(rt.right - rt.left, rt.bottom - rt.top);
 }
 
 RenderSystem::~RenderSystem()
 {
+	if (m_pCDevice != nullptr) 
+		delete m_pCDevice;
 
+	if (m_pCSwapChain != nullptr) 
+		delete m_pCSwapChain;
 }

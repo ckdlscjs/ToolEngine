@@ -1,14 +1,22 @@
 #include "SwapChain.h"
 #include "WindowSystem.h"
 
+bool SwapChain::Present(bool vsync)
+{
+	std::cout << "Present Swapchain" << std::endl;
+	m_pSwapChain->Present(vsync, NULL);		//swapchain의 present함수(최종화면에제시)
+	return true;
+}
+
 SwapChain::SwapChain(ID3D11Device* pDevice)
 {
-	std::cout << "Initialize : RenderSystem" << std::endl;
+	std::cout << "Initialize : SwapChain" << std::endl;
 	RECT rt = g_pWindow->GetClientWindowRect();
 	int iWidth = rt.right - rt.left;
 	int iHeight = rt.bottom - rt.top;
+
 	DXGI_SWAP_CHAIN_DESC desc;								//swapchain description
-	ZeroMemory(&desc, sizeof(desc));
+	ZeroMemory(&desc, sizeof(DXGI_SWAP_CHAIN_DESC));
 	desc.BufferCount = 1;
 	desc.BufferDesc.Width = iWidth;
 	desc.BufferDesc.Height = iHeight;
@@ -34,10 +42,8 @@ SwapChain::SwapChain(ID3D11Device* pDevice)
 	{
 		throw std::exception("SwapChain not create successfully");
 	}
-	
-	//reloadBuffers(iWidth, iHeight);
 }
 SwapChain::~SwapChain()
 {
-
+	if (m_pSwapChain != nullptr) m_pSwapChain->Release();
 }

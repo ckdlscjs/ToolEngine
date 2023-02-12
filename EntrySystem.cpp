@@ -1,34 +1,38 @@
 #include "EntrySystem.h"
 
-void EntrySystem::CreateRenderSystem()
-{
-
-}
+// Data
+static ID3D11Device* g_pd3dDevice = NULL;
+static ID3D11DeviceContext* g_pd3dDeviceContext = NULL;
+static IDXGISwapChain* g_pSwapChain = NULL;
+static ID3D11RenderTargetView* g_mainRenderTargetView = NULL;
 
 void EntrySystem::OnCreate()
 {
     std::cout << "onCreate" << std::endl;
+    _InputSystem;
+    _EngineSystem;
+    _ImguiSystem;
+    
 }
 
 void EntrySystem::OnUpdate()
 {
     std::cout << "onUpdate" << std::endl;
     _InputSystem.Update();
+    /*POINT pt = _InputSystem.GetPos();
+   std::cout << pt.x << " | " << pt.y << std::endl;*/
+    _EngineSystem.Update();
+    _ImguiSystem.Update();
+    
 
-    POINT pt = _InputSystem.GetPos();
-    std::cout << pt.x << " | " << pt.y << std::endl;
+    g_pSwapChain->Present(1, 0); // Present with vsync
+    //g_pSwapChain->Present(0, 0); // Present without vsync
 }
 
-void EntrySystem::OnDestroy()
-{
-    std::cout << "onDestroy" << std::endl;
-
-}
 
 void EntrySystem::OnFocus()
 {
     std::cout << "onFocus" << std::endl;
-
 }
 
 void EntrySystem::OnKillFocus()
@@ -47,36 +51,23 @@ void EntrySystem::OnSize()
     }*/
 }
 
-// Forward declare message handler from imgui_impl_win32.cpp
-extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+void EntrySystem::OnDestroy()
+{
+    std::cout << "onDestroy" << std::endl;
+
+   
+}
+
 
 LRESULT EntrySystem::MessageHandler(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 {
-	if (ImGui_ImplWin32_WndProcHandler(hWnd, Msg, wParam, lParam))
-		return true;
-	switch (Msg)
-	{
-        //case WM_SIZE:
-        //    if (g_pd3dDevice != NULL && wParam != SIZE_MINIMIZED)
-        //    {
-        //        CleanupRenderTarget();
-        //        g_pSwapChain->ResizeBuffers(0, (UINT)LOWORD(lParam), (UINT)HIWORD(lParam), DXGI_FORMAT_UNKNOWN, 0);
-        //        CreateRenderTarget();
-        //    }
-        //    return 0;
-        case WM_SYSCOMMAND:
-        {
-            if ((wParam & 0xfff0) == SC_KEYMENU) // Disable ALT application menu
-                return 0;
-        }break;
-	}
+    if (_ImguiSystem.MessageHandler(hWnd, Msg, wParam, lParam))
+        return true;
 	return ::DefWindowProc(hWnd, Msg, wParam, lParam);
 }
 
 EntrySystem::EntrySystem()
 {
-    _InputSystem;
-
 }
 
 EntrySystem::~EntrySystem()

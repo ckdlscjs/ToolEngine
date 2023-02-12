@@ -31,6 +31,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 			g_pWindow->OnKillFocus();
 		}break;
 
+		case WM_SYSCOMMAND:
+		{
+			if ((wParam & 0xfff0) == SC_KEYMENU) // Disable ALT application menu
+				return 0;
+		}break;
+
 		case WM_DESTROY:
 		{
 			//Event When WindowDestroyed
@@ -87,7 +93,6 @@ bool WindowSystem::Initialize()
 
 	//SetFlagWindowIsRunning
 	m_bIsRun = true;
-	g_hWnd = m_hWnd;
 
 	return true;
 }
@@ -140,4 +145,5 @@ RECT WindowSystem::GetScreenSize()
 void WindowSystem::SetHWND(HWND hWnd)
 {
 	m_hWnd = hWnd;
+	g_hWnd = m_hWnd;
 }

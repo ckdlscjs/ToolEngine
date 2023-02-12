@@ -7,9 +7,6 @@
     <Filter Include="Shaders">
       <UniqueIdentifier>{0c7c620b-d82e-4224-9532-312c0406dae8}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Imgui">
-      <UniqueIdentifier>{ffe8806e-5f2a-4059-8ccd-67531d9015f0}</UniqueIdentifier>
-    </Filter>
     <Filter Include="WindowSystem">
       <UniqueIdentifier>{ebb6abe7-7bb6-4986-a162-6c171c91c5ff}</UniqueIdentifier>
     </Filter>
@@ -28,6 +25,15 @@
     <Filter Include="EngineSystem\RenderySystem\SwapChain">
       <UniqueIdentifier>{f49033b0-a7f2-43fd-87ea-61348a6d67f2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="EngineSystem\RenderySystem\Device">
+      <UniqueIdentifier>{b037ae5c-2a72-4416-aebf-bf73664a8284}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ImguiSystem">
+      <UniqueIdentifier>{bcfd9189-7fd0-46c8-b21a-4adbc93983a2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ImguiSystem\Imgui">
+      <UniqueIdentifier>{ffe8806e-5f2a-4059-8ccd-67531d9015f0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="WindowSystem.h">
@@ -35,28 +41,28 @@
     </ClInclude>
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="imconfig.h">
-      <Filter>Imgui</Filter>
+      <Filter>ImguiSystem\Imgui</Filter>
     </ClInclude>
     <ClInclude Include="imgui.h">
-      <Filter>Imgui</Filter>
+      <Filter>ImguiSystem\Imgui</Filter>
     </ClInclude>
     <ClInclude Include="imgui_impl_dx11.h">
-      <Filter>Imgui</Filter>
+      <Filter>ImguiSystem\Imgui</Filter>
     </ClInclude>
     <ClInclude Include="imgui_impl_win32.h">
-      <Filter>Imgui</Filter>
+      <Filter>ImguiSystem\Imgui</Filter>
     </ClInclude>
     <ClInclude Include="imgui_internal.h">
-      <Filter>Imgui</Filter>
+      <Filter>ImguiSystem\Imgui</Filter>
     </ClInclude>
     <ClInclude Include="imstb_rectpack.h">
-      <Filter>Imgui</Filter>
+      <Filter>ImguiSystem\Imgui</Filter>
     </ClInclude>
     <ClInclude Include="imstb_textedit.h">
-      <Filter>Imgui</Filter>
+      <Filter>ImguiSystem\Imgui</Filter>
     </ClInclude>
     <ClInclude Include="imstb_truetype.h">
-      <Filter>Imgui</Filter>
+      <Filter>ImguiSystem\Imgui</Filter>
     </ClInclude>
     <ClInclude Include="EntrySystem.h">
       <Filter>EntrySystem</Filter>
@@ -73,31 +79,37 @@
     <ClInclude Include="SwapChain.h">
       <Filter>EngineSystem\RenderySystem\SwapChain</Filter>
     </ClInclude>
+    <ClInclude Include="Device.h">
+      <Filter>EngineSystem\RenderySystem\Device</Filter>
+    </ClInclude>
+    <ClInclude Include="ImguiSystem.h">
+      <Filter>ImguiSystem</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WindowSystem.cpp">
       <Filter>WindowSystem</Filter>
     </ClCompile>
     <ClCompile Include="imgui.cpp">
-      <Filter>Imgui</Filter>
+      <Filter>ImguiSystem\Imgui</Filter>
     </ClCompile>
     <ClCompile Include="imgui_demo.cpp">
-      <Filter>Imgui</Filter>
+      <Filter>ImguiSystem\Imgui</Filter>
     </ClCompile>
     <ClCompile Include="imgui_draw.cpp">
-      <Filter>Imgui</Filter>
+      <Filter>ImguiSystem\Imgui</Filter>
     </ClCompile>
     <ClCompile Include="imgui_impl_dx11.cpp">
-      <Filter>Imgui</Filter>
+      <Filter>ImguiSystem\Imgui</Filter>
     </ClCompile>
     <ClCompile Include="imgui_impl_win32.cpp">
-      <Filter>Imgui</Filter>
+      <Filter>ImguiSystem\Imgui</Filter>
     </ClCompile>
     <ClCompile Include="imgui_tables.cpp">
-      <Filter>Imgui</Filter>
+      <Filter>ImguiSystem\Imgui</Filter>
     </ClCompile>
     <ClCompile Include="imgui_widgets.cpp">
-      <Filter>Imgui</Filter>
+      <Filter>ImguiSystem\Imgui</Filter>
     </ClCompile>
     <ClCompile Include="EntrySystem.cpp">
       <Filter>EntrySystem</Filter>
@@ -115,15 +127,21 @@
     <ClCompile Include="SwapChain.cpp">
       <Filter>EngineSystem\RenderySystem\SwapChain</Filter>
     </ClCompile>
+    <ClCompile Include="Device.cpp">
+      <Filter>EngineSystem\RenderySystem\Device</Filter>
+    </ClCompile>
+    <ClCompile Include="ImguiSystem.cpp">
+      <Filter>ImguiSystem</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="imgui.ini">
-      <Filter>Imgui</Filter>
+      <Filter>ImguiSystem\Imgui</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="imgui.natvis">
-      <Filter>Imgui</Filter>
+      <Filter>ImguiSystem\Imgui</Filter>
     </Natvis>
   </ItemGroup>
 </Project>
