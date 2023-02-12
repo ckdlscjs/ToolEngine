@@ -16,7 +16,7 @@ public:
 public:
 	ImguiSystem();
 	~ImguiSystem();
-private:
+public:
 	// Our state
 	bool m_show_demo_window = true;
 	bool m_show_another_window = false;

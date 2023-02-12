@@ -7,7 +7,8 @@ void EngineSystem::CreateRenderSystem()
 
 void EngineSystem::Update()
 {
-	m_pRenderSystem->Frame();
+	m_pRenderSystem->PreRender();
+	m_pRenderSystem->Update();
 	m_pRenderSystem->Render();
 }
 

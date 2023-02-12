@@ -97,7 +97,13 @@ ID3D11DeviceContext* RenderSystem::GetDeviceContext()
 	return m_pCDevice->m_pImmediateContext;
 }
 
-void RenderSystem::Frame()
+void RenderSystem::Update()
+{
+	
+
+}
+
+void RenderSystem::PreRender()
 {
 	// ClearRenderTarget
 	m_pCDevice->ClearRenderTargetColor(0, 0.3f, 0.4f, 1);	//렌터타겟을 지정한 컬러로 초기화
@@ -105,7 +111,6 @@ void RenderSystem::Frame()
 	// Set viewport of rendertarget in which we have draw
 	RECT rt = g_pWindow->GetClientWindowRect();
 	m_pCDevice->SetViewport(rt.right - rt.left, rt.bottom - rt.top);
-
 }
 
 void RenderSystem::Render()

@@ -19,7 +19,8 @@ public:
 	void drawTriangleStrip(UINT vertex_count, UINT start_vertex_index);
 	void drawIndexedTriangleList(UINT index_count, UINT start_vertex_index, UINT start_index_location);
 public:
-	void Frame();
+	void Update();
+	void PreRender();
 	void Render();
 	void PostRender();
 public:

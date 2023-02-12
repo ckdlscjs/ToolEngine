@@ -34,6 +34,21 @@
     <Filter Include="ImguiSystem\Imgui">
       <UniqueIdentifier>{ffe8806e-5f2a-4059-8ccd-67531d9015f0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="EngineSystem\RenderySystem\VertexBuffer">
+      <UniqueIdentifier>{1cc983fe-60ba-4d56-986f-d88d8689b585}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="EngineSystem\RenderySystem\IndexBuffer">
+      <UniqueIdentifier>{70339c64-7a49-44a7-a131-27fc3a84c449}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="EngineSystem\RenderySystem\ConstantBuffer">
+      <UniqueIdentifier>{35643c2c-bccf-4ce2-a60d-703af6da2d21}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="EngineSystem\RenderySystem\VertexShader">
+      <UniqueIdentifier>{55b0426d-68f3-462f-9545-4465a5c1336d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="EngineSystem\RenderySystem\PixelShader">
+      <UniqueIdentifier>{7784ca5a-7455-41c8-bf39-d1c9b157c3c1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="WindowSystem.h">
@@ -85,6 +100,9 @@
     <ClInclude Include="ImguiSystem.h">
       <Filter>ImguiSystem</Filter>
     </ClInclude>
+    <ClInclude Include="VetexBuffer.h">
+      <Filter>EngineSystem\RenderySystem\VertexBuffer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WindowSystem.cpp">
@@ -132,6 +150,9 @@
     </ClCompile>
     <ClCompile Include="ImguiSystem.cpp">
       <Filter>ImguiSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="VetexBuffer.cpp">
+      <Filter>EngineSystem\RenderySystem\VertexBuffer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
