@@ -10,6 +10,8 @@ class ImguiSystem : public Singleton<ImguiSystem>
 {
 public:
 	LRESULT MessageHandler(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam);
+	//void SetImguiAttributes(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext, IDXGISwapChain* pSwapChain, ID3D11RenderTargetView* pRederTargetView);
+	void Initialize(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);
 	void Update();
 public:
 	ImguiSystem();

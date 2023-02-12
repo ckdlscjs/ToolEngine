@@ -11,6 +11,11 @@ void EngineSystem::Update()
 	m_pRenderSystem->Render();
 }
 
+void EngineSystem::Present()
+{
+	m_pRenderSystem->PostRender();
+}
+
 RenderSystem* EngineSystem::GetRenderSystem()
 {
 	return m_pRenderSystem;
@@ -23,5 +28,6 @@ EngineSystem::EngineSystem()
 
 EngineSystem::~EngineSystem()
 {
+	
 	if(m_pRenderSystem != nullptr) delete m_pRenderSystem;
 }

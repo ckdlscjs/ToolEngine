@@ -8,6 +8,7 @@ private:
 	void CreateRenderSystem();
 public:
 	void Update();
+	void Present();
 	RenderSystem* GetRenderSystem();
 public:
 	EngineSystem();

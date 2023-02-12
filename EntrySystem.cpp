@@ -1,18 +1,13 @@
 #include "EntrySystem.h"
 
-// Data
-static ID3D11Device* g_pd3dDevice = NULL;
-static ID3D11DeviceContext* g_pd3dDeviceContext = NULL;
-static IDXGISwapChain* g_pSwapChain = NULL;
-static ID3D11RenderTargetView* g_mainRenderTargetView = NULL;
-
 void EntrySystem::OnCreate()
 {
     std::cout << "onCreate" << std::endl;
     _InputSystem;
     _EngineSystem;
     _ImguiSystem;
-    
+    _ImguiSystem.Initialize(_EngineSystem.GetRenderSystem()->GetDevice(), _EngineSystem.GetRenderSystem()->GetDeviceContext());
+
 }
 
 void EntrySystem::OnUpdate()
@@ -24,9 +19,7 @@ void EntrySystem::OnUpdate()
     _EngineSystem.Update();
     _ImguiSystem.Update();
     
-
-    g_pSwapChain->Present(1, 0); // Present with vsync
-    //g_pSwapChain->Present(0, 0); // Present without vsync
+    _EngineSystem.Present();
 }
 
 
@@ -63,7 +56,8 @@ LRESULT EntrySystem::MessageHandler(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM l
 {
     if (_ImguiSystem.MessageHandler(hWnd, Msg, wParam, lParam))
         return true;
-	return ::DefWindowProc(hWnd, Msg, wParam, lParam);
+    else
+        return ::DefWindowProc(hWnd, Msg, wParam, lParam);
 }
 
 EntrySystem::EntrySystem()
@@ -72,4 +66,5 @@ EntrySystem::EntrySystem()
 
 EntrySystem::~EntrySystem()
 {
+ 
 }

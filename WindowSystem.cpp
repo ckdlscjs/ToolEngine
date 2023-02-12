@@ -31,11 +31,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 			g_pWindow->OnKillFocus();
 		}break;
 
-		case WM_SYSCOMMAND:
-		{
-			if ((wParam & 0xfff0) == SC_KEYMENU) // Disable ALT application menu
-				return 0;
-		}break;
+		//case WM_SYSCOMMAND:
+		//{
+		//	if ((wParam & 0xfff0) == SC_KEYMENU) // Disable ALT application menu
+		//		return 0;
+		//}break;
 
 		case WM_DESTROY:
 		{
@@ -100,15 +100,13 @@ bool WindowSystem::BroadCast()
 {
 	MSG msg;
 	OnUpdate();										//onUpdate가 BroadCast통해서 계속 호출되면서 프로그램의 몸체 사용됨
-	while (::PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+	while (::PeekMessage(&msg, NULL, 0, 0, PM_REMOVE) > 0)
 	{
 		::TranslateMessage(&msg);
 		::DispatchMessage(&msg);
 		if (msg.message == WM_QUIT)
 			return false;
 	}
-
-	Sleep(1);
 
 	return true;
 }

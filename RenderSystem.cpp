@@ -1,14 +1,6 @@
 #include "RenderSystem.h"
 #include "WindowSystem.h"
 
-void RenderSystem::SetImguiAttributes(ID3D11Device** pDevice, ID3D11DeviceContext** pDeviceContext, IDXGISwapChain** pSwapChain, ID3D11RenderTargetView** pRederTargetView)
-{
-	*pDevice = m_pCDevice->m_pDevice;
-	*pDeviceContext = m_pCDevice->m_pImmediateContext;
-	*pSwapChain = m_pCSwapChain->m_pSwapChain;
-	*pRederTargetView = m_pCDevice->m_pRenderTargetView;
-}
-
 bool RenderSystem::CompileShader(const wchar_t* szFilePath, const char* entryPointName, const char* shaderVersion, void** shaderCode, size_t* shaderSize)
 {
     ID3DBlob* codeBlob = nullptr;
@@ -95,6 +87,16 @@ void RenderSystem::CreateSwapChain()
     m_pCSwapChain = new SwapChain(m_pCDevice->m_pDevice);
 }
 
+ID3D11Device* RenderSystem::GetDevice()
+{
+	return m_pCDevice->m_pDevice;
+}
+
+ID3D11DeviceContext* RenderSystem::GetDeviceContext()
+{
+	return m_pCDevice->m_pImmediateContext;
+}
+
 void RenderSystem::Frame()
 {
 	// ClearRenderTarget
@@ -110,6 +112,11 @@ void RenderSystem::Render()
 {
 	
 
+}
+
+void RenderSystem::PostRender()
+{
+	m_pCSwapChain->Present(true);
 }
 
 RenderSystem::RenderSystem()

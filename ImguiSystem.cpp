@@ -2,17 +2,31 @@
 // Forward declare message handler from imgui_impl_win32.cpp
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-
 LRESULT ImguiSystem::MessageHandler(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 {
     return ImGui_ImplWin32_WndProcHandler(hWnd, Msg, wParam, lParam);
 }
 
+void ImguiSystem::Initialize(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext)
+{
+    // Setup Dear ImGui context
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    //io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+    //io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+
+    // Setup Dear ImGui style
+    ImGui::StyleColorsDark();
+    //ImGui::StyleColorsLight();
+
+    // Setup Platform/Renderer backends
+    ImGui_ImplWin32_Init(g_hWnd);
+    ImGui_ImplDX11_Init(pDevice, pDeviceContext);
+}
+
 void ImguiSystem::Update()
 {
-    // Setup ImguiAttributes
-    _EngineSystem.GetRenderSystem()->SetImguiAttributes(&g_pd3dDevice, &g_pd3dDeviceContext, &g_pSwapChain, &g_mainRenderTargetView);
-
     // Start the Dear ImGui frame
     ImGui_ImplDX11_NewFrame();
     ImGui_ImplWin32_NewFrame();
@@ -62,20 +76,7 @@ void ImguiSystem::Update()
 
 ImguiSystem::ImguiSystem()
 {
-    // Setup Dear ImGui context
-    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-    ImGuiIO& io = ImGui::GetIO(); (void)io;
-    //io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
-    //io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
-
-    // Setup Dear ImGui style
-    ImGui::StyleColorsDark();
-    //ImGui::StyleColorsLight();
-
-    // Setup Platform/Renderer backends
-    ImGui_ImplWin32_Init(g_hWnd);
-    ImGui_ImplDX11_Init(g_pd3dDevice, g_pd3dDeviceContext);
+    
 }
 
 ImguiSystem::~ImguiSystem()
