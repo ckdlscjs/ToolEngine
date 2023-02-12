@@ -2,6 +2,8 @@
 #include "stdafx.h"
 #include "Device.h"
 #include "SwapChain.h"
+
+class EngineSystem;
 class RenderSystem
 {
 private:
@@ -20,8 +22,11 @@ public:
 	void drawIndexedTriangleList(UINT index_count, UINT start_vertex_index, UINT start_index_location);
 public:
 	void Update();
-	void PreRender();
 	void Render();
+
+
+private:
+	void PreRender();
 	void PostRender();
 public:
 	RenderSystem();
@@ -36,5 +41,6 @@ private:
 	IDXGIDevice* m_dxgiDevice;
 	IDXGIAdapter* m_dxgiAdapter;
 	IDXGIFactory* m_dxgiFactory;
+	friend class EngineSystem;
 };
 

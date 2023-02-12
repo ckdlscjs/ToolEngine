@@ -4,7 +4,7 @@ class RenderSystem;
 class SwapChain
 {
 public:
-	bool Present(bool bVsync);
+	void Present(bool bVsync);
 public:
 	SwapChain(ID3D11Device* pDevice);
 	~SwapChain();

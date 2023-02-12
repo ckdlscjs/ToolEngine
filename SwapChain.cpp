@@ -1,11 +1,10 @@
 #include "SwapChain.h"
 #include "WindowSystem.h"
 
-bool SwapChain::Present(bool vsync)
+void SwapChain::Present(bool vsync)
 {
 	std::cout << "Present Swapchain" << std::endl;
 	m_pSwapChain->Present(vsync, NULL);		//swapchain의 present함수(최종화면에제시)
-	return true;
 }
 
 SwapChain::SwapChain(ID3D11Device* pDevice)

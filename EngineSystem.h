@@ -1,6 +1,7 @@
 #pragma once
 #include "stdafx.h"
 #include "RenderSystem.h"
+
 class EngineSystem : public Singleton<EngineSystem>
 {
 
@@ -8,7 +9,6 @@ private:
 	void CreateRenderSystem();
 public:
 	void Update();
-	void Present();
 	RenderSystem* GetRenderSystem();
 public:
 	EngineSystem();

@@ -1,5 +1,6 @@
 #include "RenderSystem.h"
 #include "WindowSystem.h"
+#include "ImguiSystem.h"
 
 bool RenderSystem::CompileShader(const wchar_t* szFilePath, const char* entryPointName, const char* shaderVersion, void** shaderCode, size_t* shaderSize)
 {
@@ -99,14 +100,18 @@ ID3D11DeviceContext* RenderSystem::GetDeviceContext()
 
 void RenderSystem::Update()
 {
-	
+	_ImguiSystem.Update();
 
 }
 
 void RenderSystem::PreRender()
 {
 	// ClearRenderTarget
-	m_pCDevice->ClearRenderTargetColor(0, 0.3f, 0.4f, 1);	//렌터타겟을 지정한 컬러로 초기화
+	m_pCDevice->ClearRenderTargetColor(
+		_ImguiSystem.m_clear_color.x * _ImguiSystem.m_clear_color.w, 
+		_ImguiSystem.m_clear_color.y * _ImguiSystem.m_clear_color.w, 
+		_ImguiSystem.m_clear_color.z * _ImguiSystem.m_clear_color.w, 
+		_ImguiSystem.m_clear_color.w);	//렌터타겟을 지정한 컬러로 초기화
 
 	// Set viewport of rendertarget in which we have draw
 	RECT rt = g_pWindow->GetClientWindowRect();
@@ -115,8 +120,11 @@ void RenderSystem::PreRender()
 
 void RenderSystem::Render()
 {
-	
+	PreRender();
+	/*Rendering Block*/
+	_ImguiSystem.Render();
 
+	PostRender();
 }
 
 void RenderSystem::PostRender()
@@ -131,6 +139,8 @@ RenderSystem::RenderSystem()
 	CreateSwapChain();
 	RECT rt = g_pWindow->GetClientWindowRect();
 	ReloadBuffer(rt.right - rt.left, rt.bottom - rt.top);
+	_ImguiSystem;
+	_ImguiSystem.Initialize(m_pCDevice->m_pDevice, m_pCDevice->m_pImmediateContext);
 }
 
 RenderSystem::~RenderSystem()

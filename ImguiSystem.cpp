@@ -69,6 +69,11 @@ void ImguiSystem::Update()
         ImGui::End();
     }
 
+}
+
+void ImguiSystem::Render()
+{
+   
     // Rendering
     ImGui::Render();
     ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());

@@ -1,5 +1,6 @@
 #include "EngineSystem.h"
 
+
 void EngineSystem::CreateRenderSystem()
 {
 	m_pRenderSystem = new RenderSystem();
@@ -7,14 +8,8 @@ void EngineSystem::CreateRenderSystem()
 
 void EngineSystem::Update()
 {
-	m_pRenderSystem->PreRender();
 	m_pRenderSystem->Update();
 	m_pRenderSystem->Render();
-}
-
-void EngineSystem::Present()
-{
-	m_pRenderSystem->PostRender();
 }
 
 RenderSystem* EngineSystem::GetRenderSystem()

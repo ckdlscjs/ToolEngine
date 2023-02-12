@@ -6,6 +6,7 @@
 #include "imgui_impl_win32.h"
 #include "imgui_impl_dx11.h"
 
+class RenderSystem;
 class ImguiSystem : public Singleton<ImguiSystem>
 {
 public:
@@ -13,6 +14,8 @@ public:
 	//void SetImguiAttributes(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext, IDXGISwapChain* pSwapChain, ID3D11RenderTargetView* pRederTargetView);
 	void Initialize(ID3D11Device* pDevice, ID3D11DeviceContext* pDeviceContext);
 	void Update();
+	void Render();
+
 public:
 	ImguiSystem();
 	~ImguiSystem();
@@ -21,6 +24,7 @@ public:
 	bool m_show_demo_window = true;
 	bool m_show_another_window = false;
 	ImVec4 m_clear_color;
+	friend class RenderSystem;
 };
 
 #define _ImguiSystem Singleton<ImguiSystem>::GetInstance()
