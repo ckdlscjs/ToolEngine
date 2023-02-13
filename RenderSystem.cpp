@@ -2,22 +2,21 @@
 #include "WindowSystem.h"
 #include "ImguiSystem.h"
 
-bool RenderSystem::CompileShader(const wchar_t* szFilePath, const char* entryPointName, const char* shaderVersion, void** shaderCode, size_t* shaderSize)
+void RenderSystem::CompileShader(const wchar_t* szFilePath, const char* entryPointName, const char* shaderVersion, void** shaderCode, size_t* shaderSize)
 {
     ID3DBlob* codeBlob = nullptr;
     ID3DBlob* errBlob = nullptr;
-    if (FAILED(D3DCompileFromFile(szFilePath, nullptr, nullptr, entryPointName, entryPointName, NULL, NULL, &codeBlob, &errBlob)))
+    if (FAILED(D3DCompileFromFile(szFilePath, nullptr, nullptr, entryPointName, shaderVersion, NULL, NULL, &codeBlob, &errBlob)))
     {
         OutputDebugStringA((char*)errBlob->GetBufferPointer());
         if (errBlob) errBlob->Release();
         if (codeBlob) codeBlob->Release();
-        return false;
+		throw std::exception("Shader not create successfully");
     }
     *shaderCode = codeBlob->GetBufferPointer();
     *shaderSize = codeBlob->GetBufferSize();
-    errBlob->Release();
-    codeBlob->Release();
-    return true;
+    if (errBlob) errBlob->Release();
+	if (codeBlob) codeBlob->Release();
 }
 
 void RenderSystem::SetFullScreen(bool bFullscreen, unsigned int iWidth, unsigned int iHeight)
@@ -104,6 +103,31 @@ void RenderSystem::CreateDevice()
 void RenderSystem::CreateSwapChain()
 {
     m_pCSwapChain = new SwapChain(m_pCDevice->m_pDevice);
+}
+
+VertexBuffer* RenderSystem::CreateVertexBuffer(void* pVertices, UINT iSizeVertex, UINT iSizeList, void* pCodeShader, UINT iSizeShader)
+{
+	return new VertexBuffer(m_pCDevice->m_pDevice, pVertices, iSizeVertex, iSizeList, pCodeShader, iSizeShader);
+}
+
+IndexBuffer* RenderSystem::CreateIndexBuffer(void* pIndices, UINT iSizeList)
+{
+	return new IndexBuffer(m_pCDevice->m_pDevice, pIndices, iSizeList);
+}
+
+ConstantBuffer* RenderSystem::CreateConstantBuffer(void* pBuffer, UINT iSizeBuffer)
+{
+	return new ConstantBuffer(m_pCDevice->m_pDevice, pBuffer, iSizeBuffer);
+}
+
+VertexShader* RenderSystem::CreateVertexShader(const void* pCodeShader, size_t iSizeShader)
+{
+	return new VertexShader(m_pCDevice->m_pDevice, pCodeShader, iSizeShader);
+}
+
+PixelShader* RenderSystem::CreatePixelShader(const void* pCodeShader, size_t iSizeShader)
+{
+	return new PixelShader(m_pCDevice->m_pDevice, pCodeShader, iSizeShader);
 }
 
 void RenderSystem::Update()

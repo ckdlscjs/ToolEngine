@@ -2,6 +2,7 @@
 #include "stdafx.h"
 class VertexBuffer
 {
+public:
 	VertexBuffer(ID3D11Device* pDevice, void* pVertices, UINT iSizeVertex, UINT iSizeList, void* pCodeShader, UINT iSizeShader);
 	~VertexBuffer();
 private:
