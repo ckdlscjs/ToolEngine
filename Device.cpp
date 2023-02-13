@@ -45,7 +45,6 @@ void Device::setConstantBuffer(PixelShader* pPixelShader, ConstantBuffer* pConst
 void Device::setVertexShader(VertexShader* pVertexShader)
 {
     m_pImmediateContext->VSSetShader(pVertexShader->m_pVertexShader, nullptr, 0);
-
 }
 
 void Device::setPixelShader(PixelShader* pPixelShader)

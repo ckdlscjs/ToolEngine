@@ -15,8 +15,8 @@ void RenderSystem::CompileShader(const wchar_t* szFilePath, const char* entryPoi
     }
     *shaderCode = codeBlob->GetBufferPointer();
     *shaderSize = codeBlob->GetBufferSize();
-    if (errBlob) errBlob->Release();
-	if (codeBlob) codeBlob->Release();
+  /*  if (errBlob) errBlob->Release();
+	if (codeBlob) codeBlob->Release();*/
 }
 
 void RenderSystem::SetFullScreen(bool bFullscreen, unsigned int iWidth, unsigned int iHeight)
@@ -132,7 +132,7 @@ PixelShader* RenderSystem::CreatePixelShader(const void* pCodeShader, size_t iSi
 
 void RenderSystem::Update()
 {
-	_ImguiSystem.Update();
+	//_ImguiSystem.Update();
 
 	Render();
 }
@@ -145,7 +145,6 @@ void RenderSystem::PreRender()
 		_ImguiSystem.m_clear_color.y * _ImguiSystem.m_clear_color.w, 
 		_ImguiSystem.m_clear_color.z * _ImguiSystem.m_clear_color.w, 
 		_ImguiSystem.m_clear_color.w);	//렌터타겟을 지정한 컬러로 초기화
-
 	// Set viewport of rendertarget in which we have draw
 	RECT rt = g_pWindow->GetClientWindowRect();
 	m_pCDevice->SetViewport(rt.right - rt.left, rt.bottom - rt.top);
@@ -155,7 +154,7 @@ void RenderSystem::Render()
 {
 	//PreRender();
 	///*Rendering Block*/
-	_ImguiSystem.Render();
+	//_ImguiSystem.Render();
 	//
 
 	//PostRender();

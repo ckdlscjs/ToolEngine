@@ -1,5 +1,5 @@
 #include "EntrySystem.h"
-
+#include "WindowSystem.h"
 struct object
 {
     Vector3 pos;
@@ -71,13 +71,18 @@ void EntrySystem::OnCreate()
     size_t size_shader = 0;
 
     _EngineSystem.GetRenderSystem()->CompileShader(L"DefaultVertexShader.hlsl", "vsmain", "vs_5_0", &shader_byte_code, &size_shader);
-    m_pVertexBuffer = _EngineSystem.GetRenderSystem()->CreateVertexBuffer(vertex_list, sizeof(object), size_vertex_list, shader_byte_code, size_shader);
     m_pVertexShader = _EngineSystem.GetRenderSystem()->CreateVertexShader(shader_byte_code, size_shader);
-
+    m_pVertexBuffer = _EngineSystem.GetRenderSystem()->CreateVertexBuffer(vertex_list, sizeof(object), size_vertex_list, shader_byte_code, size_shader);
     m_pIndexBuffer = _EngineSystem.GetRenderSystem()->CreateIndexBuffer(index_list, size_index_list);
-    _EngineSystem.GetRenderSystem()->CompileShader(L"DefaultPixelShader.hlsl", "psmain", "ps_5_0", &shader_byte_code, &size_shader);
 
+    _EngineSystem.GetRenderSystem()->CompileShader(L"DefaultPixelShader.hlsl", "psmain", "ps_5_0", &shader_byte_code, &size_shader);
+    m_pPixelShader = _EngineSystem.GetRenderSystem()->CreatePixelShader(shader_byte_code, size_shader);
     constant cc;
+    RECT rt = g_pWindow->GetClientWindowRect();
+    cc.matWorld.Translation({ 0,0,-2 });
+    //cc.matWorld.Transpose();
+    Matrix a;
+    cc.matProj = a.CreateOrthographic((rt.right - rt.left) / 100.0f, (rt.bottom - rt.top) / 100.0f, -4.0f, 4.0f);
     m_pConstantBuffer = _EngineSystem.GetRenderSystem()->CreateConstantBuffer(&cc, sizeof(constant));
 }
 
@@ -88,6 +93,8 @@ void EntrySystem::OnUpdate()
     /*POINT pt = _InputSystem.GetPos();
    std::cout << pt.x << " | " << pt.y << std::endl;*/
     _EngineSystem.GetRenderSystem()->PreRender();
+    _EngineSystem.GetRenderSystem()->m_pCDevice->setVertexShader(m_pVertexShader);
+    _EngineSystem.GetRenderSystem()->m_pCDevice->setPixelShader(m_pPixelShader);
     _EngineSystem.GetRenderSystem()->m_pCDevice->setVertexBuffer(m_pVertexBuffer);
     _EngineSystem.GetRenderSystem()->m_pCDevice->setIndexBuffer(m_pIndexBuffer);
     _EngineSystem.GetRenderSystem()->m_pCDevice->setConstantBuffer(m_pVertexShader, m_pConstantBuffer);
