@@ -19,6 +19,40 @@ void Device::SetViewport(UINT iWidth, UINT iHeight)
     m_pImmediateContext->RSSetViewports(1, &vp);
 }
 
+void Device::setVertexBuffer(VertexBuffer* pVertexBuffer)
+{
+    UINT stride = pVertexBuffer->m_iSizeVertex; //정점의크기
+    UINT offset = 0;                            //정점의오프셋
+    m_pImmediateContext->IASetVertexBuffers(0, 1, &pVertexBuffer->m_pBuffer, &stride, &offset);	// VertexBuffer를 세팅, 1은 버퍼의갯수
+    m_pImmediateContext->IASetInputLayout(pVertexBuffer->m_pInputLayout);
+}
+
+void Device::setIndexBuffer(IndexBuffer* pIndexBuffer)
+{
+    m_pImmediateContext->IASetIndexBuffer(pIndexBuffer->m_pBuffer, DXGI_FORMAT_R32_UINT, 0);
+}
+
+void Device::setConstantBuffer(VertexShader* pVertexShader, ConstantBuffer* pConstantBuffer)
+{
+    m_pImmediateContext->VSSetConstantBuffers(0, 1, &pConstantBuffer->m_pBuffer);
+}
+
+void Device::setConstantBuffer(PixelShader* pPixelShader, ConstantBuffer* pConstantBuffer)
+{
+    m_pImmediateContext->PSSetConstantBuffers(0, 1, &pConstantBuffer->m_pBuffer);
+}
+
+void Device::setVertexShader(VertexShader* pVertexShader)
+{
+    m_pImmediateContext->VSSetShader(pVertexShader->m_pVertexShader, nullptr, 0);
+
+}
+
+void Device::setPixelShader(PixelShader* pPixelShader)
+{
+    m_pImmediateContext->PSSetShader(pPixelShader->m_pPixelShader, nullptr, 0);
+}
+
 Device::Device()
 {
     std::cout << "Initialize : Device" << std::endl;

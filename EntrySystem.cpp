@@ -5,8 +5,7 @@ void EntrySystem::OnCreate()
     std::cout << "onCreate" << std::endl;
     _InputSystem;
     _EngineSystem;
-    //_ImguiSystem;
-    //_ImguiSystem.Initialize(_EngineSystem.GetRenderSystem()->GetDevice(), _EngineSystem.GetRenderSystem()->GetDeviceContext());
+
 
 }
 
@@ -17,7 +16,6 @@ void EntrySystem::OnUpdate()
     /*POINT pt = _InputSystem.GetPos();
    std::cout << pt.x << " | " << pt.y << std::endl;*/
     _EngineSystem.Update();
-    //_ImguiSystem.Update();
     
 }
 

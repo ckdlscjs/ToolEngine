@@ -49,6 +49,21 @@
     <Filter Include="EngineSystem\RenderySystem\PixelShader">
       <UniqueIdentifier>{7784ca5a-7455-41c8-bf39-d1c9b157c3c1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="EngineSystem\ResourceSystem">
+      <UniqueIdentifier>{aeace847-671b-48cf-9d58-553c0ba7b304}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="EngineSystem\ResourceSystem\TextureSystem">
+      <UniqueIdentifier>{4c22790f-5137-41bb-bf32-33acbb1aa8d4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="EngineSystem\ResourceSystem\MaterialSystem">
+      <UniqueIdentifier>{35e4ab3a-7c1b-4b2c-b298-8fa7b3cf7e51}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="EngineSystem\ResourceSystem\MeshSystem">
+      <UniqueIdentifier>{56d08058-abd3-4b96-89cb-e4a804203f7b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="EngineSystem\ResourceSystem\ObjectSystem">
+      <UniqueIdentifier>{bcdcdcf9-1291-47bb-8128-99645106ec6f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="WindowSystem.h">
@@ -115,6 +130,18 @@
     <ClInclude Include="ConstantBuffer.h">
       <Filter>EngineSystem\RenderySystem\ConstantBuffer</Filter>
     </ClInclude>
+    <ClInclude Include="ResourceSystem.h">
+      <Filter>EngineSystem\ResourceSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>EngineSystem\ResourceSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="Texture.h">
+      <Filter>EngineSystem\ResourceSystem\TextureSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="TextureSystem.h">
+      <Filter>EngineSystem\ResourceSystem\TextureSystem</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WindowSystem.cpp">
@@ -177,6 +204,18 @@
     </ClCompile>
     <ClCompile Include="ConstantBuffer.cpp">
       <Filter>EngineSystem\RenderySystem\ConstantBuffer</Filter>
+    </ClCompile>
+    <ClCompile Include="ResourceSystem.cpp">
+      <Filter>EngineSystem\ResourceSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="Resource.cpp">
+      <Filter>EngineSystem\ResourceSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="Texture.cpp">
+      <Filter>EngineSystem\ResourceSystem\TextureSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="TextureSystem.cpp">
+      <Filter>EngineSystem\ResourceSystem\TextureSystem</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

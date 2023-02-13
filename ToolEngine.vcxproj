@@ -36,8 +36,12 @@
     <ClInclude Include="InputSystem.h" />
     <ClInclude Include="PixelShader.h" />
     <ClInclude Include="RenderSystem.h" />
+    <ClInclude Include="Resource.h" />
+    <ClInclude Include="ResourceSystem.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="SwapChain.h" />
+    <ClInclude Include="Texture.h" />
+    <ClInclude Include="TextureSystem.h" />
     <ClInclude Include="VertexBuffer.h" />
     <ClInclude Include="VertexShader.h" />
     <ClInclude Include="WindowSystem.h" />
@@ -60,7 +64,11 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="PixelShader.cpp" />
     <ClCompile Include="RenderSystem.cpp" />
+    <ClCompile Include="Resource.cpp" />
+    <ClCompile Include="ResourceSystem.cpp" />
     <ClCompile Include="SwapChain.cpp" />
+    <ClCompile Include="Texture.cpp" />
+    <ClCompile Include="TextureSystem.cpp" />
     <ClCompile Include="VertexBuffer.cpp" />
     <ClCompile Include="VertexShader.cpp" />
     <ClCompile Include="WindowSystem.cpp" />
@@ -133,7 +141,7 @@
     <LinkIncremental>true</LinkIncremental>
     <OutDir>../../Output/Debug/</OutDir>
     <IntDir>../../Output/Debug/$(ProjectName)</IntDir>
-    <IncludePath>../../Include/DXTEX;../../Include/tinyobjloader;$(IncludePath)</IncludePath>
+    <IncludePath>../../Include/DXTK;../../Include/DXTEX;../../Include/tinyobjloader;$(IncludePath)</IncludePath>
     <LibraryPath>../../Lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">

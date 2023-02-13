@@ -9,7 +9,6 @@ void EngineSystem::CreateRenderSystem()
 void EngineSystem::Update()
 {
 	m_pRenderSystem->Update();
-	m_pRenderSystem->Render();
 }
 
 RenderSystem* EngineSystem::GetRenderSystem()

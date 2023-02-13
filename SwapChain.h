@@ -1,6 +1,6 @@
 #pragma once
 #include "stdafx.h"
-class RenderSystem;
+
 class SwapChain
 {
 public:

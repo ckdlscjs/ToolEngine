@@ -7,6 +7,8 @@
 #include <exception>
 #include <codecvt>
 #include <tchar.h>
+#include <unordered_map>
+#include <string>
 
 // Windows
 #include <Windows.h>
@@ -19,6 +21,12 @@
 #pragma comment(lib, "dxgi.lib")
 #include "DXTEX\DirectXTex.h"
 #pragma comment(lib, "DirectXTex.lib")
+
+// Math
+#include "DXTK\SimpleMath.h"
+using namespace DirectX::SimpleMath;
+
+
 
 class WindowSystem;
 

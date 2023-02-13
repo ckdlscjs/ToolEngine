@@ -78,6 +78,24 @@ void RenderSystem::ReloadBuffer(unsigned int iWidth, unsigned int iHeight)
 	}
 }
 
+void RenderSystem::drawTriangleList(UINT iCountVertex, UINT iStartVertexLocation)
+{
+	m_pCDevice->m_pImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);		// TriangleList를 Vertex로 그린다
+	m_pCDevice->m_pImmediateContext->Draw(iCountVertex, iStartVertexLocation);							// 입력받은 vertex_count, 시작번호
+}
+
+void RenderSystem::drawTriangleStrip(UINT iCountVertex, UINT iStartVertexLocation)
+{
+	m_pCDevice->m_pImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);	// Vertex를 TrangleList로그린다
+	m_pCDevice->m_pImmediateContext->Draw(iCountVertex, iStartVertexLocation);
+}
+
+void RenderSystem::drawIndexedTriangleList(UINT iCountIndex, UINT iStartIndexLocation, UINT iBaseVertexLocation)
+{
+	m_pCDevice->m_pImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);		//TrangleList를 Index로그린다
+	m_pCDevice->m_pImmediateContext->DrawIndexed(iCountIndex, iStartIndexLocation, iBaseVertexLocation);
+}
+
 void RenderSystem::CreateDevice()
 {
     m_pCDevice = new Device();
@@ -92,6 +110,7 @@ void RenderSystem::Update()
 {
 	_ImguiSystem.Update();
 
+	Render();
 }
 
 void RenderSystem::PreRender()
@@ -113,6 +132,7 @@ void RenderSystem::Render()
 	PreRender();
 	/*Rendering Block*/
 	_ImguiSystem.Render();
+	
 
 	PostRender();
 }

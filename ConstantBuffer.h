@@ -11,6 +11,6 @@ private:
 	ID3D11Buffer* m_pBuffer;
 
 private:
-	friend class DeviceContext;
+	friend class Device;
 };
 
