@@ -103,6 +103,18 @@
     <ClInclude Include="VertexBuffer.h">
       <Filter>EngineSystem\RenderySystem\VertexBuffer</Filter>
     </ClInclude>
+    <ClInclude Include="VertexShader.h">
+      <Filter>EngineSystem\RenderySystem\VertexShader</Filter>
+    </ClInclude>
+    <ClInclude Include="PixelShader.h">
+      <Filter>EngineSystem\RenderySystem\PixelShader</Filter>
+    </ClInclude>
+    <ClInclude Include="IndexBuffer.h">
+      <Filter>EngineSystem\RenderySystem\IndexBuffer</Filter>
+    </ClInclude>
+    <ClInclude Include="ConstantBuffer.h">
+      <Filter>EngineSystem\RenderySystem\ConstantBuffer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WindowSystem.cpp">
@@ -153,6 +165,18 @@
     </ClCompile>
     <ClCompile Include="VertexBuffer.cpp">
       <Filter>EngineSystem\RenderySystem\VertexBuffer</Filter>
+    </ClCompile>
+    <ClCompile Include="VertexShader.cpp">
+      <Filter>EngineSystem\RenderySystem\VertexShader</Filter>
+    </ClCompile>
+    <ClCompile Include="PixelShader.cpp">
+      <Filter>EngineSystem\RenderySystem\PixelShader</Filter>
+    </ClCompile>
+    <ClCompile Include="IndexBuffer.cpp">
+      <Filter>EngineSystem\RenderySystem\IndexBuffer</Filter>
+    </ClCompile>
+    <ClCompile Include="ConstantBuffer.cpp">
+      <Filter>EngineSystem\RenderySystem\ConstantBuffer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

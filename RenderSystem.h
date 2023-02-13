@@ -10,8 +10,6 @@ private:
 	void CreateDevice();
 	void CreateSwapChain();
 public:
-	ID3D11Device* GetDevice();
-	ID3D11DeviceContext* GetDeviceContext();
 	bool CompileShader(const wchar_t* szFilePath, const char* entryPointName, const char* shaderVersion, void** shaderCode, size_t* shaderSize);
 	void SetFullScreen(bool bFullscreen, unsigned int iWidth, unsigned int iHeight);
 	void Resize(unsigned int iWidth, unsigned int iHeight);

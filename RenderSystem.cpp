@@ -88,16 +88,6 @@ void RenderSystem::CreateSwapChain()
     m_pCSwapChain = new SwapChain(m_pCDevice->m_pDevice);
 }
 
-ID3D11Device* RenderSystem::GetDevice()
-{
-	return m_pCDevice->m_pDevice;
-}
-
-ID3D11DeviceContext* RenderSystem::GetDeviceContext()
-{
-	return m_pCDevice->m_pImmediateContext;
-}
-
 void RenderSystem::Update()
 {
 	_ImguiSystem.Update();
