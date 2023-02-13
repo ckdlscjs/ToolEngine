@@ -21,6 +21,43 @@ void RenderSystem::ReleaseBlob()
 	if (m_pBlobErr) m_pBlobErr->Release();
 }
 
+VertexShader* RenderSystem::CreateVertexShader(const void* pCodeShader, size_t iSizeShader)
+{
+	return new VertexShader(m_pCDevice->m_pDevice, pCodeShader, iSizeShader);
+}
+
+PixelShader* RenderSystem::CreatePixelShader(const void* pCodeShader, size_t iSizeShader)
+{
+	return new PixelShader(m_pCDevice->m_pDevice, pCodeShader, iSizeShader);
+}
+
+void RenderSystem::CreateDevice()
+{
+    m_pCDevice = new Device();
+}
+
+void RenderSystem::CreateSwapChain()
+{
+    m_pCSwapChain = new SwapChain(m_pCDevice->m_pDevice);
+}
+
+VertexBuffer* RenderSystem::CreateVertexBuffer(void* pVertices, UINT iSizeVertex, UINT iSizeList, void* pCodeShader, UINT iSizeShader)
+{
+	return new VertexBuffer(m_pCDevice->m_pDevice, pVertices, iSizeVertex, iSizeList, pCodeShader, iSizeShader);
+}
+
+IndexBuffer* RenderSystem::CreateIndexBuffer(void* pIndices, UINT iSizeList)
+{
+	return new IndexBuffer(m_pCDevice->m_pDevice, pIndices, iSizeList);
+}
+
+ConstantBuffer* RenderSystem::CreateConstantBuffer(void* pBuffer, UINT iSizeBuffer)
+{
+	return new ConstantBuffer(m_pCDevice->m_pDevice, pBuffer, iSizeBuffer);
+}
+
+
+
 void RenderSystem::SetFullScreen(bool bFullscreen, unsigned int iWidth, unsigned int iHeight)
 {
 	Resize(iWidth, iHeight);
@@ -79,60 +116,6 @@ void RenderSystem::ReloadBuffer(unsigned int iWidth, unsigned int iHeight)
 	}
 }
 
-void RenderSystem::drawTriangleList(UINT iCountVertex, UINT iStartVertexLocation)
-{
-	m_pCDevice->m_pImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);		// TriangleList를 Vertex로 그린다
-	m_pCDevice->m_pImmediateContext->Draw(iCountVertex, iStartVertexLocation);							// 입력받은 vertex_count, 시작번호
-}
-
-void RenderSystem::drawTriangleStrip(UINT iCountVertex, UINT iStartVertexLocation)
-{
-	m_pCDevice->m_pImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);	// Vertex를 TrangleList로그린다
-	m_pCDevice->m_pImmediateContext->Draw(iCountVertex, iStartVertexLocation);
-}
-
-void RenderSystem::drawIndexedTriangleList(UINT iCountIndex, UINT iStartIndexLocation, UINT iBaseVertexLocation)
-{
-	m_pCDevice->m_pImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);		//TrangleList를 Index로그린다
-	m_pCDevice->m_pImmediateContext->DrawIndexed(iCountIndex, iStartIndexLocation, iBaseVertexLocation);
-}
-
-void RenderSystem::CreateDevice()
-{
-    m_pCDevice = new Device();
-}
-
-void RenderSystem::CreateSwapChain()
-{
-    m_pCSwapChain = new SwapChain(m_pCDevice->m_pDevice);
-}
-
-VertexBuffer* RenderSystem::CreateVertexBuffer(void* pVertices, UINT iSizeVertex, UINT iSizeList, void* pCodeShader, UINT iSizeShader)
-{
-	return new VertexBuffer(m_pCDevice->m_pDevice, pVertices, iSizeVertex, iSizeList, pCodeShader, iSizeShader);
-}
-
-IndexBuffer* RenderSystem::CreateIndexBuffer(void* pIndices, UINT iSizeList)
-{
-	return new IndexBuffer(m_pCDevice->m_pDevice, pIndices, iSizeList);
-}
-
-ConstantBuffer* RenderSystem::CreateConstantBuffer(void* pBuffer, UINT iSizeBuffer)
-{
-	return new ConstantBuffer(m_pCDevice->m_pDevice, pBuffer, iSizeBuffer);
-}
-
-VertexShader* RenderSystem::CreateVertexShader(const void* pCodeShader, size_t iSizeShader)
-{
-	return new VertexShader(m_pCDevice->m_pDevice, pCodeShader, iSizeShader);
-}
-
-PixelShader* RenderSystem::CreatePixelShader(const void* pCodeShader, size_t iSizeShader)
-{
-	return new PixelShader(m_pCDevice->m_pDevice, pCodeShader, iSizeShader);
-}
-
-
 void RenderSystem::ClearRenderTargetColor(float fRed, float fGreen, float fBlue, float fAlpha)
 {
 	FLOAT clear_color[] = { fRed, fGreen, fBlue, fAlpha };
@@ -185,22 +168,22 @@ void RenderSystem::SetPixelShader(PixelShader* pPixelShader)
 	m_pCDevice->m_pImmediateContext->PSSetShader(pPixelShader->m_pPixelShader, nullptr, 0);
 }
 
-void RenderSystem::Update()
+void RenderSystem::drawTriangleList(UINT iCountVertex, UINT iStartVertexLocation)
 {
-	Reset();
-
-	_ImguiSystem.Update();
-
-
+	m_pCDevice->m_pImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);		// TriangleList를 Vertex로 그린다
+	m_pCDevice->m_pImmediateContext->Draw(iCountVertex, iStartVertexLocation);							// 입력받은 vertex_count, 시작번호
 }
 
-
-void RenderSystem::Render()
+void RenderSystem::drawTriangleStrip(UINT iCountVertex, UINT iStartVertexLocation)
 {
-	_ImguiSystem.Render();
+	m_pCDevice->m_pImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);	// Vertex를 TrangleList로그린다
+	m_pCDevice->m_pImmediateContext->Draw(iCountVertex, iStartVertexLocation);
+}
 
-
-	m_pCSwapChain->Present(true);
+void RenderSystem::drawIndexedTriangleList(UINT iCountIndex, UINT iStartIndexLocation, UINT iBaseVertexLocation)
+{
+	m_pCDevice->m_pImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);		//TrangleList를 Index로그린다
+	m_pCDevice->m_pImmediateContext->DrawIndexed(iCountIndex, iStartIndexLocation, iBaseVertexLocation);
 }
 
 void RenderSystem::Reset()
@@ -215,6 +198,23 @@ void RenderSystem::Reset()
 	RECT rt = g_pWindow->GetClientWindowRect();
 	SetViewport(rt.right - rt.left, rt.bottom - rt.top);
 }
+
+void RenderSystem::Update()
+{
+	Reset();
+
+	_ImguiSystem.Update();
+}
+
+
+void RenderSystem::Render()
+{
+	_ImguiSystem.Render();
+
+
+	m_pCSwapChain->Present(true);
+}
+
 
 RenderSystem::RenderSystem()
 {

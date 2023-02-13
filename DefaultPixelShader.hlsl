@@ -15,5 +15,5 @@ cbuffer constant : register(b0)
 
 float4 psmain(PS_INPUT input) : SV_TARGET
 {
-	return float4(0.5, 0.5,0.5, 1);
+	return float4(input.color, 1);
 }

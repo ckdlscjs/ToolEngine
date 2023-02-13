@@ -1,19 +1,19 @@
 #include "EntrySystem.h"
-#include "WindowSystem.h"
+
 struct object
 {
-    Vector3 pos;
-    Vector2 tex;
-    Vector3 normal;
-    Vector3 color;
+    XMFLOAT3 pos;
+    XMFLOAT2 tex;
+    XMFLOAT3 normal;
+    XMFLOAT3 color;
 };
 
 __declspec(align(16))
 struct constant
 {
-    Matrix matWorld;
-    Matrix matView;
-    Matrix matProj;
+    XMMATRIX matWorld;
+    XMMATRIX matView;
+    XMMATRIX matProj;
 };
 
 void EntrySystem::OnCreate()
@@ -27,16 +27,16 @@ void EntrySystem::OnCreate()
     object vertex_list[] =
     {
         //FrontFace
-        {Vector3(-0.5f,-0.5f,-0.5f),	Vector2(0,0),		Vector3(1, 0, 0),		Vector3(0, 1, 0)},
-        {Vector3(-0.5f,0.5f,-0.5f), 	Vector2(0,0),		Vector3(0, 1, 0),		Vector3(1, 1, 0)},
-        {Vector3(0.5f,0.5f,-0.5f), 		Vector2(0,0),	    Vector3(0, 0, 1),		Vector3(1, 0, 0)},
-        {Vector3(0.5f,-0.5f,-0.5f),		Vector2(0,0),		Vector3(1, 1, 0),		Vector3(0, 0, 1)},
+        {XMFLOAT3(-0.5f,-0.5f,-0.5f),	XMFLOAT2(0,0),		XMFLOAT3(1, 0, 0),		XMFLOAT3(0, 1, 0)},
+        {XMFLOAT3(-0.5f,0.5f,-0.5f), 	XMFLOAT2(0,0),		XMFLOAT3(0, 1, 0),		XMFLOAT3(1, 1, 0)},
+        {XMFLOAT3(0.5f,0.5f,-0.5f), 	XMFLOAT2(0,0),	    XMFLOAT3(0, 0, 1),		XMFLOAT3(1, 0, 0)},
+        {XMFLOAT3(0.5f,-0.5f,-0.5f),	XMFLOAT2(0,0),		XMFLOAT3(1, 1, 0),		XMFLOAT3(0, 0, 1)},
 
         //BackFace
-        {Vector3(0.5f,-0.5f,0.5f),		Vector2(0,0),	    Vector3(1, 0, 0),		Vector3(0, 1, 0)},
-        {Vector3(0.5f,0.5f,0.5f),		Vector2(0,0),	    Vector3(0, 1, 0),		Vector3(1, 1, 0)},
-        {Vector3(-0.5f,0.5f,0.5f), 	    Vector2(0,0),	    Vector3(0, 0, 1),		Vector3(1, 0, 0)},
-        {Vector3(-0.5f,-0.5f,0.5f),	    Vector2(0,0),		Vector3(1, 1, 0),		Vector3(0, 0, 1)},
+        {XMFLOAT3(0.5f,-0.5f,0.5f),		XMFLOAT2(0,0),	    XMFLOAT3(1, 0, 0),		XMFLOAT3(0, 1, 0)},
+        {XMFLOAT3(0.5f,0.5f,0.5f),		XMFLOAT2(0,0),	    XMFLOAT3(0, 1, 0),		XMFLOAT3(1, 1, 0)},
+        {XMFLOAT3(-0.5f,0.5f,0.5f), 	XMFLOAT2(0,0),	    XMFLOAT3(0, 0, 1),		XMFLOAT3(1, 0, 0)},
+        {XMFLOAT3(-0.5f,-0.5f,0.5f),	XMFLOAT2(0,0),		XMFLOAT3(1, 1, 0),		XMFLOAT3(0, 0, 1)},
     };
     UINT size_vertex_list = ARRAYSIZE(vertex_list);
 
@@ -75,15 +75,24 @@ void EntrySystem::OnCreate()
     m_pVertexShader = _EngineSystem.GetRenderSystem()->CreateVertexShader(shader_byte_code, size_shader);
     m_pVertexBuffer = _EngineSystem.GetRenderSystem()->CreateVertexBuffer(vertex_list, sizeof(object), size_vertex_list, shader_byte_code, size_shader);
     m_pIndexBuffer = _EngineSystem.GetRenderSystem()->CreateIndexBuffer(index_list, size_index_list);
+    _EngineSystem.GetRenderSystem()->ReleaseBlob();
 
     _EngineSystem.GetRenderSystem()->CompileShader(L"DefaultPixelShader.hlsl", "psmain", "ps_5_0", &shader_byte_code, &size_shader);
     m_pPixelShader = _EngineSystem.GetRenderSystem()->CreatePixelShader(shader_byte_code, size_shader);
+    _EngineSystem.GetRenderSystem()->ReleaseBlob();
+
     constant cc;
+    cc.matWorld = XMMatrixIdentity();
+    cc.matView = XMMatrixIdentity();
+    cc.matProj = XMMatrixIdentity();
     RECT rt = g_pWindow->GetClientWindowRect();
-    cc.matWorld.Translation({ 0,0,-2 });
-    //cc.matWorld.Transpose();
-    Matrix a;
-    cc.matProj = a.CreateOrthographic((rt.right - rt.left) / 100.0f, (rt.bottom - rt.top) / 100.0f, -4.0f, 4.0f);
+    cc.matWorld *= XMMatrixTranslation(0, 0, -2);
+    //cc.matWorld = XMMatrixTranspose(cc.matWorld);
+    cc.matView = XMMatrixLookToLH({ 2, 1, -5 }, { 0, 0, 1 }, { 0, 1, 0 });
+    //cc.matView = XMMatrixTranspose(cc.matView);
+    cc.matProj = XMMatrixPerspectiveFovLH(1.57f, ((float)(rt.right - rt.left) / (float)(rt.bottom - rt.top)), 0.1f, 1001.0f);
+    //cc.matProj = XMMatrixTranspose(cc.matProj);
+
     m_pConstantBuffer = _EngineSystem.GetRenderSystem()->CreateConstantBuffer(&cc, sizeof(constant));
 }
 

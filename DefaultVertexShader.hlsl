@@ -14,6 +14,7 @@ struct VS_OUTPUT
 	float3 color : COLOR0;
 };
 
+//if using row_major, not transpose in cpp
 cbuffer constant : register(b0)
 {
 	row_major float4x4 matWorld;

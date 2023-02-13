@@ -23,8 +23,8 @@
 #pragma comment(lib, "DirectXTex.lib")
 
 // Math
-#include "DXTK\SimpleMath.h"
-using namespace DirectX::SimpleMath;
+//#include "DXTK\SimpleMath.h"
+using namespace DirectX;
 
 
 

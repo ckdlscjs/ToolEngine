@@ -30,15 +30,15 @@ public:
 	/*Set Block*/
 	void ClearRenderTargetColor(float red, float green, float blue, float alpha);
 	void SetViewport(UINT iWidth, UINT iHeight);
+	void SetFullScreen(bool bFullscreen, unsigned int iWidth, unsigned int iHeight);
+	void Resize(unsigned int iWidth, unsigned int iHeight);
+	void ReloadBuffer(unsigned int iWidth, unsigned int iHeight);
 	void SetVertexBuffer(VertexBuffer* pVertexBuffer);
 	void SetIndexBuffer(IndexBuffer* pIndexBuffer);
 	void SetConstantBuffer(VertexShader* pVertexShader, ConstantBuffer* pConstantBuffer);
 	void SetConstantBuffer(PixelShader* pPixelShader, ConstantBuffer* pConstantBuffer);
 	void SetVertexShader(VertexShader* pVertexShader);
 	void SetPixelShader(PixelShader* pPixelShader);
-	void SetFullScreen(bool bFullscreen, unsigned int iWidth, unsigned int iHeight);
-	void Resize(unsigned int iWidth, unsigned int iHeight);
-	void ReloadBuffer(unsigned int iWidth, unsigned int iHeight);
 
 	/*Draw Block*/
 	void drawTriangleList(UINT iCountVertex, UINT iStartVertexLocation);
@@ -46,10 +46,9 @@ public:
 	void drawIndexedTriangleList(UINT iCountIndex, UINT iStartIndexLocation, UINT iBaseVertexLocation);
 
 public:
+	void Reset();
 	void Update();
 	void Render();
-public:
-	void Reset();
 public:
 	RenderSystem();
 	~RenderSystem();
