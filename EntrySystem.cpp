@@ -168,5 +168,9 @@ EntrySystem::EntrySystem()
 
 EntrySystem::~EntrySystem()
 {
- 
+    if (m_pVertexBuffer) delete m_pVertexBuffer;
+    if (m_pIndexBuffer) delete m_pIndexBuffer;
+    if (m_pConstantBuffer) delete m_pConstantBuffer;
+    if (m_pVertexShader) delete m_pVertexShader;
+    if (m_pPixelShader) delete m_pPixelShader;
 }
