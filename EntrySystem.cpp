@@ -87,14 +87,17 @@ void EntrySystem::OnUpdate()
     _InputSystem.Update();
     /*POINT pt = _InputSystem.GetPos();
    std::cout << pt.x << " | " << pt.y << std::endl;*/
+    _EngineSystem.GetRenderSystem()->PreRender();
     _EngineSystem.GetRenderSystem()->m_pCDevice->setVertexBuffer(m_pVertexBuffer);
     _EngineSystem.GetRenderSystem()->m_pCDevice->setIndexBuffer(m_pIndexBuffer);
     _EngineSystem.GetRenderSystem()->m_pCDevice->setConstantBuffer(m_pVertexShader, m_pConstantBuffer);
     _EngineSystem.GetRenderSystem()->m_pCDevice->setConstantBuffer(m_pPixelShader, m_pConstantBuffer);
     _EngineSystem.GetRenderSystem()->drawIndexedTriangleList(m_pIndexBuffer->getSizeIndexList(), 0, 0);
-
-
     _EngineSystem.Update();
+
+
+    _EngineSystem.GetRenderSystem()->PostRender();
+
 }
 
 

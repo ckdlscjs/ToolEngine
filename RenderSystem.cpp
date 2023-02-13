@@ -153,12 +153,12 @@ void RenderSystem::PreRender()
 
 void RenderSystem::Render()
 {
-	PreRender();
-	/*Rendering Block*/
+	//PreRender();
+	///*Rendering Block*/
 	_ImguiSystem.Render();
-	
+	//
 
-	PostRender();
+	//PostRender();
 }
 
 void RenderSystem::PostRender()

@@ -31,7 +31,7 @@ public:
 public:
 	void Update();
 	void Render();
-private:
+public:
 	void PreRender();
 	void PostRender();
 public:
