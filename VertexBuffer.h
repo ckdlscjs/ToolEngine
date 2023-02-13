@@ -12,6 +12,6 @@ private:
 	UINT m_iSizeVertex;
 	UINT m_iSizeList;
 
-	friend class Device;
+	friend class RenderSystem;
 };
 

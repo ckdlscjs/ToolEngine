@@ -4,19 +4,21 @@
 
 void RenderSystem::CompileShader(const wchar_t* szFilePath, const char* entryPointName, const char* shaderVersion, void** shaderCode, size_t* shaderSize)
 {
-    ID3DBlob* codeBlob = nullptr;
-    ID3DBlob* errBlob = nullptr;
-    if (FAILED(D3DCompileFromFile(szFilePath, nullptr, nullptr, entryPointName, shaderVersion, NULL, NULL, &codeBlob, &errBlob)))
+    if (FAILED(D3DCompileFromFile(szFilePath, nullptr, nullptr, entryPointName, shaderVersion, NULL, NULL, &m_pBlobCode, &m_pBlobErr)))
     {
-        OutputDebugStringA((char*)errBlob->GetBufferPointer());
-        if (errBlob) errBlob->Release();
-        if (codeBlob) codeBlob->Release();
+        OutputDebugStringA((char*)m_pBlobErr->GetBufferPointer());
+        if (m_pBlobErr) m_pBlobErr->Release();
+        if (m_pBlobCode) m_pBlobCode->Release();
 		throw std::exception("Shader not create successfully");
     }
-    *shaderCode = codeBlob->GetBufferPointer();
-    *shaderSize = codeBlob->GetBufferSize();
-  /*  if (errBlob) errBlob->Release();
-	if (codeBlob) codeBlob->Release();*/
+    *shaderCode = m_pBlobCode->GetBufferPointer();
+    *shaderSize = m_pBlobCode->GetBufferSize();
+}
+
+void RenderSystem::ReleaseBlob()
+{
+	if (m_pBlobCode) m_pBlobCode->Release();
+	if (m_pBlobErr) m_pBlobErr->Release();
 }
 
 void RenderSystem::SetFullScreen(bool bFullscreen, unsigned int iWidth, unsigned int iHeight)
@@ -130,39 +132,88 @@ PixelShader* RenderSystem::CreatePixelShader(const void* pCodeShader, size_t iSi
 	return new PixelShader(m_pCDevice->m_pDevice, pCodeShader, iSizeShader);
 }
 
+
+void RenderSystem::ClearRenderTargetColor(float fRed, float fGreen, float fBlue, float fAlpha)
+{
+	FLOAT clear_color[] = { fRed, fGreen, fBlue, fAlpha };
+	m_pCDevice->m_pImmediateContext->ClearRenderTargetView(m_pCDevice->m_pRenderTargetView, clear_color);
+	m_pCDevice->m_pImmediateContext->ClearDepthStencilView(m_pCDevice->m_pDetphStenilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1, 0);
+	m_pCDevice->m_pImmediateContext->OMSetRenderTargets(1, &m_pCDevice->m_pRenderTargetView, m_pCDevice->m_pDetphStenilView);
+}
+
+void RenderSystem::SetViewport(UINT iWidth, UINT iHeight)
+{
+	D3D11_VIEWPORT vp;
+	ZeroMemory(&vp, sizeof(D3D11_VIEWPORT));
+	vp.Width = (float)iWidth;
+	vp.Height = (float)iHeight;
+	vp.MinDepth = 0.0f;
+	vp.MaxDepth = 1.0f;
+	m_pCDevice->m_pImmediateContext->RSSetViewports(1, &vp);
+}
+
+void RenderSystem::SetVertexBuffer(VertexBuffer* pVertexBuffer)
+{
+	UINT stride = pVertexBuffer->m_iSizeVertex; //정점의크기
+	UINT offset = 0;                            //정점의오프셋
+	m_pCDevice->m_pImmediateContext->IASetVertexBuffers(0, 1, &pVertexBuffer->m_pBuffer, &stride, &offset);	// VertexBuffer를 세팅, 1은 버퍼의갯수
+	m_pCDevice->m_pImmediateContext->IASetInputLayout(pVertexBuffer->m_pInputLayout);
+}
+
+void RenderSystem::SetIndexBuffer(IndexBuffer* pIndexBuffer)
+{
+	m_pCDevice->m_pImmediateContext->IASetIndexBuffer(pIndexBuffer->m_pBuffer, DXGI_FORMAT_R32_UINT, 0);
+}
+
+void RenderSystem::SetConstantBuffer(VertexShader* pVertexShader, ConstantBuffer* pConstantBuffer)
+{
+	m_pCDevice->m_pImmediateContext->VSSetConstantBuffers(0, 1, &pConstantBuffer->m_pBuffer);
+}
+
+void RenderSystem::SetConstantBuffer(PixelShader* pPixelShader, ConstantBuffer* pConstantBuffer)
+{
+	m_pCDevice->m_pImmediateContext->PSSetConstantBuffers(0, 1, &pConstantBuffer->m_pBuffer);
+}
+
+void RenderSystem::SetVertexShader(VertexShader* pVertexShader)
+{
+	m_pCDevice->m_pImmediateContext->VSSetShader(pVertexShader->m_pVertexShader, nullptr, 0);
+}
+
+void RenderSystem::SetPixelShader(PixelShader* pPixelShader)
+{
+	m_pCDevice->m_pImmediateContext->PSSetShader(pPixelShader->m_pPixelShader, nullptr, 0);
+}
+
 void RenderSystem::Update()
 {
-	//_ImguiSystem.Update();
+	Reset();
 
-	Render();
+	_ImguiSystem.Update();
+
+
 }
 
-void RenderSystem::PreRender()
-{
-	// ClearRenderTarget
-	m_pCDevice->ClearRenderTargetColor(
-		_ImguiSystem.m_clear_color.x * _ImguiSystem.m_clear_color.w, 
-		_ImguiSystem.m_clear_color.y * _ImguiSystem.m_clear_color.w, 
-		_ImguiSystem.m_clear_color.z * _ImguiSystem.m_clear_color.w, 
-		_ImguiSystem.m_clear_color.w);	//렌터타겟을 지정한 컬러로 초기화
-	// Set viewport of rendertarget in which we have draw
-	RECT rt = g_pWindow->GetClientWindowRect();
-	m_pCDevice->SetViewport(rt.right - rt.left, rt.bottom - rt.top);
-}
 
 void RenderSystem::Render()
 {
-	//PreRender();
-	///*Rendering Block*/
-	//_ImguiSystem.Render();
-	//
+	_ImguiSystem.Render();
 
-	//PostRender();
+
+	m_pCSwapChain->Present(true);
 }
 
-void RenderSystem::PostRender()
+void RenderSystem::Reset()
 {
-	m_pCSwapChain->Present(true);
+	// ClearRenderTarget
+	ClearRenderTargetColor(
+		_ImguiSystem.m_clear_color.x * _ImguiSystem.m_clear_color.w,
+		_ImguiSystem.m_clear_color.y * _ImguiSystem.m_clear_color.w,
+		_ImguiSystem.m_clear_color.z * _ImguiSystem.m_clear_color.w,
+		_ImguiSystem.m_clear_color.w);	//렌터타겟을 지정한 컬러로 초기화
+	// Set viewport of rendertarget in which we have draw
+	RECT rt = g_pWindow->GetClientWindowRect();
+	SetViewport(rt.right - rt.left, rt.bottom - rt.top);
 }
 
 RenderSystem::RenderSystem()
@@ -172,8 +223,10 @@ RenderSystem::RenderSystem()
 	CreateSwapChain();
 	RECT rt = g_pWindow->GetClientWindowRect();
 	ReloadBuffer(rt.right - rt.left, rt.bottom - rt.top);
-	_ImguiSystem;
-	_ImguiSystem.Initialize(m_pCDevice->m_pDevice, m_pCDevice->m_pImmediateContext);
+
+	// Setup Platform/Renderer backends
+	ImGui_ImplWin32_Init(g_hWnd);
+	ImGui_ImplDX11_Init(m_pCDevice->m_pDevice, m_pCDevice->m_pImmediateContext);
 }
 
 RenderSystem::~RenderSystem()

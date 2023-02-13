@@ -20,9 +20,10 @@ void EntrySystem::OnCreate()
 {
     std::cout << "onCreate" << std::endl;
     _InputSystem;
+    _ImguiSystem;
     _EngineSystem;
+    _ObjectManager;
 
-    
     object vertex_list[] =
     {
         //FrontFace
@@ -89,22 +90,8 @@ void EntrySystem::OnCreate()
 void EntrySystem::OnUpdate()
 {
     std::cout << "onUpdate" << std::endl;
-    _InputSystem.Update();
-    /*POINT pt = _InputSystem.GetPos();
-   std::cout << pt.x << " | " << pt.y << std::endl;*/
-    _EngineSystem.GetRenderSystem()->PreRender();
-    _EngineSystem.GetRenderSystem()->m_pCDevice->setVertexShader(m_pVertexShader);
-    _EngineSystem.GetRenderSystem()->m_pCDevice->setPixelShader(m_pPixelShader);
-    _EngineSystem.GetRenderSystem()->m_pCDevice->setVertexBuffer(m_pVertexBuffer);
-    _EngineSystem.GetRenderSystem()->m_pCDevice->setIndexBuffer(m_pIndexBuffer);
-    _EngineSystem.GetRenderSystem()->m_pCDevice->setConstantBuffer(m_pVertexShader, m_pConstantBuffer);
-    _EngineSystem.GetRenderSystem()->m_pCDevice->setConstantBuffer(m_pPixelShader, m_pConstantBuffer);
-    _EngineSystem.GetRenderSystem()->drawIndexedTriangleList(m_pIndexBuffer->getSizeIndexList(), 0, 0);
-    _EngineSystem.Update();
-
-
-    _EngineSystem.GetRenderSystem()->PostRender();
-
+    Update();
+    Render();
 }
 
 
@@ -143,6 +130,27 @@ LRESULT EntrySystem::MessageHandler(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM l
         return true;
     else
         return ::DefWindowProc(hWnd, Msg, wParam, lParam);
+}
+
+void EntrySystem::Update()
+{
+    _InputSystem.Update();
+    /*POINT pt = _InputSystem.GetPos();
+   std::cout << pt.x << " | " << pt.y << std::endl;*/
+    _EngineSystem.Update();
+    _EngineSystem.GetRenderSystem()->SetVertexShader(m_pVertexShader);
+    _EngineSystem.GetRenderSystem()->SetPixelShader(m_pPixelShader);
+    _EngineSystem.GetRenderSystem()->SetVertexBuffer(m_pVertexBuffer);
+    _EngineSystem.GetRenderSystem()->SetIndexBuffer(m_pIndexBuffer);
+    _EngineSystem.GetRenderSystem()->SetConstantBuffer(m_pVertexShader, m_pConstantBuffer);
+    _EngineSystem.GetRenderSystem()->SetConstantBuffer(m_pPixelShader, m_pConstantBuffer);
+    _EngineSystem.GetRenderSystem()->drawIndexedTriangleList(m_pIndexBuffer->getSizeIndexList(), 0, 0);
+}
+
+void EntrySystem::Render()
+{
+    
+    _EngineSystem.Render();
 }
 
 EntrySystem::EntrySystem()

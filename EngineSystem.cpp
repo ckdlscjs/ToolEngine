@@ -9,7 +9,14 @@ void EngineSystem::CreateRenderSystem()
 void EngineSystem::Update()
 {
 	m_pRenderSystem->Update();
+
 }
+
+void EngineSystem::Render()
+{
+	m_pRenderSystem->Render();
+}
+
 
 RenderSystem* EngineSystem::GetRenderSystem()
 {

@@ -9,6 +9,7 @@ private:
 	void CreateRenderSystem();
 public:
 	void Update();
+	void Render();
 	RenderSystem* GetRenderSystem();
 public:
 	EngineSystem();

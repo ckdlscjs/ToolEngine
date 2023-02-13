@@ -4,7 +4,7 @@
 #include "EngineSystem.h"
 #include "InputSystem.h"
 #include "ImguiSystem.h"
-
+#include "ObjectManager.h"
 
 class EntrySystem : public WindowSystem
 {
@@ -18,6 +18,8 @@ public:
 	virtual void OnSize() override;
 	virtual void OnDestroy() override;
 	virtual LRESULT MessageHandler(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam) override;
+	void Update();
+	void Render();
 
 	/*Constructor Block*/
 public:

@@ -10,6 +10,6 @@ private:
 	UINT m_iSizeList;
 private:
 	ID3D11Buffer* m_pBuffer;
-	friend class Device;
+	friend class RenderSystem;
 };
 

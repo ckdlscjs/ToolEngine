@@ -9,6 +9,6 @@ public:
 
 private:
 	ID3D11PixelShader* m_pPixelShader;
-	friend class Device;
+	friend class RenderSystem;
 };
 

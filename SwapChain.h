@@ -12,5 +12,6 @@ public:
 private:
 	IDXGISwapChain* m_pSwapChain;
 	friend class RenderSystem;
+	friend class ImguiSystem;
 };
 

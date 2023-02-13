@@ -9,6 +9,6 @@ public:
 
 private:
 	ID3D11VertexShader* m_pVertexShader;
-	friend class Device;
+	friend class RenderSystem;
 };
 

@@ -49,20 +49,20 @@
     <Filter Include="EngineSystem\RenderySystem\PixelShader">
       <UniqueIdentifier>{7784ca5a-7455-41c8-bf39-d1c9b157c3c1}</UniqueIdentifier>
     </Filter>
-    <Filter Include="EngineSystem\ResourceSystem">
+    <Filter Include="EngineSystem\ObjectManager">
       <UniqueIdentifier>{aeace847-671b-48cf-9d58-553c0ba7b304}</UniqueIdentifier>
     </Filter>
-    <Filter Include="EngineSystem\ResourceSystem\TextureSystem">
+    <Filter Include="EngineSystem\ObjectManager\TextureSystem">
       <UniqueIdentifier>{4c22790f-5137-41bb-bf32-33acbb1aa8d4}</UniqueIdentifier>
     </Filter>
-    <Filter Include="EngineSystem\ResourceSystem\MaterialSystem">
+    <Filter Include="EngineSystem\ObjectManager\MaterialSystem">
       <UniqueIdentifier>{35e4ab3a-7c1b-4b2c-b298-8fa7b3cf7e51}</UniqueIdentifier>
     </Filter>
-    <Filter Include="EngineSystem\ResourceSystem\MeshSystem">
+    <Filter Include="EngineSystem\ObjectManager\MeshSystem">
       <UniqueIdentifier>{56d08058-abd3-4b96-89cb-e4a804203f7b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="EngineSystem\ResourceSystem\ObjectSystem">
-      <UniqueIdentifier>{bcdcdcf9-1291-47bb-8128-99645106ec6f}</UniqueIdentifier>
+    <Filter Include="EngineSystem\ObjectManager\ResourceSystem">
+      <UniqueIdentifier>{960b28d9-d01f-42eb-92e6-5961374e11fc}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -130,17 +130,23 @@
     <ClInclude Include="ConstantBuffer.h">
       <Filter>EngineSystem\RenderySystem\ConstantBuffer</Filter>
     </ClInclude>
-    <ClInclude Include="ResourceSystem.h">
-      <Filter>EngineSystem\ResourceSystem</Filter>
-    </ClInclude>
-    <ClInclude Include="Resource.h">
-      <Filter>EngineSystem\ResourceSystem</Filter>
-    </ClInclude>
     <ClInclude Include="Texture.h">
-      <Filter>EngineSystem\ResourceSystem\TextureSystem</Filter>
+      <Filter>EngineSystem\ObjectManager\TextureSystem</Filter>
     </ClInclude>
     <ClInclude Include="TextureSystem.h">
-      <Filter>EngineSystem\ResourceSystem\TextureSystem</Filter>
+      <Filter>EngineSystem\ObjectManager\TextureSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="ObjectManager.h">
+      <Filter>EngineSystem\ObjectManager</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>EngineSystem\ObjectManager\ResourceSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="ResourceSystem.h">
+      <Filter>EngineSystem\ObjectManager\ResourceSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="Object.h">
+      <Filter>EngineSystem\ObjectManager</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -205,17 +211,23 @@
     <ClCompile Include="ConstantBuffer.cpp">
       <Filter>EngineSystem\RenderySystem\ConstantBuffer</Filter>
     </ClCompile>
-    <ClCompile Include="ResourceSystem.cpp">
-      <Filter>EngineSystem\ResourceSystem</Filter>
-    </ClCompile>
-    <ClCompile Include="Resource.cpp">
-      <Filter>EngineSystem\ResourceSystem</Filter>
-    </ClCompile>
     <ClCompile Include="Texture.cpp">
-      <Filter>EngineSystem\ResourceSystem\TextureSystem</Filter>
+      <Filter>EngineSystem\ObjectManager\TextureSystem</Filter>
     </ClCompile>
     <ClCompile Include="TextureSystem.cpp">
-      <Filter>EngineSystem\ResourceSystem\TextureSystem</Filter>
+      <Filter>EngineSystem\ObjectManager\TextureSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="ObjectManager.cpp">
+      <Filter>EngineSystem\ObjectManager</Filter>
+    </ClCompile>
+    <ClCompile Include="Resource.cpp">
+      <Filter>EngineSystem\ObjectManager\ResourceSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="ResourceSystem.cpp">
+      <Filter>EngineSystem\ObjectManager\ResourceSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="Object.cpp">
+      <Filter>EngineSystem\ObjectManager</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

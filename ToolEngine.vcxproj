@@ -34,9 +34,11 @@
     <ClInclude Include="imstb_truetype.h" />
     <ClInclude Include="IndexBuffer.h" />
     <ClInclude Include="InputSystem.h" />
+    <ClInclude Include="Object.h" />
     <ClInclude Include="PixelShader.h" />
     <ClInclude Include="RenderSystem.h" />
     <ClInclude Include="Resource.h" />
+    <ClInclude Include="ObjectManager.h" />
     <ClInclude Include="ResourceSystem.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="SwapChain.h" />
@@ -62,9 +64,11 @@
     <ClCompile Include="IndexBuffer.cpp" />
     <ClCompile Include="InputSystem.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Object.cpp" />
     <ClCompile Include="PixelShader.cpp" />
     <ClCompile Include="RenderSystem.cpp" />
     <ClCompile Include="Resource.cpp" />
+    <ClCompile Include="ObjectManager.cpp" />
     <ClCompile Include="ResourceSystem.cpp" />
     <ClCompile Include="SwapChain.cpp" />
     <ClCompile Include="Texture.cpp" />
