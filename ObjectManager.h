@@ -7,6 +7,9 @@ class ObjectManager : public Singleton<ObjectManager>
 public:
 	Object* CreateObject();
 public:
+	void Update();
+	void Render();
+public:
 	ObjectManager();
 	~ObjectManager();
 private:

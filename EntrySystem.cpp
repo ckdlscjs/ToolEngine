@@ -154,14 +154,15 @@ LRESULT EntrySystem::MessageHandler(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM l
 void EntrySystem::Update()
 {
     _InputSystem.Update();
+    _EngineSystem.Update();
     /*POINT pt = _InputSystem.GetPos();
    std::cout << pt.x << " | " << pt.y << std::endl;*/
     m_pCamera->m_vCameraPos.x -= 0.01f;
     _CameraSystem.Update();
     cc.matView = m_pCamera->m_matCamera;
     cc.matProj = m_pCamera->m_matProj;
-    m_pConstantBuffer->UpdateBuffer(g_pDeviceContext, &cc);
-    _EngineSystem.Update();
+
+    _EngineSystem.GetRenderSystem()->UpdateConstantBuffer(m_pConstantBuffer, &cc);
     _EngineSystem.GetRenderSystem()->SetVertexShader(m_pVertexShader);
     _EngineSystem.GetRenderSystem()->SetPixelShader(m_pPixelShader);
     _EngineSystem.GetRenderSystem()->SetVertexBuffer(m_pVertexBuffer);
@@ -169,10 +170,13 @@ void EntrySystem::Update()
     _EngineSystem.GetRenderSystem()->SetConstantBuffer(m_pVertexShader, m_pConstantBuffer);
     _EngineSystem.GetRenderSystem()->SetConstantBuffer(m_pPixelShader, m_pConstantBuffer);
     _EngineSystem.GetRenderSystem()->drawIndexedTriangleList(m_pIndexBuffer->getSizeIndexList(), 0, 0);
+
+    _ImguiSystem.Update();
 }
 
 void EntrySystem::Render()
 {
+    _ImguiSystem.Render();
     _EngineSystem.Render();
 }
 

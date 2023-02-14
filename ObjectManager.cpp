@@ -7,6 +7,15 @@ Object* ObjectManager::CreateObject()
 	return pObject;
 }
 
+void ObjectManager::Update()
+{
+}
+
+void ObjectManager::Render()
+{
+
+	
+}
 ObjectManager::ObjectManager()
 {
 
