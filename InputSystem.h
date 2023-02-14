@@ -22,8 +22,5 @@ public:
 public:
 	InputSystem();
 	~InputSystem();
-
-	
 };
-
 #define _InputSystem Singleton<InputSystem>::GetInstance()

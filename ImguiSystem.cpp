@@ -79,7 +79,7 @@ ImguiSystem::ImguiSystem()
     ImGui::StyleColorsDark();
     //ImGui::StyleColorsLight();
 
-   
+
 }
 
 ImguiSystem::~ImguiSystem()

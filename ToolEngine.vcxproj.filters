@@ -64,6 +64,9 @@
     <Filter Include="PhysicsSystem">
       <UniqueIdentifier>{f7efe1f4-6912-4152-abc8-9479a593c9a4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="CameraSystem">
+      <UniqueIdentifier>{0ee06906-4478-4336-860b-189e537498f3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="WindowSystem.h">
@@ -148,6 +151,12 @@
     <ClInclude Include="Object.h">
       <Filter>EngineSystem\ObjectManager</Filter>
     </ClInclude>
+    <ClInclude Include="CameraSystem.h">
+      <Filter>CameraSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera.h">
+      <Filter>CameraSystem</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WindowSystem.cpp">
@@ -228,6 +237,12 @@
     </ClCompile>
     <ClCompile Include="Object.cpp">
       <Filter>EngineSystem\ObjectManager</Filter>
+    </ClCompile>
+    <ClCompile Include="CameraSystem.cpp">
+      <Filter>CameraSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="Camera.cpp">
+      <Filter>CameraSystem</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

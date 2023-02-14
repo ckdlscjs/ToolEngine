@@ -15,14 +15,15 @@ struct constant
     XMMATRIX matView;
     XMMATRIX matProj;
 };
-
+constant cc;
 void EntrySystem::OnCreate()
 {
     std::cout << "onCreate" << std::endl;
     _InputSystem;
-    _ImguiSystem;
     _EngineSystem;
+    _ImguiSystem;
     _ObjectManager;
+    _CameraSystem;
 
     object vertex_list[] =
     {
@@ -81,16 +82,19 @@ void EntrySystem::OnCreate()
     m_pPixelShader = _EngineSystem.GetRenderSystem()->CreatePixelShader(shader_byte_code, size_shader);
     _EngineSystem.GetRenderSystem()->ReleaseBlob();
 
-    constant cc;
+    
     cc.matWorld = XMMatrixIdentity();
     cc.matView = XMMatrixIdentity();
     cc.matProj = XMMatrixIdentity();
     RECT rt = g_pWindow->GetClientWindowRect();
-    cc.matWorld *= XMMatrixTranslation(0, 0, -2);
+
+    m_pCamera = new Camera(L"MainCamera", MAT_PROJ::PERSPECTIVE, { 2, 1, -3 }, {0, 0, 1}, {0, 1, 0});
+    _CameraSystem.AddCamera(m_pCamera);
+    /*cc.matWorld *= XMMatrixTranslation(0, 0, -2);*/
     //cc.matWorld = XMMatrixTranspose(cc.matWorld);
-    cc.matView = XMMatrixLookToLH({ 2, 1, -5 }, { 0, 0, 1 }, { 0, 1, 0 });
+    cc.matView = m_pCamera->m_matCamera;
     //cc.matView = XMMatrixTranspose(cc.matView);
-    cc.matProj = XMMatrixPerspectiveFovLH(1.57f, ((float)(rt.right - rt.left) / (float)(rt.bottom - rt.top)), 0.1f, 1001.0f);
+    cc.matProj = m_pCamera->m_matProj;
     //cc.matProj = XMMatrixTranspose(cc.matProj);
 
     m_pConstantBuffer = _EngineSystem.GetRenderSystem()->CreateConstantBuffer(&cc, sizeof(constant));
@@ -152,6 +156,11 @@ void EntrySystem::Update()
     _InputSystem.Update();
     /*POINT pt = _InputSystem.GetPos();
    std::cout << pt.x << " | " << pt.y << std::endl;*/
+    m_pCamera->m_vCameraPos.x -= 0.01f;
+    _CameraSystem.Update();
+    cc.matView = m_pCamera->m_matCamera;
+    cc.matProj = m_pCamera->m_matProj;
+    m_pConstantBuffer->UpdateBuffer(g_pDeviceContext, &cc);
     _EngineSystem.Update();
     _EngineSystem.GetRenderSystem()->SetVertexShader(m_pVertexShader);
     _EngineSystem.GetRenderSystem()->SetPixelShader(m_pPixelShader);

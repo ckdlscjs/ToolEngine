@@ -5,6 +5,7 @@
 #include "InputSystem.h"
 #include "ImguiSystem.h"
 #include "ObjectManager.h"
+#include "CameraSystem.h"
 
 class EntrySystem : public WindowSystem
 {
@@ -34,5 +35,7 @@ public:
 	PixelShader* m_pPixelShader;
 	
 	Texture* m_pTexture;
+	Camera* m_pCamera;
+	
 };
 

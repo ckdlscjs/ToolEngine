@@ -30,19 +30,20 @@ Texture::Texture(const wchar_t* szFullPath) : Resource(szFullPath)
 	sampler_desc.MinLOD = 0;
 	sampler_desc.MaxLOD = (UINT)image_data.GetMetadata().mipLevels;
 
-	// 샘플러스테이트 생성
-	result = g_pDevice->CreateSamplerState(&sampler_desc, &m_pSamplerState);
-	if (FAILED(result))
-		throw std::exception("SamplerState not create successfully");
 	// 자원뷰 생성
 	result = g_pDevice->CreateShaderResourceView(m_pTexture, &desc, &m_pShaderResourceView);
 	if (FAILED(result))
 		throw std::exception("ShaderResourceView not create successfully");
+
+	// 샘플러스테이트 생성
+	result = g_pDevice->CreateSamplerState(&sampler_desc, &m_pSamplerState);
+	if (FAILED(result))
+		throw std::exception("SamplerState not create successfully");
 }
 
 Texture::~Texture()
 {
 	if (m_pTexture) m_pTexture->Release();
-	if(m_pShaderResourceView) m_pShaderResourceView->Release();
-	if(m_pSamplerState) m_pSamplerState->Release();
+	if (m_pShaderResourceView) m_pShaderResourceView->Release();
+	if (m_pSamplerState) m_pSamplerState->Release();
 }
