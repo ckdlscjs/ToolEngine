@@ -15,6 +15,13 @@ void EngineSystem::CreateTextureSystem()
 		throw std::exception("TextureSystem not create successfully");
 }
 
+void EngineSystem::CreateMeshSystem()
+{
+	m_pMeshSystem = new MeshSystem();
+	if (m_pMeshSystem == nullptr)
+		throw std::exception("MeshSystem not create successfully");
+}
+
 void EngineSystem::Update()
 {
 	m_pRenderSystem->Update();
@@ -41,11 +48,12 @@ EngineSystem::EngineSystem()
 {
 	CreateRenderSystem();
 	CreateTextureSystem();
+	CreateMeshSystem();
 }
 
 EngineSystem::~EngineSystem()
 {
-	
 	if (m_pRenderSystem != nullptr) delete m_pRenderSystem;
 	if (m_pTextureSystem != nullptr) delete m_pTextureSystem;
+	if (m_pMeshSystem != nullptr) delete m_pMeshSystem;
 }

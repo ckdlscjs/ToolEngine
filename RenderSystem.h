@@ -38,6 +38,7 @@ public:
 	void SetIndexBuffer(IndexBuffer* pIndexBuffer);
 	void SetConstantBuffer(VertexShader* pVertexShader, ConstantBuffer* pConstantBuffer);
 	void SetConstantBuffer(PixelShader* pPixelShader, ConstantBuffer* pConstantBuffer);
+	void UpdateConstantBuffer(ConstantBuffer* pConstantBuffer, void* pBuffer);
 	void SetVertexShader(VertexShader* pVertexShader);
 	void SetPixelShader(PixelShader* pPixelShader);
 	void setTexture(const VertexShader* pVertexShader, Texture* const* ppListTex, unsigned int iNumTextures);

@@ -56,8 +56,6 @@ ConstantBuffer* RenderSystem::CreateConstantBuffer(void* pBuffer, UINT iSizeBuff
 	return new ConstantBuffer(m_pCDevice->m_pDevice, pBuffer, iSizeBuffer);
 }
 
-
-
 void RenderSystem::SetFullScreen(bool bFullscreen, unsigned int iWidth, unsigned int iHeight)
 {
 	Resize(iWidth, iHeight);
@@ -76,20 +74,36 @@ void RenderSystem::Resize(unsigned int iWidth, unsigned int iHeight)
 void RenderSystem::ReloadBuffer(unsigned int iWidth, unsigned int iHeight)
 {
 	//Get the BackBuffer and view's
-	ID3D11Texture2D* buffer;
-	HRESULT hr = m_pCSwapChain->m_pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&buffer);	//스왑체인에서 사용하는 버퍼를 받아옴
-	if (FAILED(hr))
-	{
-		throw std::exception("BackBuffer not create successfully");
-	}
+	ID3D11Texture2D* buffer = nullptr;
 
+	HRESULT hr = m_pCSwapChain->m_pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&buffer);	//스왑체인에서 사용하는 버퍼를 받아옴
 	hr = m_pCDevice->m_pDevice->CreateRenderTargetView(buffer, NULL, &m_pCDevice->m_pRenderTargetView); //해당버퍼를 이용하여 렌더타겟뷰를 생성
-	buffer->Release();											//임의의 사용한 버퍼를 제거
 	if (FAILED(hr))
 	{
 		throw std::exception("RenderTargetView not create successfully");
 	}
+	
+	//D3D11_TEXTURE2D_DESC tex_desc;
+	//ZeroMemory(&tex_desc, sizeof(D3D11_TEXTURE2D_DESC));
+	//tex_desc.Width = iWidth;
+	//tex_desc.Height = iHeight;
+	//tex_desc.MipLevels = 1;
+	//tex_desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	//tex_desc.SampleDesc.Count = 1;
+	//tex_desc.Usage = D3D11_USAGE_DEFAULT;
+	//tex_desc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
+	//tex_desc.CPUAccessFlags = 0;
+	//tex_desc.MiscFlags = 0;
+	//tex_desc.ArraySize = 1;
+	//m_pCDevice->m_pDevice->CreateTexture2D(&tex_desc, NULL, &buffer);
 
+	//hr = m_pCDevice->m_pDevice->CreateShaderResourceView(buffer, NULL, &m_pCDevice->m_pShaderResourceView); //해당버퍼를 이용하여 렌더타겟뷰를 생성
+	//if (FAILED(hr))
+	//{
+	//	throw std::exception("ShaderResourceView not create successfully");
+	//}
+	buffer->Release();											//임의의 사용한 버퍼를 제거
+	
 	D3D11_TEXTURE2D_DESC tex_desc;
 	ZeroMemory(&tex_desc, sizeof(D3D11_TEXTURE2D_DESC));
 	tex_desc.Width = iWidth;
@@ -108,6 +122,7 @@ void RenderSystem::ReloadBuffer(unsigned int iWidth, unsigned int iHeight)
 	{
 		throw std::exception("DepthStencilBuffer not create successfully");
 	}
+
 	hr = m_pCDevice->m_pDevice->CreateDepthStencilView(buffer, NULL, &m_pCDevice->m_pDetphStenilView); //해당버퍼를 이용하여 깊이스텐실 뷰를 생성
 	buffer->Release();								// Backbuffer Release
 	if (FAILED(hr))
@@ -156,6 +171,11 @@ void RenderSystem::SetConstantBuffer(VertexShader* pVertexShader, ConstantBuffer
 void RenderSystem::SetConstantBuffer(PixelShader* pPixelShader, ConstantBuffer* pConstantBuffer)
 {
 	m_pCDevice->m_pImmediateContext->PSSetConstantBuffers(0, 1, &pConstantBuffer->m_pBuffer);
+}
+
+void RenderSystem::UpdateConstantBuffer(ConstantBuffer* pConstantBuffer, void* pBuffer)
+{
+	m_pCDevice->m_pImmediateContext->UpdateSubresource(pConstantBuffer->m_pBuffer, NULL, NULL, pBuffer, NULL, NULL);
 }
 
 void RenderSystem::SetVertexShader(VertexShader* pVertexShader)
@@ -225,7 +245,6 @@ void RenderSystem::Reset()
 void RenderSystem::Update()
 {
 	Reset();
-
 	_ImguiSystem.Update();
 }
 
@@ -233,7 +252,6 @@ void RenderSystem::Update()
 void RenderSystem::Render()
 {
 	_ImguiSystem.Render();
-
 
 	m_pCSwapChain->Present(true);
 }

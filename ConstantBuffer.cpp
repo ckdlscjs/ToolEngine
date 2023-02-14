@@ -1,9 +1,5 @@
 #include "ConstantBuffer.h"
 
-void ConstantBuffer::UpdateBuffer(ID3D11DeviceContext* pDeviceContext, void* pBuffer)
-{
-	pDeviceContext->UpdateSubresource(m_pBuffer, NULL, NULL, pBuffer, NULL, NULL);
-}
 ConstantBuffer::ConstantBuffer(ID3D11Device* pDevice, void* pBuffer, UINT iSizeBuffer) : m_pBuffer(nullptr)
 {
 	//BufferDescriptor

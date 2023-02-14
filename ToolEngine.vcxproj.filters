@@ -157,6 +157,12 @@
     <ClInclude Include="Camera.h">
       <Filter>CameraSystem</Filter>
     </ClInclude>
+    <ClInclude Include="MeshSystem.h">
+      <Filter>EngineSystem\ObjectManager\MeshSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="Mesh.h">
+      <Filter>EngineSystem\ObjectManager\MeshSystem</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WindowSystem.cpp">
@@ -243,6 +249,12 @@
     </ClCompile>
     <ClCompile Include="Camera.cpp">
       <Filter>CameraSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="MeshSystem.cpp">
+      <Filter>EngineSystem\ObjectManager\MeshSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="Mesh.cpp">
+      <Filter>EngineSystem\ObjectManager\MeshSystem</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
