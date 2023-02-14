@@ -1,6 +1,27 @@
 #include "Device.h"
 
+ID3D11Device* g_pDevice;
+ID3D11DeviceContext* g_pDeviceContext;
 
+ID3D11Device* Device::GetDevice()
+{
+    return m_pDevice;
+}
+
+ID3D11DeviceContext* Device::GetDeviceContext()
+{
+    return m_pImmediateContext;
+}
+
+ID3D11RenderTargetView* Device::GetRtv()
+{
+    return m_pRenderTargetView;
+}
+
+ID3D11DepthStencilView* Device::GetDsv()
+{
+    return m_pDetphStenilView;
+}
 
 Device::Device()
 {
@@ -48,7 +69,8 @@ Device::Device()
 
     if (FAILED(hResult))
         throw std::exception("RenderSystem not create successfully");
-
+    g_pDevice = m_pDevice;
+    g_pDeviceContext = m_pImmediateContext;
     //initRasterizerState();
 }
 

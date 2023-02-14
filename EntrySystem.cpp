@@ -27,16 +27,16 @@ void EntrySystem::OnCreate()
     object vertex_list[] =
     {
         //FrontFace
-        {XMFLOAT3(-0.5f,-0.5f,-0.5f),	XMFLOAT2(0,0),		XMFLOAT3(1, 0, 0),		XMFLOAT3(0, 1, 0)},
+        {XMFLOAT3(-0.5f,-0.5f,-0.5f),	XMFLOAT2(0,1),		XMFLOAT3(1, 0, 0),		XMFLOAT3(0, 1, 0)},
         {XMFLOAT3(-0.5f,0.5f,-0.5f), 	XMFLOAT2(0,0),		XMFLOAT3(0, 1, 0),		XMFLOAT3(1, 1, 0)},
-        {XMFLOAT3(0.5f,0.5f,-0.5f), 	XMFLOAT2(0,0),	    XMFLOAT3(0, 0, 1),		XMFLOAT3(1, 0, 0)},
-        {XMFLOAT3(0.5f,-0.5f,-0.5f),	XMFLOAT2(0,0),		XMFLOAT3(1, 1, 0),		XMFLOAT3(0, 0, 1)},
+        {XMFLOAT3(0.5f,0.5f,-0.5f), 	XMFLOAT2(1,0),	    XMFLOAT3(0, 0, 1),		XMFLOAT3(1, 0, 0)},
+        {XMFLOAT3(0.5f,-0.5f,-0.5f),	XMFLOAT2(1,1),		XMFLOAT3(1, 1, 0),		XMFLOAT3(0, 0, 1)},
 
         //BackFace
-        {XMFLOAT3(0.5f,-0.5f,0.5f),		XMFLOAT2(0,0),	    XMFLOAT3(1, 0, 0),		XMFLOAT3(0, 1, 0)},
+        {XMFLOAT3(0.5f,-0.5f,0.5f),		XMFLOAT2(0,1),	    XMFLOAT3(1, 0, 0),		XMFLOAT3(0, 1, 0)},
         {XMFLOAT3(0.5f,0.5f,0.5f),		XMFLOAT2(0,0),	    XMFLOAT3(0, 1, 0),		XMFLOAT3(1, 1, 0)},
-        {XMFLOAT3(-0.5f,0.5f,0.5f), 	XMFLOAT2(0,0),	    XMFLOAT3(0, 0, 1),		XMFLOAT3(1, 0, 0)},
-        {XMFLOAT3(-0.5f,-0.5f,0.5f),	XMFLOAT2(0,0),		XMFLOAT3(1, 1, 0),		XMFLOAT3(0, 0, 1)},
+        {XMFLOAT3(-0.5f,0.5f,0.5f), 	XMFLOAT2(1,0),	    XMFLOAT3(0, 0, 1),		XMFLOAT3(1, 0, 0)},
+        {XMFLOAT3(-0.5f,-0.5f,0.5f),	XMFLOAT2(1,1),		XMFLOAT3(1, 1, 0),		XMFLOAT3(0, 0, 1)},
     };
     UINT size_vertex_list = ARRAYSIZE(vertex_list);
 
@@ -94,6 +94,12 @@ void EntrySystem::OnCreate()
     //cc.matProj = XMMatrixTranspose(cc.matProj);
 
     m_pConstantBuffer = _EngineSystem.GetRenderSystem()->CreateConstantBuffer(&cc, sizeof(constant));
+
+    m_pTexture = _EngineSystem.GetTextureSystem()->createTextureFromFile(L"../../Assets/Textures/stars_map.jpg");
+    Texture* listTexture[5] = { 0, };
+    listTexture[0] = m_pTexture;
+    _EngineSystem.GetRenderSystem()->setTexture(m_pVertexShader, listTexture, 1);
+    _EngineSystem.GetRenderSystem()->setTexture(m_pPixelShader, listTexture, 1);
 }
 
 void EntrySystem::OnUpdate()
@@ -158,7 +164,6 @@ void EntrySystem::Update()
 
 void EntrySystem::Render()
 {
-    
     _EngineSystem.Render();
 }
 

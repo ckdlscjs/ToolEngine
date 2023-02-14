@@ -7,6 +7,7 @@
 #include "ConstantBuffer.h"
 #include "VertexShader.h"
 #include "PixelShader.h"
+#include "Texture.h"
 
 class RenderSystem
 {
@@ -39,6 +40,8 @@ public:
 	void SetConstantBuffer(PixelShader* pPixelShader, ConstantBuffer* pConstantBuffer);
 	void SetVertexShader(VertexShader* pVertexShader);
 	void SetPixelShader(PixelShader* pPixelShader);
+	void setTexture(const VertexShader* pVertexShader, Texture* const* ppListTex, unsigned int iNumTextures);
+	void setTexture(const PixelShader* pPixelShader, Texture* const* ppListTex, unsigned int iNumTextures);
 
 	/*Draw Block*/
 	void drawTriangleList(UINT iCountVertex, UINT iStartVertexLocation);

@@ -12,6 +12,7 @@
 
 ResourceSystem::ResourceSystem()
 {
+
 }
 
 ResourceSystem::~ResourceSystem()
@@ -22,7 +23,7 @@ ResourceSystem::~ResourceSystem()
 	}
 }
 
-Resource* ResourceSystem::createResourceFromFile(ID3D11Device* pDevice, const wchar_t* szFilePath)
+Resource* ResourceSystem::createResourceFromFile(const wchar_t* szFilePath)
 {
 #if (_MSC_VER >= 1900 && _MSC_VER <= 1916)  || ( _MSC_VER >= 1920 && __cplusplus <= 201402L) 
 	std::wstring szFullPath = std::experimental::filesystem::absolute(szFilePath);
@@ -36,7 +37,7 @@ Resource* ResourceSystem::createResourceFromFile(ID3D11Device* pDevice, const wc
 	if (it != m_mapResources.end())
 		return it->second;
 
-	Resource* pResource = createResourceFromFileConcrete(pDevice, szFullPath.c_str());
+	Resource* pResource = createResourceFromFileConcrete(szFullPath.c_str());
 	if (pResource)
 	{
 		m_mapResources[szFullPath] = pResource;

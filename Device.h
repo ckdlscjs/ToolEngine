@@ -4,6 +4,12 @@
 
 class Device
 {	
+public:
+	ID3D11Device* GetDevice();
+	ID3D11DeviceContext* GetDeviceContext();
+	ID3D11RenderTargetView* GetRtv();
+	ID3D11DepthStencilView* GetDsv();
+
 	/*Constructor Block*/
 public:
 	Device();

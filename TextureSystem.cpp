@@ -8,14 +8,14 @@ TextureSystem::~TextureSystem()
 {
 }
 
-Texture* TextureSystem::createTextureFromFile(ID3D11Device* pDevice, const wchar_t* szFilePath)
+Texture* TextureSystem::createTextureFromFile(const wchar_t* szFilePath)
 {
-	return (Texture*)createResourceFromFile(pDevice, szFilePath);
+	return (Texture*)createResourceFromFile(szFilePath);
 }
 
-Resource* TextureSystem::createResourceFromFileConcrete(ID3D11Device* pDevice, const wchar_t* szFilePath)
+Resource* TextureSystem::createResourceFromFileConcrete(const wchar_t* szFilePath)
 {
-	Texture* pTexutre = new Texture(pDevice, szFilePath);
+	Texture* pTexutre = new Texture(szFilePath);
 	return pTexutre;
 }
 

@@ -1,3 +1,6 @@
+Texture2D TextureColor : register(t0);
+sampler TextureSamplerColor : register(s0);
+
 struct PS_INPUT
 {
 	float4 position : SV_POSITION;
@@ -15,5 +18,6 @@ cbuffer constant : register(b0)
 
 float4 psmain(PS_INPUT input) : SV_TARGET
 {
-	return float4(input.color, 1);
+	float4 tex = TextureColor.Sample(TextureSamplerColor, input.tex);
+	return tex;
 }

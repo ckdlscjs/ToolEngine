@@ -32,6 +32,8 @@ class WindowSystem;
 
 extern HWND g_hWnd;
 extern WindowSystem* g_pWindow;
+extern ID3D11Device* g_pDevice;
+extern ID3D11DeviceContext* g_pDeviceContext;
 
 template<class T> class Singleton
 {

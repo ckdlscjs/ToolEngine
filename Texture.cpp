@@ -1,5 +1,6 @@
 #include "Texture.h"
-Texture::Texture(ID3D11Device* pDevice, const wchar_t* szFullPath) : Resource(szFullPath)
+
+Texture::Texture(const wchar_t* szFullPath) : Resource(szFullPath)
 {
 	DirectX::ScratchImage image_data;
 	HRESULT result = CoInitialize(nullptr);	//WhyConinitialize
@@ -8,7 +9,7 @@ Texture::Texture(ID3D11Device* pDevice, const wchar_t* szFullPath) : Resource(sz
 	result = DirectX::LoadFromWICFile(szFullPath, DirectX::WIC_FLAGS_IGNORE_SRGB, nullptr, image_data);
 	if (FAILED(result))
 		throw std::exception("LoadTexture not successfully");
-	result = DirectX::CreateTexture(pDevice, image_data.GetImages(), image_data.GetImageCount(), image_data.GetMetadata(), &m_pTexture);
+	result = DirectX::CreateTexture(g_pDevice, image_data.GetImages(), image_data.GetImageCount(), image_data.GetMetadata(), &m_pTexture);
 	if (FAILED(result))
 		throw std::exception("Texture not create successfully");
 
@@ -30,11 +31,11 @@ Texture::Texture(ID3D11Device* pDevice, const wchar_t* szFullPath) : Resource(sz
 	sampler_desc.MaxLOD = (UINT)image_data.GetMetadata().mipLevels;
 
 	// 샘플러스테이트 생성
-	result = pDevice->CreateSamplerState(&sampler_desc, &m_pSamplerState);
+	result = g_pDevice->CreateSamplerState(&sampler_desc, &m_pSamplerState);
 	if (FAILED(result))
 		throw std::exception("SamplerState not create successfully");
 	// 자원뷰 생성
-	result = pDevice->CreateShaderResourceView(m_pTexture, &desc, &m_pShaderResourceView);
+	result = g_pDevice->CreateShaderResourceView(m_pTexture, &desc, &m_pShaderResourceView);
 	if (FAILED(result))
 		throw std::exception("ShaderResourceView not create successfully");
 }

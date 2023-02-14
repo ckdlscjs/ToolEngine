@@ -32,5 +32,7 @@ public:
 	ConstantBuffer* m_pConstantBuffer;
 	VertexShader* m_pVertexShader;
 	PixelShader* m_pPixelShader;
+	
+	Texture* m_pTexture;
 };
 
