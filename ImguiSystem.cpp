@@ -15,8 +15,8 @@ void ImguiSystem::Update()
     // Start the Dear ImGui frame
     ImGui_ImplDX11_NewFrame();
     ImGui_ImplWin32_NewFrame();
-    ImGui::DockSpaceOverViewport(ImGui::GetMainViewport());
     ImGui::NewFrame();
+    //ImGui::DockSpaceOverViewport(ImGui::GetMainViewport());
 
     ImGui::Begin("Demo");
     ImGui::Button("btn1");
@@ -25,28 +25,15 @@ void ImguiSystem::Update()
     ImGui::Button("btn1");
     ImGui::End();
    
-    // 0.메인
-    {
-        ImGui::Begin("##main");
-        ImGui::SetNextWindowPos({ 0, 0 }, ImGuiCond_Always);
-        ImGui::SetNextWindowSize({ ImGui::GetIO().DisplaySize.x,ImGui::GetIO().DisplaySize.y });
-
-        ID3D11Texture2D* buffer = nullptr;
-        HRESULT hr = _EngineSystem.GetRenderSystem()->m_pCSwapChain->m_pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&buffer);
-        D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
-        ZeroMemory(&srvDesc, sizeof(srvDesc));
-        srvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-        srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-        srvDesc.Texture2D.MipLevels = 1;
-        srvDesc.Texture2D.MostDetailedMip = 0;
-        srvDesc.f
-        ID3D11ShaderResourceView* srv;
-        hr = g_pDevice->CreateShaderResourceView(buffer, &srvDesc, &srv);
-   
-        ImGui::Image(srv, { ImGui::GetIO().DisplaySize.x,ImGui::GetIO().DisplaySize.y });
-        ImGui::End();
-    }
-    
+    //// 0.메인
+    //{
+    //    ImGui::Begin("##main");
+    //    ImGui::SetNextWindowPos({ 0, 0 }, ImGuiCond_Always);
+    //    ImGui::SetNextWindowSize({ ImGui::GetIO().DisplaySize.x,ImGui::GetIO().DisplaySize.y });
+    //    ImGui::Image(srv, { ImGui::GetIO().DisplaySize.x,ImGui::GetIO().DisplaySize.y });
+    //    ImGui::End();
+    //}
+    //
 
     //// 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
     //if (m_show_demo_window)

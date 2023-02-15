@@ -76,13 +76,20 @@ void RenderSystem::ReloadBuffer(unsigned int iWidth, unsigned int iHeight)
 	//Get the BackBuffer and view's
 	ID3D11Texture2D* buffer = nullptr;
 	HRESULT hr = m_pCSwapChain->m_pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&buffer);	//스왑체인에서 사용하는 버퍼를 받아옴
+
+	D3D11_RENDER_TARGET_VIEW_DESC renderTargetViewDesc;
+	renderTargetViewDesc.Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+	renderTargetViewDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
+	renderTargetViewDesc.Texture2D.MipSlice = 0;
+
 	hr = m_pCDevice->m_pDevice->CreateRenderTargetView(buffer, NULL, &m_pCDevice->m_pRenderTargetView); //해당버퍼를 이용하여 렌더타겟뷰를 생성
 	if (FAILED(hr))
 	{
 		throw std::exception("RenderTargetView not create successfully");
 	}
+
 	buffer->Release();
-	
+
 	D3D11_TEXTURE2D_DESC tex_desc;
 	ZeroMemory(&tex_desc, sizeof(D3D11_TEXTURE2D_DESC));
 	tex_desc.Width = iWidth;

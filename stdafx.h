@@ -25,7 +25,8 @@
 // Math
 //#include "DXTK\SimpleMath.h"
 using namespace DirectX;
-
+#define _DegreeToRadian(X) X*(XM_PI/180.0f)
+#define _RadianToDegree(X) X*(180.0f/XM_PI)
 
 
 class WindowSystem;
@@ -43,4 +44,12 @@ public:
 		static T SingletonInstance;
 		return SingletonInstance;
 	}
+};
+
+__declspec(align(16))
+struct constant
+{
+	XMMATRIX matWorld;
+	XMMATRIX matView;
+	XMMATRIX matProj;
 };

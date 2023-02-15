@@ -90,4 +90,7 @@ Device::~Device()
 
    if (m_pDetphStenilView != nullptr) 
        m_pDetphStenilView->Release();
+
+   if (m_pShaderResourceView != nullptr)
+       m_pShaderResourceView->Release();
 }

@@ -1,5 +1,6 @@
 #pragma once
 #include "stdafx.h"
+
 enum MAT_PROJ
 {
 	ORTHO = 0,
@@ -10,16 +11,22 @@ class Camera
 public:
 	void Update();
 public:
-	Camera(std::wstring szCameraName, MAT_PROJ cameraType ,XMFLOAT3 vCameraPos, XMFLOAT3 vCameraDir, XMFLOAT3 vCameraUp);
+	Camera(std::wstring szCameraName, MAT_PROJ cameraType , XMVECTOR vCameraPos, XMVECTOR vCameraDir, XMVECTOR vCameraUp);
 	~Camera();
 public:
 	std::wstring m_szCameraName;
+	float m_fCameraSpeed = 100.0f;
+	float m_fYaw = 0.0f;
+	float m_fPitch = 0.0f;
+	float m_fRoll = 0.0f;
 	MAT_PROJ m_type;
 
-	XMFLOAT3 m_vCameraPos;
-	XMFLOAT3 m_vCameraDir;
-	XMFLOAT3 m_vCameraUp;
+	XMVECTOR m_vCameraPos;
+	XMVECTOR m_vCameraDir;
+	XMVECTOR m_vCameraUp;
+	XMVECTOR m_vCameraRight;
 
+	XMMATRIX m_matWorld;
 	XMMATRIX m_matCamera;
 	XMMATRIX m_matProj;
 };

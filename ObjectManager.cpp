@@ -9,13 +9,16 @@ Object* ObjectManager::CreateObject()
 
 void ObjectManager::Update()
 {
+	for (auto& object : m_ListObject)
+		object->Update();
 }
 
 void ObjectManager::Render()
 {
-
-	
+	for (auto& object : m_ListObject)
+		object->Render();
 }
+
 ObjectManager::ObjectManager()
 {
 
@@ -25,6 +28,7 @@ ObjectManager::~ObjectManager()
 {
 	for (auto iter = m_ListObject.begin(); iter != m_ListObject.end(); )
 	{
+		delete (*iter);
 		iter = m_ListObject.erase(iter);
 	}
 	m_ListObject.clear();

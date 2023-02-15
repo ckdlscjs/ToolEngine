@@ -1,5 +1,4 @@
 #include "EntrySystem.h"
-
 struct object
 {
     XMFLOAT3 pos;
@@ -8,13 +7,6 @@ struct object
     XMFLOAT3 color;
 };
 
-__declspec(align(16))
-struct constant
-{
-    XMMATRIX matWorld;
-    XMMATRIX matView;
-    XMMATRIX matProj;
-};
 constant cc;
 void EntrySystem::OnCreate()
 {
@@ -82,13 +74,16 @@ void EntrySystem::OnCreate()
     m_pPixelShader = _EngineSystem.GetRenderSystem()->CreatePixelShader(shader_byte_code, size_shader);
     _EngineSystem.GetRenderSystem()->ReleaseBlob();
 
+    Mesh* pMesh = new Mesh();
+    pMesh->m_pVertexBuffer = m_pVertexBuffer;
+    pMesh->m_pIndexBuffer = m_pIndexBuffer;
     
     cc.matWorld = XMMatrixIdentity();
     cc.matView = XMMatrixIdentity();
     cc.matProj = XMMatrixIdentity();
     RECT rt = g_pWindow->GetClientWindowRect();
 
-    m_pCamera = new Camera(L"MainCamera", MAT_PROJ::PERSPECTIVE, { 2, 1, -3 }, {0, 0, 1}, {0, 1, 0});
+    m_pCamera = new Camera(L"MainCamera", MAT_PROJ::PERSPECTIVE, { 0,0,-2 }, {0, 0, 1}, {0, 1, 0});
     _CameraSystem.AddCamera(m_pCamera);
     /*cc.matWorld *= XMMatrixTranslation(0, 0, -2);*/
     //cc.matWorld = XMMatrixTranspose(cc.matWorld);
@@ -100,10 +95,15 @@ void EntrySystem::OnCreate()
     m_pConstantBuffer = _EngineSystem.GetRenderSystem()->CreateConstantBuffer(&cc, sizeof(constant));
 
     m_pTexture = _EngineSystem.GetTextureSystem()->createTextureFromFile(L"../../Assets/Textures/stars_map.jpg");
-    Texture* listTexture[5] = { 0, };
+    Texture** listTexture = new Texture*[5];
     listTexture[0] = m_pTexture;
-    _EngineSystem.GetRenderSystem()->setTexture(m_pVertexShader, listTexture, 1);
-    _EngineSystem.GetRenderSystem()->setTexture(m_pPixelShader, listTexture, 1);
+   
+    m_pObject = _ObjectManager.CreateObject();
+    m_pObject->SetConstantData(cc);
+    m_pObject->SetTransform({ {0, 10, 0}, {5,5,5}, {1, 1, 1} });
+    m_pObject->SetMesh(pMesh);
+    m_pObject->SetShader(m_pVertexShader, m_pPixelShader);
+    m_pObject->SetTexture(listTexture, 1);
 }
 
 void EntrySystem::OnUpdate()
@@ -138,8 +138,6 @@ void EntrySystem::OnSize()
 void EntrySystem::OnDestroy()
 {
     std::cout << "onDestroy" << std::endl;
-
-   
 }
 
 
@@ -155,27 +153,24 @@ void EntrySystem::Update()
 {
     _InputSystem.Update();
     _EngineSystem.Update();
+
     /*POINT pt = _InputSystem.GetPos();
    std::cout << pt.x << " | " << pt.y << std::endl;*/
-    m_pCamera->m_vCameraPos.x -= 0.01f;
+    //m_pCamera->m_vCameraPos.x -= 0.01f;
     _CameraSystem.Update();
     cc.matView = m_pCamera->m_matCamera;
     cc.matProj = m_pCamera->m_matProj;
-
-    _EngineSystem.GetRenderSystem()->UpdateConstantBuffer(m_pConstantBuffer, &cc);
-    _EngineSystem.GetRenderSystem()->SetVertexShader(m_pVertexShader);
-    _EngineSystem.GetRenderSystem()->SetPixelShader(m_pPixelShader);
-    _EngineSystem.GetRenderSystem()->SetVertexBuffer(m_pVertexBuffer);
-    _EngineSystem.GetRenderSystem()->SetIndexBuffer(m_pIndexBuffer);
-    _EngineSystem.GetRenderSystem()->SetConstantBuffer(m_pVertexShader, m_pConstantBuffer);
-    _EngineSystem.GetRenderSystem()->SetConstantBuffer(m_pPixelShader, m_pConstantBuffer);
-    _EngineSystem.GetRenderSystem()->drawIndexedTriangleList(m_pIndexBuffer->getSizeIndexList(), 0, 0);
-
+    m_pObject->SetConstantData(cc);
+    m_pObject->SetTransform({ {0, 0, 0}, {0,0,45}, {0.5, 0.5, 0.5} });
     _ImguiSystem.Update();
+
+    _ObjectManager.Update();
 }
 
 void EntrySystem::Render()
 {
+    _ObjectManager.Render();
+
     _ImguiSystem.Render();
     _EngineSystem.Render();
 }

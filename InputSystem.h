@@ -12,6 +12,7 @@ class InputSystem : public Singleton<InputSystem>
 {
 private:
 	DWORD m_dwKeyState[256];
+public:
 	POINT m_ptPos;
 	POINT m_ptPrePos;
 	POINT m_ptOffSet;

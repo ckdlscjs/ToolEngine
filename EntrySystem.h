@@ -36,6 +36,6 @@ public:
 	
 	Texture* m_pTexture;
 	Camera* m_pCamera;
-	
+	Object* m_pObject;
 };
 
