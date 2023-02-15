@@ -49,8 +49,10 @@ void Camera::Update()
 
 	XMVECTOR translation = m_vCameraPos;
 
-	m_matWorld = XMMatrixTransformation({ 0,0,0,1 }, { 0,0,0,1 },scale, m_vCameraDir, rotation, translation);
+	
 
+	//m_matWorld = XMMatrixScalingFromVector(scale) * XMMatrixRotationX(_DegreeToRadian(m_fPitch)) * XMMatrixRotationY(_DegreeToRadian(m_fYaw)) * XMMatrixRotationZ(_DegreeToRadian(m_fRoll)) * XMMatrixTranslationFromVector(translation);
+	m_matWorld = XMMatrixTransformation({ 0,0,0,1 }, { 0,0,0,1 }, scale, {0,0,0,1}, rotation, translation);
 	m_matCamera = XMMatrixInverse(NULL, m_matWorld);
 
 	m_vCameraRight = XMVectorSet(XMVectorGetX(m_matCamera.r[0]), XMVectorGetX(m_matCamera.r[1]), XMVectorGetX(m_matCamera.r[2]), XMVectorGetX(m_matCamera.r[3]));

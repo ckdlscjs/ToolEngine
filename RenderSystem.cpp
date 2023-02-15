@@ -177,7 +177,7 @@ void RenderSystem::SetPixelShader(PixelShader* pPixelShader)
 	m_pCDevice->m_pImmediateContext->PSSetShader(pPixelShader->m_pPixelShader, nullptr, 0);
 }
 
-void RenderSystem::setTexture(const VertexShader* pVertexShader, Texture* const *ppListTex, unsigned int iNumTextures)
+void RenderSystem::setTexture(const VertexShader* pVertexShader, Texture* const *ppListTex, unsigned int iNumTextures, unsigned int iNumStart)
 {
 	ID3D11ShaderResourceView* listResources[32] = { 0, };
 	for (int idx = 0; idx < iNumTextures; idx++)
@@ -187,14 +187,14 @@ void RenderSystem::setTexture(const VertexShader* pVertexShader, Texture* const 
 	m_pCDevice->m_pImmediateContext->VSSetShaderResources(0, iNumTextures, listResources);
 }
 
-void RenderSystem::setTexture(const PixelShader* pPixelShader, Texture* const* ppListTex, unsigned int iNumTextures)
+void RenderSystem::setTexture(const PixelShader* pPixelShader, Texture* const* ppListTex, unsigned int iNumTextures, unsigned int iNumStart)
 {
 	ID3D11ShaderResourceView* listResources[32] = { 0, };
 	ID3D11SamplerState* listSamplers[32] = { 0, };
 	for (int idx = 0; idx < iNumTextures; idx++)
 	{
-		listResources[idx] = ppListTex[idx]->m_pShaderResourceView;
-		listSamplers[idx] = ppListTex[idx]->m_pSamplerState;
+		listResources[idx] = ppListTex[idx + iNumStart]->m_pShaderResourceView;
+		listSamplers[idx] = ppListTex[idx + iNumStart]->m_pSamplerState;
 	}
 	m_pCDevice->m_pImmediateContext->PSSetShaderResources(0, iNumTextures, listResources);
 	m_pCDevice->m_pImmediateContext->PSSetSamplers(0, iNumTextures, listSamplers);

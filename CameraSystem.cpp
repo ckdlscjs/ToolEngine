@@ -1,5 +1,22 @@
 #include "CameraSystem.h"
 
+void CameraSystem::SetCurrentCamera(Camera* pCamera)
+{
+	m_pCurrentCamera = pCamera;
+}
+
+Camera* CameraSystem::GetCurrentCamera()
+{
+	return m_pCurrentCamera;
+}
+
+Camera* CameraSystem::CreateCamera(std::wstring szCameraName, MAT_PROJ cameraType, XMVECTOR vCameraPos, XMVECTOR vCameraDir, XMVECTOR vCameraUp)
+{
+	Camera* pCamera = new Camera(szCameraName, cameraType, vCameraPos, vCameraDir, vCameraUp);
+	AddCamera(pCamera);
+	return pCamera;
+}
+
 void CameraSystem::AddCamera(Camera* pCamera)
 {
 	if (!pCamera)

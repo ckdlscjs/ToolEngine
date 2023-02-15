@@ -1,6 +1,7 @@
 #include "ImguiSystem.h"
 #include "EngineSystem.h"
 #include "WindowSystem.h"
+#include "ToolSystemMap.h"
 
 // Forward declare message handler from imgui_impl_win32.cpp
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
@@ -17,11 +18,12 @@ void ImguiSystem::Update()
     ImGui_ImplWin32_NewFrame();
     ImGui::NewFrame();
     //ImGui::DockSpaceOverViewport(ImGui::GetMainViewport());
-
+    static int item_current_idx = 0; // Here we store our selection data as an index.
     ImGui::Begin("Demo");
     {
-        ImGui::Button("CreateObject");
-            
+        if(ImGui::Button("CreateObject"))
+            _ToolSystemMap.CreateSimpleObject(item_current_idx);
+        
         ImGui::Button("btn1");
 
         ImGui::Button("btn1");
@@ -40,9 +42,9 @@ void ImguiSystem::Update()
     //}
     //
 
-    //// 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
-    //if (m_show_demo_window)
-    //    ImGui::ShowDemoWindow(&m_show_demo_window);
+    // 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
+   /* if (m_show_demo_window)
+        ImGui::ShowDemoWindow(&m_show_demo_window);*/
    
     //// 2. Show a simple window that we create ourselves. We use a Begin/End pair to create a named window.
     //{
@@ -86,15 +88,51 @@ void ImguiSystem::Update()
         ifd::FileDialog::Instance().Open("DirectoryOpenDialog", "Open a directory", "");
     if (ImGui::Button("Save file"))
         ifd::FileDialog::Instance().Save("ShaderSaveDialog", "Save a shader", "*.sprj {.sprj}");*/
+
+    /*ImGui::ListBox(nameID, &index, &list, listSize, showCount);
+    ImGui::EndListBox();*/
+    /*message_a.assign(message_w.begin(), message_w.end());
+    printf(message_a.c_str());*/
+    //const char* items[] = { "AAAA", "BBBB", "CCCC", "DDDD", "EEEE", "FFFF", "GGGG", "HHHH", "IIII", "JJJJ", "KKKK", "LLLLLLL", "MMMM", "OOOOOOO" };
+    
+
+    if (ImGui::BeginListBox("listbox 1"))
+    {
+        for (int n = 0; n < _ToolSystemMap.m_ListTextures.size(); n++)
+        {
+            std::string fullpath;
+            fullpath.assign(_ToolSystemMap.m_ListTextures[n].begin(), _ToolSystemMap.m_ListTextures[n].end());
+            
+            std::string content;
+            size_t pos = fullpath.find_last_of("/\\");
+            if (pos == std::string::npos) 
+                content = fullpath;
+            else
+                content = fullpath.substr(pos + 1);
+                
+            const bool is_selected = (item_current_idx == n);
+            if (ImGui::Selectable(content.c_str(), is_selected))
+                item_current_idx = n;
+
+            // Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
+            if (is_selected)
+                ImGui::SetItemDefaultFocus();
+        }
+        ImGui::EndListBox();
+    }
     ImGui::End();
 
+    // Using the generic BeginListBox() API, you have full control over how to display the combo contents.
+        // (your selection data could be an index, a pointer to the object, an id for the object, a flag intrusively
+        // stored in the object itself, etc.)
+    
    
     // file dialogs
     if (ifd::FileDialog::Instance().IsDone("ShaderOpenDialog")) {
         if (ifd::FileDialog::Instance().HasResult()) {
             const std::vector<std::filesystem::path>& res = ifd::FileDialog::Instance().GetResults();
             for(int idx = 0; idx < res.size(); idx++)
-                m_ListTextures.insert(res[idx].wstring()); 
+                _ToolSystemMap.m_ListTextures.push_back(res[idx].wstring()); 
             //for (const auto& r : res) // ShaderOpenDialog supports multiselection
             //{
             //   printf("OPEN[%s]\n", r.u8string().c_str()); 
@@ -102,6 +140,8 @@ void ImguiSystem::Update()
         }
         ifd::FileDialog::Instance().Close();
     }
+
+    
     /*if (ifd::FileDialog::Instance().IsDone("DirectoryOpenDialog")) {
         if (ifd::FileDialog::Instance().HasResult()) {
             std::string res = ifd::FileDialog::Instance().GetResult().u8string();

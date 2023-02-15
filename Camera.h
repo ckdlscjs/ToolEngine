@@ -15,7 +15,7 @@ public:
 	~Camera();
 public:
 	std::wstring m_szCameraName;
-	float m_fCameraSpeed = 100.0f;
+	float m_fCameraSpeed = 50.0f;
 	float m_fDelta = 0.001f;
 	float m_fYaw = 0.0f;
 	float m_fPitch = 0.0f;

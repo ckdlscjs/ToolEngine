@@ -9,13 +9,13 @@ Object* ObjectManager::CreateObject()
 
 void ObjectManager::Update()
 {
-	for (auto& object : m_ListObject)
+	for (auto object : m_ListObject)
 		object->Update();
 }
 
 void ObjectManager::Render()
 {
-	for (auto& object : m_ListObject)
+	for (auto object : m_ListObject)
 		object->Render();
 }
 

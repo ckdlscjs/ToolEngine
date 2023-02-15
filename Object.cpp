@@ -1,5 +1,5 @@
 #include "Object.h"
-
+#include "CameraSystem.h"
 void Object::SetTransform(Transform transform)
 {
 	m_Transform = transform;
@@ -33,6 +33,11 @@ void Object::SetTexture(Texture** ppListTex, unsigned int iNumTextures)
 	m_iNumTextures = iNumTextures;
 }
 
+void Object::SelectTexture(int iChkTex)
+{
+	m_iDefaultTexture = iChkTex == -1 ? 0 : iChkTex;
+}
+
 void Object::SetConstantData(constant cc)
 {
 	constantData = cc;
@@ -50,19 +55,21 @@ CULL_MODE Object::GetCullMode()
 
 void Object::Update()
 {
+	constantData.matView = _CameraSystem.GetCurrentCamera()->m_matCamera;
 	_EngineSystem.GetRenderSystem()->UpdateConstantBuffer(m_pConstantBuffer, &constantData);
-	_EngineSystem.GetRenderSystem()->SetVertexShader(m_pVertexShader);
-	_EngineSystem.GetRenderSystem()->SetPixelShader(m_pPixelShader);
-	_EngineSystem.GetRenderSystem()->SetVertexBuffer(m_pMesh->GetVertexBuffer());
-	_EngineSystem.GetRenderSystem()->SetIndexBuffer(m_pMesh->GetIndexBuffer());
-	_EngineSystem.GetRenderSystem()->SetConstantBuffer(m_pVertexShader, m_pConstantBuffer);
-	_EngineSystem.GetRenderSystem()->SetConstantBuffer(m_pPixelShader, m_pConstantBuffer);
-	_EngineSystem.GetRenderSystem()->setTexture(m_pVertexShader, m_ListTextures, m_iNumTextures);
-	_EngineSystem.GetRenderSystem()->setTexture(m_pPixelShader, m_ListTextures, m_iNumTextures);
+	
 }
 
 void Object::Render()
 {
+	_EngineSystem.GetRenderSystem()->SetConstantBuffer(m_pVertexShader, m_pConstantBuffer);
+	_EngineSystem.GetRenderSystem()->SetConstantBuffer(m_pPixelShader, m_pConstantBuffer);
+	_EngineSystem.GetRenderSystem()->SetVertexShader(m_pVertexShader);
+	_EngineSystem.GetRenderSystem()->SetPixelShader(m_pPixelShader);
+	_EngineSystem.GetRenderSystem()->SetVertexBuffer(m_pMesh->GetVertexBuffer());
+	_EngineSystem.GetRenderSystem()->SetIndexBuffer(m_pMesh->GetIndexBuffer());
+	_EngineSystem.GetRenderSystem()->setTexture(m_pVertexShader, m_ListTextures, m_iNumTextures);
+	_EngineSystem.GetRenderSystem()->setTexture(m_pPixelShader, m_ListTextures, m_iNumTextures);
 	_EngineSystem.GetRenderSystem()->drawIndexedTriangleList(m_pMesh->GetIndexBuffer()->getSizeIndexList(), 0, 0);
 }
 

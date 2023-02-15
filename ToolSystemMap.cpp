@@ -8,7 +8,7 @@ struct object
     XMFLOAT3 color;
 };
 
-void ToolSystemMap::CreateSimpleObject()
+void ToolSystemMap::CreateSimpleObject(int iChkIdx)
 {
    
     object vertex_list[] =
@@ -73,36 +73,28 @@ void ToolSystemMap::CreateSimpleObject()
     pMesh->m_pIndexBuffer = pIndexBuffer;
     constant cc;
     cc.matWorld = XMMatrixIdentity();
-    cc.matView = XMMatrixIdentity();
-    cc.matProj = XMMatrixIdentity();
-  
-    _CameraSystem.AddCamera(m_pCamera);
-    cc.matWorld = XMMatrixIdentity();
     cc.matView = m_pCamera->m_matCamera;
     cc.matProj = m_pCamera->m_matProj;
 
-    ConstantBuffer* pConstantBuffer = _EngineSystem.GetRenderSystem()->CreateConstantBuffer(&cc, sizeof(constant));
-
-    //m_pTexture = _EngineSystem.GetTextureSystem()->createTextureFromFile(L"../../Assets/Textures/stars_map.jpg");
-
-    Texture** listTexture = new Texture*[_ImguiSystem.m_ListTextures.size()];
-    for (auto path : _ImguiSystem.m_ListTextures)
+    Texture** listTexture = new Texture*[m_ListTextures.size() - iChkIdx];
+    for (int idx = 0; idx + iChkIdx < m_ListTextures.size(); idx++)
     {
-        _EngineSystem.GetTextureSystem()->createTextureFromFile(path.c_str());
+        listTexture[idx] = _EngineSystem.GetTextureSystem()->createTextureFromFile(m_ListTextures[idx + iChkIdx].c_str());
     }
 
     Object* pObject;
     pObject = _ObjectManager.CreateObject();
     pObject->SetConstantData(cc);
-    pObject->SetTransform({ {0, 10, 0}, {5,5,5}, {1, 1, 1} });
+    pObject->SetTransform({ _CameraSystem.GetCurrentCamera()->m_vCameraPos , {0, 0, 0}, {1, 1, 1} });
     pObject->SetMesh(pMesh);
-    pObject->SetShader(m_pVertexShader, m_pPixelShader);
-    pObject->SetTexture(listTexture, _ImguiSystem.m_ListTextures.size());
+    pObject->SetShader(pVertexShader, pPixelShader);
+    pObject->SetTexture(listTexture, m_ListTextures.size() - iChkIdx);
 }
 
 ToolSystemMap::ToolSystemMap()
 {
-    m_pCamera = new Camera(L"MainCamera", MAT_PROJ::PERSPECTIVE, { 0,0,-2 }, { 0, 0, 1 }, { 0, 1, 0 });
+    m_pCamera = _CameraSystem.CreateCamera(L"MainCamera", MAT_PROJ::PERSPECTIVE, { 0,0,-2 }, { 0, 0, 1 }, { 0, 1, 0 });
+    _CameraSystem.SetCurrentCamera(m_pCamera);
 }
 
 ToolSystemMap::~ToolSystemMap()

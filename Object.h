@@ -22,6 +22,7 @@ public:
 	void SetMesh(Mesh* pMesh);
 	void SetShader(VertexShader* pVertexShader, PixelShader* pPixelShader);
 	void SetTexture(Texture** pTexture, unsigned int iNumTextures);
+	void SelectTexture(int iChkTex = -1);
 	void SetConstantData(constant cc);
 	void SetCullMode(CULL_MODE mode);
 	CULL_MODE GetCullMode();
@@ -39,6 +40,7 @@ private:
 	ConstantBuffer* m_pConstantBuffer;
 	Texture** m_ListTextures;
 	unsigned int m_iNumTextures;
+	unsigned int m_iDefaultTexture;
 	CULL_MODE m_CullMode;
 };
 

@@ -7,9 +7,9 @@ void EntrySystem::OnCreate()
     _InputSystem;
     _EngineSystem;
     _ImguiSystem;
-    _ObjectManager;
     _CameraSystem;
-
+    _ObjectManager;
+    _ToolSystemMap;
 }
 
 void EntrySystem::OnUpdate()
@@ -58,16 +58,10 @@ LRESULT EntrySystem::MessageHandler(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM l
 void EntrySystem::Update()
 {
     _InputSystem.Update();
+    _CameraSystem.Update();
     _EngineSystem.Update();
-
     /*POINT pt = _InputSystem.GetPos();
    std::cout << pt.x << " | " << pt.y << std::endl;*/
-    //m_pCamera->m_vCameraPos.x -= 0.01f;
-    _CameraSystem.Update();
-    //cc.matView = m_pCamera->m_matCamera;
-    //cc.matProj = m_pCamera->m_matProj;
-    //m_pObject->SetConstantData(cc);
-    //m_pObject->SetTransform({ {0, 0, 0}, {0,0,45}, {0.5, 0.5, 0.5} });
     _ImguiSystem.Update();
     _ObjectManager.Update();
 }

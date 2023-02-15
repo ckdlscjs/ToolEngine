@@ -41,8 +41,8 @@ public:
 	void UpdateConstantBuffer(ConstantBuffer* pConstantBuffer, void* pBuffer);
 	void SetVertexShader(VertexShader* pVertexShader);
 	void SetPixelShader(PixelShader* pPixelShader);
-	void setTexture(const VertexShader* pVertexShader, Texture* const* ppListTex, unsigned int iNumTextures);
-	void setTexture(const PixelShader* pPixelShader, Texture* const* ppListTex, unsigned int iNumTextures);
+	void setTexture(const VertexShader* pVertexShader, Texture* const* ppListTex, unsigned int iNumTextures, unsigned int iNumStart = 0);
+	void setTexture(const PixelShader* pPixelShader, Texture* const* ppListTex, unsigned int iNumTextures, unsigned int iNumStart = 0);
 
 	/*Draw Block*/
 	void drawTriangleList(UINT iCountVertex, UINT iStartVertexLocation);

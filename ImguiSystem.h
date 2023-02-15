@@ -23,7 +23,6 @@ public:
 	bool m_show_another_window = false;
 	ImVec4 m_clear_color;
 	friend class RenderSystem;
-	std::unordered_set<std::wstring> m_ListTextures;
 };
 
 #define _ImguiSystem Singleton<ImguiSystem>::GetInstance()

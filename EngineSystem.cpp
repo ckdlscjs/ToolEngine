@@ -25,7 +25,6 @@ void EngineSystem::CreateMeshSystem()
 void EngineSystem::Update()
 {
 	m_pRenderSystem->Update();
-
 }
 
 void EngineSystem::Render()
