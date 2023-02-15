@@ -79,10 +79,6 @@ Object::~Object()
 	delete m_ListTextures;
 	if (m_pMesh) delete m_pMesh;
 	if (m_pConstantBuffer) delete m_pConstantBuffer;
-	/*Mesh* m_pMesh;
-	VertexShader* m_pVertexShader;
-	PixelShader* m_pPixelShader;
-	constant constantData;
-	ConstantBuffer* m_pConstantBuffer;
-	Texture** m_ListTextures;*/
+	if (m_pVertexShader) delete m_pVertexShader;
+	if (m_pPixelShader) delete m_pPixelShader;
 }

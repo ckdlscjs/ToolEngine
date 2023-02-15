@@ -6,8 +6,8 @@ public:
 	VertexBuffer* GetVertexBuffer();
 	IndexBuffer* GetIndexBuffer();
 //public:
-//	Mesh();
-//	~Mesh();
+	Mesh();
+	~Mesh();
 public:
 	VertexBuffer* m_pVertexBuffer;
 	IndexBuffer* m_pIndexBuffer;
