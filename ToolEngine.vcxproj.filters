@@ -67,6 +67,12 @@
     <Filter Include="CameraSystem">
       <UniqueIdentifier>{0ee06906-4478-4336-860b-189e537498f3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ToolSystemMap">
+      <UniqueIdentifier>{934255c2-38eb-4726-b841-b3d9c18444fb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ToolSystemCharacter">
+      <UniqueIdentifier>{349fd12a-3eea-4e3b-9117-74fc82d63ebe}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="WindowSystem.h">
@@ -163,6 +169,15 @@
     <ClInclude Include="Mesh.h">
       <Filter>EngineSystem\ObjectManager\MeshSystem</Filter>
     </ClInclude>
+    <ClInclude Include="stb_image.h">
+      <Filter>ImguiSystem\Imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="ImFileDialog.h">
+      <Filter>ImguiSystem\Imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="ToolSystemMap.h">
+      <Filter>ToolSystemMap</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WindowSystem.cpp">
@@ -255,6 +270,12 @@
     </ClCompile>
     <ClCompile Include="Mesh.cpp">
       <Filter>EngineSystem\ObjectManager\MeshSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="ImFileDialog.cpp">
+      <Filter>ImguiSystem\Imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="ToolSystemMap.cpp">
+      <Filter>ToolSystemMap</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -5,59 +5,64 @@ void Camera::Update()
 {
 	if (_InputSystem.GetKey('W') || _InputSystem.GetKey('w'))
 	{
-		XMVECTOR v = m_vCameraDir * m_fCameraSpeed * 0.001f;
+		XMVECTOR v = m_vCameraDir * m_fCameraSpeed * m_fDelta;
 		m_vCameraPos += v;
 	}
 	if (_InputSystem.GetKey('S') || _InputSystem.GetKey('s'))
 	{
-		XMVECTOR v = m_vCameraDir * -m_fCameraSpeed * 0.001f;
+		XMVECTOR v = m_vCameraDir * -m_fCameraSpeed * m_fDelta;
 		m_vCameraPos += v;
 	}
 	if (_InputSystem.GetKey('A') || _InputSystem.GetKey('a'))
 	{
-		XMVECTOR v = m_vCameraRight * -m_fCameraSpeed * 0.001f;
+		XMVECTOR v = m_vCameraRight * -m_fCameraSpeed * m_fDelta;
 		m_vCameraPos += v;
 	}
 	if (_InputSystem.GetKey('D') || _InputSystem.GetKey('d'))
 	{
-		XMVECTOR v = m_vCameraRight * m_fCameraSpeed * 0.001f;
+		XMVECTOR v = m_vCameraRight * m_fCameraSpeed * m_fDelta;
 		m_vCameraPos += v;
 	}
 	if (_InputSystem.GetKey('Q') || _InputSystem.GetKey('q'))
 	{
-		XMVECTOR v = m_vCameraUp * m_fCameraSpeed * 0.001f;
+		XMVECTOR v = m_vCameraUp * m_fCameraSpeed * m_fDelta;
 		m_vCameraPos += v;
 	}
 	if (_InputSystem.GetKey('E') || _InputSystem.GetKey('e'))
 	{
-		XMVECTOR v = m_vCameraUp * -m_fCameraSpeed * 0.001f;
+		XMVECTOR v = m_vCameraUp * -m_fCameraSpeed * m_fDelta;
 		m_vCameraPos += v;
 	}
+
 	if (_InputSystem.GetKey(VK_LBUTTON))
 	{
-		m_fYaw += _InputSystem.m_ptOffSet.x * m_fCameraSpeed * 0.002f;
-		m_fPitch += _InputSystem.m_ptOffSet.y * m_fCameraSpeed * 0.002f;
+		m_fYaw += _InputSystem.m_ptOffSet.x * m_fCameraSpeed * m_fDelta;
+		m_fPitch += _InputSystem.m_ptOffSet.y * m_fCameraSpeed * m_fDelta;
 	}
-
+	
 	XMVECTOR scale = XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f);
 	XMVECTOR rotation =
 		XMQuaternionRotationRollPitchYaw(
 			_DegreeToRadian(m_fPitch),
 			_DegreeToRadian(m_fYaw),
 			_DegreeToRadian(m_fRoll));
+
 	XMVECTOR translation = m_vCameraPos;
 
-	m_matWorld = XMMatrixAffineTransformation(scale, { 0,0,0,1 }, rotation, translation);
+	m_matWorld = XMMatrixTransformation({ 0,0,0,1 }, { 0,0,0,1 },scale, m_vCameraDir, rotation, translation);
 
 	m_matCamera = XMMatrixInverse(NULL, m_matWorld);
 
 	m_vCameraRight = XMVectorSet(XMVectorGetX(m_matCamera.r[0]), XMVectorGetX(m_matCamera.r[1]), XMVectorGetX(m_matCamera.r[2]), XMVectorGetX(m_matCamera.r[3]));
 	XMVector3Normalize(m_vCameraRight);
+
 	m_vCameraUp = XMVectorSet(XMVectorGetY(m_matCamera.r[0]), XMVectorGetY(m_matCamera.r[1]), XMVectorGetY(m_matCamera.r[2]), XMVectorGetY(m_matCamera.r[3]));
 	XMVector3Normalize(m_vCameraUp);
+
 	m_vCameraDir = XMVectorSet(XMVectorGetZ(m_matCamera.r[0]), XMVectorGetZ(m_matCamera.r[1]), XMVectorGetZ(m_matCamera.r[2]), XMVectorGetZ(m_matCamera.r[3]));
 	XMVector3Normalize(m_vCameraDir);
 
+	
 	RECT rt = g_pWindow->GetClientWindowRect();
 	if (m_type == MAT_PROJ::ORTHO)
 	{

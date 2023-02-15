@@ -8,7 +8,9 @@
 #include <codecvt>
 #include <tchar.h>
 #include <unordered_map>
+#include <unordered_set>
 #include <string>
+#include <atlconv.h> 
 
 // Windows
 #include <Windows.h>
@@ -53,3 +55,5 @@ struct constant
 	XMMATRIX matView;
 	XMMATRIX matProj;
 };
+
+

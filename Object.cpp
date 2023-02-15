@@ -4,13 +4,15 @@ void Object::SetTransform(Transform transform)
 {
 	m_Transform = transform;
 	
-	XMVECTOR scale = XMLoadFloat3(&m_Transform.scale);
-	XMVECTOR rotation = 
+	XMVECTOR scale = m_Transform.scale;
+	XMFLOAT3 rotateAngle;
+	XMStoreFloat3(&rotateAngle, m_Transform.rotation);
+	XMVECTOR rotation =
 		XMQuaternionRotationRollPitchYaw(
-			_DegreeToRadian(transform.rotation.x), 
-			_DegreeToRadian(transform.rotation.y),
-			_DegreeToRadian(transform.rotation.z));
-	XMVECTOR translation = XMLoadFloat3(&m_Transform.position);
+			_DegreeToRadian(rotateAngle.x),
+			_DegreeToRadian(rotateAngle.y),
+			_DegreeToRadian(rotateAngle.z));
+	XMVECTOR translation = m_Transform.position;
 	constantData.matWorld = XMMatrixTransformation({ 0,0,0,1 }, { 0,0,0,1 },scale, { 0,0,0,1 }, rotation, translation);
 }
 

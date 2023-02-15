@@ -3,9 +3,9 @@
 #include "Mesh.h"
 struct Transform
 {
-	XMFLOAT3 position;
-	XMFLOAT3 rotation;
-	XMFLOAT3 scale;
+	XMVECTOR position;
+	XMVECTOR rotation;
+	XMVECTOR scale;
 };
 
 enum CULL_MODE

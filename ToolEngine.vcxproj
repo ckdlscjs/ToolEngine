@@ -26,6 +26,7 @@
     <ClInclude Include="EngineSystem.h" />
     <ClInclude Include="EntrySystem.h" />
     <ClInclude Include="imconfig.h" />
+    <ClInclude Include="ImFileDialog.h" />
     <ClInclude Include="imgui.h" />
     <ClInclude Include="ImguiSystem.h" />
     <ClInclude Include="imgui_impl_dx11.h" />
@@ -44,10 +45,12 @@
     <ClInclude Include="Resource.h" />
     <ClInclude Include="ObjectManager.h" />
     <ClInclude Include="ResourceSystem.h" />
+    <ClInclude Include="stb_image.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="SwapChain.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="TextureSystem.h" />
+    <ClInclude Include="ToolSystemMap.h" />
     <ClInclude Include="VertexBuffer.h" />
     <ClInclude Include="VertexShader.h" />
     <ClInclude Include="WindowSystem.h" />
@@ -59,6 +62,7 @@
     <ClCompile Include="Device.cpp" />
     <ClCompile Include="EngineSystem.cpp" />
     <ClCompile Include="EntrySystem.cpp" />
+    <ClCompile Include="ImFileDialog.cpp" />
     <ClCompile Include="imgui.cpp" />
     <ClCompile Include="ImguiSystem.cpp" />
     <ClCompile Include="imgui_demo.cpp" />
@@ -81,6 +85,7 @@
     <ClCompile Include="SwapChain.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="TextureSystem.cpp" />
+    <ClCompile Include="ToolSystemMap.cpp" />
     <ClCompile Include="VertexBuffer.cpp" />
     <ClCompile Include="VertexShader.cpp" />
     <ClCompile Include="WindowSystem.cpp" />

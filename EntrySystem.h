@@ -6,6 +6,7 @@
 #include "ImguiSystem.h"
 #include "ObjectManager.h"
 #include "CameraSystem.h"
+#include "ToolSystemMap.h"
 
 class EntrySystem : public WindowSystem
 {
@@ -27,15 +28,15 @@ public:
 	EntrySystem();
 	~EntrySystem();
 	
-	/*Variable Block*/
-	VertexBuffer* m_pVertexBuffer;
-	IndexBuffer* m_pIndexBuffer;
-	ConstantBuffer* m_pConstantBuffer;
-	VertexShader* m_pVertexShader;
-	PixelShader* m_pPixelShader;
-	
-	Texture* m_pTexture;
-	Camera* m_pCamera;
-	Object* m_pObject;
+	///*Variable Block*/
+	//VertexBuffer* m_pVertexBuffer;
+	//IndexBuffer* m_pIndexBuffer;
+	//ConstantBuffer* m_pConstantBuffer;
+	//VertexShader* m_pVertexShader;
+	//PixelShader* m_pPixelShader;
+	//
+	//Texture* m_pTexture;
+	//Camera* m_pCamera;
+	//Object* m_pObject;
 };
 
