@@ -117,6 +117,18 @@ namespace sylCollision
 		float fExtent[3];
 	};
 
+	struct _RAY
+	{
+		float			fExtent;
+		XMVECTOR		vOrigin;
+		XMVECTOR		vDirection;
+		_RAY()
+		{
+			//  fExtent > 0 : 세그먼트로 사용 
+			fExtent = -1;
+		}
+	};
+
 	class Collision
 	{
 	public:

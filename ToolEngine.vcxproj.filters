@@ -205,6 +205,9 @@
     <ClInclude Include="RasterizerState.h">
       <Filter>EngineSystem\RenderySystem\RasterizerState</Filter>
     </ClInclude>
+    <ClInclude Include="FSelect.h">
+      <Filter>ToolSystemMap\MapObject</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WindowSystem.cpp">
@@ -321,6 +324,9 @@
     </ClCompile>
     <ClCompile Include="RasterizerState.cpp">
       <Filter>EngineSystem\RenderySystem\RasterizerState</Filter>
+    </ClCompile>
+    <ClCompile Include="FSelect.cpp">
+      <Filter>ToolSystemMap\MapObject</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

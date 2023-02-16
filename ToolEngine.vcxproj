@@ -28,6 +28,7 @@
     <ClInclude Include="FNode.h" />
     <ClInclude Include="FQuadTree.h" />
     <ClInclude Include="Frustum.h" />
+    <ClInclude Include="FSelect.h" />
     <ClInclude Include="imconfig.h" />
     <ClInclude Include="ImFileDialog.h" />
     <ClInclude Include="imgui.h" />
@@ -71,6 +72,7 @@
     <ClCompile Include="FNode.cpp" />
     <ClCompile Include="FQuadTree.cpp" />
     <ClCompile Include="Frustum.cpp" />
+    <ClCompile Include="FSelect.cpp" />
     <ClCompile Include="ImFileDialog.cpp" />
     <ClCompile Include="imgui.cpp" />
     <ClCompile Include="ImguiSystem.cpp" />

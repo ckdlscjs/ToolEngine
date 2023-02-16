@@ -12,7 +12,7 @@ public:
 
 	void SetWireframe(bool bWireFrame);
 	void SetPicking(bool bPicking);
-	void CreateSimpleObject(int iChkIdx);
+	void CreateSimpleObject(int iChkIdx, XMVECTOR vPos);
 	void CreateSimpleMap(int iWidth, int iHeight,float fDistance);
 	void DeleteSimpleMap();
 	void OpenFile();

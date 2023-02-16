@@ -9,11 +9,12 @@ void ToolSystemMap::SetWireframe(bool bWireFrame)
 
 void ToolSystemMap::SetPicking(bool bPicking)
 {
+    if(m_pQuadTree)
+        m_pQuadTree->SetPicking(bPicking);
 }
 
-void ToolSystemMap::CreateSimpleObject(int iChkIdx)
+void ToolSystemMap::CreateSimpleObject(int iChkIdx, XMVECTOR vPos)
 {
-   
     object vertex_list[] =
     {
         //FrontFace
@@ -76,6 +77,7 @@ void ToolSystemMap::CreateSimpleObject(int iChkIdx)
     pMesh->m_pIndexBuffer = pIndexBuffer;
     constant cc;
     cc.matWorld = XMMatrixIdentity();
+    cc.matWorld = XMMatrixTranslationFromVector(vPos);
     cc.matView = m_pCamera->m_matCamera;
     cc.matProj = m_pCamera->m_matProj;
 
@@ -88,7 +90,7 @@ void ToolSystemMap::CreateSimpleObject(int iChkIdx)
     Object* pObject;
     pObject = _ObjectManager.CreateObject();
     pObject->SetConstantData(cc);
-    pObject->SetTransform({ _CameraSystem.GetCurrentCamera()->m_vCameraPos , {0, 0, 0}, {1, 1, 1} });
+    //pObject->SetTransform({ _CameraSystem.GetCurrentCamera()->m_vCameraPos , {0, 0, 0}, {1, 1, 1} });
     pObject->SetMesh(pMesh);
     pObject->SetShader(pVertexShader, pPixelShader);
     pObject->SetTexture(listTexture, m_ListTextures.size() - iChkIdx);
@@ -154,19 +156,6 @@ void ToolSystemMap::SaveFile(std::wstring szFullPath)
     outfile.close();
 }
 
-//void ToolSystemMap::Update()
-//{
-//  
-//        m_pMap->Update();
-//  
-//        m_pQuadTree->Update();
-//}
-//
-//void ToolSystemMap::Render()
-//{
-//
-//        m_pQuadTree->Render();
-//}
 
 ToolSystemMap::ToolSystemMap()
 {
