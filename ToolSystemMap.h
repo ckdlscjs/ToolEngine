@@ -3,9 +3,13 @@
 #include "ObjectManager.h"
 #include "CameraSystem.h"
 
+#include "MeshMap.h"
+#include "FQuadTree.h"
+
 class ToolSystemMap : public Singleton<ToolSystemMap>
 {
 public:
+	void CreateSimpleMap(int iWidth, int iHeight);
 	void CreateSimpleObject(int iChkIdx);
 public:
 	ToolSystemMap();

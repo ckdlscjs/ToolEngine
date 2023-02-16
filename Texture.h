@@ -1,10 +1,10 @@
 #pragma once
-#include "stdafx.h"
 #include "Resource.h"
 
 class Texture : public Resource
 {
 public:
+	Texture();
 	Texture(const wchar_t* szFullPath);
 	~Texture();
 private:

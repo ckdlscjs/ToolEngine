@@ -8,12 +8,12 @@ TextureSystem::~TextureSystem()
 {
 }
 
-Texture* TextureSystem::createTextureFromFile(const wchar_t* szFilePath)
+Texture* TextureSystem::CreateTextureFromFile(const wchar_t* szFilePath)
 {
-	return (Texture*)createResourceFromFile(szFilePath);
+	return (Texture*)CreateResourceFromFile(szFilePath);
 }
 
-Resource* TextureSystem::createResourceFromFileConcrete(const wchar_t* szFilePath)
+Resource* TextureSystem::CreateResourceFromFileConcrete(const wchar_t* szFilePath)
 {
 	Texture* pTexutre = new Texture(szFilePath);
 	return pTexutre;

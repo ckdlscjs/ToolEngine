@@ -1,6 +1,6 @@
 #pragma once
 #include "stdafx.h"
-
+#include "Frustum.h"
 enum MAT_PROJ
 {
 	ORTHO = 0,
@@ -30,5 +30,7 @@ public:
 	XMMATRIX m_matWorld;
 	XMMATRIX m_matCamera;
 	XMMATRIX m_matProj;
+
+	Frustum m_Frustum;
 };
 

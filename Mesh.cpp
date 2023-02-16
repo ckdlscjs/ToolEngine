@@ -8,8 +8,14 @@ IndexBuffer* Mesh::GetIndexBuffer()
 	return m_pIndexBuffer;
 }
 
-Mesh::Mesh()
+Mesh::Mesh() : Resource()
 {
+}
+
+
+Mesh::Mesh(const wchar_t* szFullPath) : Resource(szFullPath)
+{
+
 }
 
 Mesh::~Mesh()

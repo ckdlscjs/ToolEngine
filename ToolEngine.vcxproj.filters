@@ -73,6 +73,12 @@
     <Filter Include="ToolSystemCharacter">
       <UniqueIdentifier>{349fd12a-3eea-4e3b-9117-74fc82d63ebe}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ToolSystemMap\MapObject">
+      <UniqueIdentifier>{13463f5d-affc-4215-8510-cf7f6a0ea600}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CameraSystem\Frustum">
+      <UniqueIdentifier>{c7df679c-42db-43de-a844-4cefb66ad56f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="WindowSystem.h">
@@ -178,6 +184,21 @@
     <ClInclude Include="ToolSystemMap.h">
       <Filter>ToolSystemMap</Filter>
     </ClInclude>
+    <ClInclude Include="MeshMap.h">
+      <Filter>ToolSystemMap\MapObject</Filter>
+    </ClInclude>
+    <ClInclude Include="Frustum.h">
+      <Filter>CameraSystem\Frustum</Filter>
+    </ClInclude>
+    <ClInclude Include="sylCollision.h">
+      <Filter>PhysicsSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="FNode.h">
+      <Filter>ToolSystemMap\MapObject</Filter>
+    </ClInclude>
+    <ClInclude Include="FQuadTree.h">
+      <Filter>ToolSystemMap\MapObject</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WindowSystem.cpp">
@@ -276,6 +297,21 @@
     </ClCompile>
     <ClCompile Include="ToolSystemMap.cpp">
       <Filter>ToolSystemMap</Filter>
+    </ClCompile>
+    <ClCompile Include="MeshMap.cpp">
+      <Filter>ToolSystemMap\MapObject</Filter>
+    </ClCompile>
+    <ClCompile Include="Frustum.cpp">
+      <Filter>CameraSystem\Frustum</Filter>
+    </ClCompile>
+    <ClCompile Include="sylCollision.cpp">
+      <Filter>PhysicsSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="FNode.cpp">
+      <Filter>ToolSystemMap\MapObject</Filter>
+    </ClCompile>
+    <ClCompile Include="FQuadTree.cpp">
+      <Filter>ToolSystemMap\MapObject</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

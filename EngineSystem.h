@@ -6,7 +6,6 @@
 
 class EngineSystem : public Singleton<EngineSystem>
 {
-
 private:
 	void CreateRenderSystem();
 	void CreateTextureSystem();
@@ -16,6 +15,7 @@ public:
 	void Render();
 	RenderSystem* GetRenderSystem();
 	TextureSystem* GetTextureSystem();
+	MeshSystem* GetMeshSystem();
 public:
 	EngineSystem();
 	~EngineSystem();

@@ -25,6 +25,9 @@
     <ClInclude Include="Device.h" />
     <ClInclude Include="EngineSystem.h" />
     <ClInclude Include="EntrySystem.h" />
+    <ClInclude Include="FNode.h" />
+    <ClInclude Include="FQuadTree.h" />
+    <ClInclude Include="Frustum.h" />
     <ClInclude Include="imconfig.h" />
     <ClInclude Include="ImFileDialog.h" />
     <ClInclude Include="imgui.h" />
@@ -37,6 +40,7 @@
     <ClInclude Include="imstb_truetype.h" />
     <ClInclude Include="IndexBuffer.h" />
     <ClInclude Include="InputSystem.h" />
+    <ClInclude Include="MeshMap.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="MeshSystem.h" />
     <ClInclude Include="Object.h" />
@@ -48,6 +52,7 @@
     <ClInclude Include="stb_image.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="SwapChain.h" />
+    <ClInclude Include="sylCollision.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="TextureSystem.h" />
     <ClInclude Include="ToolSystemMap.h" />
@@ -62,6 +67,9 @@
     <ClCompile Include="Device.cpp" />
     <ClCompile Include="EngineSystem.cpp" />
     <ClCompile Include="EntrySystem.cpp" />
+    <ClCompile Include="FNode.cpp" />
+    <ClCompile Include="FQuadTree.cpp" />
+    <ClCompile Include="Frustum.cpp" />
     <ClCompile Include="ImFileDialog.cpp" />
     <ClCompile Include="imgui.cpp" />
     <ClCompile Include="ImguiSystem.cpp" />
@@ -74,6 +82,7 @@
     <ClCompile Include="IndexBuffer.cpp" />
     <ClCompile Include="InputSystem.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="MeshMap.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="MeshSystem.cpp" />
     <ClCompile Include="Object.cpp" />
@@ -83,6 +92,7 @@
     <ClCompile Include="ObjectManager.cpp" />
     <ClCompile Include="ResourceSystem.cpp" />
     <ClCompile Include="SwapChain.cpp" />
+    <ClCompile Include="sylCollision.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="TextureSystem.cpp" />
     <ClCompile Include="ToolSystemMap.cpp" />
@@ -205,7 +215,7 @@
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <ConformanceMode>true</ConformanceMode>
+      <ConformanceMode>false</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalIncludeDirectories>../../Include</AdditionalIncludeDirectories>
     </ClCompile>

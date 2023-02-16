@@ -11,5 +11,6 @@ private:
 private:
 	ID3D11Buffer* m_pBuffer;
 	friend class RenderSystem;
+	friend class MeshMap;
 };
 

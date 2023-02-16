@@ -52,7 +52,7 @@ void Camera::Update()
 	
 
 	//m_matWorld = XMMatrixScalingFromVector(scale) * XMMatrixRotationX(_DegreeToRadian(m_fPitch)) * XMMatrixRotationY(_DegreeToRadian(m_fYaw)) * XMMatrixRotationZ(_DegreeToRadian(m_fRoll)) * XMMatrixTranslationFromVector(translation);
-	m_matWorld = XMMatrixTransformation({ 0,0,0,1 }, { 0,0,0,1 }, scale, {0,0,0,1}, rotation, translation);
+	m_matWorld = XMMatrixTransformation({ 0,0,0,0 }, { 0,0,0,0 }, scale, {0,0,0,0}, rotation, translation);
 	m_matCamera = XMMatrixInverse(NULL, m_matWorld);
 
 	m_vCameraRight = XMVectorSet(XMVectorGetX(m_matCamera.r[0]), XMVectorGetX(m_matCamera.r[1]), XMVectorGetX(m_matCamera.r[2]), XMVectorGetX(m_matCamera.r[3]));
@@ -76,6 +76,11 @@ void Camera::Update()
 		m_matProj = XMMatrixPerspectiveFovLH(1.57f, ((float)(rt.right - rt.left) / (float)(rt.bottom - rt.top)), 0.1f, 1001.0f);
 		return;
 	}
+
+	/// <summary>
+	/// 
+	/// </summary>
+	m_Frustum.CreateFrustum(&m_matCamera, &m_matProj);
 }
 
 Camera::Camera(

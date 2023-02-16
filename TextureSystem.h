@@ -6,10 +6,10 @@ class TextureSystem : public ResourceSystem
 public:
 	TextureSystem();
 	~TextureSystem();
-	Texture* createTextureFromFile(const wchar_t* szFilePath);
+	Texture* CreateTextureFromFile(const wchar_t* szFilePath);
 protected:
 	// ResourceSystem을(를) 통해 상속됨
-	virtual Resource* createResourceFromFileConcrete(const wchar_t* szFilePath) override;
+	virtual Resource* CreateResourceFromFileConcrete(const wchar_t* szFilePath) override;
 	friend class RenderSystem;
 };
 

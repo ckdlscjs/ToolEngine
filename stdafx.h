@@ -25,11 +25,12 @@
 #pragma comment(lib, "DirectXTex.lib")
 
 // Math
-//#include "DXTK\SimpleMath.h"
+#include <DirectXMath.h>
 using namespace DirectX;
 #define _DegreeToRadian(X) X*(XM_PI/180.0f)
 #define _RadianToDegree(X) X*(180.0f/XM_PI)
-
+constexpr auto _PI = 3.141592f;
+constexpr auto _Epsilon = 0.001f;
 
 class WindowSystem;
 
@@ -48,6 +49,14 @@ public:
 	}
 };
 
+struct object
+{
+	XMFLOAT3 pos;
+	XMFLOAT2 tex;
+	XMFLOAT3 normal;
+	XMFLOAT4 color;
+};
+
 __declspec(align(16))
 struct constant
 {
@@ -56,4 +65,152 @@ struct constant
 	XMMATRIX matProj;
 };
 
+static XMFLOAT2 operator+(XMFLOAT2& a, XMFLOAT2& b)
+{
+	return XMFLOAT2(a.x + b.x, a.y + b.y);
+}
 
+static XMFLOAT2 operator-(XMFLOAT2& a, XMFLOAT2& b)
+{
+	return XMFLOAT2(a.x - b.x, a.y - b.y);
+}
+
+static XMFLOAT2 operator*(XMFLOAT2& a, float scala)
+{
+	return XMFLOAT2(a.x * scala, a.y * scala);
+}
+
+static XMFLOAT2 operator/(XMFLOAT2& a, float scala)
+{
+	return XMFLOAT2(a.x / scala, a.y / scala);
+}
+
+static XMFLOAT2 operator+=(XMFLOAT2& a, XMFLOAT2& b)
+{
+	a.x += b.x;
+	a.y += b.y;
+	return a;
+}
+
+static XMFLOAT2 operator-=(XMFLOAT2& a, XMFLOAT2& b)
+{
+	a.x -= b.x;
+	a.y -= b.y;
+	return a;
+}
+
+static XMFLOAT2 operator*=(XMFLOAT2& a, XMFLOAT2& b)
+{
+	a.x *= b.x;
+	a.y *= b.y;
+	return a;
+}
+
+static XMFLOAT2 operator/=(XMFLOAT2& a, XMFLOAT2& b)
+{
+	a.x /= b.x;
+	a.y /= b.y;
+	return a;
+}
+
+static bool operator==(XMFLOAT2& a, XMFLOAT2& b)
+{
+	if ((fabs(a.x - b.x) <= _Epsilon) && (fabs(a.y - b.y) <= _Epsilon))
+		return true;
+	else
+		return false;
+}
+
+static bool operator<=(XMFLOAT2& a, XMFLOAT2& b)
+{
+	if (a.x <= b.x && a.y <= b.y) 
+		return true;
+	else
+		return false;
+}
+
+static bool operator>=(XMFLOAT2& a, XMFLOAT2& b)
+{
+	if (a.x >= b.x && a.y >= b.y)
+		return true;
+	else
+		return false;
+}
+
+
+
+static XMFLOAT3 operator+(XMFLOAT3& a, XMFLOAT3& b)
+{
+	return XMFLOAT3(a.x + b.x, a.y + b.y, a.z + b.z);
+}
+
+static XMFLOAT3 operator-(XMFLOAT3& a, XMFLOAT3& b)
+{
+	return XMFLOAT3(a.x - b.x, a.y - b.y, a.z - b.z);
+}
+
+static XMFLOAT3 operator*(XMFLOAT3& a, float scala)
+{
+	return XMFLOAT3(a.x * scala, a.y * scala, a.z * scala);
+}
+
+static XMFLOAT3 operator/(XMFLOAT3& a, float scala)
+{
+	return XMFLOAT3(a.x / scala, a.y / scala, a.z / scala);
+}
+
+static XMFLOAT3 operator+=(XMFLOAT3& a, XMFLOAT3& b)
+{
+	a.x += b.x;
+	a.y += b.y;
+	a.y += b.z;
+	return a;
+}
+
+static XMFLOAT3 operator-=(XMFLOAT3& a, XMFLOAT3& b)
+{
+	a.x -= b.x;
+	a.y -= b.y;
+	a.z -= b.z;
+	return a;
+}
+
+static XMFLOAT3 operator*=(XMFLOAT3& a, XMFLOAT3& b)
+{
+	a.x *= b.x;
+	a.y *= b.y;
+	a.z *= b.z;
+	return a;
+}
+
+static XMFLOAT3 operator/=(XMFLOAT3& a, XMFLOAT3& b)
+{
+	a.x /= b.x;
+	a.y /= b.y;
+	a.z /= b.z;
+	return a;
+}
+
+static bool operator==(XMFLOAT3& a, XMFLOAT3& b)
+{
+	if ((fabs(a.x - b.x) <= _Epsilon) && (fabs(a.y - b.y) <= _Epsilon) && (fabs(a.z - b.z) <= _Epsilon))
+		return true;
+	else
+		return false;
+}
+
+static bool operator<=(XMFLOAT3& a, XMFLOAT3& b)
+{
+	if (a.x <= b.x && a.y <= b.y && a.z <= b.z)
+		return true;
+	else
+		return false;
+}
+
+static bool operator>=(XMFLOAT3& a, XMFLOAT3& b)
+{
+	if (a.x >= b.x && a.y >= b.y && a.z >= b.z)
+		return true;
+	else
+		return false;
+}

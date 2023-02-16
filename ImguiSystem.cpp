@@ -18,16 +18,34 @@ void ImguiSystem::Update()
     ImGui_ImplWin32_NewFrame();
     ImGui::NewFrame();
     //ImGui::DockSpaceOverViewport(ImGui::GetMainViewport());
+
+
     static int item_current_idx = 0; // Here we store our selection data as an index.
+    static int iMapSize[2] = { 0, 0 };
+    static bool bWireFrame = false;
+
     ImGui::Begin("Demo");
     {
+        if (ImGui::Checkbox("WireFrame", &bWireFrame))
+        {
+            ~bWireFrame;
+
+        }
+            
+
+        ImGui::Dummy({ 0, 10 });
         if(ImGui::Button("CreateObject"))
             _ToolSystemMap.CreateSimpleObject(item_current_idx);
-        
+
+        ImGui::Dummy({0, 10});
+        if(ImGui::Button("CreateMap"))
+            _ToolSystemMap.CreateSimpleMap(iMapSize[0]+1, iMapSize[1]+1);
+        ImGui::InputInt2("MapSize", iMapSize);
+
+        ImGui::Dummy({ 0, 10 });
         ImGui::Button("btn1");
 
-        ImGui::Button("btn1");
-
+        ImGui::Dummy({ 0, 10 });
         ImGui::Button("btn1");
     }
     ImGui::End();
@@ -43,8 +61,8 @@ void ImguiSystem::Update()
     //
 
     // 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
-   /* if (m_show_demo_window)
-        ImGui::ShowDemoWindow(&m_show_demo_window);*/
+    if (m_show_demo_window)
+        ImGui::ShowDemoWindow(&m_show_demo_window);
    
     //// 2. Show a simple window that we create ourselves. We use a Begin/End pair to create a named window.
     //{

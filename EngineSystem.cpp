@@ -43,6 +43,11 @@ TextureSystem* EngineSystem::GetTextureSystem()
 	return m_pTextureSystem;
 }
 
+MeshSystem* EngineSystem::GetMeshSystem()
+{
+	return m_pMeshSystem;
+}
+
 EngineSystem::EngineSystem()
 {
 	CreateRenderSystem();

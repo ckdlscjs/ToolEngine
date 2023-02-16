@@ -1,4 +1,8 @@
 #include "Texture.h"
+Texture::Texture() : Resource()
+{
+
+}
 
 Texture::Texture(const wchar_t* szFullPath) : Resource(szFullPath)
 {

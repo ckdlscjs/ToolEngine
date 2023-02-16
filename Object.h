@@ -31,7 +31,7 @@ public:
 public:
 	Object();
 	~Object();
-private:
+protected:
 	Transform m_Transform;
 	Mesh* m_pMesh;
 	VertexShader* m_pVertexShader;
@@ -42,5 +42,10 @@ private:
 	unsigned int m_iNumTextures;
 	unsigned int m_iDefaultTexture;
 	CULL_MODE m_CullMode;
+	/// <summary>
+	/// /////
+	/// </summary>
+	friend class FNode;
+	friend class ToolSystemMap;
 };
 

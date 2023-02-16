@@ -1,15 +1,21 @@
 #pragma once
-#include "EngineSystem.h"
-class Mesh
+#include "Resource.h"
+#include "VertexBuffer.h"
+#include "IndexBuffer.h"
+
+class Mesh : public Resource
 {
 public:
 	VertexBuffer* GetVertexBuffer();
 	IndexBuffer* GetIndexBuffer();
 //public:
 	Mesh();
+	Mesh(const wchar_t* szFullPath);
 	~Mesh();
 public:
+	std::vector<object> m_ListVertex;
 	VertexBuffer* m_pVertexBuffer;
+	std::vector<unsigned int> m_ListIndex;
 	IndexBuffer* m_pIndexBuffer;
 };
 

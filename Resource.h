@@ -3,6 +3,7 @@
 class Resource
 {
 public:
+	Resource();
 	Resource(const wchar_t* szFullPath);
 	virtual ~Resource();
 protected:
