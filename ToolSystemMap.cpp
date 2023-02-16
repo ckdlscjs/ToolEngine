@@ -7,10 +7,10 @@ void ToolSystemMap::SetWireframe(bool bWireFrame)
     _EngineSystem.GetRenderSystem()->SetWireFrame(bWireFrame);
 }
 
-void ToolSystemMap::SetPicking(bool bPicking)
+void ToolSystemMap::SetPicking(int iChkIdx, bool bPicking)
 {
     if(m_pQuadTree)
-        m_pQuadTree->SetPicking(bPicking);
+        m_pQuadTree->SetPicking(iChkIdx, bPicking);
 }
 
 void ToolSystemMap::CreateSimpleObject(int iChkIdx, XMVECTOR vPos)

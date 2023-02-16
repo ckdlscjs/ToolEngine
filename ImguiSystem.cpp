@@ -21,7 +21,7 @@ void ImguiSystem::Update()
 
 
     static int item_current_idx = 0; // Here we store our selection data as an index.
-    static int iMapSize[2] = { 4, 4 };
+    static int iMapSize = 4;
     static float fMapDistance = 1.0f;
     static bool bWireFrame = false;
     static bool bPicking = false;
@@ -39,7 +39,7 @@ void ImguiSystem::Update()
             if (ImGui::Checkbox("Picking", &bPicking))
             {
                 ~bPicking;
-                _ToolSystemMap.SetPicking(bPicking);
+                _ToolSystemMap.SetPicking(item_current_idx, bPicking);
             }
 
         }
@@ -56,9 +56,9 @@ void ImguiSystem::Update()
         {
             if (ImGui::Button("CreateMap"))
             {
-                _ToolSystemMap.CreateSimpleMap(iMapSize[0] + 1, iMapSize[1] + 1, fMapDistance);
+                _ToolSystemMap.CreateSimpleMap(iMapSize + 1, iMapSize + 1, fMapDistance);
             }
-            ImGui::InputInt2("MapSize", iMapSize);
+            ImGui::InputInt("MapSize", &iMapSize);
             ImGui::InputFloat("ShellDistance", &fMapDistance);
         }
         ImGui::Dummy({ 0, 10 });
@@ -175,7 +175,11 @@ void ImguiSystem::Update()
                 
             const bool is_selected = (item_current_idx == n);
             if (ImGui::Selectable(content.c_str(), is_selected))
+            {
                 item_current_idx = n;
+                _ToolSystemMap.SetPicking(item_current_idx, bPicking);
+            }
+                
 
             // Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
             if (is_selected)

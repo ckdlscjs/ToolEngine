@@ -11,7 +11,7 @@ class ToolSystemMap : public Singleton<ToolSystemMap>
 public:
 
 	void SetWireframe(bool bWireFrame);
-	void SetPicking(bool bPicking);
+	void SetPicking(int iChkIdx, bool bPicking);
 	void CreateSimpleObject(int iChkIdx, XMVECTOR vPos);
 	void CreateSimpleMap(int iWidth, int iHeight,float fDistance);
 	void DeleteSimpleMap();

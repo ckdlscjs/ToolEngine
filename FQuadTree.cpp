@@ -17,9 +17,10 @@ FQuadTree::~FQuadTree()
 {
     if (m_pRootNode != nullptr) delete m_pRootNode;
 }
-
-void FQuadTree::SetPicking(bool bPicking)
+#include "ToolSystemMap.h"
+void FQuadTree::SetPicking(int iChkIdx, bool bPicking)
 {
+    m_iChkIdx = iChkIdx;
     m_bPicking = bPicking;
 }
 
@@ -108,20 +109,19 @@ FNode* FQuadTree::VisibleNode(FNode* pNode)
     }
     return pNode;
 }
-#include "ToolSystemMap.h"
+
 void FQuadTree::Update()
 {
-    
-    FSelect point_select;
-    point_select.SetMatrix(nullptr, &m_pCamera->m_matCamera, &m_pCamera->m_matProj);
-
     Object::Update();
     m_pDrawLeafNodeList.clear();
     VisibleNode(m_pRootNode); //재귀로 VisibleNode체크
+
+    FSelect point_select;
+    point_select.SetMatrix(nullptr, &m_pCamera->m_matCamera, &m_pCamera->m_matProj);
     //교점체크
     if ((_InputSystem.GetKey(VK_RBUTTON) == KEY_STATE::KEY_DOWN) && m_bPicking)
     {
-        
+
         for (auto node : m_pDrawLeafNodeList)
         {
             UINT index = 0;
@@ -136,7 +136,7 @@ void FQuadTree::Update()
                 XMFLOAT3 v2 = m_pMesh->m_ListVertex[i2].pos;
                 if (point_select.ChkPick(XMLoadFloat3(&v0), XMLoadFloat3(&v1), XMLoadFloat3(&v2)))
                 {
-                    _ToolSystemMap.CreateSimpleObject(0, point_select.m_vIntersection);
+                    _ToolSystemMap.CreateSimpleObject(m_iChkIdx, point_select.m_vIntersection);
                     return;
                 }
                 index += 3;
