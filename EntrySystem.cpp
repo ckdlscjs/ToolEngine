@@ -64,10 +64,12 @@ void EntrySystem::Update()
    std::cout << pt.x << " | " << pt.y << std::endl;*/
     _ImguiSystem.Update();
     _ObjectManager.Update();
+
 }
 
 void EntrySystem::Render()
 {
+ 
     _ObjectManager.Render();
     _ImguiSystem.Render();
     _EngineSystem.Render();

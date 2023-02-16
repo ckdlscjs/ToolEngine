@@ -64,23 +64,19 @@ void Camera::Update()
 	m_vCameraDir = XMVectorSet(XMVectorGetZ(m_matCamera.r[0]), XMVectorGetZ(m_matCamera.r[1]), XMVectorGetZ(m_matCamera.r[2]), XMVectorGetZ(m_matCamera.r[3]));
 	XMVector3Normalize(m_vCameraDir);
 
-	
+
 	RECT rt = g_pWindow->GetClientWindowRect();
 	if (m_type == MAT_PROJ::ORTHO)
 	{
 		m_matProj = XMMatrixOrthographicLH((float)(rt.right - rt.left), (float)(rt.bottom - rt.top), 0.1f, 1001.0f);
-		return;
 	}
 	if (m_type == MAT_PROJ::PERSPECTIVE)
 	{
 		m_matProj = XMMatrixPerspectiveFovLH(1.57f, ((float)(rt.right - rt.left) / (float)(rt.bottom - rt.top)), 0.1f, 1001.0f);
-		return;
 	}
 
-	/// <summary>
-	/// 
-	/// </summary>
 	m_Frustum.CreateFrustum(&m_matCamera, &m_matProj);
+	
 }
 
 Camera::Camera(

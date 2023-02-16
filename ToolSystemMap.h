@@ -13,16 +13,19 @@ public:
 	void SetWireframe(bool bWireFrame);
 	void SetPicking(bool bPicking);
 	void CreateSimpleObject(int iChkIdx);
-	void CreateSimpleMap(int iWidth, int iHeight);
+	void CreateSimpleMap(int iWidth, int iHeight,float fDistance);
 	void DeleteSimpleMap();
 	void OpenFile();
 	void SaveFile(std::wstring szFullPath);
 public:
+	//void Update();
+	//void Render();
+public:
 	ToolSystemMap();
 	~ToolSystemMap();
 private:
-	Object* m_pMap;
 	Camera* m_pCamera;
+	FQuadTree* m_pQuadTree;
 	std::vector<std::wstring> m_ListTextures;
 	friend class ImguiSystem;
 };

@@ -7,6 +7,11 @@ Object* ObjectManager::CreateObject()
 	return pObject;
 }
 
+void ObjectManager::AddObject(Object* pObject)
+{
+	m_ListObject.insert(pObject);
+}
+
 void ObjectManager::DeleteObject(Object* pObject)
 {
 	m_ListObject.erase(pObject);

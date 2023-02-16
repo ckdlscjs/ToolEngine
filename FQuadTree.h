@@ -2,7 +2,7 @@
 #include "FNode.h"
 #include "MeshMap.h"
 #include "Object.h"
-class FQuadTree
+class FQuadTree : public Object
 {
 public:
 	FNode* m_pRootNode;
@@ -12,18 +12,16 @@ public:
 	std::vector<FNode*> m_pLeafNodeList;
 	std::vector<FNode*> m_pDrawLeafNodeList;
 public:
-	BOOL	Create(Camera* pCamera, MeshMap* pMap, int iMaxDepth = 2);
 	BOOL	AddObject(Object* pObj);
 	void	BuildTree(FNode* pNode, MeshMap* pMap);
 	BOOL	IsSubDivide(FNode* pNode);
 	FNode*	FindNode(FNode* pNode, Object* pObj);
 	void	Reset(FNode* pNode);
 	FNode*	VisibleNode(FNode* pNode);
-	BOOL	Frame();
-	BOOL	Render();
-	BOOL	Release();
+	void	Update();
+	void	Render();
 public:
-	FQuadTree() {}
-	~FQuadTree() { Release(); }
+	FQuadTree(Camera* pCamera, MeshMap* pMap, int iMaxDepth = 2);
+	~FQuadTree();
 };
 

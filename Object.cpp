@@ -57,7 +57,6 @@ void Object::Update()
 {
 	constantData.matView = _CameraSystem.GetCurrentCamera()->m_matCamera;
 	_EngineSystem.GetRenderSystem()->UpdateConstantBuffer(m_pConstantBuffer, &constantData);
-	
 }
 
 void Object::Render()

@@ -21,7 +21,8 @@ void ImguiSystem::Update()
 
 
     static int item_current_idx = 0; // Here we store our selection data as an index.
-    static int iMapSize[2] = { 0, 0 };
+    static int iMapSize[2] = { 4, 4 };
+    static float fMapDistance = 1.0f;
     static bool bWireFrame = false;
     static bool bPicking = false;
     ImGui::Begin("Demo");
@@ -55,9 +56,10 @@ void ImguiSystem::Update()
         {
             if (ImGui::Button("CreateMap"))
             {
-                _ToolSystemMap.CreateSimpleMap(iMapSize[0] + 1, iMapSize[1] + 1);
+                _ToolSystemMap.CreateSimpleMap(iMapSize[0] + 1, iMapSize[1] + 1, fMapDistance);
             }
             ImGui::InputInt2("MapSize", iMapSize);
+            ImGui::InputFloat("ShellDistance", &fMapDistance);
         }
         ImGui::Dummy({ 0, 10 });
 

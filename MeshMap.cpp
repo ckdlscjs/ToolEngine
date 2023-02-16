@@ -132,16 +132,15 @@ XMVECTOR MeshMap::ComputeFaceNormal(UINT i0, UINT i1, UINT i2)
     return vNormal;
 }
 
-MeshMap::MeshMap(UINT iWidth, UINT iHeight)
+MeshMap::MeshMap(UINT iWidth, UINT iHeight, float fShellDistance)
 {
+    m_fShellDistance = fShellDistance;
     m_dwNumRows = iHeight;
     m_dwNumColumns = iWidth;
     m_ListVertex.resize(m_dwNumRows * m_dwNumColumns);
     int iHalfWidth = m_dwNumColumns / 2;
     int iHalfHeight = m_dwNumRows / 2;
-    float fShellY = 1.0f;
-    float fShellDistance = 1.0f;
-    float fShellTexCount = 1.0f;
+    
     for (int iRow = 0; iRow < m_dwNumRows; iRow++)
     {
         for (int iCol = 0; iCol < m_dwNumColumns; iCol++)
@@ -150,9 +149,10 @@ MeshMap::MeshMap(UINT iWidth, UINT iHeight)
             float radRow = _DegreeToRadian(iRow);
             m_ListVertex[iRow * m_dwNumColumns + iCol].pos =
             {
-                (float)(iCol - iHalfWidth) * fShellDistance,
-                cosf(iCol) * fShellY + sinf(iRow) * fShellY,
-                (float)(iHalfHeight - iRow) * fShellDistance
+                (float)(iCol - iHalfWidth) * m_fShellDistance,
+                //cosf(iCol) * fShellY + sinf(iRow) * fShellY,
+                0.0f,
+                (float)(iHalfHeight - iRow) * m_fShellDistance
             };
             if (m_fHeightList.size())
             {
@@ -161,8 +161,8 @@ MeshMap::MeshMap(UINT iWidth, UINT iHeight)
                 
             m_ListVertex[iRow * m_dwNumColumns + iCol].color = { 1, 1, 1, 1 };
             m_ListVertex[iRow * m_dwNumColumns + iCol].tex =
-            { ((float)iCol / (float)(iWidth - 1)) * fShellTexCount,
-              ((float)iRow / (float)(iHeight - 1)) * fShellTexCount };
+            { ((float)iCol / (float)(iWidth - 1)) * m_fShellTexCount,
+              ((float)iRow / (float)(iHeight - 1)) * m_fShellTexCount };
         }
     }
     m_ListIndex.resize((m_dwNumRows - 1) * (m_dwNumColumns - 1) * 2 * 3.0f);

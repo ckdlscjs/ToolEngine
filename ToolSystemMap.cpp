@@ -94,10 +94,10 @@ void ToolSystemMap::CreateSimpleObject(int iChkIdx)
     pObject->SetTexture(listTexture, m_ListTextures.size() - iChkIdx);
 }
 
-void ToolSystemMap::CreateSimpleMap(int iWidth, int iHeight)
+void ToolSystemMap::CreateSimpleMap(int iWidth, int iHeight, float fDistance)
 {
 
-    MeshMap* pMapMesh = new MeshMap(iWidth, iHeight);
+    MeshMap* pMapMesh = new MeshMap(iWidth, iHeight, fDistance);
 
     void* shader_byte_code = nullptr;
     size_t size_shader = 0;
@@ -126,17 +126,18 @@ void ToolSystemMap::CreateSimpleMap(int iWidth, int iHeight)
         listTexture[idx] = _EngineSystem.GetTextureSystem()->CreateTextureFromFile(m_ListTextures[idx].c_str());
     }
 
-    m_pMap = _ObjectManager.CreateObject();
-    m_pMap->SetConstantData(cc);
-    m_pMap->SetTransform({ _CameraSystem.GetCurrentCamera()->m_vCameraPos , {0, 0, 0}, {1, 1, 1} });
-    m_pMap->SetMesh(pMapMesh);
-    m_pMap->SetShader(pVertexShader, pPixelShader);
-    m_pMap->SetTexture(listTexture, m_ListTextures.size());
+    m_pQuadTree = new FQuadTree(m_pCamera, pMapMesh);
+    m_pQuadTree->SetConstantData(cc);
+    m_pQuadTree->SetTransform({ _CameraSystem.GetCurrentCamera()->m_vCameraPos , {0, 0, 0}, {1, 1, 1} });
+    m_pQuadTree->SetMesh(pMapMesh);
+    m_pQuadTree->SetShader(pVertexShader, pPixelShader);
+    m_pQuadTree->SetTexture(listTexture, m_ListTextures.size());
+    _ObjectManager.AddObject(m_pQuadTree);
 }
 
 void ToolSystemMap::DeleteSimpleMap()
 {
-    _ObjectManager.DeleteObject(m_pMap);
+    _ObjectManager.DeleteObject(m_pQuadTree);
 }
 
 void ToolSystemMap::OpenFile()
@@ -153,6 +154,20 @@ void ToolSystemMap::SaveFile(std::wstring szFullPath)
     outfile.close();
 }
 
+//void ToolSystemMap::Update()
+//{
+//  
+//        m_pMap->Update();
+//  
+//        m_pQuadTree->Update();
+//}
+//
+//void ToolSystemMap::Render()
+//{
+//
+//        m_pQuadTree->Render();
+//}
+
 ToolSystemMap::ToolSystemMap()
 {
     m_pCamera = _CameraSystem.CreateCamera(L"MainCamera", MAT_PROJ::PERSPECTIVE, { 0,0,-2 }, { 0, 0, 1 }, { 0, 1, 0 });
@@ -161,4 +176,5 @@ ToolSystemMap::ToolSystemMap()
 
 ToolSystemMap::~ToolSystemMap()
 {
+ 
 }

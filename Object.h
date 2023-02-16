@@ -26,11 +26,11 @@ public:
 	void SetConstantData(constant cc);
 	void SetCullMode(CULL_MODE mode);
 	CULL_MODE GetCullMode();
-	void Update();
-	void Render();
+	virtual void Update();
+	virtual void Render();
 public:
 	Object();
-	~Object();
+	virtual ~Object();
 protected:
 	Transform m_Transform;
 	Mesh* m_pMesh;

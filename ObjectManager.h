@@ -7,6 +7,7 @@ class ObjectManager : public Singleton<ObjectManager>
 {
 public:
 	Object* CreateObject();
+	void AddObject(Object* pObject);
 	void DeleteObject(Object* pObject);
 public:
 	void Update();

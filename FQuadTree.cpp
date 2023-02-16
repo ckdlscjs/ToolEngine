@@ -1,6 +1,6 @@
 #include "FQuadTree.h"
 
-BOOL FQuadTree::Create(Camera* pCamera, MeshMap* pMap, int iMaxDepth)
+FQuadTree::FQuadTree(Camera* pCamera, MeshMap* pMap, int iMaxDepth)
 {
     m_pCamera = pCamera;
     m_pMap = pMap;
@@ -8,7 +8,11 @@ BOOL FQuadTree::Create(Camera* pCamera, MeshMap* pMap, int iMaxDepth)
     m_pRootNode = new FNode(nullptr, pMap, 0, m_pMap->m_dwNumColumns - 1, m_pMap->m_dwNumRows * (m_pMap->m_dwNumColumns - 1), m_pMap->m_dwNumRows * m_pMap->m_dwNumColumns - 1);
 
     BuildTree(m_pRootNode, pMap);
-    return TRUE;
+}
+
+FQuadTree::~FQuadTree()
+{
+    if (m_pRootNode != nullptr) delete m_pRootNode;
 }
 
 BOOL FQuadTree::AddObject(Object* pObj)
@@ -75,11 +79,11 @@ void FQuadTree::Reset(FNode* pNode)
 FNode* FQuadTree::VisibleNode(FNode* pNode)
 {
     F_POSITION dwRet = m_pCamera->m_Frustum.ClassifyBox(pNode->m_Box);
-    //if (F_FRONT == dwRet)// 완전포함.
-    //{
-    //    m_pDrawLeafNodeList.push_back(pNode);
-    //    return pNode;
-    //}
+    if (F_FRONT == dwRet)// 완전포함.
+    {
+        m_pDrawLeafNodeList.push_back(pNode);
+        return pNode;
+    }
     if (F_SPANNING == dwRet) // 걸쳐있다.
     {
         if (pNode->m_bLeaf)
@@ -97,27 +101,26 @@ FNode* FQuadTree::VisibleNode(FNode* pNode)
     return pNode;
 }
 
-BOOL FQuadTree::Frame()
+void FQuadTree::Update()
 {
+    Object::Update();
     m_pDrawLeafNodeList.clear();
     VisibleNode(m_pRootNode); //재귀로 VisibleNode체크
-    return TRUE;
 }
 
-BOOL FQuadTree::Render()
+void FQuadTree::Render()
 {
     for (auto node : m_pDrawLeafNodeList)
     {
-        /*m_pMap->PreRender();
-        m_pMap->m_pImmediateContext->IASetIndexBuffer(node->m_pIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
-        m_pMap->m_pImmediateContext->DrawIndexed(node->m_dwFace * 3, 0, 0);*/
+        _EngineSystem.GetRenderSystem()->SetConstantBuffer(m_pVertexShader, m_pConstantBuffer);
+        _EngineSystem.GetRenderSystem()->SetConstantBuffer(m_pPixelShader, m_pConstantBuffer);
+        _EngineSystem.GetRenderSystem()->SetVertexShader(m_pVertexShader);
+        _EngineSystem.GetRenderSystem()->SetPixelShader(m_pPixelShader);
+        _EngineSystem.GetRenderSystem()->SetVertexBuffer(m_pMesh->GetVertexBuffer());
+        g_pDeviceContext->IASetIndexBuffer(node->m_pIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
+        _EngineSystem.GetRenderSystem()->setTexture(m_pVertexShader, m_ListTextures, m_iNumTextures);
+        _EngineSystem.GetRenderSystem()->setTexture(m_pPixelShader, m_ListTextures, m_iNumTextures);
+        _EngineSystem.GetRenderSystem()->drawIndexedTriangleList(node->m_dwFace * 3, 0, 0);
+        //g_pDeviceContext->DrawIndexed(node->m_dwFace * 3, 0, 0);
     }
-    return true;
 }
-
-BOOL FQuadTree::Release()
-{
-    if (m_pRootNode != nullptr) delete m_pRootNode;
-    return TRUE;
-}
-

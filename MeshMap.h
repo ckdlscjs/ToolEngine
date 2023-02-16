@@ -4,12 +4,13 @@
 class MeshMap : public Mesh
 {
 public:
+
 	void	UpdateBuffer(Camera* pCamera);
 	void	LoadHeightMap(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, std::wstring szFullPath);	//높이맵을만드는함수
 	void	GenerateVertexNormal();																		//각 버텍스정점의 법선노말생성
 	XMVECTOR ComputeFaceNormal(UINT i0, UINT i1, UINT i2);
 public:
-	MeshMap(UINT iWidth, UINT iHeight);
+	MeshMap(UINT iWidth, UINT iHeight, float fShellDistance);
 	~MeshMap();
 public:
 	DWORD m_dwNumRows;
@@ -17,6 +18,9 @@ public:
 	DWORD m_dwFace;
 	std::vector<DWORD> m_dwIndexList;
 	std::vector<float> m_fHeightList;	//맵의y높이정보
+	float m_fShellY = 1.0f;
+	float m_fShellDistance = 1.0f;
+	float m_fShellTexCount = 1.0f;
 	friend class FNode;
 	friend class ToolSystemMap;
 };
