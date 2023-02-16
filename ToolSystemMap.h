@@ -11,9 +11,12 @@ class ToolSystemMap : public Singleton<ToolSystemMap>
 public:
 
 	void SetWireframe(bool bWireFrame);
+	void SetPicking(bool bPicking);
+	void CreateSimpleObject(int iChkIdx);
 	void CreateSimpleMap(int iWidth, int iHeight);
 	void DeleteSimpleMap();
-	void CreateSimpleObject(int iChkIdx);
+	void OpenFile();
+	void SaveFile(std::wstring szFullPath);
 public:
 	ToolSystemMap();
 	~ToolSystemMap();

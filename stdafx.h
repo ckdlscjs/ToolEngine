@@ -11,6 +11,7 @@
 #include <unordered_set>
 #include <string>
 #include <atlconv.h> 
+#include <fstream>
 
 // Windows
 #include <Windows.h>

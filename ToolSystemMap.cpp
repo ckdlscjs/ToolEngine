@@ -7,49 +7,8 @@ void ToolSystemMap::SetWireframe(bool bWireFrame)
     _EngineSystem.GetRenderSystem()->SetWireFrame(bWireFrame);
 }
 
-void ToolSystemMap::CreateSimpleMap(int iWidth, int iHeight)
+void ToolSystemMap::SetPicking(bool bPicking)
 {
-  
-    MeshMap* pMapMesh = new MeshMap(iWidth, iHeight);
-
-    void* shader_byte_code = nullptr;
-    size_t size_shader = 0;
-
-    _EngineSystem.GetRenderSystem()->CompileShader(L"DefaultVertexShader.hlsl", "vsmain", "vs_5_0", &shader_byte_code, &size_shader);
-    VertexShader* pVertexShader = _EngineSystem.GetRenderSystem()->CreateVertexShader(shader_byte_code, size_shader);
-    VertexBuffer* pVertexBuffer = _EngineSystem.GetRenderSystem()->CreateVertexBuffer(&pMapMesh->m_ListVertex[0], sizeof(object), pMapMesh->m_ListVertex.size(), shader_byte_code, size_shader);
-    IndexBuffer* pIndexBuffer = _EngineSystem.GetRenderSystem()->CreateIndexBuffer(&pMapMesh->m_ListIndex[0], pMapMesh->m_ListIndex.size());
-    _EngineSystem.GetRenderSystem()->ReleaseBlob();
-
-    _EngineSystem.GetRenderSystem()->CompileShader(L"DefaultPixelShader.hlsl", "psmain", "ps_5_0", &shader_byte_code, &size_shader);
-    PixelShader* pPixelShader = _EngineSystem.GetRenderSystem()->CreatePixelShader(shader_byte_code, size_shader);
-    _EngineSystem.GetRenderSystem()->ReleaseBlob();
-
-  
-    pMapMesh->m_pVertexBuffer = pVertexBuffer;
-    pMapMesh->m_pIndexBuffer = pIndexBuffer;
-    constant cc;
-    cc.matWorld = XMMatrixIdentity();
-    cc.matView = m_pCamera->m_matCamera;
-    cc.matProj = m_pCamera->m_matProj;
-
-    Texture** listTexture = new Texture * [m_ListTextures.size()];
-    for (int idx = 0; idx < m_ListTextures.size(); idx++)
-    {
-        listTexture[idx] = _EngineSystem.GetTextureSystem()->CreateTextureFromFile(m_ListTextures[idx].c_str());
-    }
- 
-    m_pMap = _ObjectManager.CreateObject();
-    m_pMap->SetConstantData(cc);
-    m_pMap->SetTransform({ _CameraSystem.GetCurrentCamera()->m_vCameraPos , {0, 0, 0}, {1, 1, 1} });
-    m_pMap->SetMesh(pMapMesh);
-    m_pMap->SetShader(pVertexShader, pPixelShader);
-    m_pMap->SetTexture(listTexture, m_ListTextures.size());
-}
-
-void ToolSystemMap::DeleteSimpleMap()
-{
-    _ObjectManager.DeleteObject(m_pMap);
 }
 
 void ToolSystemMap::CreateSimpleObject(int iChkIdx)
@@ -133,6 +92,65 @@ void ToolSystemMap::CreateSimpleObject(int iChkIdx)
     pObject->SetMesh(pMesh);
     pObject->SetShader(pVertexShader, pPixelShader);
     pObject->SetTexture(listTexture, m_ListTextures.size() - iChkIdx);
+}
+
+void ToolSystemMap::CreateSimpleMap(int iWidth, int iHeight)
+{
+
+    MeshMap* pMapMesh = new MeshMap(iWidth, iHeight);
+
+    void* shader_byte_code = nullptr;
+    size_t size_shader = 0;
+
+    _EngineSystem.GetRenderSystem()->CompileShader(L"DefaultVertexShader.hlsl", "vsmain", "vs_5_0", &shader_byte_code, &size_shader);
+    VertexShader* pVertexShader = _EngineSystem.GetRenderSystem()->CreateVertexShader(shader_byte_code, size_shader);
+    VertexBuffer* pVertexBuffer = _EngineSystem.GetRenderSystem()->CreateVertexBuffer(&pMapMesh->m_ListVertex[0], sizeof(object), pMapMesh->m_ListVertex.size(), shader_byte_code, size_shader);
+    IndexBuffer* pIndexBuffer = _EngineSystem.GetRenderSystem()->CreateIndexBuffer(&pMapMesh->m_ListIndex[0], pMapMesh->m_ListIndex.size());
+    _EngineSystem.GetRenderSystem()->ReleaseBlob();
+
+    _EngineSystem.GetRenderSystem()->CompileShader(L"DefaultPixelShader.hlsl", "psmain", "ps_5_0", &shader_byte_code, &size_shader);
+    PixelShader* pPixelShader = _EngineSystem.GetRenderSystem()->CreatePixelShader(shader_byte_code, size_shader);
+    _EngineSystem.GetRenderSystem()->ReleaseBlob();
+
+
+    pMapMesh->m_pVertexBuffer = pVertexBuffer;
+    pMapMesh->m_pIndexBuffer = pIndexBuffer;
+    constant cc;
+    cc.matWorld = XMMatrixIdentity();
+    cc.matView = m_pCamera->m_matCamera;
+    cc.matProj = m_pCamera->m_matProj;
+
+    Texture** listTexture = new Texture * [m_ListTextures.size()];
+    for (int idx = 0; idx < m_ListTextures.size(); idx++)
+    {
+        listTexture[idx] = _EngineSystem.GetTextureSystem()->CreateTextureFromFile(m_ListTextures[idx].c_str());
+    }
+
+    m_pMap = _ObjectManager.CreateObject();
+    m_pMap->SetConstantData(cc);
+    m_pMap->SetTransform({ _CameraSystem.GetCurrentCamera()->m_vCameraPos , {0, 0, 0}, {1, 1, 1} });
+    m_pMap->SetMesh(pMapMesh);
+    m_pMap->SetShader(pVertexShader, pPixelShader);
+    m_pMap->SetTexture(listTexture, m_ListTextures.size());
+}
+
+void ToolSystemMap::DeleteSimpleMap()
+{
+    _ObjectManager.DeleteObject(m_pMap);
+}
+
+void ToolSystemMap::OpenFile()
+{
+}
+
+void ToolSystemMap::SaveFile(std::wstring szFullPath)
+{
+    std::ofstream outfile(szFullPath);
+    for (auto object : _ObjectManager.m_ListObject)
+    {
+        outfile.write(reinterpret_cast<char*>(object), sizeof(Object));
+    }
+    outfile.close();
 }
 
 ToolSystemMap::ToolSystemMap()

@@ -1,6 +1,7 @@
 #pragma once
 #include "stdafx.h"
 #include "Object.h"
+#include "ToolSystemMap.h"
 
 class ObjectManager : public Singleton<ObjectManager>
 {
@@ -15,5 +16,6 @@ public:
 	~ObjectManager();
 private:
 	std::unordered_set<Object*> m_ListObject;
+	friend class ToolSystemMap;
 };
 #define _ObjectManager Singleton<ObjectManager>::GetInstance()

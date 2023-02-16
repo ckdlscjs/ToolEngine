@@ -23,7 +23,7 @@ void ImguiSystem::Update()
     static int item_current_idx = 0; // Here we store our selection data as an index.
     static int iMapSize[2] = { 0, 0 };
     static bool bWireFrame = false;
-
+    static bool bPicking = false;
     ImGui::Begin("Demo");
     {
         {
@@ -31,6 +31,14 @@ void ImguiSystem::Update()
             {
                 ~bWireFrame;
                 _ToolSystemMap.SetWireframe(bWireFrame);
+            }
+
+        }
+        {
+            if (ImGui::Checkbox("Picking", &bPicking))
+            {
+                ~bPicking;
+                
             }
 
         }
@@ -63,9 +71,19 @@ void ImguiSystem::Update()
 
        
         {
-            if (ImGui::Button("btn1"))
+            if (ImGui::Button("open"))
             {
+                ifd::FileDialog::Instance().Open("ShaderOpenDialog", "Open a shader", "*.sav {.sav}", true);
+                _ToolSystemMap.OpenFile();
+            }
+        }
+        ImGui::Dummy({ 0, 10 });
 
+        {
+            if (ImGui::Button("save"))
+            {
+                ifd::FileDialog::Instance().Save("ShaderSaveDialog", "Save a shader", "*.txt {.txt}");
+                //_ToolSystemMap.SaveFile();
             }
         }
         ImGui::Dummy({ 0, 10 });
@@ -132,8 +150,10 @@ void ImguiSystem::Update()
 
     /*ImGui::ListBox(nameID, &index, &list, listSize, showCount);
     ImGui::EndListBox();*/
+
     /*message_a.assign(message_w.begin(), message_w.end());
     printf(message_a.c_str());*/
+
     //const char* items[] = { "AAAA", "BBBB", "CCCC", "DDDD", "EEEE", "FFFF", "GGGG", "HHHH", "IIII", "JJJJ", "KKKK", "LLLLLLL", "MMMM", "OOOOOOO" };
     
 
@@ -182,21 +202,22 @@ void ImguiSystem::Update()
         ifd::FileDialog::Instance().Close();
     }
 
-    
     /*if (ifd::FileDialog::Instance().IsDone("DirectoryOpenDialog")) {
         if (ifd::FileDialog::Instance().HasResult()) {
             std::string res = ifd::FileDialog::Instance().GetResult().u8string();
             printf("DIRECTORY[%s]\n", res.c_str());
         }
         ifd::FileDialog::Instance().Close();
-    }
+    }*/
+
     if (ifd::FileDialog::Instance().IsDone("ShaderSaveDialog")) {
         if (ifd::FileDialog::Instance().HasResult()) {
-            std::string res = ifd::FileDialog::Instance().GetResult().u8string();
-            printf("SAVE[%s]\n", res.c_str());
+            std::wstring res = ifd::FileDialog::Instance().GetResult().wstring();
+            _ToolSystemMap.SaveFile(res);
+            //printf("SAVE[%s]\n", res.c_str());
         }
         ifd::FileDialog::Instance().Close();
-    }*/
+    }
 
 }
 
