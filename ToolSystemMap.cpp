@@ -2,6 +2,11 @@
 #include "Object.h"
 
 
+void ToolSystemMap::SetWireframe(bool bWireFrame)
+{
+    _EngineSystem.GetRenderSystem()->SetWireFrame(bWireFrame);
+}
+
 void ToolSystemMap::CreateSimpleMap(int iWidth, int iHeight)
 {
   
@@ -33,13 +38,18 @@ void ToolSystemMap::CreateSimpleMap(int iWidth, int iHeight)
     {
         listTexture[idx] = _EngineSystem.GetTextureSystem()->CreateTextureFromFile(m_ListTextures[idx].c_str());
     }
-    Object* pMap;
-    pMap = _ObjectManager.CreateObject();
-    pMap->SetConstantData(cc);
-    pMap->SetTransform({ _CameraSystem.GetCurrentCamera()->m_vCameraPos , {0, 0, 0}, {1, 1, 1} });
-    pMap->SetMesh(pMapMesh);
-    pMap->SetShader(pVertexShader, pPixelShader);
-    pMap->SetTexture(listTexture, m_ListTextures.size());
+ 
+    m_pMap = _ObjectManager.CreateObject();
+    m_pMap->SetConstantData(cc);
+    m_pMap->SetTransform({ _CameraSystem.GetCurrentCamera()->m_vCameraPos , {0, 0, 0}, {1, 1, 1} });
+    m_pMap->SetMesh(pMapMesh);
+    m_pMap->SetShader(pVertexShader, pPixelShader);
+    m_pMap->SetTexture(listTexture, m_ListTextures.size());
+}
+
+void ToolSystemMap::DeleteSimpleMap()
+{
+    _ObjectManager.DeleteObject(m_pMap);
 }
 
 void ToolSystemMap::CreateSimpleObject(int iChkIdx)

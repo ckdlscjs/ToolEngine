@@ -41,6 +41,11 @@ void RenderSystem::CreateSwapChain()
     m_pCSwapChain = new SwapChain(m_pCDevice->m_pDevice);
 }
 
+void RenderSystem::CreateRasterizeState(ID3D11Device* pDevice)
+{
+	m_pCRasterizerState = new RasterizerState(pDevice);
+}
+
 VertexBuffer* RenderSystem::CreateVertexBuffer(void* pVertices, UINT iSizeVertex, UINT iSizeList, void* pCodeShader, UINT iSizeShader)
 {
 	return new VertexBuffer(m_pCDevice->m_pDevice, pVertices, iSizeVertex, iSizeList, pCodeShader, iSizeShader);
@@ -126,6 +131,11 @@ void RenderSystem::ClearRenderTargetColor(float fRed, float fGreen, float fBlue,
 	m_pCDevice->m_pImmediateContext->ClearDepthStencilView(m_pCDevice->m_pDetphStenilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1, 0);
 	m_pCDevice->m_pImmediateContext->OMSetRenderTargets(1, &m_pCDevice->m_pRenderTargetView, m_pCDevice->m_pDetphStenilView);
 
+}
+
+void RenderSystem::SetWireFrame(bool bWireFrame)
+{
+	m_bWireFrame = bWireFrame;
 }
 
 void RenderSystem::SetViewport(UINT iWidth, UINT iHeight)
@@ -228,6 +238,7 @@ void RenderSystem::Reset()
 		_ImguiSystem.m_clear_color.w);	//렌터타겟을 지정한 컬러로 초기화
 	// Set viewport of rendertarget in which we have draw
 	RECT rt = g_pWindow->GetClientWindowRect();
+	m_pCDevice->m_pImmediateContext->RSSetState(m_bWireFrame ? m_pCRasterizerState->m_pDefaultRSWireFrame : m_pCRasterizerState->m_pDefaultRSSolid);
 	SetViewport(rt.right - rt.left, rt.bottom - rt.top);
 }
 
@@ -248,9 +259,10 @@ RenderSystem::RenderSystem()
 	std::cout << "Initialize : RenderSystem" << std::endl;
     CreateDevice();
 	CreateSwapChain();
+	CreateRasterizeState(m_pCDevice->m_pDevice);
 	RECT rt = g_pWindow->GetClientWindowRect();
 	ReloadBuffer(rt.right - rt.left, rt.bottom - rt.top);
-
+	
 	// Setup Platform/Renderer backends
 	ImGui_ImplWin32_Init(g_hWnd);
 	ImGui_ImplDX11_Init(m_pCDevice->m_pDevice, m_pCDevice->m_pImmediateContext);
@@ -263,4 +275,7 @@ RenderSystem::~RenderSystem()
 
 	if (m_pCSwapChain != nullptr) 
 		delete m_pCSwapChain;
+
+	if (m_pCRasterizerState != nullptr)
+		delete m_pCRasterizerState;
 }

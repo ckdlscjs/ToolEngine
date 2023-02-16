@@ -79,6 +79,9 @@
     <Filter Include="CameraSystem\Frustum">
       <UniqueIdentifier>{c7df679c-42db-43de-a844-4cefb66ad56f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="EngineSystem\RenderySystem\RasterizerState">
+      <UniqueIdentifier>{3253f162-5840-4863-890a-61ac204fc3b3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="WindowSystem.h">
@@ -199,6 +202,9 @@
     <ClInclude Include="FQuadTree.h">
       <Filter>ToolSystemMap\MapObject</Filter>
     </ClInclude>
+    <ClInclude Include="RasterizerState.h">
+      <Filter>EngineSystem\RenderySystem\RasterizerState</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WindowSystem.cpp">
@@ -312,6 +318,9 @@
     </ClCompile>
     <ClCompile Include="FQuadTree.cpp">
       <Filter>ToolSystemMap\MapObject</Filter>
+    </ClCompile>
+    <ClCompile Include="RasterizerState.cpp">
+      <Filter>EngineSystem\RenderySystem\RasterizerState</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

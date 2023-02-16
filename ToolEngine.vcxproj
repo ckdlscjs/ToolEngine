@@ -45,6 +45,7 @@
     <ClInclude Include="MeshSystem.h" />
     <ClInclude Include="Object.h" />
     <ClInclude Include="PixelShader.h" />
+    <ClInclude Include="RasterizerState.h" />
     <ClInclude Include="RenderSystem.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="ObjectManager.h" />
@@ -87,6 +88,7 @@
     <ClCompile Include="MeshSystem.cpp" />
     <ClCompile Include="Object.cpp" />
     <ClCompile Include="PixelShader.cpp" />
+    <ClCompile Include="RasterizerState.cpp" />
     <ClCompile Include="RenderSystem.cpp" />
     <ClCompile Include="Resource.cpp" />
     <ClCompile Include="ObjectManager.cpp" />

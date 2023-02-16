@@ -26,27 +26,50 @@ void ImguiSystem::Update()
 
     ImGui::Begin("Demo");
     {
-        if (ImGui::Checkbox("WireFrame", &bWireFrame))
         {
-            ~bWireFrame;
+            if (ImGui::Checkbox("WireFrame", &bWireFrame))
+            {
+                ~bWireFrame;
+                _ToolSystemMap.SetWireframe(bWireFrame);
+            }
 
         }
-            
-
         ImGui::Dummy({ 0, 10 });
-        if(ImGui::Button("CreateObject"))
-            _ToolSystemMap.CreateSimpleObject(item_current_idx);
 
-        ImGui::Dummy({0, 10});
-        if(ImGui::Button("CreateMap"))
-            _ToolSystemMap.CreateSimpleMap(iMapSize[0]+1, iMapSize[1]+1);
-        ImGui::InputInt2("MapSize", iMapSize);
+        {
+            if (ImGui::Button("CreateObject"))
+                _ToolSystemMap.CreateSimpleObject(item_current_idx);
 
+        }
         ImGui::Dummy({ 0, 10 });
-        ImGui::Button("btn1");
 
+
+        {
+            if (ImGui::Button("CreateMap"))
+            {
+                _ToolSystemMap.CreateSimpleMap(iMapSize[0] + 1, iMapSize[1] + 1);
+            }
+            ImGui::InputInt2("MapSize", iMapSize);
+        }
         ImGui::Dummy({ 0, 10 });
-        ImGui::Button("btn1");
+
+        {
+            if (ImGui::Button("DeleteMap"))
+            {
+                _ToolSystemMap.DeleteSimpleMap();
+            }
+        }
+        ImGui::Dummy({ 0, 10 });
+
+       
+        {
+            if (ImGui::Button("btn1"))
+            {
+
+            }
+        }
+        ImGui::Dummy({ 0, 10 });
+
     }
     ImGui::End();
    

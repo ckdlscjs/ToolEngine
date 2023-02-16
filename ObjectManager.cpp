@@ -3,8 +3,14 @@
 Object* ObjectManager::CreateObject()
 {
 	Object* pObject = new Object();
-	m_ListObject.push_back(pObject);
+	m_ListObject.insert(pObject);
 	return pObject;
+}
+
+void ObjectManager::DeleteObject(Object* pObject)
+{
+	m_ListObject.erase(pObject);
+	delete pObject;
 }
 
 void ObjectManager::Update()

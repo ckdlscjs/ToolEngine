@@ -1,6 +1,7 @@
 #pragma once
 #include "stdafx.h"
 #include "Device.h"
+#include "RasterizerState.h"
 #include "SwapChain.h"
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
@@ -15,6 +16,7 @@ public:
 	/*Create Block*/
 	void CreateDevice();
 	void CreateSwapChain();
+	void CreateRasterizeState(ID3D11Device* pDevice);
 
 	/*Shader Block*/
 	void CompileShader(const wchar_t* szFilePath, const char* entryPointName, const char* shaderVersion, void** shaderCode, size_t* shaderSize);
@@ -30,6 +32,7 @@ public:
 public:
 	/*Set Block*/
 	void ClearRenderTargetColor(float red, float green, float blue, float alpha);
+	void SetWireFrame(bool bWireFrame);
 	void SetViewport(UINT iWidth, UINT iHeight);
 	void SetFullScreen(bool bFullscreen, unsigned int iWidth, unsigned int iHeight);
 	void Resize(unsigned int iWidth, unsigned int iHeight);
@@ -62,8 +65,10 @@ public:
 private:
 	Device* m_pCDevice;
 	SwapChain* m_pCSwapChain;
+	RasterizerState* m_pCRasterizerState;
 	ID3DBlob* m_pBlobCode;
 	ID3DBlob* m_pBlobErr;
+	bool m_bWireFrame;
 
 	friend class EngineSystem;
 	friend class ImguiSystem;
