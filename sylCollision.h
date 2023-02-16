@@ -119,9 +119,9 @@ namespace sylCollision
 
 	struct _RAY
 	{
-		float			fExtent;
-		XMVECTOR		vOrigin;
-		XMVECTOR		vDirection;
+		float			fExtent = 0.0f;
+		XMVECTOR		vOrigin = XMVectorSet(0, 0, 0, 0);
+		XMVECTOR		vDirection = XMVectorSet(0, 0, 0, 0);
 		_RAY()
 		{
 			//  fExtent > 0 : 세그먼트로 사용 

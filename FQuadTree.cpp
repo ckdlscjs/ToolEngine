@@ -111,13 +111,17 @@ FNode* FQuadTree::VisibleNode(FNode* pNode)
 #include "ToolSystemMap.h"
 void FQuadTree::Update()
 {
+    
+    FSelect point_select;
+    point_select.SetMatrix(nullptr, &m_pCamera->m_matCamera, &m_pCamera->m_matProj);
+
     Object::Update();
     m_pDrawLeafNodeList.clear();
     VisibleNode(m_pRootNode); //재귀로 VisibleNode체크
     //교점체크
     if ((_InputSystem.GetKey(VK_RBUTTON) == KEY_STATE::KEY_DOWN) && m_bPicking)
     {
-        FSelect point_select;
+        
         for (auto node : m_pDrawLeafNodeList)
         {
             UINT index = 0;

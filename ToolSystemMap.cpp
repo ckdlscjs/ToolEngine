@@ -77,7 +77,6 @@ void ToolSystemMap::CreateSimpleObject(int iChkIdx, XMVECTOR vPos)
     pMesh->m_pIndexBuffer = pIndexBuffer;
     constant cc;
     cc.matWorld = XMMatrixIdentity();
-    cc.matWorld = XMMatrixTranslationFromVector(vPos);
     cc.matView = m_pCamera->m_matCamera;
     cc.matProj = m_pCamera->m_matProj;
 
@@ -90,7 +89,7 @@ void ToolSystemMap::CreateSimpleObject(int iChkIdx, XMVECTOR vPos)
     Object* pObject;
     pObject = _ObjectManager.CreateObject();
     pObject->SetConstantData(cc);
-    //pObject->SetTransform({ _CameraSystem.GetCurrentCamera()->m_vCameraPos , {0, 0, 0}, {1, 1, 1} });
+    pObject->SetTransform({ vPos , {0, 0, 0}, {1, 1, 1} });
     pObject->SetMesh(pMesh);
     pObject->SetShader(pVertexShader, pPixelShader);
     pObject->SetTexture(listTexture, m_ListTextures.size() - iChkIdx);
@@ -130,7 +129,7 @@ void ToolSystemMap::CreateSimpleMap(int iWidth, int iHeight, float fDistance)
 
     m_pQuadTree = new FQuadTree(m_pCamera, pMapMesh);
     m_pQuadTree->SetConstantData(cc);
-    m_pQuadTree->SetTransform({ _CameraSystem.GetCurrentCamera()->m_vCameraPos , {0, 0, 0}, {1, 1, 1} });
+    m_pQuadTree->SetTransform({ {0,0,0} , {0, 0, 0}, {1, 1, 1} });
     m_pQuadTree->SetMesh(pMapMesh);
     m_pQuadTree->SetShader(pVertexShader, pPixelShader);
     m_pQuadTree->SetTexture(listTexture, m_ListTextures.size());
