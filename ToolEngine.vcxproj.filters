@@ -46,41 +46,50 @@
     <Filter Include="EngineSystem\RenderySystem\PixelShader">
       <UniqueIdentifier>{7784ca5a-7455-41c8-bf39-d1c9b157c3c1}</UniqueIdentifier>
     </Filter>
-    <Filter Include="EngineSystem\ObjectManager">
-      <UniqueIdentifier>{aeace847-671b-48cf-9d58-553c0ba7b304}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="EngineSystem\ObjectManager\TextureSystem">
-      <UniqueIdentifier>{4c22790f-5137-41bb-bf32-33acbb1aa8d4}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="EngineSystem\ObjectManager\MaterialSystem">
-      <UniqueIdentifier>{35e4ab3a-7c1b-4b2c-b298-8fa7b3cf7e51}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="EngineSystem\ObjectManager\MeshSystem">
-      <UniqueIdentifier>{56d08058-abd3-4b96-89cb-e4a804203f7b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="EngineSystem\ObjectManager\ResourceSystem">
-      <UniqueIdentifier>{960b28d9-d01f-42eb-92e6-5961374e11fc}</UniqueIdentifier>
-    </Filter>
     <Filter Include="PhysicsSystem">
       <UniqueIdentifier>{f7efe1f4-6912-4152-abc8-9479a593c9a4}</UniqueIdentifier>
     </Filter>
     <Filter Include="CameraSystem">
       <UniqueIdentifier>{0ee06906-4478-4336-860b-189e537498f3}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ToolSystemMap">
-      <UniqueIdentifier>{934255c2-38eb-4726-b841-b3d9c18444fb}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ToolSystemCharacter">
-      <UniqueIdentifier>{349fd12a-3eea-4e3b-9117-74fc82d63ebe}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="ToolSystemMap\MapObject">
-      <UniqueIdentifier>{13463f5d-affc-4215-8510-cf7f6a0ea600}</UniqueIdentifier>
-    </Filter>
     <Filter Include="CameraSystem\Frustum">
       <UniqueIdentifier>{c7df679c-42db-43de-a844-4cefb66ad56f}</UniqueIdentifier>
     </Filter>
     <Filter Include="EngineSystem\RenderySystem\RasterizerState">
       <UniqueIdentifier>{3253f162-5840-4863-890a-61ac204fc3b3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ToolSystem">
+      <UniqueIdentifier>{ff22594f-e7dc-42fc-8b73-5e2398cca654}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ToolSystem\ToolSystemUI">
+      <UniqueIdentifier>{4c3993ff-40a4-4631-af39-1db93c7627ef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ToolSystem\ToolSystemEffect">
+      <UniqueIdentifier>{0a554dec-f709-4b80-85f8-1d2bb2b5b845}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ToolSystem\ToolSystemCharacter">
+      <UniqueIdentifier>{349fd12a-3eea-4e3b-9117-74fc82d63ebe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ToolSystem\ToolSystemMap">
+      <UniqueIdentifier>{934255c2-38eb-4726-b841-b3d9c18444fb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ToolSystem\ToolSystemMap\MapObject">
+      <UniqueIdentifier>{13463f5d-affc-4215-8510-cf7f6a0ea600}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="EngineSystem\ObjectSystem">
+      <UniqueIdentifier>{aeace847-671b-48cf-9d58-553c0ba7b304}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="EngineSystem\ObjectSystem\TextureSystem">
+      <UniqueIdentifier>{4c22790f-5137-41bb-bf32-33acbb1aa8d4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="EngineSystem\ObjectSystem\MaterialSystem">
+      <UniqueIdentifier>{35e4ab3a-7c1b-4b2c-b298-8fa7b3cf7e51}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="EngineSystem\ObjectSystem\MeshSystem">
+      <UniqueIdentifier>{56d08058-abd3-4b96-89cb-e4a804203f7b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="EngineSystem\ObjectSystem\ResourceSystem">
+      <UniqueIdentifier>{960b28d9-d01f-42eb-92e6-5961374e11fc}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -149,22 +158,22 @@
       <Filter>EngineSystem\RenderySystem\ConstantBuffer</Filter>
     </ClInclude>
     <ClInclude Include="Texture.h">
-      <Filter>EngineSystem\ObjectManager\TextureSystem</Filter>
+      <Filter>EngineSystem\ObjectSystem\TextureSystem</Filter>
     </ClInclude>
     <ClInclude Include="TextureSystem.h">
-      <Filter>EngineSystem\ObjectManager\TextureSystem</Filter>
+      <Filter>EngineSystem\ObjectSystem\TextureSystem</Filter>
     </ClInclude>
-    <ClInclude Include="ObjectManager.h">
-      <Filter>EngineSystem\ObjectManager</Filter>
+    <ClInclude Include="ObjectSystem.h">
+      <Filter>EngineSystem\ObjectSystem</Filter>
     </ClInclude>
     <ClInclude Include="Resource.h">
-      <Filter>EngineSystem\ObjectManager\ResourceSystem</Filter>
+      <Filter>EngineSystem\ObjectSystem\ResourceSystem</Filter>
     </ClInclude>
     <ClInclude Include="ResourceSystem.h">
-      <Filter>EngineSystem\ObjectManager\ResourceSystem</Filter>
+      <Filter>EngineSystem\ObjectSystem\ResourceSystem</Filter>
     </ClInclude>
     <ClInclude Include="Object.h">
-      <Filter>EngineSystem\ObjectManager</Filter>
+      <Filter>EngineSystem\ObjectSystem</Filter>
     </ClInclude>
     <ClInclude Include="CameraSystem.h">
       <Filter>CameraSystem</Filter>
@@ -173,10 +182,10 @@
       <Filter>CameraSystem</Filter>
     </ClInclude>
     <ClInclude Include="MeshSystem.h">
-      <Filter>EngineSystem\ObjectManager\MeshSystem</Filter>
+      <Filter>EngineSystem\ObjectSystem\MeshSystem</Filter>
     </ClInclude>
     <ClInclude Include="Mesh.h">
-      <Filter>EngineSystem\ObjectManager\MeshSystem</Filter>
+      <Filter>EngineSystem\ObjectSystem\MeshSystem</Filter>
     </ClInclude>
     <ClInclude Include="stb_image.h">
       <Filter>ImguiSystem\Imgui</Filter>
@@ -185,10 +194,10 @@
       <Filter>ImguiSystem\Imgui</Filter>
     </ClInclude>
     <ClInclude Include="ToolSystemMap.h">
-      <Filter>ToolSystemMap</Filter>
+      <Filter>ToolSystem\ToolSystemMap</Filter>
     </ClInclude>
     <ClInclude Include="MeshMap.h">
-      <Filter>ToolSystemMap\MapObject</Filter>
+      <Filter>ToolSystem\ToolSystemMap\MapObject</Filter>
     </ClInclude>
     <ClInclude Include="Frustum.h">
       <Filter>CameraSystem\Frustum</Filter>
@@ -197,16 +206,22 @@
       <Filter>PhysicsSystem</Filter>
     </ClInclude>
     <ClInclude Include="FNode.h">
-      <Filter>ToolSystemMap\MapObject</Filter>
+      <Filter>ToolSystem\ToolSystemMap\MapObject</Filter>
     </ClInclude>
     <ClInclude Include="FQuadTree.h">
-      <Filter>ToolSystemMap\MapObject</Filter>
+      <Filter>ToolSystem\ToolSystemMap\MapObject</Filter>
     </ClInclude>
     <ClInclude Include="RasterizerState.h">
       <Filter>EngineSystem\RenderySystem\RasterizerState</Filter>
     </ClInclude>
     <ClInclude Include="FSelect.h">
-      <Filter>ToolSystemMap\MapObject</Filter>
+      <Filter>ToolSystem\ToolSystemMap\MapObject</Filter>
+    </ClInclude>
+    <ClInclude Include="Material.h">
+      <Filter>EngineSystem\ObjectSystem\MaterialSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="MaterialSystem.h">
+      <Filter>EngineSystem\ObjectSystem\MaterialSystem</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -272,22 +287,22 @@
       <Filter>EngineSystem\RenderySystem\ConstantBuffer</Filter>
     </ClCompile>
     <ClCompile Include="Texture.cpp">
-      <Filter>EngineSystem\ObjectManager\TextureSystem</Filter>
+      <Filter>EngineSystem\ObjectSystem\TextureSystem</Filter>
     </ClCompile>
     <ClCompile Include="TextureSystem.cpp">
-      <Filter>EngineSystem\ObjectManager\TextureSystem</Filter>
+      <Filter>EngineSystem\ObjectSystem\TextureSystem</Filter>
     </ClCompile>
-    <ClCompile Include="ObjectManager.cpp">
-      <Filter>EngineSystem\ObjectManager</Filter>
+    <ClCompile Include="ObjectSystem.cpp">
+      <Filter>EngineSystem\ObjectSystem</Filter>
     </ClCompile>
     <ClCompile Include="Resource.cpp">
-      <Filter>EngineSystem\ObjectManager\ResourceSystem</Filter>
+      <Filter>EngineSystem\ObjectSystem\ResourceSystem</Filter>
     </ClCompile>
     <ClCompile Include="ResourceSystem.cpp">
-      <Filter>EngineSystem\ObjectManager\ResourceSystem</Filter>
+      <Filter>EngineSystem\ObjectSystem\ResourceSystem</Filter>
     </ClCompile>
     <ClCompile Include="Object.cpp">
-      <Filter>EngineSystem\ObjectManager</Filter>
+      <Filter>EngineSystem\ObjectSystem</Filter>
     </ClCompile>
     <ClCompile Include="CameraSystem.cpp">
       <Filter>CameraSystem</Filter>
@@ -296,19 +311,19 @@
       <Filter>CameraSystem</Filter>
     </ClCompile>
     <ClCompile Include="MeshSystem.cpp">
-      <Filter>EngineSystem\ObjectManager\MeshSystem</Filter>
+      <Filter>EngineSystem\ObjectSystem\MeshSystem</Filter>
     </ClCompile>
     <ClCompile Include="Mesh.cpp">
-      <Filter>EngineSystem\ObjectManager\MeshSystem</Filter>
+      <Filter>EngineSystem\ObjectSystem\MeshSystem</Filter>
     </ClCompile>
     <ClCompile Include="ImFileDialog.cpp">
       <Filter>ImguiSystem\Imgui</Filter>
     </ClCompile>
     <ClCompile Include="ToolSystemMap.cpp">
-      <Filter>ToolSystemMap</Filter>
+      <Filter>ToolSystem\ToolSystemMap</Filter>
     </ClCompile>
     <ClCompile Include="MeshMap.cpp">
-      <Filter>ToolSystemMap\MapObject</Filter>
+      <Filter>ToolSystem\ToolSystemMap\MapObject</Filter>
     </ClCompile>
     <ClCompile Include="Frustum.cpp">
       <Filter>CameraSystem\Frustum</Filter>
@@ -317,16 +332,22 @@
       <Filter>PhysicsSystem</Filter>
     </ClCompile>
     <ClCompile Include="FNode.cpp">
-      <Filter>ToolSystemMap\MapObject</Filter>
+      <Filter>ToolSystem\ToolSystemMap\MapObject</Filter>
     </ClCompile>
     <ClCompile Include="FQuadTree.cpp">
-      <Filter>ToolSystemMap\MapObject</Filter>
+      <Filter>ToolSystem\ToolSystemMap\MapObject</Filter>
     </ClCompile>
     <ClCompile Include="RasterizerState.cpp">
       <Filter>EngineSystem\RenderySystem\RasterizerState</Filter>
     </ClCompile>
     <ClCompile Include="FSelect.cpp">
-      <Filter>ToolSystemMap\MapObject</Filter>
+      <Filter>ToolSystem\ToolSystemMap\MapObject</Filter>
+    </ClCompile>
+    <ClCompile Include="Material.cpp">
+      <Filter>EngineSystem\ObjectSystem\MaterialSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="MaterialSystem.cpp">
+      <Filter>EngineSystem\ObjectSystem\MaterialSystem</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

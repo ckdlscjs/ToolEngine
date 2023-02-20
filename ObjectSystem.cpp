@@ -1,41 +1,41 @@
-#include "ObjectManager.h"
+#include "ObjectSystem.h"
 
-Object* ObjectManager::CreateObject()
+Object* ObjectSystem::CreateObject()
 {
 	Object* pObject = new Object();
 	m_ListObject.insert(pObject);
 	return pObject;
 }
 
-void ObjectManager::AddObject(Object* pObject)
+void ObjectSystem::AddObject(Object* pObject)
 {
 	m_ListObject.insert(pObject);
 }
 
-void ObjectManager::DeleteObject(Object* pObject)
+void ObjectSystem::DeleteObject(Object* pObject)
 {
 	m_ListObject.erase(pObject);
 	delete pObject;
 }
 
-void ObjectManager::Update()
+void ObjectSystem::Update()
 {
 	for (auto object : m_ListObject)
 		object->Update();
 }
 
-void ObjectManager::Render()
+void ObjectSystem::Render()
 {
 	for (auto object : m_ListObject)
 		object->Render();
 }
 
-ObjectManager::ObjectManager()
+ObjectSystem::ObjectSystem()
 {
 
 }
 
-ObjectManager::~ObjectManager()
+ObjectSystem::~ObjectSystem()
 {
 	for (auto iter = m_ListObject.begin(); iter != m_ListObject.end(); )
 	{

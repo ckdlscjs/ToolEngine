@@ -87,7 +87,7 @@ void ToolSystemMap::CreateSimpleObject(int iChkIdx, XMVECTOR vPos)
     }
 
     Object* pObject;
-    pObject = _ObjectManager.CreateObject();
+    pObject = _ObjectSystem.CreateObject();
     pObject->SetConstantData(cc);
     pObject->SetTransform({ vPos , {0, 0, 0}, {1, 1, 1} });
     pObject->SetMesh(pMesh);
@@ -133,12 +133,12 @@ void ToolSystemMap::CreateSimpleMap(int iWidth, int iHeight, float fDistance)
     m_pQuadTree->SetMesh(pMapMesh);
     m_pQuadTree->SetShader(pVertexShader, pPixelShader);
     m_pQuadTree->SetTexture(listTexture, m_ListTextures.size());
-    _ObjectManager.AddObject(m_pQuadTree);
+    _ObjectSystem.AddObject(m_pQuadTree);
 }
 
 void ToolSystemMap::DeleteSimpleMap()
 {
-    _ObjectManager.DeleteObject(m_pQuadTree);
+    _ObjectSystem.DeleteObject(m_pQuadTree);
 }
 
 void ToolSystemMap::OpenFile()
@@ -148,7 +148,7 @@ void ToolSystemMap::OpenFile()
 void ToolSystemMap::SaveFile(std::wstring szFullPath)
 {
     std::ofstream outfile(szFullPath);
-    for (auto object : _ObjectManager.m_ListObject)
+    for (auto object : _ObjectSystem.m_ListObject)
     {
         outfile.write(reinterpret_cast<char*>(object), sizeof(Object));
     }

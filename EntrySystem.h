@@ -4,7 +4,8 @@
 #include "EngineSystem.h"
 #include "InputSystem.h"
 #include "ImguiSystem.h"
-#include "ObjectManager.h"
+#include "ObjectSystem.h"
+#include "MaterialSystem.h"
 #include "CameraSystem.h"
 #include "ToolSystemMap.h"
 

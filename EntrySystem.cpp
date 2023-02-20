@@ -8,7 +8,8 @@ void EntrySystem::OnCreate()
     _EngineSystem;
     _ImguiSystem;
     _CameraSystem;
-    _ObjectManager;
+    _ObjectSystem;
+    _MaterialSystem;
     _ToolSystemMap;
 }
 
@@ -63,14 +64,14 @@ void EntrySystem::Update()
     /*POINT pt = _InputSystem.GetPos();
    std::cout << pt.x << " | " << pt.y << std::endl;*/
     _ImguiSystem.Update();
-    _ObjectManager.Update();
+    _ObjectSystem.Update();
 
 }
 
 void EntrySystem::Render()
 {
  
-    _ObjectManager.Render();
+    _ObjectSystem.Render();
     _ImguiSystem.Render();
     _EngineSystem.Render();
 }

@@ -82,8 +82,9 @@ Object::Object()
 
 Object::~Object()
 {
-	delete m_ListTextures;
-	if (m_pMesh) delete m_pMesh;
+	delete m_ListTextures;								//delete manager need fix
+	if (m_pMesh) delete m_pMesh;						//delete manager need fix
+	if (m_pMaterial) delete m_pMaterial;				//delete manager need fix
 	if (m_pConstantBuffer) delete m_pConstantBuffer;
 	if (m_pVertexShader) delete m_pVertexShader;
 	if (m_pPixelShader) delete m_pPixelShader;

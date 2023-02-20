@@ -3,7 +3,7 @@
 #include "Object.h"
 #include "ToolSystemMap.h"
 
-class ObjectManager : public Singleton<ObjectManager>
+class ObjectSystem : public Singleton<ObjectSystem>
 {
 public:
 	Object* CreateObject();
@@ -13,10 +13,10 @@ public:
 	void Update();
 	void Render();
 public:
-	ObjectManager();
-	~ObjectManager();
+	ObjectSystem();
+	~ObjectSystem();
 private:
 	std::unordered_set<Object*> m_ListObject;
 	friend class ToolSystemMap;
 };
-#define _ObjectManager Singleton<ObjectManager>::GetInstance()
+#define _ObjectSystem Singleton<ObjectSystem>::GetInstance()

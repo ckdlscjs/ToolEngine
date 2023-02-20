@@ -4,8 +4,9 @@ MeshSystem::MeshSystem() : ResourceSystem()
 {
 }
 
-MeshSystem::~MeshSystem()
+MeshSystem::~MeshSystem() 
 {
+
 }
 
 Mesh* MeshSystem::CreateMeshFromFile(const wchar_t* szFilePath)

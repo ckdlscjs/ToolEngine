@@ -1,6 +1,7 @@
 #pragma once
 #include "EngineSystem.h"
 #include "Mesh.h"
+#include "Material.h"
 struct Transform
 {
 	XMVECTOR position;
@@ -34,6 +35,7 @@ public:
 protected:
 	Transform m_Transform;
 	Mesh* m_pMesh;
+	Material* m_pMaterial;
 	VertexShader* m_pVertexShader;
 	PixelShader* m_pPixelShader;
 	constant constantData;

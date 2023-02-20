@@ -41,6 +41,8 @@
     <ClInclude Include="imstb_truetype.h" />
     <ClInclude Include="IndexBuffer.h" />
     <ClInclude Include="InputSystem.h" />
+    <ClInclude Include="Material.h" />
+    <ClInclude Include="MaterialSystem.h" />
     <ClInclude Include="MeshMap.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="MeshSystem.h" />
@@ -49,7 +51,7 @@
     <ClInclude Include="RasterizerState.h" />
     <ClInclude Include="RenderSystem.h" />
     <ClInclude Include="Resource.h" />
-    <ClInclude Include="ObjectManager.h" />
+    <ClInclude Include="ObjectSystem.h" />
     <ClInclude Include="ResourceSystem.h" />
     <ClInclude Include="stb_image.h" />
     <ClInclude Include="stdafx.h" />
@@ -85,6 +87,8 @@
     <ClCompile Include="IndexBuffer.cpp" />
     <ClCompile Include="InputSystem.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Material.cpp" />
+    <ClCompile Include="MaterialSystem.cpp" />
     <ClCompile Include="MeshMap.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="MeshSystem.cpp" />
@@ -93,7 +97,7 @@
     <ClCompile Include="RasterizerState.cpp" />
     <ClCompile Include="RenderSystem.cpp" />
     <ClCompile Include="Resource.cpp" />
-    <ClCompile Include="ObjectManager.cpp" />
+    <ClCompile Include="ObjectSystem.cpp" />
     <ClCompile Include="ResourceSystem.cpp" />
     <ClCompile Include="SwapChain.cpp" />
     <ClCompile Include="sylCollision.cpp" />
