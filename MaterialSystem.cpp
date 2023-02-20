@@ -20,10 +20,12 @@ void MaterialSystem::DeleteMaterial(Material* pMaterial)
 
 MaterialSystem::MaterialSystem()
 {
+	std::cout << "Initialize : MaterialSystem" << std::endl;
 }
 
 MaterialSystem::~MaterialSystem()
 {
+	std::cout << "Release : MaterialSystem" << std::endl;
 	for (auto iter = m_ListMaterial.begin(); iter != m_ListMaterial.end(); )
 	{
 		delete (*iter);

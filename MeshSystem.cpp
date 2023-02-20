@@ -2,11 +2,12 @@
 
 MeshSystem::MeshSystem() : ResourceSystem()
 {
+	std::cout << "Initialize : MeshSystem" << std::endl;
 }
 
 MeshSystem::~MeshSystem() 
 {
-
+	std::cout << "Release : MeshSystem" << std::endl;
 }
 
 Mesh* MeshSystem::CreateMeshFromFile(const wchar_t* szFilePath)

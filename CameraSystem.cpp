@@ -38,11 +38,13 @@ void CameraSystem::Update()
 
 CameraSystem::CameraSystem()
 {
-
+	std::cout << "Initialize : CameraSystem" << std::endl;
 }
 
 CameraSystem::~CameraSystem()
 {
+	std::cout << "Release : CameraSystem" << std::endl;
+
 	for (auto& camera : m_mapCameras)
 	{
 		delete camera.second;

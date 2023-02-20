@@ -2,10 +2,12 @@
 
 TextureSystem::TextureSystem() : ResourceSystem()
 {
+	std::cout << "Initialize : TextureSystem" << std::endl;
 }
 
 TextureSystem::~TextureSystem()
 {
+	std::cout << "Release : TextureSystem" << std::endl;
 }
 
 Texture* TextureSystem::CreateTextureFromFile(const wchar_t* szFilePath)

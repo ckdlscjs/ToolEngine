@@ -12,11 +12,12 @@
 
 ResourceSystem::ResourceSystem()
 {
-
+	std::cout << "Initialize : ResourceSystem" << std::endl;
 }
 
 ResourceSystem::~ResourceSystem()
 {
+	std::cout << "Release : ResourceSystem" << std::endl;
 	for (auto& pResource : m_mapResources)
 	{
 		delete pResource.second;

@@ -78,10 +78,12 @@ void EntrySystem::Render()
 
 EntrySystem::EntrySystem()
 {
+    std::cout << "Initialize : EntrySystem" << std::endl;
 }
 
 EntrySystem::~EntrySystem()
 {
+    std::cout << "Release : EntrySystem" << std::endl;
  /*   if (m_pVertexBuffer) delete m_pVertexBuffer;
     if (m_pIndexBuffer) delete m_pIndexBuffer;
     if (m_pConstantBuffer) delete m_pConstantBuffer;

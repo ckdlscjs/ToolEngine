@@ -40,11 +40,12 @@ void InputSystem::Update()
 
 InputSystem::InputSystem()
 {
+	std::cout << "Initialize : InputSystem" << std::endl;
 	ZeroMemory(m_dwKeyState, sizeof(DWORD) * 256);
 	m_ptPos.x = m_ptPos.y = 0;
 	m_ptPrePos = m_ptPos;
 }
 InputSystem::~InputSystem()
 {
-
+	std::cout << "Release : InputSystem" << std::endl;
 }

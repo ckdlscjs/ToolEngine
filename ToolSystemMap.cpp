@@ -158,11 +158,12 @@ void ToolSystemMap::SaveFile(std::wstring szFullPath)
 
 ToolSystemMap::ToolSystemMap()
 {
+    std::cout << "Initialize : ToolSystemMap" << std::endl;
     m_pCamera = _CameraSystem.CreateCamera(L"MainCamera", MAT_PROJ::PERSPECTIVE, { 0,0,-2 }, { 0, 0, 1 }, { 0, 1, 0 });
     _CameraSystem.SetCurrentCamera(m_pCamera);
 }
 
 ToolSystemMap::~ToolSystemMap()
 {
- 
+    std::cout << "Release : ToolSystemMap" << std::endl;
 }

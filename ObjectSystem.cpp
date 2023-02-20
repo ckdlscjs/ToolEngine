@@ -32,11 +32,12 @@ void ObjectSystem::Render()
 
 ObjectSystem::ObjectSystem()
 {
-
+	std::cout << "Initialize : ObjectSystem" << std::endl;
 }
 
 ObjectSystem::~ObjectSystem()
 {
+	std::cout << "Release : ObjectSystem" << std::endl;
 	for (auto iter = m_ListObject.begin(); iter != m_ListObject.end(); )
 	{
 		delete (*iter);

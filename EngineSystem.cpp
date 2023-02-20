@@ -50,6 +50,7 @@ MeshSystem* EngineSystem::GetMeshSystem()
 
 EngineSystem::EngineSystem()
 {
+	std::cout << "Initialize : EngineSystem" << std::endl;
 	CreateRenderSystem();
 	CreateTextureSystem();
 	CreateMeshSystem();
@@ -57,6 +58,7 @@ EngineSystem::EngineSystem()
 
 EngineSystem::~EngineSystem()
 {
+	std::cout << "Release : EngineSystem" << std::endl;
 	if (m_pRenderSystem != nullptr) delete m_pRenderSystem;
 	if (m_pTextureSystem != nullptr) delete m_pTextureSystem;
 	if (m_pMeshSystem != nullptr) delete m_pMeshSystem;

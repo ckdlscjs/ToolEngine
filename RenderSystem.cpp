@@ -270,6 +270,7 @@ RenderSystem::RenderSystem()
 
 RenderSystem::~RenderSystem()
 {
+	std::cout << "Release : RenderSystem" << std::endl;
 	if (m_pCDevice != nullptr) 
 		delete m_pCDevice;
 

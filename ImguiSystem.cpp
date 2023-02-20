@@ -24,7 +24,8 @@ void ImguiSystem::Update()
     static int iMapSize = 4;
     static float fMapDistance = 1.0f;
     static bool bWireFrame = false;
-    static bool bPicking = false;
+    static bool bMapPicking = false;
+    static bool bOjbectPicking = false;
     ImGui::Begin("Demo");
     {
         {
@@ -34,14 +35,17 @@ void ImguiSystem::Update()
                 _ToolSystemMap.SetWireframe(bWireFrame);
             }
 
-        }
-        {
-            if (ImGui::Checkbox("Picking", &bPicking))
+            if (ImGui::Checkbox("MapPicking", &bMapPicking))
             {
-                ~bPicking;
-                _ToolSystemMap.SetPicking(item_current_idx, bPicking);
+                ~bMapPicking;
+                _ToolSystemMap.SetPicking(item_current_idx, bMapPicking);
             }
 
+            if (ImGui::Checkbox("OjbectPicking", &bOjbectPicking))
+            {
+                ~bOjbectPicking;
+                _ToolSystemMap.SetPicking(item_current_idx, bOjbectPicking);
+            }
         }
         ImGui::Dummy({ 0, 10 });
 
@@ -177,7 +181,7 @@ void ImguiSystem::Update()
             if (ImGui::Selectable(content.c_str(), is_selected))
             {
                 item_current_idx = n;
-                _ToolSystemMap.SetPicking(item_current_idx, bPicking);
+                _ToolSystemMap.SetPicking(item_current_idx, bMapPicking);
             }
                 
 
@@ -243,6 +247,7 @@ void ImguiSystem::Render()
 
 ImguiSystem::ImguiSystem()
 {
+    std::cout << "Initialize : ImguiSystem" << std::endl;
     m_show_demo_window = true;
     m_show_another_window = false;
     m_clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
@@ -300,6 +305,7 @@ ImguiSystem::ImguiSystem()
 
 ImguiSystem::~ImguiSystem()
 {
+    std::cout << "Release : ImguiSystem" << std::endl;
     // Cleanup
     ImGui_ImplDX11_Shutdown();
     ImGui_ImplWin32_Shutdown();
