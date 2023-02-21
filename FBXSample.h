@@ -6,20 +6,13 @@
 namespace fbxsample
 {
     /* Tab character ("\t") counter */
-    static int numTabs = 0;
-
-    /**
-     * Print the required number of tabs.
-     */
-    
-
 
     class FBXSample
     {
     public:
         void sample()
         {
-            const char* szFileName = "../../data/fbx/box.fbx";
+            const char* szFileName = "../../data/fbx/man.fbx";
             FbxManager* pFbxManager = FbxManager::Create();
             FbxImporter* pImporter = FbxImporter::Create(pFbxManager, "");
             pImporter->Initialize(szFileName, -1, nullptr);
@@ -29,17 +22,18 @@ namespace fbxsample
             pImporter->Import(pFbxScene);
 
             FbxNode* pFbxRootNode = pFbxScene->GetRootNode();
+            
+            int childCount = pFbxRootNode->GetChildCount();
 
-            if (pFbxRootNode)
-            {
-                for (int i = 0; i < pFbxRootNode->GetChildCount(); i++)
-                    PrintNode(pFbxRootNode->GetChild(i));
-            }
+            PrintNode(pFbxRootNode, 0);
+       
+
+            pFbxRootNode->Destroy();
+            pFbxScene->Destroy();
+            pImporter->Destroy();
+            pFbxManager->Destroy();
         }
-        void PrintTabs() {
-            for (int i = 0; i < numTabs; i++)
-                printf("\t");
-        }
+
 
         /**
          * Return a string-based representation based on the attribute type.
@@ -73,12 +67,17 @@ namespace fbxsample
         /**
          * Print an attribute.
          */
+
+        void printTab(int depth)
+        {
+            for (int i = 0; i < depth; i++)
+                printf("#");
+        }
         void PrintAttribute(FbxNodeAttribute* pAttribute) {
             if (!pAttribute) return;
-
             FbxString typeName = GetAttributeTypeName(pAttribute->GetAttributeType());
             FbxString attrName = pAttribute->GetName();
-            PrintTabs();
+            //PrintTabs();
             // Note: to retrieve the character array of a FbxString, use its Buffer() method.
             printf("<attribute type='%s' name='%s'/>\n", typeName.Buffer(), attrName.Buffer());
         }
@@ -86,33 +85,34 @@ namespace fbxsample
         /**
          * Print a node, its attributes, and all its children recursively.
          */
-        void PrintNode(FbxNode* pNode) {
-            PrintTabs();
+        void PrintNode(FbxNode* pNode, int depth) {
+           
             const char* nodeName = pNode->GetName();
+            FbxMesh* pMesh = pNode->GetMesh();
             FbxDouble3 translation = pNode->LclTranslation.Get();
             FbxDouble3 rotation = pNode->LclRotation.Get();
             FbxDouble3 scaling = pNode->LclScaling.Get();
 
             // Print the contents of the node.
-            printf("<node name='%s' translation='(%f, %f, %f)' rotation='(%f, %f, %f)' scaling='(%f, %f, %f)'>\n",
-                nodeName,
-                translation[0], translation[1], translation[2],
-                rotation[0], rotation[1], rotation[2],
-                scaling[0], scaling[1], scaling[2]
-            );
-            numTabs++;
+            printTab(depth);
+            printf("node name='%s'\n", nodeName);
 
+            printTab(depth);
             // Print the node's attributes.
             for (int i = 0; i < pNode->GetNodeAttributeCount(); i++)
                 PrintAttribute(pNode->GetNodeAttributeByIndex(i));
 
+            int childCount = pNode->GetChildCount();
+            printTab(depth);
+            printf("-------------childCount------------- : %d\n\n", childCount);
             // Recursively print the children.
-            for (int j = 0; j < pNode->GetChildCount(); j++)
-                PrintNode(pNode->GetChild(j));
-
-            numTabs--;
-            PrintTabs();
-            printf("</node>\n");
+            for (int j = 0; j < childCount; j++)
+            {
+                printTab(depth+1);
+                printf("childIdx : %d\n", j);
+                PrintNode(pNode->GetChild(j), depth+1);
+            }
+       
         }
     };
 
