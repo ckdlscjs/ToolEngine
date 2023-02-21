@@ -167,15 +167,9 @@ void ImguiSystem::Update()
     {
         for (int n = 0; n < _ToolSystemMap.m_ListTextures.size(); n++)
         {
-            std::string fullpath;
-            fullpath.assign(_ToolSystemMap.m_ListTextures[n].begin(), _ToolSystemMap.m_ListTextures[n].end());
-            
-            std::string content;
-            size_t pos = fullpath.find_last_of("/\\");
-            if (pos == std::string::npos) 
-                content = fullpath;
-            else
-                content = fullpath.substr(pos + 1);
+            std::string fullpath = _towm(_ToolSystemMap.m_ListTextures[n]);
+
+            std::string content = GetSplitName(fullpath);
                 
             const bool is_selected = (item_current_idx == n);
             if (ImGui::Selectable(content.c_str(), is_selected))
@@ -184,7 +178,6 @@ void ImguiSystem::Update()
                 _ToolSystemMap.SetPicking(item_current_idx, bMapPicking);
             }
                 
-
             // Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
             if (is_selected)
                 ImGui::SetItemDefaultFocus();

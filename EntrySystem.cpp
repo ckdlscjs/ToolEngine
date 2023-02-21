@@ -11,6 +11,7 @@ void EntrySystem::OnCreate()
     _ObjectSystem;
     _MaterialSystem;
     _ToolSystemMap;
+    _FBXSystem;
 }
 
 void EntrySystem::OnUpdate()

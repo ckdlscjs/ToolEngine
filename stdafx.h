@@ -25,6 +25,12 @@
 #include "DXTEX\DirectXTex.h"
 #pragma comment(lib, "DirectXTex.lib")
 
+// FBXSDK
+#include "fbxsdk.h"
+#pragma comment(lib, "libfbxsdk-md.lib")
+#pragma comment(lib, "libxml2-md.lib")
+#pragma comment(lib, "zlib-md.lib")
+
 // Math
 #include <DirectXMath.h>
 using namespace DirectX;
@@ -50,6 +56,28 @@ public:
 	}
 };
 
+static std::wstring _tomw(std::string str)
+{
+	std::wstring content;
+	content.assign(str.begin(), str.end());
+	return content;
+}
+static std::string _towm(std::wstring wstr)
+{
+	std::string content;
+	content.assign(wstr.begin(), wstr.end());
+	return content;
+}
+
+static std::string GetSplitName(std::string szFullPath)
+{
+	size_t pos = szFullPath.find_last_of("/\\");
+	if (pos == std::string::npos)
+		return szFullPath;
+	else
+		return szFullPath.substr(pos + 1);
+}
+
 struct object
 {
 	XMFLOAT3 pos;
@@ -64,6 +92,63 @@ struct constant
 	XMMATRIX matWorld;
 	XMMATRIX matView;
 	XMMATRIX matProj;
+};
+struct iw_data
+{
+	std::vector<int> index;
+	std::vector<float> weight;
+	void insert(int iBone, float fWeight)
+	{
+		for (int i = 0; i < index.size(); i++)
+		{
+			if (fWeight > weight[i])
+			{
+				for (int j = index.size() - 1; j > i; --j)
+				{
+					index[j] = index[j - 1];
+					weight[j] = weight[j - 1];
+				}
+				index[i] = iBone;
+				weight[i] = fWeight;
+				break;
+			}
+		}
+	}
+	iw_data()
+	{
+		index.resize(8);
+		weight.resize(8);
+	}
+};
+
+struct weight_data
+{
+	std::vector<float> weight;
+	void insert(float fWeight)
+	{
+		for (int i = 0; i < weight.size(); i++)
+		{
+			if (fWeight > weight[i])
+			{
+				for (int j = weight.size() - 1; j > i; --j)
+				{
+					weight[j] = weight[j - 1];
+				}
+				weight[i] = fWeight;
+				break;
+			}
+		}
+	}
+	weight_data()
+	{
+		weight.resize(8);
+	}
+};
+
+struct iw
+{
+	XMFLOAT4 index;
+	XMFLOAT4 weight;
 };
 
 static XMFLOAT2 operator+(XMFLOAT2& a, XMFLOAT2& b)

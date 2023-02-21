@@ -13,6 +13,50 @@ void ToolSystemMap::SetPicking(int iChkIdx, bool bPicking)
         m_pQuadTree->SetPicking(iChkIdx, bPicking);
 }
 
+void ToolSystemMap::CreateFbxObject(std::wstring szFullPath, int iChkIdx, XMVECTOR vPos)
+{
+    FBXFile* pFBXFile = _FBXSystem.LoadFile(_towm(szFullPath).c_str());
+    Mesh* pMesh = new Mesh();
+    void* shader_byte_code = nullptr;
+    size_t size_shader = 0;
+    VertexShader* pVertexShader;
+    PixelShader* pPixelShader;
+    for (int idx = 0; idx < pFBXFile->m_ListVertexPNCT.size(); idx++)
+    {
+        _EngineSystem.GetRenderSystem()->CompileShader(L"DefaultVertexShader.hlsl", "vsmain", "vs_5_0", &shader_byte_code, &size_shader);
+        pVertexShader = _EngineSystem.GetRenderSystem()->CreateVertexShader(shader_byte_code, size_shader);
+        VertexBuffer* pVertexBuffer = _EngineSystem.GetRenderSystem()->CreateVertexBuffer(&pFBXFile->m_ListVertexPNCT[idx], sizeof(object), pFBXFile->m_ListVertexPNCT[idx].size(), shader_byte_code, size_shader);
+      /*  IndexBuffer* pIndexBuffer = _EngineSystem.GetRenderSystem()->CreateIndexBuffer(index_list, size_index_list);*/
+        IndexBuffer* pIndexBuffer;
+        _EngineSystem.GetRenderSystem()->ReleaseBlob();
+
+        _EngineSystem.GetRenderSystem()->CompileShader(L"DefaultPixelShader.hlsl", "psmain", "ps_5_0", &shader_byte_code, &size_shader);
+        pPixelShader = _EngineSystem.GetRenderSystem()->CreatePixelShader(shader_byte_code, size_shader);
+        _EngineSystem.GetRenderSystem()->ReleaseBlob();
+        pMesh->m_ListVertexBuffer[idx] = pVertexBuffer;
+        pMesh->m_ListIndexBuffer[idx] = pIndexBuffer;
+    }
+    
+    constant cc;
+    cc.matWorld = XMMatrixIdentity();
+    cc.matView = m_pCamera->m_matCamera;
+    cc.matProj = m_pCamera->m_matProj;
+
+    /*Texture** listTexture = new Texture * [m_ListTextures.size() - iChkIdx];
+    for (int idx = 0; idx + iChkIdx < m_ListTextures.size(); idx++)
+    {
+        listTexture[idx] = _EngineSystem.GetTextureSystem()->CreateTextureFromFile(m_ListTextures[idx + iChkIdx].c_str());
+    }*/
+
+    Object* pObject;
+    pObject = _ObjectSystem.CreateObject();
+    pObject->SetConstantData(cc);
+    pObject->SetTransform({ vPos , {0, 0, 0}, {1, 1, 1} });
+    pObject->SetMesh(pMesh);
+    pObject->SetShader(pVertexShader, pPixelShader);
+    //pObject->SetTexture(listTexture, m_ListTextures.size() - iChkIdx);
+}
+
 void ToolSystemMap::CreateSimpleObject(int iChkIdx, XMVECTOR vPos)
 {
     object vertex_list[] =

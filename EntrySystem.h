@@ -8,6 +8,7 @@
 #include "MaterialSystem.h"
 #include "CameraSystem.h"
 #include "ToolSystemMap.h"
+#include "FBXSystem.h"
 
 class EntrySystem : public WindowSystem
 {

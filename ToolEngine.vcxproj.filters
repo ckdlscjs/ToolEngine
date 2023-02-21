@@ -91,6 +91,15 @@
     <Filter Include="EngineSystem\ObjectSystem\ResourceSystem">
       <UniqueIdentifier>{960b28d9-d01f-42eb-92e6-5961374e11fc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="FBXSystem">
+      <UniqueIdentifier>{6020fa11-8f80-4385-88e6-97ce96d0aaf8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="FBXSystem\FBXFile">
+      <UniqueIdentifier>{23b06e83-3f45-4917-afd8-838c8909f845}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="FBXSystem\FBXFile\FBXNode">
+      <UniqueIdentifier>{c4a1539a-e82c-4ae8-a494-42bebb08bf97}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="WindowSystem.h">
@@ -223,7 +232,18 @@
     <ClInclude Include="MaterialSystem.h">
       <Filter>EngineSystem\ObjectSystem\MaterialSystem</Filter>
     </ClInclude>
-    <ClInclude Include="FBXSample.h" />
+    <ClInclude Include="FBXSystem.h">
+      <Filter>FBXSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="FBXSample.h">
+      <Filter>FBXSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="FBXFile.h">
+      <Filter>FBXSystem\FBXFile</Filter>
+    </ClInclude>
+    <ClInclude Include="FBXNode.h">
+      <Filter>FBXSystem\FBXFile\FBXNode</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WindowSystem.cpp">
@@ -350,7 +370,18 @@
     <ClCompile Include="MaterialSystem.cpp">
       <Filter>EngineSystem\ObjectSystem\MaterialSystem</Filter>
     </ClCompile>
-    <ClCompile Include="FBXSample.cpp" />
+    <ClCompile Include="FBXSample.cpp">
+      <Filter>FBXSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="FBXSystem.cpp">
+      <Filter>FBXSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="FBXFile.cpp">
+      <Filter>FBXSystem\FBXFile</Filter>
+    </ClCompile>
+    <ClCompile Include="FBXNode.cpp">
+      <Filter>FBXSystem\FBXFile\FBXNode</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="imgui.ini">

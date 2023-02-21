@@ -1,6 +1,7 @@
 #pragma once
 #include "stdafx.h"
 #include "ObjectSystem.h"
+#include "FBXSystem.h"
 #include "CameraSystem.h"
 
 #include "MeshMap.h"
@@ -12,6 +13,7 @@ public:
 
 	void SetWireframe(bool bWireFrame);
 	void SetPicking(int iChkIdx, bool bPicking);
+	void CreateFbxObject(std::wstring szFullPath, int iChkIdx, XMVECTOR vPos);
 	void CreateSimpleObject(int iChkIdx, XMVECTOR vPos);
 	void CreateSimpleMap(int iWidth, int iHeight,float fDistance);
 	void DeleteSimpleMap();
