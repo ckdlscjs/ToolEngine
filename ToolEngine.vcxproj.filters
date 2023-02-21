@@ -223,6 +223,7 @@
     <ClInclude Include="MaterialSystem.h">
       <Filter>EngineSystem\ObjectSystem\MaterialSystem</Filter>
     </ClInclude>
+    <ClInclude Include="FBXSample.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WindowSystem.cpp">
@@ -349,6 +350,7 @@
     <ClCompile Include="MaterialSystem.cpp">
       <Filter>EngineSystem\ObjectSystem\MaterialSystem</Filter>
     </ClCompile>
+    <ClCompile Include="FBXSample.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="imgui.ini">

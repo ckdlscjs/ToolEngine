@@ -25,6 +25,7 @@
     <ClInclude Include="Device.h" />
     <ClInclude Include="EngineSystem.h" />
     <ClInclude Include="EntrySystem.h" />
+    <ClInclude Include="FBXSample.h" />
     <ClInclude Include="FNode.h" />
     <ClInclude Include="FQuadTree.h" />
     <ClInclude Include="Frustum.h" />
@@ -71,6 +72,7 @@
     <ClCompile Include="Device.cpp" />
     <ClCompile Include="EngineSystem.cpp" />
     <ClCompile Include="EntrySystem.cpp" />
+    <ClCompile Include="FBXSample.cpp" />
     <ClCompile Include="FNode.cpp" />
     <ClCompile Include="FQuadTree.cpp" />
     <ClCompile Include="Frustum.cpp" />
