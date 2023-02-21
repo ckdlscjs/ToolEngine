@@ -17,21 +17,21 @@ void ToolSystemMap::CreateFbxObject(std::wstring szFullPath, int iChkIdx, XMVECT
 {
     FBXFile* pFBXFile = _FBXSystem.LoadFile(_towm(szFullPath).c_str());
     Mesh* pMesh = new Mesh();
+
+
     void* shader_byte_code = nullptr;
     size_t size_shader = 0;
-    VertexShader* pVertexShader;
-    PixelShader* pPixelShader;
+    _EngineSystem.GetRenderSystem()->CompileShader(L"DefaultVertexShader.hlsl", "vsmain", "vs_5_0", &shader_byte_code, &size_shader);
+    VertexShader* pVertexShader = _EngineSystem.GetRenderSystem()->CreateVertexShader(shader_byte_code, size_shader);
+
     for (int idx = 0; idx < pFBXFile->m_ListVertexPNCT.size(); idx++)
     {
-        _EngineSystem.GetRenderSystem()->CompileShader(L"DefaultVertexShader.hlsl", "vsmain", "vs_5_0", &shader_byte_code, &size_shader);
-        pVertexShader = _EngineSystem.GetRenderSystem()->CreateVertexShader(shader_byte_code, size_shader);
         VertexBuffer* pVertexBuffer = _EngineSystem.GetRenderSystem()->CreateVertexBuffer(&pFBXFile->m_ListVertexPNCT[idx], sizeof(object), pFBXFile->m_ListVertexPNCT[idx].size(), shader_byte_code, size_shader);
-      /*  IndexBuffer* pIndexBuffer = _EngineSystem.GetRenderSystem()->CreateIndexBuffer(index_list, size_index_list);*/
-        IndexBuffer* pIndexBuffer;
+        IndexBuffer* pIndexBuffer = _EngineSystem.GetRenderSystem()->CreateIndexBuffer(&pFBXFile->m_ListIndex[idx], pFBXFile->m_ListIndex[idx].size());
         _EngineSystem.GetRenderSystem()->ReleaseBlob();
 
         _EngineSystem.GetRenderSystem()->CompileShader(L"DefaultPixelShader.hlsl", "psmain", "ps_5_0", &shader_byte_code, &size_shader);
-        pPixelShader = _EngineSystem.GetRenderSystem()->CreatePixelShader(shader_byte_code, size_shader);
+        PixelShader* pPixelShader = _EngineSystem.GetRenderSystem()->CreatePixelShader(shader_byte_code, size_shader);
         _EngineSystem.GetRenderSystem()->ReleaseBlob();
         pMesh->m_ListVertexBuffer[idx] = pVertexBuffer;
         pMesh->m_ListIndexBuffer[idx] = pIndexBuffer;

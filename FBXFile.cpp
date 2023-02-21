@@ -129,6 +129,7 @@ void FBXFile::ParseMesh(FBXNode* pNode)
 			iCornerIndex[1] = pFbxMesh->GetPolygonVertex(idxPolygon, iFace + 2);
 			iCornerIndex[2] = pFbxMesh->GetPolygonVertex(idxPolygon, iFace + 1);
 
+			
 			int iUVIndex[3];
 			iUVIndex[0] = pFbxMesh->GetTextureUVIndex(idxPolygon, 0);
 			iUVIndex[1] = pFbxMesh->GetTextureUVIndex(idxPolygon, iFace + 2);
@@ -211,11 +212,13 @@ void FBXFile::ParseMesh(FBXNode* pNode)
 				if (iNumMtrl <= 1)
 				{
 					m_ListVertexPNCT[0].push_back(pnctVertex);
+					m_ListIndex[0].push_back(iCornerIndex[idxVertFace]);
 					m_ListVertexIW[0].push_back(iwVertex);
 				}
 				else
 				{
 					m_ListVertexPNCT[iSubMtrl].push_back(pnctVertex);
+					m_ListIndex[iSubMtrl].push_back(iCornerIndex[idxVertFace]);
 					m_ListVertexIW[iSubMtrl].push_back(iwVertex);
 				}
 			}
