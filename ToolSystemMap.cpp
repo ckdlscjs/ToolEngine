@@ -13,9 +13,9 @@ void ToolSystemMap::SetPicking(int iChkIdx, bool bPicking)
         m_pQuadTree->SetPicking(iChkIdx, bPicking);
 }
 
-void ToolSystemMap::CreateFbxObject(std::wstring szFullPath, int iChkIdx, XMVECTOR vPos)
+void ToolSystemMap::CreateFbxObject(std::wstring szFullPath, XMVECTOR vPos)
 {
-    FBXFile* pFBXFile = _FBXSystem.LoadFile(_towm(L"../../data/fbx/man.fbx").c_str());
+    FBXFile* pFBXFile = _FBXSystem.LoadFile(_towm(szFullPath).c_str());
     Mesh* pMesh = new Mesh();
 
     void* shader_byte_code = nullptr;
@@ -45,20 +45,20 @@ void ToolSystemMap::CreateFbxObject(std::wstring szFullPath, int iChkIdx, XMVECT
     cc.matProj = m_pCamera->m_matProj;
     std::wstring defaultDir = L"../../data/fbx/";
     for (int idx = 0; idx < pFBXFile->m_ListTextures.size(); idx++)
-        m_ListTextures.push_back(defaultDir + pFBXFile->m_ListTextures[idx]);
+        m_ListTexture.push_back(defaultDir + pFBXFile->m_ListTextures[idx]);
 
 
-    Texture** listTexture = new Texture * [m_ListTextures.size()];
-    for (int idx = 0; idx < m_ListTextures.size(); idx++)
-        listTexture[idx] = _EngineSystem.GetTextureSystem()->CreateTextureFromFile(m_ListTextures[idx].c_str());
+    Texture** listTexture = new Texture * [m_ListTexture.size()];
+    for (int idx = 0; idx < m_ListTexture.size(); idx++)
+        listTexture[idx] = _EngineSystem.GetTextureSystem()->CreateTextureFromFile(m_ListTexture[idx].c_str());
 
     Object* pObject;
     pObject = _ObjectSystem.CreateObject();
     pObject->SetConstantData(cc);
-    pObject->SetTransform({ {0, 0, 0} , {0, 0, 0}, {1, 1, 1} });
+    pObject->SetTransform({ vPos , {0, 0, 0}, {1, 1, 1} });
     pObject->SetMesh(pMesh);
     pObject->SetShader(pVertexShader, pPixelShader);
-    pObject->SetTexture(listTexture, m_ListTextures.size());
+    pObject->SetTexture(listTexture, m_ListTexture.size());
 }
 
 void ToolSystemMap::CreateSimpleObject(int iChkIdx, XMVECTOR vPos)
@@ -128,10 +128,10 @@ void ToolSystemMap::CreateSimpleObject(int iChkIdx, XMVECTOR vPos)
     cc.matView = m_pCamera->m_matCamera;
     cc.matProj = m_pCamera->m_matProj;
 
-    Texture** listTexture = new Texture*[m_ListTextures.size() - iChkIdx];
-    for (int idx = 0; idx + iChkIdx < m_ListTextures.size(); idx++)
+    Texture** listTexture = new Texture*[m_ListTexture.size() - iChkIdx];
+    for (int idx = 0; idx + iChkIdx < m_ListTexture.size(); idx++)
     {
-        listTexture[idx] = _EngineSystem.GetTextureSystem()->CreateTextureFromFile(m_ListTextures[idx + iChkIdx].c_str());
+        listTexture[idx] = _EngineSystem.GetTextureSystem()->CreateTextureFromFile(m_ListTexture[idx + iChkIdx].c_str());
     }
 
     Object* pObject;
@@ -140,7 +140,7 @@ void ToolSystemMap::CreateSimpleObject(int iChkIdx, XMVECTOR vPos)
     pObject->SetTransform({ vPos , {0, 0, 0}, {1, 1, 1} });
     pObject->SetMesh(pMesh);
     pObject->SetShader(pVertexShader, pPixelShader);
-    pObject->SetTexture(listTexture, m_ListTextures.size() - iChkIdx);
+    pObject->SetTexture(listTexture, m_ListTexture.size() - iChkIdx);
 }
 
 void ToolSystemMap::CreateSimpleMap(int iWidth, int iHeight, float fDistance)
@@ -169,10 +169,10 @@ void ToolSystemMap::CreateSimpleMap(int iWidth, int iHeight, float fDistance)
     cc.matView = m_pCamera->m_matCamera;
     cc.matProj = m_pCamera->m_matProj;
 
-    Texture** listTexture = new Texture * [m_ListTextures.size()];
-    for (int idx = 0; idx < m_ListTextures.size(); idx++)
+    Texture** listTexture = new Texture * [m_ListTexture.size()];
+    for (int idx = 0; idx < m_ListTexture.size(); idx++)
     {
-        listTexture[idx] = _EngineSystem.GetTextureSystem()->CreateTextureFromFile(m_ListTextures[idx].c_str());
+        listTexture[idx] = _EngineSystem.GetTextureSystem()->CreateTextureFromFile(m_ListTexture[idx].c_str());
     }
 
     m_pQuadTree = new FQuadTree(m_pCamera, pMapMesh);
@@ -180,7 +180,7 @@ void ToolSystemMap::CreateSimpleMap(int iWidth, int iHeight, float fDistance)
     m_pQuadTree->SetTransform({ {0,0,0} , {0, 0, 0}, {1, 1, 1} });
     m_pQuadTree->SetMesh(pMapMesh);
     m_pQuadTree->SetShader(pVertexShader, pPixelShader);
-    m_pQuadTree->SetTexture(listTexture, m_ListTextures.size());
+    m_pQuadTree->SetTexture(listTexture, m_ListTexture.size());
     _ObjectSystem.AddObject(m_pQuadTree);
 }
 

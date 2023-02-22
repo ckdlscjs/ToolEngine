@@ -20,7 +20,8 @@ void ImguiSystem::Update()
     //ImGui::DockSpaceOverViewport(ImGui::GetMainViewport());
 
 
-    static int item_current_idx = 0; // Here we store our selection data as an index.
+    static int image_current_idx = 0; // Here we store our selection data as an index.
+    static int fbx_current_idx = 0; // Here we store our selection data as an index.
     static int iMapSize = 4;
     static float fMapDistance = 1.0f;
     static bool bWireFrame = false;
@@ -38,20 +39,20 @@ void ImguiSystem::Update()
             if (ImGui::Checkbox("MapPicking", &bMapPicking))
             {
                 ~bMapPicking;
-                _ToolSystemMap.SetPicking(item_current_idx, bMapPicking);
+                _ToolSystemMap.SetPicking(image_current_idx, bMapPicking);
             }
 
             if (ImGui::Checkbox("OjbectPicking", &bOjbectPicking))
             {
                 ~bOjbectPicking;
-                _ToolSystemMap.SetPicking(item_current_idx, bOjbectPicking);
+                _ToolSystemMap.SetPicking(image_current_idx, bOjbectPicking);
             }
         }
         ImGui::Dummy({ 0, 10 });
 
         {
             if (ImGui::Button("CreateObject"))
-                _ToolSystemMap.CreateFbxObject(L"", item_current_idx, _CameraSystem.GetCurrentCamera()->m_vCameraPos);
+                _ToolSystemMap.CreateFbxObject(_ToolSystemMap.m_ListFbx[fbx_current_idx], _CameraSystem.GetCurrentCamera()->m_vCameraPos);
 
         }
         ImGui::Dummy({ 0, 10 });
@@ -147,8 +148,8 @@ void ImguiSystem::Update()
 
     // Simple window
     ImGui::Begin("Control Panel");
-    if (ImGui::Button("Open file"))
-        ifd::FileDialog::Instance().Open("ShaderOpenDialog", "Open a shader", "Image file (*.png;*.jpg;*.jpeg;*.bmp;*.tga){.png,.jpg,.jpeg,.bmp,.tga},.*", true);
+    if (ImGui::Button("Open ImgFile"))
+        ifd::FileDialog::Instance().Open("ImageOpenDialog", "Open a Image", "Image file (*.png;*.jpg;*.jpeg;*.bmp;*.tga){.png,.jpg,.jpeg,.bmp,.tga},.*", true);
     /*if (ImGui::Button("Open directory"))
         ifd::FileDialog::Instance().Open("DirectoryOpenDialog", "Open a directory", "");
     if (ImGui::Button("Save file"))
@@ -161,23 +162,45 @@ void ImguiSystem::Update()
     printf(message_a.c_str());*/
 
     //const char* items[] = { "AAAA", "BBBB", "CCCC", "DDDD", "EEEE", "FFFF", "GGGG", "HHHH", "IIII", "JJJJ", "KKKK", "LLLLLLL", "MMMM", "OOOOOOO" };
-    
-
+  
     if (ImGui::BeginListBox("listbox 1"))
     {
-        for (int n = 0; n < _ToolSystemMap.m_ListTextures.size(); n++)
+        for (int n = 0; n < _ToolSystemMap.m_ListTexture.size(); n++)
         {
-            std::string fullpath = _towm(_ToolSystemMap.m_ListTextures[n]);
+            std::string fullpath = _towm(_ToolSystemMap.m_ListTexture[n]);
 
             std::string content = GetSplitName(fullpath);
                 
-            const bool is_selected = (item_current_idx == n);
+            const bool is_selected = (image_current_idx == n);
             if (ImGui::Selectable(content.c_str(), is_selected))
             {
-                item_current_idx = n;
-                _ToolSystemMap.SetPicking(item_current_idx, bMapPicking);
+                image_current_idx = n;
+                _ToolSystemMap.SetPicking(image_current_idx, bMapPicking);
             }
                 
+            // Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
+            if (is_selected)
+                ImGui::SetItemDefaultFocus();
+        }
+        ImGui::EndListBox();
+    }
+    if (ImGui::Button("Open Fbxfile"))
+        ifd::FileDialog::Instance().Open("FbxOpenDialog", "Open a Fbx", "Fbx file (*.fbx;*.FBX){.fbx,.FBX},.*", true);
+    if (ImGui::BeginListBox("listbox 2"))
+    {
+        for (int n = 0; n < _ToolSystemMap.m_ListFbx.size(); n++)
+        {
+            std::string fullpath = _towm(_ToolSystemMap.m_ListFbx[n]);
+
+            std::string content = GetSplitName(fullpath);
+
+            const bool is_selected = (fbx_current_idx == n);
+            if (ImGui::Selectable(content.c_str(), is_selected))
+            {
+                fbx_current_idx = n;
+                _ToolSystemMap.SetPicking(fbx_current_idx, bMapPicking);
+            }
+
             // Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
             if (is_selected)
                 ImGui::SetItemDefaultFocus();
@@ -192,11 +215,26 @@ void ImguiSystem::Update()
     
    
     // file dialogs
-    if (ifd::FileDialog::Instance().IsDone("ShaderOpenDialog")) {
+    if (ifd::FileDialog::Instance().IsDone("ImageOpenDialog")) {
         if (ifd::FileDialog::Instance().HasResult()) {
             const std::vector<std::filesystem::path>& res = ifd::FileDialog::Instance().GetResults();
             for(int idx = 0; idx < res.size(); idx++)
-                _ToolSystemMap.m_ListTextures.push_back(res[idx].wstring()); 
+                _ToolSystemMap.m_ListTexture.push_back(res[idx].wstring()); 
+            //for (const auto& r : res) // ShaderOpenDialog supports multiselection
+            //{
+            //   printf("OPEN[%s]\n", r.u8string().c_str()); 
+            //}
+        }
+        ifd::FileDialog::Instance().Close();
+    }
+
+
+    // file dialogs
+    if (ifd::FileDialog::Instance().IsDone("FbxOpenDialog")) {
+        if (ifd::FileDialog::Instance().HasResult()) {
+            const std::vector<std::filesystem::path>& res = ifd::FileDialog::Instance().GetResults();
+            for (int idx = 0; idx < res.size(); idx++)
+                _ToolSystemMap.m_ListFbx.push_back(res[idx].wstring());
             //for (const auto& r : res) // ShaderOpenDialog supports multiselection
             //{
             //   printf("OPEN[%s]\n", r.u8string().c_str()); 

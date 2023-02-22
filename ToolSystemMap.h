@@ -13,7 +13,7 @@ public:
 
 	void SetWireframe(bool bWireFrame);
 	void SetPicking(int iChkIdx, bool bPicking);
-	void CreateFbxObject(std::wstring szFullPath, int iChkIdx, XMVECTOR vPos);
+	void CreateFbxObject(std::wstring szFullPath, XMVECTOR vPos);
 	void CreateSimpleObject(int iChkIdx, XMVECTOR vPos);
 	void CreateSimpleMap(int iWidth, int iHeight,float fDistance);
 	void DeleteSimpleMap();
@@ -28,7 +28,8 @@ public:
 private:
 	Camera* m_pCamera;
 	FQuadTree* m_pQuadTree;
-	std::vector<std::wstring> m_ListTextures;
+	std::vector<std::wstring> m_ListTexture;
+	std::vector<std::wstring> m_ListFbx;
 	friend class ImguiSystem;
 };
 #define _ToolSystemMap Singleton<ToolSystemMap>::GetInstance()
