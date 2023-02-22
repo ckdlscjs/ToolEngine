@@ -15,27 +15,27 @@ void ToolSystemMap::SetPicking(int iChkIdx, bool bPicking)
 
 void ToolSystemMap::CreateFbxObject(std::wstring szFullPath, int iChkIdx, XMVECTOR vPos)
 {
-    FBXFile* pFBXFile = _FBXSystem.LoadFile(_towm(szFullPath).c_str());
+    FBXFile* pFBXFile = _FBXSystem.LoadFile(_towm(L"../../data/fbx/ship.fbx").c_str());
     Mesh* pMesh = new Mesh();
-
 
     void* shader_byte_code = nullptr;
     size_t size_shader = 0;
+
     _EngineSystem.GetRenderSystem()->CompileShader(L"DefaultVertexShader.hlsl", "vsmain", "vs_5_0", &shader_byte_code, &size_shader);
     VertexShader* pVertexShader = _EngineSystem.GetRenderSystem()->CreateVertexShader(shader_byte_code, size_shader);
-
     for (int idx = 0; idx < pFBXFile->m_ListVertexPNCT.size(); idx++)
     {
-        VertexBuffer* pVertexBuffer = _EngineSystem.GetRenderSystem()->CreateVertexBuffer(&pFBXFile->m_ListVertexPNCT[idx], sizeof(object), pFBXFile->m_ListVertexPNCT[idx].size(), shader_byte_code, size_shader);
-        IndexBuffer* pIndexBuffer = _EngineSystem.GetRenderSystem()->CreateIndexBuffer(&pFBXFile->m_ListIndex[idx], pFBXFile->m_ListIndex[idx].size());
-        _EngineSystem.GetRenderSystem()->ReleaseBlob();
-
-        _EngineSystem.GetRenderSystem()->CompileShader(L"DefaultPixelShader.hlsl", "psmain", "ps_5_0", &shader_byte_code, &size_shader);
-        PixelShader* pPixelShader = _EngineSystem.GetRenderSystem()->CreatePixelShader(shader_byte_code, size_shader);
-        _EngineSystem.GetRenderSystem()->ReleaseBlob();
-        pMesh->m_ListVertexBuffer[idx] = pVertexBuffer;
-        pMesh->m_ListIndexBuffer[idx] = pIndexBuffer;
+        VertexBuffer* pVertexBuffer = _EngineSystem.GetRenderSystem()->CreateVertexBuffer(&pFBXFile->m_ListVertexPNCT[idx][0], sizeof(object), pFBXFile->m_ListVertexPNCT[idx].size(), shader_byte_code, size_shader);
+        IndexBuffer* pIndexBuffer = _EngineSystem.GetRenderSystem()->CreateIndexBuffer(&pFBXFile->m_ListIndex[idx][0], pFBXFile->m_ListIndex[idx].size());
+        pMesh->m_ListVertexBuffer.push_back(pVertexBuffer);
+        pMesh->m_ListIndexBuffer.push_back(pIndexBuffer);
     }
+    _EngineSystem.GetRenderSystem()->ReleaseBlob();
+
+    _EngineSystem.GetRenderSystem()->CompileShader(L"DefaultPixelShader.hlsl", "psmain", "ps_5_0", &shader_byte_code, &size_shader);
+    PixelShader* pPixelShader = _EngineSystem.GetRenderSystem()->CreatePixelShader(shader_byte_code, size_shader);
+    _EngineSystem.GetRenderSystem()->ReleaseBlob();
+    
     
     constant cc;
     cc.matWorld = XMMatrixIdentity();
@@ -51,7 +51,7 @@ void ToolSystemMap::CreateFbxObject(std::wstring szFullPath, int iChkIdx, XMVECT
     Object* pObject;
     pObject = _ObjectSystem.CreateObject();
     pObject->SetConstantData(cc);
-    pObject->SetTransform({ vPos , {0, 0, 0}, {1, 1, 1} });
+    pObject->SetTransform({ {0,0,0} , {0, 0, 0}, {1, 1, 1} });
     pObject->SetMesh(pMesh);
     pObject->SetShader(pVertexShader, pPixelShader);
     //pObject->SetTexture(listTexture, m_ListTextures.size() - iChkIdx);
@@ -117,8 +117,8 @@ void ToolSystemMap::CreateSimpleObject(int iChkIdx, XMVECTOR vPos)
     _EngineSystem.GetRenderSystem()->ReleaseBlob();
 
     Mesh* pMesh = new Mesh();
-    pMesh->m_pVertexBuffer = pVertexBuffer;
-    pMesh->m_pIndexBuffer = pIndexBuffer;
+    pMesh->m_ListVertexBuffer.push_back(pVertexBuffer);
+    pMesh->m_ListIndexBuffer.push_back(pIndexBuffer);
     constant cc;
     cc.matWorld = XMMatrixIdentity();
     cc.matView = m_pCamera->m_matCamera;
@@ -158,8 +158,8 @@ void ToolSystemMap::CreateSimpleMap(int iWidth, int iHeight, float fDistance)
     _EngineSystem.GetRenderSystem()->ReleaseBlob();
 
 
-    pMapMesh->m_pVertexBuffer = pVertexBuffer;
-    pMapMesh->m_pIndexBuffer = pIndexBuffer;
+    pMapMesh->m_ListVertexBuffer.push_back(pVertexBuffer);
+    pMapMesh->m_ListIndexBuffer.push_back(pIndexBuffer);
     constant cc;
     cc.matWorld = XMMatrixIdentity();
     cc.matView = m_pCamera->m_matCamera;
@@ -203,7 +203,7 @@ void ToolSystemMap::SaveFile(std::wstring szFullPath)
 ToolSystemMap::ToolSystemMap()
 {
     std::cout << "Initialize : ToolSystemMap" << std::endl;
-    m_pCamera = _CameraSystem.CreateCamera(L"MainCamera", MAT_PROJ::PERSPECTIVE, { 0,0,-2 }, { 0, 0, 1 }, { 0, 1, 0 });
+    m_pCamera = _CameraSystem.CreateCamera(L"MainCamera", MAT_PROJ::PERSPECTIVE, { 0,0,-1000 }, { 0, 0, 1 }, { 0, 1, 0 });
     _CameraSystem.SetCurrentCamera(m_pCamera);
 }
 

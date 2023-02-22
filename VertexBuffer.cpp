@@ -1,5 +1,10 @@
 #include "VertexBuffer.h"
 
+UINT VertexBuffer::GetSizeList()
+{
+	return 	m_iSizeList;
+}
+
 VertexBuffer::VertexBuffer(ID3D11Device* pDevice, void* pVertices, UINT iSizeVertex, UINT iSizeList, void* pCodeShader, UINT iSizeShader) : m_pBuffer(nullptr), m_pInputLayout(nullptr)
 {
 	//BufferDescriptor

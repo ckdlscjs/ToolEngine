@@ -1,11 +1,12 @@
 #include "Mesh.h"
-VertexBuffer* Mesh::GetVertexBuffer()
+
+std::vector<VertexBuffer*>& Mesh::GetVertexBuffer()
 {
-	return m_pVertexBuffer;
+	return m_ListVertexBuffer;
 }
-IndexBuffer* Mesh::GetIndexBuffer()
+std::vector<IndexBuffer*>& Mesh::GetIndexBuffer()
 {
-	return m_pIndexBuffer;
+	return m_ListIndexBuffer;
 }
 
 Mesh::Mesh() : Resource()
@@ -20,7 +21,7 @@ Mesh::Mesh(const wchar_t* szFullPath) : Resource(szFullPath)
 
 Mesh::~Mesh()
 {
-	if (m_pVertexBuffer) delete m_pVertexBuffer;
+	//if (m_pVertexBuffer) delete m_pVertexBuffer;
 	for (auto iter = m_ListVertexBuffer.begin(); iter != m_ListVertexBuffer.end(); )
 	{
 		delete (*iter);
@@ -28,7 +29,7 @@ Mesh::~Mesh()
 	}
 	m_ListVertexBuffer.clear();
 
-	if (m_pIndexBuffer) delete m_pIndexBuffer;
+	//if (m_pIndexBuffer) delete m_pIndexBuffer;
 	for (auto iter = m_ListIndexBuffer.begin(); iter != m_ListIndexBuffer.end(); )
 	{
 		delete (*iter);

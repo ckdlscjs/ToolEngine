@@ -31,7 +31,7 @@ FBXSystem::~FBXSystem()
 	}
 	m_ListFile.clear();
 
-	if (m_pFbxManager) m_pFbxManager->Destroy();
 	if (m_pFbxImporter) m_pFbxImporter->Destroy();
+	if (m_pFbxManager) m_pFbxManager->Destroy();
 	
 }

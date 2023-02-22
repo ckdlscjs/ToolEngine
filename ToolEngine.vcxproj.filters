@@ -4,9 +4,6 @@
     <Filter Include="Shaders">
       <UniqueIdentifier>{0c7c620b-d82e-4224-9532-312c0406dae8}</UniqueIdentifier>
     </Filter>
-    <Filter Include="WindowSystem">
-      <UniqueIdentifier>{ebb6abe7-7bb6-4986-a162-6c171c91c5ff}</UniqueIdentifier>
-    </Filter>
     <Filter Include="EntrySystem">
       <UniqueIdentifier>{f3f27a5b-ac88-4b62-861a-ce75647c7425}</UniqueIdentifier>
     </Filter>
@@ -61,9 +58,6 @@
     <Filter Include="ToolSystem">
       <UniqueIdentifier>{ff22594f-e7dc-42fc-8b73-5e2398cca654}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ToolSystem\ToolSystemUI">
-      <UniqueIdentifier>{4c3993ff-40a4-4631-af39-1db93c7627ef}</UniqueIdentifier>
-    </Filter>
     <Filter Include="ToolSystem\ToolSystemEffect">
       <UniqueIdentifier>{0a554dec-f709-4b80-85f8-1d2bb2b5b845}</UniqueIdentifier>
     </Filter>
@@ -99,6 +93,12 @@
     </Filter>
     <Filter Include="FBXSystem\FBXFile\FBXNode">
       <UniqueIdentifier>{c4a1539a-e82c-4ae8-a494-42bebb08bf97}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ToolSystem\ToolSystemUI">
+      <UniqueIdentifier>{4c3993ff-40a4-4631-af39-1db93c7627ef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="WindowSystem">
+      <UniqueIdentifier>{ebb6abe7-7bb6-4986-a162-6c171c91c5ff}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -202,9 +202,6 @@
     <ClInclude Include="ImFileDialog.h">
       <Filter>ImguiSystem\Imgui</Filter>
     </ClInclude>
-    <ClInclude Include="ToolSystemMap.h">
-      <Filter>ToolSystem\ToolSystemMap</Filter>
-    </ClInclude>
     <ClInclude Include="MeshMap.h">
       <Filter>ToolSystem\ToolSystemMap\MapObject</Filter>
     </ClInclude>
@@ -243,6 +240,9 @@
     </ClInclude>
     <ClInclude Include="FBXNode.h">
       <Filter>FBXSystem\FBXFile\FBXNode</Filter>
+    </ClInclude>
+    <ClInclude Include="ToolSystemMap.h">
+      <Filter>ToolSystem\ToolSystemMap</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -340,9 +340,6 @@
     <ClCompile Include="ImFileDialog.cpp">
       <Filter>ImguiSystem\Imgui</Filter>
     </ClCompile>
-    <ClCompile Include="ToolSystemMap.cpp">
-      <Filter>ToolSystem\ToolSystemMap</Filter>
-    </ClCompile>
     <ClCompile Include="MeshMap.cpp">
       <Filter>ToolSystem\ToolSystemMap\MapObject</Filter>
     </ClCompile>
@@ -381,6 +378,9 @@
     </ClCompile>
     <ClCompile Include="FBXNode.cpp">
       <Filter>FBXSystem\FBXFile\FBXNode</Filter>
+    </ClCompile>
+    <ClCompile Include="ToolSystemMap.cpp">
+      <Filter>ToolSystem\ToolSystemMap</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

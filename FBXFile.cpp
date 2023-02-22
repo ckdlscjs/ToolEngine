@@ -12,10 +12,10 @@ void FBXFile::ParseNode(FbxNode* pFbxNode)
 	FBXNode* pNode = new FBXNode();
 	pNode->m_pNode = pFbxNode;
 	pNode->m_szName = pNode->m_pNode->GetName();
-	pNode->m_type = pNode->m_pNode->GetNodeAttribute()->GetAttributeType();
+	//pNode->m_type = pNode->m_pNode->GetNodeAttribute()->GetAttributeType();
 	if (pNode->m_pNode->GetMesh())
 		ParseMesh(pNode);
-	m_mapNode.insert(std::make_pair(pNode->m_szName, m_mapNode.size()));
+	m_mapNode.insert(std::make_pair(pNode, m_mapNode.size()));
 
 
 	int iNumChild = pFbxNode->GetChildCount();
@@ -35,15 +35,19 @@ void FBXFile::ParseMesh(FBXNode* pNode)
 	FbxMesh* pFbxMesh = pFbxNode->GetMesh();
 	if (!pFbxMesh)
 		return;
-	int iNumPolygonCount = pFbxMesh->GetPolygonCount();
-	int iNumFace = 0;
-	int iBasePolygonIndex = 0;
-	int iSubMtrl = 0;
-	int iPolygonSize = 0;
-	// 3 정점 -> 1폴리곤( 삼각형)
-	// 4 정점 -> 1폴리곤( 쿼드 )
-	FbxVector4* pControlPositions = pFbxMesh->GetControlPoints();
+	//using Normalvector
+	FbxAMatrix geom; // 기하(로칼)행렬(초기 정점 위치를 변환할 때 사용한다.)
+	FbxVector4 scale = pFbxNode->GetGeometricScaling(FbxNode::eSourcePivot);
+	FbxVector4 rot = pFbxNode->GetGeometricRotation(FbxNode::eSourcePivot);
+	FbxVector4 trans = pFbxNode->GetGeometricTranslation(FbxNode::eSourcePivot);
+	geom.SetS(scale);
+	geom.SetR(rot);
+	geom.SetT(trans);
+	FbxAMatrix normalLocalMatrix = geom;
+	normalLocalMatrix = normalLocalMatrix.Inverse();
+	normalLocalMatrix = normalLocalMatrix.Transpose();
 
+		 
 	// Layer 개념
 	FbxLayerElementUV* VertexUVSet = nullptr;
 	FbxLayerElementVertexColor* VertexColorSet = nullptr;
@@ -59,17 +63,7 @@ void FBXFile::ParseMesh(FBXNode* pNode)
 	if (pFbxLayer->GetMaterials() != nullptr)
 		MaterialSet = pFbxLayer->GetMaterials();
 
-	//using Normalvector
-	FbxAMatrix geom; // 기하(로칼)행렬(초기 정점 위치를 변환할 때 사용한다.)
-	FbxVector4 scale = pFbxNode->GetGeometricScaling(FbxNode::eSourcePivot);
-	FbxVector4 rot = pFbxNode->GetGeometricRotation(FbxNode::eSourcePivot);
-	FbxVector4 trans = pFbxNode->GetGeometricTranslation(FbxNode::eSourcePivot);
-	geom.SetS(scale);
-	geom.SetR(rot);
-	geom.SetT(trans);
-	FbxAMatrix normalLocalMatrix = geom;
-	normalLocalMatrix = normalLocalMatrix.Inverse();
-	normalLocalMatrix = normalLocalMatrix.Transpose();
+	
 
 	std::string szFileName;
 	int iNumMtrl = pFbxNode->GetMaterialCount();
@@ -95,27 +89,36 @@ void FBXFile::ParseMesh(FBXNode* pNode)
 		}
 	}
 
+	m_ListVertexPNCT.resize(iNumMtrl);
+	m_ListVertexIW.resize(iNumMtrl);
+	m_ListIndex.resize(iNumMtrl);
+	m_ListTextures.resize(iNumMtrl);
 	if (iNumMtrl == 1)
 	{
 		m_ListTextures[0] = _tomw(GetSplitName(szFileName));
 	}
 	if (iNumMtrl > 1)
 	{
-		m_ListVertexPNCT.resize(iNumMtrl);
-		m_ListVertexIW.resize(iNumMtrl);
-
-		m_ListTextures.resize(iNumMtrl);
 		for (int iTex = 0; iTex < iNumMtrl; iTex++)
 		{
 			m_ListTextures[iTex] = _tomw(GetSplitName(texFullNameList[iTex]));
 		}
 	}
 
+	FbxVector4* pControlPositions = pFbxMesh->GetControlPoints();
+	int iNumPolygonCount = pFbxMesh->GetPolygonCount();
+	int iNumFace = 0;
+	int iBasePolygonIndex = 0;
+	int iSubMtrl = 0;
+	// 3 정점 -> 1폴리곤( 삼각형)
+	// 4 정점 -> 1폴리곤( 쿼드 )
+
+
 	for (int idxPolygon = 0; idxPolygon < iNumPolygonCount; idxPolygon++)
 	{
-		iPolygonSize = pFbxMesh->GetPolygonSize(idxPolygon);
+		int iPolygonSize = pFbxMesh->GetPolygonSize(idxPolygon);
 		iNumFace = iPolygonSize - 2; //4정점일땐 face가2개 3정점일땐 1개
-		iSubMtrl = 0;
+
 		if (MaterialSet)
 			iSubMtrl = GetSubMaterialIndex(idxPolygon, MaterialSet);
 
@@ -129,7 +132,6 @@ void FBXFile::ParseMesh(FBXNode* pNode)
 			iCornerIndex[1] = pFbxMesh->GetPolygonVertex(idxPolygon, iFace + 2);
 			iCornerIndex[2] = pFbxMesh->GetPolygonVertex(idxPolygon, iFace + 1);
 
-			
 			int iUVIndex[3];
 			iUVIndex[0] = pFbxMesh->GetTextureUVIndex(idxPolygon, 0);
 			iUVIndex[1] = pFbxMesh->GetTextureUVIndex(idxPolygon, iFace + 2);
@@ -143,11 +145,11 @@ void FBXFile::ParseMesh(FBXNode* pNode)
 				iw iwVertex;
 				FbxVector4 vConvert = geom.MultT(vOrigin);
 
-				pnctVertex.pos.x = vOrigin.mData[0];
-				pnctVertex.pos.y = vOrigin.mData[2];
-				pnctVertex.pos.z = vOrigin.mData[1];
-				pnctVertex.color = XMFLOAT4(1, 1, 1, 1);
+				pnctVertex.pos.x = vConvert.mData[0];
+				pnctVertex.pos.y = vConvert.mData[2];
+				pnctVertex.pos.z = vConvert.mData[1];
 
+				pnctVertex.color = XMFLOAT4(1, 1, 1, 1);
 				if (VertexColorSet)
 				{
 					FbxColor c = ReadColor(
@@ -208,22 +210,11 @@ void FBXFile::ParseMesh(FBXNode* pNode)
 					iwVertex.weight.z = pIW->weight[2];
 					iwVertex.weight.w = pIW->weight[3];
 				}
-
-				if (iNumMtrl <= 1)
-				{
-					m_ListVertexPNCT[0].push_back(pnctVertex);
-					m_ListIndex[0].push_back(iCornerIndex[idxVertFace]);
-					m_ListVertexIW[0].push_back(iwVertex);
-				}
-				else
-				{
-					m_ListVertexPNCT[iSubMtrl].push_back(pnctVertex);
-					m_ListIndex[iSubMtrl].push_back(iCornerIndex[idxVertFace]);
-					m_ListVertexIW[iSubMtrl].push_back(iwVertex);
-				}
+				m_ListVertexPNCT[iSubMtrl].push_back(pnctVertex);
+				m_ListVertexIW[iSubMtrl].push_back(iwVertex);
+				m_ListIndex[iSubMtrl].push_back(iBasePolygonIndex++);
 			}
 		}
-		iBasePolygonIndex += iPolygonSize;
 	}
 }
 
@@ -488,6 +479,7 @@ FBXFile::~FBXFile()
 {
 	for (auto iter = m_mapNode.begin(); iter != m_mapNode.end(); )
 	{
+		delete (*iter).first;
 		iter = m_mapNode.erase(iter);
 	}
 	m_mapNode.clear();

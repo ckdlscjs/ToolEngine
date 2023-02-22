@@ -1,7 +1,7 @@
 #include "MeshMap.h"
 void MeshMap::UpdateBuffer(Camera* pCamera)
 {
-    m_dwFace = 0;
+   /* m_dwFace = 0;
     DWORD index = 0;
     XMVECTOR v[3];
     for (int iFace = 0; iFace < m_ListIndex.size() / 3; iFace++)
@@ -25,7 +25,7 @@ void MeshMap::UpdateBuffer(Camera* pCamera)
             }
         }
     }
-    g_pDeviceContext->UpdateSubresource(m_pIndexBuffer->m_pBuffer, 0, nullptr, &m_dwIndexList.at(0), 0, 0);
+    g_pDeviceContext->UpdateSubresource(m_pIndexBuffer->m_pBuffer, 0, nullptr, &m_dwIndexList.at(0), 0, 0);*/
 }
 
 

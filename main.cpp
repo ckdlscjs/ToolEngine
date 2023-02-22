@@ -9,16 +9,16 @@
 int main()
 {
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
-	/*_CrtSetBreakAlloc(299);*/
-	fbxsample::FBXSample a;
-	a.sample();
-	/*EntrySystem entrypoint;
+	/*_CrtSetBreakAlloc(40569);*/
+	/*fbxsample::FBXSample a;
+	a.sample();*/
+	EntrySystem entrypoint;
 	entrypoint.Initialize();
 	while (entrypoint.IsRun())
 	{
 		if (!entrypoint.BroadCast())
 			break;
-	}*/
+	}
 
 	return 0;
 }

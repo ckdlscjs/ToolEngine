@@ -20,7 +20,7 @@ public:
 public:
 	FbxScene* m_pFbxScene;
 	FbxNode* m_pRootNode;
-	std::unordered_map<std::string, unsigned int> m_mapNode;
+	std::unordered_map<FBXNode*, unsigned int> m_mapNode;
 	std::vector<std::vector<object>> m_ListVertexPNCT;
 	std::vector<std::vector<iw>> m_ListVertexIW;
 	std::vector<std::vector<int>> m_ListIndex;

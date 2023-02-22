@@ -65,11 +65,16 @@ void Object::Render()
 	_EngineSystem.GetRenderSystem()->SetConstantBuffer(m_pPixelShader, m_pConstantBuffer);
 	_EngineSystem.GetRenderSystem()->SetVertexShader(m_pVertexShader);
 	_EngineSystem.GetRenderSystem()->SetPixelShader(m_pPixelShader);
-	_EngineSystem.GetRenderSystem()->SetVertexBuffer(m_pMesh->GetVertexBuffer());
-	_EngineSystem.GetRenderSystem()->SetIndexBuffer(m_pMesh->GetIndexBuffer());
-	_EngineSystem.GetRenderSystem()->setTexture(m_pVertexShader, m_ListTextures, m_iNumTextures);
-	_EngineSystem.GetRenderSystem()->setTexture(m_pPixelShader, m_ListTextures, m_iNumTextures);
-	_EngineSystem.GetRenderSystem()->drawIndexedTriangleList(m_pMesh->GetIndexBuffer()->getSizeIndexList(), 0, 0);
+	for (int idx = 0; idx < m_pMesh->GetVertexBuffer().size(); idx++)
+	{
+		_EngineSystem.GetRenderSystem()->SetVertexBuffer(m_pMesh->GetVertexBuffer()[idx]);
+		_EngineSystem.GetRenderSystem()->SetIndexBuffer(m_pMesh->GetIndexBuffer()[idx]);
+		_EngineSystem.GetRenderSystem()->setTexture(m_pVertexShader, m_ListTextures, m_iNumTextures);
+		_EngineSystem.GetRenderSystem()->setTexture(m_pPixelShader, m_ListTextures, m_iNumTextures);
+		//_EngineSystem.GetRenderSystem()->drawTriangleList(m_pMesh->GetVertexBuffer()[idx]->GetSizeList(), 0);
+		_EngineSystem.GetRenderSystem()->drawIndexedTriangleList(m_pMesh->GetIndexBuffer()[idx]->getSizeIndexList(), 0, 0);
+	}
+
 }
 
 Object::Object()

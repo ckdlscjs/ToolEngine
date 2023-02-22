@@ -51,7 +51,7 @@ void ImguiSystem::Update()
 
         {
             if (ImGui::Button("CreateObject"))
-                _ToolSystemMap.CreateSimpleObject(item_current_idx, _CameraSystem.GetCurrentCamera()->m_vCameraPos);
+                _ToolSystemMap.CreateFbxObject(L"", item_current_idx, _CameraSystem.GetCurrentCamera()->m_vCameraPos);
 
         }
         ImGui::Dummy({ 0, 10 });

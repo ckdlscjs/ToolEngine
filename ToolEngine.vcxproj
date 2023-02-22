@@ -193,7 +193,7 @@
     <OutDir>../../Output/Debug/</OutDir>
     <IntDir>../../Output/Debug/$(ProjectName)</IntDir>
     <IncludePath>../../Include/DXTK;../../Include/DXTEX;../../Include/tinyobjloader;$(IncludePath)</IncludePath>
-    <LibraryPath>../../Lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>../../Lib;../../fbxsdk/lib/vs2019/x64/Debug;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -238,7 +238,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>../../fbxsdk/lib/vs2019/x64/Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">

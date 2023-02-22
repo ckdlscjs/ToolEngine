@@ -72,7 +72,7 @@ void Camera::Update()
 	}
 	if (m_type == MAT_PROJ::PERSPECTIVE)
 	{
-		m_matProj = XMMatrixPerspectiveFovLH(1.57f, ((float)(rt.right - rt.left) / (float)(rt.bottom - rt.top)), 0.1f, 1001.0f);
+		m_matProj = XMMatrixPerspectiveFovLH(1.57f, ((float)(rt.right - rt.left) / (float)(rt.bottom - rt.top)), 0.1f, 10000.0f);
 	}
 
 	m_Frustum.CreateFrustum(&m_matCamera, &m_matProj);
