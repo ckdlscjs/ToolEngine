@@ -47,6 +47,6 @@ public:
 	std::vector<std::vector<object>> m_ListVertexPNCT;
 	std::vector<std::vector<iw>> m_ListVertexIW;
 	std::vector<std::vector<int>> m_ListIndex;
-	std::vector<std::wstring> m_ListTextures;
+	std::vector<std::wstring> m_ListTexture;
 };
 

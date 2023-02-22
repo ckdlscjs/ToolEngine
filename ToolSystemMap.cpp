@@ -44,21 +44,21 @@ void ToolSystemMap::CreateFbxObject(std::wstring szFullPath, XMVECTOR vPos)
     cc.matView = m_pCamera->m_matCamera;
     cc.matProj = m_pCamera->m_matProj;
     std::wstring defaultDir = L"../../data/fbx/";
-    for (int idx = 0; idx < pFBXFile->m_ListTextures.size(); idx++)
-        m_ListTexture.push_back(defaultDir + pFBXFile->m_ListTextures[idx]);
 
-
-    Texture** listTexture = new Texture * [m_ListTexture.size()];
-    for (int idx = 0; idx < m_ListTexture.size(); idx++)
-        listTexture[idx] = _EngineSystem.GetTextureSystem()->CreateTextureFromFile(m_ListTexture[idx].c_str());
-
+    Texture** listTexture = new Texture * [pFBXFile->m_ListTexture.size()];
+    for (int idx = 0; idx < pFBXFile->m_ListTexture.size(); idx++)
+    {
+        std::wstring szFullPath = defaultDir + pFBXFile->m_ListTexture[idx];
+        listTexture[idx] = _EngineSystem.GetTextureSystem()->CreateTextureFromFile(szFullPath.c_str());
+    }
+        
     Object* pObject;
     pObject = _ObjectSystem.CreateObject();
     pObject->SetConstantData(cc);
     pObject->SetTransform({ vPos , {0, 0, 0}, {1, 1, 1} });
     pObject->SetMesh(pMesh);
     pObject->SetShader(pVertexShader, pPixelShader);
-    pObject->SetTexture(listTexture, m_ListTexture.size());
+    pObject->SetTexture(listTexture, pFBXFile->m_ListTexture.size());
 }
 
 void ToolSystemMap::CreateSimpleObject(int iChkIdx, XMVECTOR vPos)

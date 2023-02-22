@@ -10,7 +10,10 @@ Texture::Texture(const wchar_t* szFullPath) : Resource(szFullPath)
 	HRESULT result = CoInitialize(nullptr);	//WhyConinitialize
 	if (FAILED(result))
 		throw std::exception("Coninitialize not successfully");
-	result = DirectX::LoadFromWICFile(szFullPath, DirectX::WIC_FLAGS_IGNORE_SRGB, nullptr, image_data);
+	if (GetSplitFile(_towm(szFullPath)) == "tga")
+		result = DirectX::LoadFromTGAFile(szFullPath, nullptr, image_data);
+	else
+		result = DirectX::LoadFromWICFile(szFullPath, DirectX::WIC_FLAGS_IGNORE_SRGB, nullptr, image_data);
 	if (FAILED(result))
 		throw std::exception("LoadTexture not successfully");
 	result = DirectX::CreateTexture(g_pDevice, image_data.GetImages(), image_data.GetImageCount(), image_data.GetMetadata(), &m_pTexture);

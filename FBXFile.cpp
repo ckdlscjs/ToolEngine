@@ -110,13 +110,13 @@ void FBXFile::ParseMesh(FBXNode* pNode, int nodeIdx)
 	
 	if (iNumMtrl == 1)
 	{
-		m_ListTextures.push_back(_tomw(GetSplitName(szFileName)));
+		m_ListTexture.push_back(_tomw(GetSplitName(szFileName)));
 	}
 	if (iNumMtrl > 1)
 	{
 		for (int iTex = 0; iTex < iNumMtrl; iTex++)
 		{
-			m_ListTextures.push_back(_tomw(GetSplitName(texFullNameList[iTex])));
+			m_ListTexture.push_back(_tomw(GetSplitName(texFullNameList[iTex])));
 		}
 	}
 	
