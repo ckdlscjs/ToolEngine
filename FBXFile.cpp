@@ -3,6 +3,28 @@
 
 void FBXFile::ParseAnim()
 {
+	FbxAnimStack* pStackAnim = m_pFbxScene->GetSrcObject<FbxAnimStack>(0);
+	FbxLongLong s = 0;
+	FbxLongLong n = 0;
+	FbxTime::EMode TimeMode = FbxTime::GetGlobalTimeMode();
+	if (pStackAnim)
+	{
+		FbxString takeName = pStackAnim->GetName();
+		FbxTakeInfo* take = m_pFbxScene->GetTakeInfo(takeName);
+		FbxTime::SetGlobalTimeMode(FbxTime::eFrames30);
+		TimeMode = FbxTime::GetGlobalTimeMode();
+		FbxTimeSpan localTimeSpan = take->mLocalTimeSpan;
+		FbxTime start = localTimeSpan.GetStart();
+		FbxTime end = localTimeSpan.GetStop();
+		FbxTime Duration = localTimeSpan.GetDirection();
+		s = start.GetFrameCount(TimeMode);
+		n = end.GetFrameCount(TimeMode);
+	}
+	m_AnimScene.iStartFrame = s;
+	m_AnimScene.iEndFrame = n;
+	m_AnimScene.fFrameSpeed = 30.0f;
+	m_AnimScene.fTickPerFrame = 160;
+	m_AnimScene.TimeMode = TimeMode;
 }
 
 void FBXFile::ParseNode(FbxNode* pFbxNode)
@@ -12,11 +34,8 @@ void FBXFile::ParseNode(FbxNode* pFbxNode)
 	FBXNode* pNode = new FBXNode();
 	pNode->m_pNode = pFbxNode;
 	pNode->m_szName = pNode->m_pNode->GetName();
-	//pNode->m_type = pNode->m_pNode->GetNodeAttribute()->GetAttributeType();
-	if (pNode->m_pNode->GetMesh())
-		ParseMesh(pNode);
-	m_mapNode.insert(std::make_pair(pNode, m_mapNode.size()));
-
+	//m_mapNode.insert(std::make_pair(pNode, m_mapNode.size()));
+	m_ListNode.push_back(pNode);
 
 	int iNumChild = pFbxNode->GetChildCount();
 	for (int iChild = 0; iChild < iNumChild; iChild++)
@@ -25,7 +44,8 @@ void FBXFile::ParseNode(FbxNode* pFbxNode)
 		ParseNode(pChild);
 	}
 }
-void FBXFile::ParseMesh(FBXNode* pNode)
+
+void FBXFile::ParseMesh(FBXNode* pNode, int nodeIdx)
 {
 	ParseSkinning(pNode);
 
@@ -35,6 +55,7 @@ void FBXFile::ParseMesh(FBXNode* pNode)
 	FbxMesh* pFbxMesh = pFbxNode->GetMesh();
 	if (!pFbxMesh)
 		return;
+
 	//using Normalvector
 	FbxAMatrix geom; // 기하(로칼)행렬(초기 정점 위치를 변환할 때 사용한다.)
 	FbxVector4 scale = pFbxNode->GetGeometricScaling(FbxNode::eSourcePivot);
@@ -47,7 +68,6 @@ void FBXFile::ParseMesh(FBXNode* pNode)
 	normalLocalMatrix = normalLocalMatrix.Inverse();
 	normalLocalMatrix = normalLocalMatrix.Transpose();
 
-		 
 	// Layer 개념
 	FbxLayerElementUV* VertexUVSet = nullptr;
 	FbxLayerElementVertexColor* VertexColorSet = nullptr;
@@ -62,8 +82,6 @@ void FBXFile::ParseMesh(FBXNode* pNode)
 		VertexNormalSet = pFbxLayer->GetNormals();
 	if (pFbxLayer->GetMaterials() != nullptr)
 		MaterialSet = pFbxLayer->GetMaterials();
-
-	
 
 	std::string szFileName;
 	int iNumMtrl = pFbxNode->GetMaterialCount();
@@ -89,22 +107,19 @@ void FBXFile::ParseMesh(FBXNode* pNode)
 		}
 	}
 
-	m_ListVertexPNCT.resize(iNumMtrl);
-	m_ListVertexIW.resize(iNumMtrl);
-	m_ListIndex.resize(iNumMtrl);
-	m_ListTextures.resize(iNumMtrl);
+	
 	if (iNumMtrl == 1)
 	{
-		m_ListTextures[0] = _tomw(GetSplitName(szFileName));
+		m_ListTextures.push_back(_tomw(GetSplitName(szFileName)));
 	}
 	if (iNumMtrl > 1)
 	{
 		for (int iTex = 0; iTex < iNumMtrl; iTex++)
 		{
-			m_ListTextures[iTex] = _tomw(GetSplitName(texFullNameList[iTex]));
+			m_ListTextures.push_back(_tomw(GetSplitName(texFullNameList[iTex])));
 		}
 	}
-
+	
 	FbxVector4* pControlPositions = pFbxMesh->GetControlPoints();
 	int iNumPolygonCount = pFbxMesh->GetPolygonCount();
 	int iNumFace = 0;
@@ -112,7 +127,10 @@ void FBXFile::ParseMesh(FBXNode* pNode)
 	int iSubMtrl = 0;
 	// 3 정점 -> 1폴리곤( 삼각형)
 	// 4 정점 -> 1폴리곤( 쿼드 )
+	int iNumVertexCount = pFbxMesh->GetControlPointsCount();
 
+	m_ListVertexPNCT[nodeIdx].resize(iNumVertexCount);
+	m_ListVertexIW[nodeIdx].resize(iNumVertexCount);
 
 	for (int idxPolygon = 0; idxPolygon < iNumPolygonCount; idxPolygon++)
 	{
@@ -210,9 +228,9 @@ void FBXFile::ParseMesh(FBXNode* pNode)
 					iwVertex.weight.z = pIW->weight[2];
 					iwVertex.weight.w = pIW->weight[3];
 				}
-				m_ListVertexPNCT[iSubMtrl].push_back(pnctVertex);
-				m_ListVertexIW[iSubMtrl].push_back(iwVertex);
-				m_ListIndex[iSubMtrl].push_back(iBasePolygonIndex++);
+				m_ListVertexPNCT[nodeIdx][vertexID] = pnctVertex;
+				m_ListVertexIW[nodeIdx][vertexID] = iwVertex;
+				m_ListIndex[nodeIdx].push_back(vertexID);
 			}
 		}
 	}
@@ -473,10 +491,26 @@ FBXFile::FBXFile(FbxScene* pFbxScene)
 {
 	m_pFbxScene = pFbxScene;
 	ParseNode(m_pFbxScene->GetRootNode());
+
+	m_ListVertexPNCT.resize(m_ListNode.size());
+	m_ListVertexIW.resize(m_ListNode.size());
+	m_ListIndex.resize(m_ListNode.size());
+	for(int iNodeIdx = 0; iNodeIdx < m_ListNode.size(); iNodeIdx++)
+	{
+		ParseMesh(m_ListNode[iNodeIdx], iNodeIdx);
+	}
 }
 
 FBXFile::~FBXFile()
 {
+
+	for (auto iter = m_ListNode.begin(); iter != m_ListNode.end(); )
+	{
+		delete (*iter);
+		iter = m_ListNode.erase(iter);
+	}
+	m_ListNode.clear();
+
 	for (auto iter = m_mapNode.begin(); iter != m_mapNode.end(); )
 	{
 		delete (*iter).first;

@@ -15,7 +15,7 @@ void ToolSystemMap::SetPicking(int iChkIdx, bool bPicking)
 
 void ToolSystemMap::CreateFbxObject(std::wstring szFullPath, int iChkIdx, XMVECTOR vPos)
 {
-    FBXFile* pFBXFile = _FBXSystem.LoadFile(_towm(L"../../data/fbx/ship.fbx").c_str());
+    FBXFile* pFBXFile = _FBXSystem.LoadFile(_towm(L"../../data/fbx/man.fbx").c_str());
     Mesh* pMesh = new Mesh();
 
     void* shader_byte_code = nullptr;
@@ -25,6 +25,8 @@ void ToolSystemMap::CreateFbxObject(std::wstring szFullPath, int iChkIdx, XMVECT
     VertexShader* pVertexShader = _EngineSystem.GetRenderSystem()->CreateVertexShader(shader_byte_code, size_shader);
     for (int idx = 0; idx < pFBXFile->m_ListVertexPNCT.size(); idx++)
     {
+        if (!pFBXFile->m_ListVertexPNCT[idx].size())
+            continue;
         VertexBuffer* pVertexBuffer = _EngineSystem.GetRenderSystem()->CreateVertexBuffer(&pFBXFile->m_ListVertexPNCT[idx][0], sizeof(object), pFBXFile->m_ListVertexPNCT[idx].size(), shader_byte_code, size_shader);
         IndexBuffer* pIndexBuffer = _EngineSystem.GetRenderSystem()->CreateIndexBuffer(&pFBXFile->m_ListIndex[idx][0], pFBXFile->m_ListIndex[idx].size());
         pMesh->m_ListVertexBuffer.push_back(pVertexBuffer);
@@ -41,20 +43,22 @@ void ToolSystemMap::CreateFbxObject(std::wstring szFullPath, int iChkIdx, XMVECT
     cc.matWorld = XMMatrixIdentity();
     cc.matView = m_pCamera->m_matCamera;
     cc.matProj = m_pCamera->m_matProj;
+    std::wstring defaultDir = L"../../data/fbx/";
+    for (int idx = 0; idx < pFBXFile->m_ListTextures.size(); idx++)
+        m_ListTextures.push_back(defaultDir + pFBXFile->m_ListTextures[idx]);
 
-    /*Texture** listTexture = new Texture * [m_ListTextures.size() - iChkIdx];
-    for (int idx = 0; idx + iChkIdx < m_ListTextures.size(); idx++)
-    {
-        listTexture[idx] = _EngineSystem.GetTextureSystem()->CreateTextureFromFile(m_ListTextures[idx + iChkIdx].c_str());
-    }*/
+
+    Texture** listTexture = new Texture * [m_ListTextures.size()];
+    for (int idx = 0; idx < m_ListTextures.size(); idx++)
+        listTexture[idx] = _EngineSystem.GetTextureSystem()->CreateTextureFromFile(m_ListTextures[idx].c_str());
 
     Object* pObject;
     pObject = _ObjectSystem.CreateObject();
     pObject->SetConstantData(cc);
-    pObject->SetTransform({ {0,0,0} , {0, 0, 0}, {1, 1, 1} });
+    pObject->SetTransform({ {0, 0, 0} , {0, 0, 0}, {1, 1, 1} });
     pObject->SetMesh(pMesh);
     pObject->SetShader(pVertexShader, pPixelShader);
-    //pObject->SetTexture(listTexture, m_ListTextures.size() - iChkIdx);
+    pObject->SetTexture(listTexture, m_ListTextures.size());
 }
 
 void ToolSystemMap::CreateSimpleObject(int iChkIdx, XMVECTOR vPos)
@@ -203,7 +207,7 @@ void ToolSystemMap::SaveFile(std::wstring szFullPath)
 ToolSystemMap::ToolSystemMap()
 {
     std::cout << "Initialize : ToolSystemMap" << std::endl;
-    m_pCamera = _CameraSystem.CreateCamera(L"MainCamera", MAT_PROJ::PERSPECTIVE, { 0,0,-1000 }, { 0, 0, 1 }, { 0, 1, 0 });
+    m_pCamera = _CameraSystem.CreateCamera(L"MainCamera", MAT_PROJ::PERSPECTIVE, { 0,100,-3000 }, { 0, 0, 1 }, { 0, 1, 0 });
     _CameraSystem.SetCurrentCamera(m_pCamera);
 }
 

@@ -3,6 +3,14 @@
 #include "InputSystem.h"
 void Camera::Update()
 {
+	if (_InputSystem.GetKey(VK_SPACE) == KEY_STATE::KEY_UP)
+	{
+		m_fCameraSpeed = 50.0f;
+	}
+	if (_InputSystem.GetKey(VK_SPACE) == KEY_STATE::KEY_DOWN)
+	{
+		m_fCameraSpeed = 1000.0f;
+	}
 	if (_InputSystem.GetKey('W') || _InputSystem.GetKey('w'))
 	{
 		XMVECTOR v = m_vCameraDir * m_fCameraSpeed * m_fDelta;

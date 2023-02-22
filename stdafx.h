@@ -1,4 +1,5 @@
 #pragma once
+#define _SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING
 // STL
 #include <iostream>
 #include <memory>
@@ -7,6 +8,7 @@
 #include <exception>
 #include <codecvt>
 #include <tchar.h>
+#include <locale>
 #include <unordered_map>
 #include <unordered_set>
 #include <string>
@@ -62,11 +64,11 @@ static std::wstring _tomw(std::string str)
 	content.assign(str.begin(), str.end());
 	return content;
 }
+
 static std::string _towm(std::wstring wstr)
 {
-	std::string content;
-	content.assign(wstr.begin(), wstr.end());
-	return content;
+	std::wstring_convert<std::codecvt_utf8<wchar_t>> myconv;
+	return myconv.to_bytes(wstr);
 }
 
 static std::string GetSplitName(std::string szFullPath)
@@ -93,6 +95,7 @@ struct constant
 	XMMATRIX matView;
 	XMMATRIX matProj;
 };
+
 struct iw_data
 {
 	std::vector<int> index;
