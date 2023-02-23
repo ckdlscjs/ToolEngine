@@ -1,7 +1,6 @@
 #pragma once
 #include "stdafx.h"
-#include "sylCollision.h"
-using namespace sylCollision;
+#include "TCollision.h"
 enum F_POSITION
 {
 	F_BACK = 0,
@@ -44,7 +43,7 @@ public:
 public:
 	void	CreateFrustum(XMMATRIX* matView, XMMATRIX* matProj);
 	F_POSITION ClassifyPoint(XMVECTOR v);
-	F_POSITION ClassifyBox(_BOX v);
+	F_POSITION ClassifyBox(T_BOX v);
 	//BOOL	ClassifySphere(Sphere v);
 	//BOOL	ClassifyAABB(_AABB v);
 	//BOOL	ClassifyOBB(_OBB v);

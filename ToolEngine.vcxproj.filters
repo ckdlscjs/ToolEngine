@@ -244,6 +244,9 @@
     <ClInclude Include="ToolSystemMap.h">
       <Filter>ToolSystem\ToolSystemMap</Filter>
     </ClInclude>
+    <ClInclude Include="TCollision.h">
+      <Filter>PhysicsSystem</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WindowSystem.cpp">
@@ -381,6 +384,9 @@
     </ClCompile>
     <ClCompile Include="ToolSystemMap.cpp">
       <Filter>ToolSystem\ToolSystemMap</Filter>
+    </ClCompile>
+    <ClCompile Include="TCollision.cpp">
+      <Filter>PhysicsSystem</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

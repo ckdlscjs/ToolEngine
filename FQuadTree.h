@@ -2,17 +2,23 @@
 #include "FNode.h"
 #include "MeshMap.h"
 #include "Object.h"
+//picking temp
+#include "FSelect.h"
 class FQuadTree : public Object
 {
 
 public:
-	void	SetPicking(int iChkIdx, bool bPicking);
+	UINT	SelectVertexList(T_BOX& box, std::vector<FNode*>& selectNodeList);
+	void	PickingMap(int iChkIdx, bool bPicking);
+	void	PickingObject(bool bPicking);
+	void	PickingSculpt(bool bPicking);
 	BOOL	AddObject(Object* pObj);
 	void	BuildTree(FNode* pNode, MeshMap* pMap);
 	BOOL	IsSubDivide(FNode* pNode);
 	FNode*	FindNode(FNode* pNode, Object* pObj);
 	void	Reset(FNode* pNode);
 	FNode*	VisibleNode(FNode* pNode);
+	bool	GetInterSection();
 	void	Update();
 	void	Render();
 public:
@@ -20,10 +26,13 @@ public:
 	~FQuadTree();
 
 public:
-	bool m_bPicking;
+	bool m_bSclupting;
+	bool m_bMapPicking;
+	bool m_bObjectPicking;
 	int m_iChkIdx;
 	FNode* m_pRootNode;
 	int m_iMaxDepth;
+	FSelect m_Select;
 	MeshMap* m_pMap = nullptr;
 	Camera* m_pCamera = nullptr;
 	std::vector<FNode*> m_pLeafNodeList;

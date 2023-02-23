@@ -53,10 +53,15 @@ namespace sylCollision
 	};
 	struct Box
 	{
+		
+
 		XMFLOAT3 vMin;
 		XMFLOAT3 vSize;
 		XMFLOAT3 vMax;
 		XMFLOAT3 vCenter;
+		XMFLOAT3 vPos[8];
+		XMFLOAT3 vAxis[3];
+		float fExtent[3];
 		bool   operator == (Box& dest)
 		{
 			if (vMin == dest.vMin && vSize == dest.vSize)
@@ -64,17 +69,25 @@ namespace sylCollision
 			else
 				return false;
 		}
-		Box() {};
-		Box(XMFLOAT3 vPos, XMFLOAT3 vSize)
+		Box()
 		{
-			Set(vPos, vSize);
+
 		}
-		void Set(XMFLOAT3 vPos, XMFLOAT3 vSize)
+		Box(XMFLOAT3	max, XMFLOAT3		min)
 		{
-			vMin = vPos;
-			this->vSize = vSize;
-			vMax = vMin + vSize;
-			vCenter = (vMin + vMax) / 2.0f;
+			Set(max, min);
+		}
+		void Set(XMFLOAT3	max, XMFLOAT3	min)
+		{
+			vMax = max;
+			vMin = min;
+			vCenter = (vMax + vMin) * 0.5f;
+			vAxis[0] = { 1,0,0 };
+			vAxis[1] = { 0,1,0 };
+			vAxis[2] = { 0,0,1 };
+			fExtent[0] = vMax.x - vCenter.x;
+			fExtent[1] = vMax.y - vCenter.y;
+			fExtent[2] = vMax.z - vCenter.z;
 		}
 	};
 
@@ -101,17 +114,6 @@ namespace sylCollision
 	};
 	struct _OBB
 	{
-		XMFLOAT3 vCenter;
-		XMFLOAT3 vAxis[3];
-		float fExtent[3];
-	};
-	struct _BOX
-	{
-		XMFLOAT3 vPos[8];
-		//aabb
-		XMFLOAT3 vMin;
-		XMFLOAT3 vMax;
-		//obb
 		XMFLOAT3 vCenter;
 		XMFLOAT3 vAxis[3];
 		float fExtent[3];

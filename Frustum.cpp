@@ -67,7 +67,7 @@ F_POSITION Frustum::ClassifyPoint(XMVECTOR v)
 	return F_BACK;
 }
 
-F_POSITION Frustum::ClassifyBox(_BOX v)
+F_POSITION Frustum::ClassifyBox(T_BOX v)
 {
 	float		fPlaneToCenter = 0.0;
 	float		fDistance = 0.0f;

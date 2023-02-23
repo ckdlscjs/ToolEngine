@@ -1,6 +1,5 @@
 #include "FQuadTree.h"
-//picking temp
-#include "FSelect.h"
+
 #include "InputSystem.h"
 
 FQuadTree::FQuadTree(Camera* pCamera, MeshMap* pMap, int iMaxDepth)
@@ -19,10 +18,36 @@ FQuadTree::~FQuadTree()
 }
 
 #include "ToolSystemMap.h"
-void FQuadTree::SetPicking(int iChkIdx, bool bPicking)
+UINT FQuadTree::SelectVertexList(T_BOX& box, std::vector<FNode*>& selectNodeList)
+{
+    for (auto node : m_pDrawLeafNodeList)
+    {
+        if (node != nullptr)
+        {
+            TCollisionType ret = TCollision::BoxToBox(node->m_Box, box);
+            if (ret > 0)
+            {
+                selectNodeList.push_back(node);
+            }
+        }
+    }
+    return selectNodeList.size();
+}
+
+void FQuadTree::PickingMap(int iChkIdx, bool bPicking)
 {
     m_iChkIdx = iChkIdx;
-    m_bPicking = bPicking;
+    m_bMapPicking = bPicking;
+}
+
+void FQuadTree::PickingObject(bool bPicking)
+{
+    m_bObjectPicking = bPicking;
+}
+
+void FQuadTree::PickingSculpt(bool bPicking)
+{
+    m_bSclupting = bPicking;
 }
 
 BOOL FQuadTree::AddObject(Object* pObj)
@@ -111,18 +136,12 @@ FNode* FQuadTree::VisibleNode(FNode* pNode)
     return pNode;
 }
 
-void FQuadTree::Update()
+bool FQuadTree::GetInterSection()
 {
-    Object::Update();
-    m_pDrawLeafNodeList.clear();
-    VisibleNode(m_pRootNode); //재귀로 VisibleNode체크
-
-    FSelect point_select;
-    point_select.SetMatrix(nullptr, &m_pCamera->m_matCamera, &m_pCamera->m_matProj);
+ 
     //교점체크
-    if ((_InputSystem.GetKey(VK_RBUTTON) == KEY_STATE::KEY_DOWN) && m_bPicking)
+    if ((_InputSystem.GetKey(VK_RBUTTON) == KEY_STATE::KEY_DOWN))
     {
-
         for (auto node : m_pDrawLeafNodeList)
         {
             UINT index = 0;
@@ -135,14 +154,62 @@ void FQuadTree::Update()
                 XMFLOAT3 v0 = m_pMesh->GetListVertex()[i0].pos;
                 XMFLOAT3 v1 = m_pMesh->GetListVertex()[i1].pos;
                 XMFLOAT3 v2 = m_pMesh->GetListVertex()[i2].pos;
-                if (point_select.ChkPick(XMLoadFloat3(&v0), XMLoadFloat3(&v1), XMLoadFloat3(&v2)))
+                if (m_Select.ChkPick(XMLoadFloat3(&v0), XMLoadFloat3(&v1), XMLoadFloat3(&v2)))
                 {
-                    _ToolSystemMap.CreateSimpleObject(m_iChkIdx, point_select.m_vIntersection);
-                    return;
+                    return true;
                 }
                 index += 3;
             }
         }
+    }
+    return false;
+}
+
+void FQuadTree::Update()
+{
+    Object::Update();
+    m_pDrawLeafNodeList.clear();
+    VisibleNode(m_pRootNode); //재귀로 VisibleNode체크
+    m_Select.SetMatrix(nullptr, &m_pCamera->m_matCamera, &m_pCamera->m_matProj);
+    if (m_bMapPicking && GetInterSection())
+    {
+        _ToolSystemMap.CreateSimpleObject(m_iChkIdx, m_Select.m_vIntersection);
+    }
+    if (m_bSclupting && GetInterSection())
+    {
+        std::vector<FNode*> nodelist;
+        T_BOX box;
+        XMFLOAT3 vMin, vMax;
+        XMFLOAT3 vRange(10, 10, 10);
+        XMStoreFloat3(&vMax, m_Select.m_vIntersection + XMLoadFloat3(&vRange));
+        XMStoreFloat3(&vMin, m_Select.m_vIntersection - XMLoadFloat3(&vRange));
+        box.Set(vMax, vMin);
+        if (SelectVertexList(box, nodelist) > 0)
+        {
+            for (UINT iVertex = 0; iVertex < m_pMap->GetListVertex().size(); iVertex++)
+            {
+                XMFLOAT3 v0 = m_pMap->GetListVertex()[iVertex].pos;
+                XMVECTOR v = XMLoadFloat3(&v0) - m_Select.m_vIntersection;
+                float fDistance = XMVectorGetX(XMVector3Length(v));
+                if (fDistance <= 30.0f)
+                {
+                    float fValue = (fDistance / 30.0f) * 90.0f;
+                    float fdot = cosf(_DegreeToRadian(fValue));
+                    m_pMap->GetListVertex()[iVertex].pos.y += fdot * nodelist.size();
+                    m_pMap->ComputeVertexNormal(iVertex);
+                }
+            }
+            for (auto node : nodelist)
+            {
+                node->CreateIndexData(m_pMap);
+            }
+            _EngineSystem.GetRenderSystem()->UpdateVertexBuffer(m_pMap->GetVertexBuffer()[0], &m_pMap->m_ListVertex[0]);
+        }
+    }
+
+    if (m_bObjectPicking && GetInterSection())
+    {
+
     }
 }
 

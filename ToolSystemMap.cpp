@@ -8,7 +8,19 @@ void ToolSystemMap::SetWireframe(bool bWireFrame)
 void ToolSystemMap::SelectImage(int iChkIdx, bool bPicking)
 {
     if(m_pQuadTree)
-        m_pQuadTree->SetPicking(iChkIdx, bPicking);
+        m_pQuadTree->PickingMap(iChkIdx, bPicking);
+}
+
+void ToolSystemMap::SelectSculpt(bool bPicking)
+{
+    if (m_pQuadTree)
+        m_pQuadTree->PickingSculpt(bPicking);
+}
+
+void ToolSystemMap::SelectObject(bool bPicking)
+{
+    if (m_pQuadTree)
+        m_pQuadTree->PickingObject(bPicking);
 }
 
 void ToolSystemMap::CreateFbxObject(std::wstring szFullPath, XMVECTOR vPos)
@@ -207,6 +219,11 @@ void ToolSystemMap::SaveFile(std::wstring szFullPath)
         outfile.write(reinterpret_cast<char*>(object), sizeof(Object));
     }
     outfile.close();
+}
+
+void ToolSystemMap::Update()
+{
+
 }
 
 

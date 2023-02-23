@@ -24,5 +24,6 @@ protected:
 	//IndexBuffer* m_pIndexBuffer;
 	std::vector<IndexBuffer*> m_ListIndexBuffer;
 	friend class Object;
+	friend class FQuadTree;
 };
 

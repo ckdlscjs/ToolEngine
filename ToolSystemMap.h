@@ -13,6 +13,8 @@ public:
 
 	void SetWireframe(bool bWireFrame);
 	void SelectImage(int iChkIdx, bool bPicking);
+	void SelectSculpt(bool bPicking);
+	void SelectObject(bool bPicking);
 	void CreateFbxObject(std::wstring szFullPath, XMVECTOR vPos);
 	void CreateSimpleObject(int iChkIdx, XMVECTOR vPos);
 	void CreateSimpleMap(int iWidth, int iHeight,float fDistance, int iChkIdx);
@@ -20,7 +22,7 @@ public:
 	void OpenFile();
 	void SaveFile(std::wstring szFullPath);
 public:
-	//void Update();
+	void Update();
 	//void Render();
 public:
 	ToolSystemMap();

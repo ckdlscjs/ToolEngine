@@ -1,6 +1,6 @@
 #pragma once
-#include "sylCollision.h"
-using namespace sylCollision;
+#include "TCollision.h"
+
 class FSelect
 {
 public:
@@ -13,7 +13,7 @@ public:
 	bool FSelect::IntersectTriangle(const XMVECTOR& orig, const XMVECTOR& dir, XMVECTOR& v0, XMVECTOR& v1, XMVECTOR& v2, FLOAT* t, FLOAT* u, FLOAT* v);
 
 public:
-	_RAY		m_Ray;
+	T_RAY		m_Ray;
 	XMVECTOR	m_vIntersection;
 	XMMATRIX	m_matWorld;
 	XMMATRIX	m_matView;

@@ -61,6 +61,7 @@
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="SwapChain.h" />
     <ClInclude Include="sylCollision.h" />
+    <ClInclude Include="TCollision.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="TextureSystem.h" />
     <ClInclude Include="ToolSystemMap.h" />
@@ -109,6 +110,7 @@
     <ClCompile Include="ResourceSystem.cpp" />
     <ClCompile Include="SwapChain.cpp" />
     <ClCompile Include="sylCollision.cpp" />
+    <ClCompile Include="TCollision.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="TextureSystem.cpp" />
     <ClCompile Include="ToolSystemMap.cpp" />

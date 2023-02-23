@@ -27,6 +27,7 @@ void ImguiSystem::Update()
     static bool bWireFrame = false;
     static bool bMapPicking = false;
     static bool bOjbectPicking = false;
+    static bool bSculptPicking = false;
     ImGui::Begin("Demo");
     {
         {
@@ -45,7 +46,13 @@ void ImguiSystem::Update()
             if (ImGui::Checkbox("OjbectPicking", &bOjbectPicking))
             {
                 ~bOjbectPicking;
-                _ToolSystemMap.SelectImage(image_current_idx, bOjbectPicking);
+                _ToolSystemMap.SelectObject(bOjbectPicking);
+            }
+
+            if (ImGui::Checkbox("SculptPicking", &bSculptPicking))
+            {
+                ~bSculptPicking;
+                _ToolSystemMap.SelectSculpt(bSculptPicking);
             }
         }
         ImGui::Dummy({ 0, 10 });
@@ -56,7 +63,6 @@ void ImguiSystem::Update()
 
         }
         ImGui::Dummy({ 0, 10 });
-
 
         {
             if (ImGui::Button("CreateMap"))

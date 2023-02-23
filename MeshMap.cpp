@@ -78,44 +78,32 @@ void MeshMap::LoadHeightMap(ID3D11Device* pDevice, ID3D11DeviceContext* pContext
 
 void MeshMap::GenerateVertexNormal()
 {
-    struct tVertexInfo
+    m_FaceNormals.resize(m_dwFace);
+    UINT iFace = 0;
+    for (UINT i = 0; i < m_ListIndex.size(); i += 3)
     {
-        std::vector<UINT > faceIndexArray;
-        XMVECTOR vNormal;
-    };
-    std::vector<tVertexInfo> m_VertexInfo;
-    m_VertexInfo.resize(m_dwNumRows * m_dwNumColumns);
-    std::vector<XMVECTOR> m_FaceNormals;	//법선노말
-    m_FaceNormals.resize(m_dwFace);			//페이스마다 법선노말이 하나씩 있어야하므로 페이스 갯수만큼 법선노말이있어야한다.
-    //UINT iFace = 0;
-    for (UINT iFace = 0; iFace < m_dwFace; iFace++)
-    {
-        UINT i0 = m_ListIndex[iFace * 3 + 0];
-        UINT i1 = m_ListIndex[iFace * 3 + 1];
-        UINT i2 = m_ListIndex[iFace * 3 + 2];
-        m_VertexInfo[i0].faceIndexArray.push_back(iFace);
-        m_VertexInfo[i1].faceIndexArray.push_back(iFace);
-        m_VertexInfo[i2].faceIndexArray.push_back(iFace);
-        m_FaceNormals[iFace] = ComputeFaceNormal(i0, i1, i2);		//정점3개로 법선벡터를만듬
+        UINT i0 = m_ListIndex[i + 0];
+        UINT i1 = m_ListIndex[i + 1];
+        UINT i2 = m_ListIndex[i + 2];
+        m_FaceNormals[iFace].vertexArray[0] = i0;
+        m_FaceNormals[iFace].vertexArray[1] = i1;
+        m_FaceNormals[iFace].vertexArray[2] = i2;
+        m_FaceNormals[iFace++].vNormal = ComputeFaceNormal(i0, i1, i2);
     }
 
+    m_VertexInfo.resize(m_dwNumRows * m_dwNumColumns);
     for (UINT iVertex = 0; iVertex < m_VertexInfo.size(); iVertex++)
     {
         for (UINT i = 0; i < m_VertexInfo[iVertex].faceIndexArray.size(); i++)
         {
-            m_VertexInfo[iVertex].vNormal +=
-                m_FaceNormals[m_VertexInfo[iVertex].faceIndexArray[i]];		//버텍스정점에 있는 노말을 합산해서 정규화
+            UINT i0 = m_dwIndexList[iVertex * 3 + i];
+            m_VertexInfo[i0].faceIndexArray.push_back(iVertex);
         }
-        m_VertexInfo[iVertex].vNormal = XMVector3Normalize(m_VertexInfo[iVertex].vNormal); //최종적인 특정 정점의 정점노말값(최대6면)
-   	
-        XMStoreFloat3(&m_ListVertex[iVertex].normal, m_VertexInfo[iVertex].vNormal);
-#ifdef _DEBUG
-        XMVECTOR vLight = { 1, 1, 0 };
-        XMVector3Dot(vLight, m_VertexInfo[iVertex].vNormal);
-        float fDot = XMVector3Dot(vLight, m_VertexInfo[iVertex].vNormal).m128_f32[0];
-        m_ListVertex[iVertex].color = { fDot ,fDot ,fDot , 1 };
-#endif
     }
+   	for (UINT iVertex = 0; iVertex < m_VertexInfo.size(); iVertex++)
+	{
+		ComputeVertexNormal(iVertex);
+	}
 }
 
 XMVECTOR MeshMap::ComputeFaceNormal(UINT i0, UINT i1, UINT i2)
@@ -130,6 +118,30 @@ XMVECTOR MeshMap::ComputeFaceNormal(UINT i0, UINT i1, UINT i2)
     vNormal = XMVector3Cross(e0, e1);
     vNormal = XMVector3Normalize(vNormal);
     return vNormal;
+}
+
+void MeshMap::ComputeVertexNormal(UINT iVertex)
+{
+    for (UINT i = 0; i < m_VertexInfo[iVertex].faceIndexArray.size(); i++)
+    {
+        UINT faceindex = m_VertexInfo[iVertex].faceIndexArray[i];
+        UINT i0 = m_FaceNormals[faceindex].vertexArray[0];
+        UINT i1 = m_FaceNormals[faceindex].vertexArray[1];
+        UINT i2 = m_FaceNormals[faceindex].vertexArray[2];
+        m_FaceNormals[faceindex].vNormal = ComputeFaceNormal(i0, i1, i2);
+
+        m_VertexInfo[iVertex].vNormal += m_FaceNormals[faceindex].vNormal;
+    }
+    m_VertexInfo[iVertex].vNormal = XMVector3Normalize(m_VertexInfo[iVertex].vNormal); //최종적인 특정 정점의 정점노말값(최대6면)
+    XMStoreFloat3(&m_ListVertex[iVertex].normal, m_VertexInfo[iVertex].vNormal);
+#ifdef _DEBUG
+    XMFLOAT3 vLight = { -1, 0, 0 };
+    XMFLOAT3 vTarget = { 0, 0, 0 };
+    XMFLOAT3 vDir = vTarget - vLight;
+    XMStoreFloat3(&vLight, XMVector3Normalize(XMLoadFloat3(&vLight)));
+    float fDot = XMVectorGetX(XMVector3Dot(-XMLoadFloat3(&vLight), XMLoadFloat3(&m_ListVertex[iVertex].normal)));
+    m_ListVertex[iVertex].color = { fDot + 0.3f ,fDot + 0.3f ,fDot + 0.3f , 1 };
+#endif
 }
 
 MeshMap::MeshMap(UINT iWidth, UINT iHeight, float fShellDistance)
