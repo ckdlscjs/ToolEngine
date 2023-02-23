@@ -54,5 +54,6 @@ protected:
 	friend class FNode;
 	friend class ToolSystemMap;
 	friend class FQuadTree;
+	friend class ImguiSystem;
 };
 

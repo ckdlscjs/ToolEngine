@@ -19,10 +19,10 @@ public:
 	Mesh(const wchar_t* szFullPath);
 	~Mesh();
 protected:
-	std::vector<std::vector<object>> m_ListVertex;
+	std::vector<object> m_ListVertex;
 	//VertexBuffer* m_pVertexBuffer;
 	std::vector<VertexBuffer*> m_ListVertexBuffer;
-	std::vector<std::vector<unsigned int>> m_ListIndex;
+	std::vector<unsigned int> m_ListIndex;
 	//IndexBuffer* m_pIndexBuffer;
 	std::vector<IndexBuffer*> m_ListIndexBuffer;
 	friend class Object;

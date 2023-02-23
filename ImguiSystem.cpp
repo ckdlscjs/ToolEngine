@@ -206,6 +206,39 @@ void ImguiSystem::Update()
     }
     ImGui::End();
 
+    std::string objectname;
+    static float scale[3] = { 0.0f, 0.0f, 0.0f };
+    static float rotation[3] = { 0.0f, 0.0f, 0.0f };
+    static float position[3] = { 0.0f, 0.0f, 0.0f };
+    Object* pObject;
+    // Simple window
+    ImGui::Begin("Control Panel2");
+    {
+        {
+            if (_ToolSystemMap.m_pQuadTree != nullptr)
+            {
+                if (_ToolSystemMap.m_pQuadTree->GetPickingObject() != nullptr)
+                {
+                    pObject = _ToolSystemMap.m_pQuadTree->GetPickingObject();
+                    XMVECTOR v_scale, v_rotation, v_translation;
+                    XMMatrixDecompose(&v_scale, &v_rotation, &v_translation, pObject->constantData.matWorld);
+                    scale[0] = v_scale.m128_f32[0]; scale[1] = v_scale.m128_f32[1]; scale[2] = v_scale.m128_f32[2];
+                    rotation[0] = v_rotation.m128_f32[0]; rotation[1] = v_rotation.m128_f32[1]; rotation[2] = v_rotation.m128_f32[2];
+                    position[0] = v_translation.m128_f32[0]; position[1] = v_translation.m128_f32[1]; position[2] = v_translation.m128_f32[2];
+                }
+            }
+            if (ImGui::Button("Object"))
+            {
+               
+            }
+            ImGui::InputFloat3("scale", scale);
+            ImGui::InputFloat3("rotation", rotation);
+            ImGui::InputFloat3("position", position);
+        }
+        ImGui::Dummy({ 0, 10 });
+    }
+    ImGui::End();
+
     // Using the generic BeginListBox() API, you have full control over how to display the combo contents.
         // (your selection data could be an index, a pointer to the object, an id for the object, a flag intrusively
         // stored in the object itself, etc.)

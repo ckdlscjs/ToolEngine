@@ -18,7 +18,6 @@ public:
 	std::vector<Object*> m_pStaticObjectList;
 	std::vector<Object*> m_pDynamicObjectList;
 public:
-	void		UpdateIndexData(MeshMap* pMap);
 	void		CreateChildNode(FNode* pParent, MeshMap* pMap);
 	void		CreateIndexData(MeshMap* pMap);
 	HRESULT		CreateIndexBuffer(MeshMap* pMap);

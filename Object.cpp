@@ -109,6 +109,13 @@ CULL_MODE Object::GetCullMode()
 void Object::Update()
 {
 	constantData.matView = _CameraSystem.GetCurrentCamera()->m_matCamera;
+	constantData.m_camera_position = XMFLOAT4(
+		XMVectorGetX(_CameraSystem.GetCurrentCamera()->m_matWorld.r[3]),
+		XMVectorGetX(_CameraSystem.GetCurrentCamera()->m_matWorld.r[3]),
+		XMVectorGetY(_CameraSystem.GetCurrentCamera()->m_matWorld.r[3]),
+		XMVectorGetZ(_CameraSystem.GetCurrentCamera()->m_matWorld.r[3]));
+	
+	constantData.m_light_direction = XMFLOAT4(0, 0, 1, 0.0f);
 	_EngineSystem.GetRenderSystem()->UpdateConstantBuffer(m_pConstantBuffer, &constantData);
 }
 

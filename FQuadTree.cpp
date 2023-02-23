@@ -1,5 +1,5 @@
 #include "FQuadTree.h"
-
+#include "ToolSystemMap.h"
 #include "InputSystem.h"
 
 FQuadTree::FQuadTree(Camera* pCamera, MeshMap* pMap, int iMaxDepth)
@@ -17,7 +17,12 @@ FQuadTree::~FQuadTree()
     if (m_pRootNode != nullptr) delete m_pRootNode;
 }
 
-#include "ToolSystemMap.h"
+
+Object* FQuadTree::GetPickingObject()
+{
+    return pPickingObj;
+}
+
 UINT FQuadTree::SelectVertexList(T_BOX& box, std::vector<FNode*>& selectNodeList)
 {
     for (auto node : m_pDrawLeafNodeList)
@@ -153,6 +158,9 @@ bool FQuadTree::GetInterSection()
                 XMFLOAT3 v0 = m_pMesh->GetListVertex()[i0].pos;
                 XMFLOAT3 v1 = m_pMesh->GetListVertex()[i1].pos;
                 XMFLOAT3 v2 = m_pMesh->GetListVertex()[i2].pos;
+                XMVECTOR v_0 = XMVector3TransformCoord(XMLoadFloat3(&v0), constantData.matWorld);
+                XMVECTOR v_1 = XMVector3TransformCoord(XMLoadFloat3(&v1), constantData.matWorld);
+                XMVECTOR v_2 = XMVector3TransformCoord(XMLoadFloat3(&v2), constantData.matWorld);
                 if (m_Select.ChkPick(XMLoadFloat3(&v0), XMLoadFloat3(&v1), XMLoadFloat3(&v2)))
                 {
                     return true;
@@ -188,6 +196,7 @@ bool FQuadTree::GetObjectPicking()
                     XMVECTOR v_2 = XMVector3TransformCoord(XMLoadFloat3(&v2), object->constantData.matWorld);
                     if (m_Select.ChkPick(v_0, v_1, v_2))
                     {
+                        pPickingObj = object;
                         return true;
                     }
                     index += 3;
@@ -229,20 +238,21 @@ void FQuadTree::Update()
                     float fValue = (fDistance / 30.0f) * 90.0f;
                     float fdot = cosf(_DegreeToRadian(fValue));
                     m_pMap->GetListVertex()[iVertex].pos.y += fdot * nodelist.size();
-                    m_pMap->ComputeVertexNormal(iVertex);
+                    //m_pMap->ComputeVertexNormal(iVertex);
                 }
             }
             for (auto node : nodelist)
             {
                 node->CreateIndexData(m_pMap);
             }
+            m_pMap->GenerateVertexNormal();
             _EngineSystem.GetRenderSystem()->UpdateVertexBuffer(m_pMap->GetVertexBuffer()[0], &m_pMap->m_ListVertex[0]);
         }
     }
 
     if (m_bObjectPicking && GetObjectPicking())
     {
-        OutputDebugStringA("ÇÇÅ·\n");
+
     }
 }
 

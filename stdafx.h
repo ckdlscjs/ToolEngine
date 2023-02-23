@@ -121,6 +121,8 @@ struct constant
 	XMMATRIX matWorld;
 	XMMATRIX matView;
 	XMMATRIX matProj;
+	XMFLOAT4 m_light_direction;
+	XMFLOAT4 m_camera_position;
 };
 
 struct iw_data
