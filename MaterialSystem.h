@@ -2,7 +2,7 @@
 #include "stdafx.h"
 #include "Material.h"
 #include "ToolSystemMap.h"
-class MaterialSystem
+class MaterialSystem : Singleton<MaterialSystem>
 {
 public:
 	Material* CreateMaterial();

@@ -39,13 +39,13 @@ void ImguiSystem::Update()
             if (ImGui::Checkbox("MapPicking", &bMapPicking))
             {
                 ~bMapPicking;
-                _ToolSystemMap.SetPicking(image_current_idx, bMapPicking);
+                _ToolSystemMap.SelectImage(image_current_idx, bMapPicking);
             }
 
             if (ImGui::Checkbox("OjbectPicking", &bOjbectPicking))
             {
                 ~bOjbectPicking;
-                _ToolSystemMap.SetPicking(image_current_idx, bOjbectPicking);
+                _ToolSystemMap.SelectImage(image_current_idx, bOjbectPicking);
             }
         }
         ImGui::Dummy({ 0, 10 });
@@ -154,14 +154,6 @@ void ImguiSystem::Update()
         ifd::FileDialog::Instance().Open("DirectoryOpenDialog", "Open a directory", "");
     if (ImGui::Button("Save file"))
         ifd::FileDialog::Instance().Save("ShaderSaveDialog", "Save a shader", "*.sprj {.sprj}");*/
-
-    /*ImGui::ListBox(nameID, &index, &list, listSize, showCount);
-    ImGui::EndListBox();*/
-
-    /*message_a.assign(message_w.begin(), message_w.end());
-    printf(message_a.c_str());*/
-
-    //const char* items[] = { "AAAA", "BBBB", "CCCC", "DDDD", "EEEE", "FFFF", "GGGG", "HHHH", "IIII", "JJJJ", "KKKK", "LLLLLLL", "MMMM", "OOOOOOO" };
   
     if (ImGui::BeginListBox("listbox 1"))
     {
@@ -175,7 +167,7 @@ void ImguiSystem::Update()
             if (ImGui::Selectable(content.c_str(), is_selected))
             {
                 image_current_idx = n;
-                _ToolSystemMap.SetPicking(image_current_idx, bMapPicking);
+                _ToolSystemMap.SelectImage(image_current_idx, bMapPicking);
             }
                 
             // Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
@@ -198,7 +190,6 @@ void ImguiSystem::Update()
             if (ImGui::Selectable(content.c_str(), is_selected))
             {
                 fbx_current_idx = n;
-                _ToolSystemMap.SetPicking(fbx_current_idx, bMapPicking);
             }
 
             // Set the initial focus when opening the combo (scrolling + keyboard navigation focus)

@@ -21,8 +21,8 @@ class Object
 public:
 	void SetTransform(Transform transform);
 	void SetMesh(Mesh* pMesh);
+	void SetMaterial(Material* pMaterial);
 	void SetShader(VertexShader* pVertexShader, PixelShader* pPixelShader);
-	void SetTexture(Texture** pTexture, unsigned int iNumTextures);
 	void SelectTexture(int iChkTex = -1);
 	void SetConstantData(constant cc);
 	void SetCullMode(CULL_MODE mode);
@@ -40,10 +40,8 @@ protected:
 	PixelShader* m_pPixelShader;
 	constant constantData;
 	ConstantBuffer* m_pConstantBuffer;
-	Texture** m_ListTextures;
-	unsigned int m_iNumTextures;
-	unsigned int m_iDefaultTexture;
 	CULL_MODE m_CullMode;
+	unsigned int m_iDefaultTexture;
 	/// <summary>
 	/// /////
 	/// </summary>

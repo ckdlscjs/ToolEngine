@@ -17,6 +17,7 @@ FQuadTree::~FQuadTree()
 {
     if (m_pRootNode != nullptr) delete m_pRootNode;
 }
+
 #include "ToolSystemMap.h"
 void FQuadTree::SetPicking(int iChkIdx, bool bPicking)
 {
@@ -131,9 +132,9 @@ void FQuadTree::Update()
                 UINT i0 = node->m_IndexList[index + 0];
                 UINT i1 = node->m_IndexList[index + 1];
                 UINT i2 = node->m_IndexList[index + 2];
-                XMFLOAT3 v0 = m_pMesh->m_ListVertex[i0].pos;
-                XMFLOAT3 v1 = m_pMesh->m_ListVertex[i1].pos;
-                XMFLOAT3 v2 = m_pMesh->m_ListVertex[i2].pos;
+                XMFLOAT3 v0 = m_pMesh->GetListVertex()[i0].pos;
+                XMFLOAT3 v1 = m_pMesh->GetListVertex()[i1].pos;
+                XMFLOAT3 v2 = m_pMesh->GetListVertex()[i2].pos;
                 if (point_select.ChkPick(XMLoadFloat3(&v0), XMLoadFloat3(&v1), XMLoadFloat3(&v2)))
                 {
                     _ToolSystemMap.CreateSimpleObject(m_iChkIdx, point_select.m_vIntersection);
@@ -147,17 +148,17 @@ void FQuadTree::Update()
 
 void FQuadTree::Render()
 {
-    for (auto node : m_pDrawLeafNodeList)
+    for (int idx = 0;  idx < m_pDrawLeafNodeList.size(); idx++)
     {
         _EngineSystem.GetRenderSystem()->SetConstantBuffer(m_pVertexShader, m_pConstantBuffer);
         _EngineSystem.GetRenderSystem()->SetConstantBuffer(m_pPixelShader, m_pConstantBuffer);
         _EngineSystem.GetRenderSystem()->SetVertexShader(m_pVertexShader);
         _EngineSystem.GetRenderSystem()->SetPixelShader(m_pPixelShader);
         _EngineSystem.GetRenderSystem()->SetVertexBuffer(m_pMesh->GetVertexBuffer()[0]);
-        g_pDeviceContext->IASetIndexBuffer(node->m_pIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
-        _EngineSystem.GetRenderSystem()->setTexture(m_pVertexShader, m_ListTextures, m_iNumTextures);
-        _EngineSystem.GetRenderSystem()->setTexture(m_pPixelShader, m_ListTextures, m_iNumTextures);
-        _EngineSystem.GetRenderSystem()->drawIndexedTriangleList(node->m_dwFace * 3, 0, 0);
+        g_pDeviceContext->IASetIndexBuffer(m_pDrawLeafNodeList[idx]->m_pIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
+        _EngineSystem.GetRenderSystem()->setTexture(m_pVertexShader, m_pMaterial->GetListTexture(idx), m_pMaterial->GetNumTexture(idx));
+        _EngineSystem.GetRenderSystem()->setTexture(m_pPixelShader, m_pMaterial->GetListTexture(idx), m_pMaterial->GetNumTexture(idx));
+        _EngineSystem.GetRenderSystem()->drawIndexedTriangleList(m_pDrawLeafNodeList[idx]->m_dwFace * 3, 0, 0);
         //g_pDeviceContext->DrawIndexed(node->m_dwFace * 3, 0, 0);
     }
 }

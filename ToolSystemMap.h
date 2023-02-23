@@ -12,7 +12,7 @@ class ToolSystemMap : public Singleton<ToolSystemMap>
 public:
 
 	void SetWireframe(bool bWireFrame);
-	void SetPicking(int iChkIdx, bool bPicking);
+	void SelectImage(int iChkIdx, bool bPicking);
 	void CreateFbxObject(std::wstring szFullPath, XMVECTOR vPos);
 	void CreateSimpleObject(int iChkIdx, XMVECTOR vPos);
 	void CreateSimpleMap(int iWidth, int iHeight,float fDistance);

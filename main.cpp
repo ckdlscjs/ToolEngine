@@ -9,7 +9,7 @@
 int main()
 {
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
-	/*_CrtSetBreakAlloc(40569);*/
+	//_CrtSetBreakAlloc(642129);
 	/*fbxsample::FBXSample a;
 	a.sample();*/
 	EntrySystem entrypoint;

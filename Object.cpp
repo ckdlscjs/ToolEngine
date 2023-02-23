@@ -21,16 +21,15 @@ void Object::SetMesh(Mesh* pMesh)
 	m_pMesh = pMesh;
 }
 
+void Object::SetMaterial(Material* pMaterial)
+{
+	m_pMaterial = pMaterial;
+}
+
 void Object::SetShader(VertexShader* pVertexShader, PixelShader* pPixelShader)
 {
 	m_pVertexShader = pVertexShader;
 	m_pPixelShader = pPixelShader;
-}
-
-void Object::SetTexture(Texture** ppListTex, unsigned int iNumTextures)
-{
-	m_ListTextures = ppListTex;	
-	m_iNumTextures = iNumTextures;
 }
 
 void Object::SelectTexture(int iChkTex)
@@ -69,8 +68,8 @@ void Object::Render()
 	{
 		_EngineSystem.GetRenderSystem()->SetVertexBuffer(m_pMesh->GetVertexBuffer()[idx]);
 		_EngineSystem.GetRenderSystem()->SetIndexBuffer(m_pMesh->GetIndexBuffer()[idx]);
-		_EngineSystem.GetRenderSystem()->setTexture(m_pVertexShader, m_ListTextures, m_iNumTextures);
-		_EngineSystem.GetRenderSystem()->setTexture(m_pPixelShader, m_ListTextures, m_iNumTextures);
+		_EngineSystem.GetRenderSystem()->setTexture(m_pVertexShader, m_pMaterial->GetListTexture(idx), m_pMaterial->GetNumTexture(idx));
+		_EngineSystem.GetRenderSystem()->setTexture(m_pPixelShader, m_pMaterial->GetListTexture(idx), m_pMaterial->GetNumTexture(idx));
 		//_EngineSystem.GetRenderSystem()->drawTriangleList(m_pMesh->GetVertexBuffer()[idx]->GetSizeList(), 0);
 		_EngineSystem.GetRenderSystem()->drawIndexedTriangleList(m_pMesh->GetIndexBuffer()[idx]->getSizeIndexList(), 0, 0);
 	}
@@ -87,7 +86,6 @@ Object::Object()
 
 Object::~Object()
 {
-	delete m_ListTextures;								//delete manager need fix
 	if (m_pMesh) delete m_pMesh;						//delete manager need fix
 	if (m_pMaterial) delete m_pMaterial;				//delete manager need fix
 	if (m_pConstantBuffer) delete m_pConstantBuffer;

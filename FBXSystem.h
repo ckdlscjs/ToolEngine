@@ -12,7 +12,7 @@ public:
 private:
 	FbxManager* m_pFbxManager;
 	FbxImporter* m_pFbxImporter;
-	std::unordered_set<FBXFile*> m_ListFile;
+	std::unordered_map<std::string, FBXFile*> m_mapFile;
 };
 
 #define _FBXSystem Singleton<FBXSystem>::GetInstance()

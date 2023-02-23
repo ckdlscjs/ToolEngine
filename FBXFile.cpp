@@ -87,7 +87,7 @@ void FBXFile::ParseMesh(FBXNode* pNode, int nodeIdx)
 	int iNumMtrl = pFbxNode->GetMaterialCount();
 	std::vector<std::string>   texFullNameList;
 	texFullNameList.resize(iNumMtrl);
-
+	pNode->m_ListTexture.resize(iNumMtrl);
 	for (int iMtrl = 0; iMtrl < iNumMtrl; iMtrl++)
 	{
 		// 24 이상의 정보가 있다.
@@ -110,13 +110,13 @@ void FBXFile::ParseMesh(FBXNode* pNode, int nodeIdx)
 	
 	if (iNumMtrl == 1)
 	{
-		m_ListTexture.push_back(_tomw(GetSplitName(szFileName)));
+		pNode->m_ListTexture[0] = _tomw(GetSplitName(szFileName));
 	}
 	if (iNumMtrl > 1)
 	{
 		for (int iTex = 0; iTex < iNumMtrl; iTex++)
 		{
-			m_ListTexture.push_back(_tomw(GetSplitName(texFullNameList[iTex])));
+			pNode->m_ListTexture[iTex] = _tomw(GetSplitName(texFullNameList[iTex]));
 		}
 	}
 	
@@ -129,8 +129,8 @@ void FBXFile::ParseMesh(FBXNode* pNode, int nodeIdx)
 	// 4 정점 -> 1폴리곤( 쿼드 )
 	int iNumVertexCount = pFbxMesh->GetControlPointsCount();
 
-	m_ListVertexPNCT[nodeIdx].resize(iNumVertexCount);
-	m_ListVertexIW[nodeIdx].resize(iNumVertexCount);
+	pNode->m_ListVertexPNCT.resize(iNumVertexCount);
+	pNode->m_ListVertexIW.resize(iNumVertexCount);
 
 	for (int idxPolygon = 0; idxPolygon < iNumPolygonCount; idxPolygon++)
 	{
@@ -228,9 +228,9 @@ void FBXFile::ParseMesh(FBXNode* pNode, int nodeIdx)
 					iwVertex.weight.z = pIW->weight[2];
 					iwVertex.weight.w = pIW->weight[3];
 				}
-				m_ListVertexPNCT[nodeIdx][vertexID] = pnctVertex;
-				m_ListVertexIW[nodeIdx][vertexID] = iwVertex;
-				m_ListIndex[nodeIdx].push_back(vertexID);
+				pNode->m_ListVertexPNCT[vertexID] = pnctVertex;
+				pNode->m_ListVertexIW[vertexID] = iwVertex;
+				pNode->m_ListIndex.push_back(vertexID);
 			}
 		}
 	}
@@ -492,9 +492,6 @@ FBXFile::FBXFile(FbxScene* pFbxScene)
 	m_pFbxScene = pFbxScene;
 	ParseNode(m_pFbxScene->GetRootNode());
 
-	m_ListVertexPNCT.resize(m_ListNode.size());
-	m_ListVertexIW.resize(m_ListNode.size());
-	m_ListIndex.resize(m_ListNode.size());
 	for(int iNodeIdx = 0; iNodeIdx < m_ListNode.size(); iNodeIdx++)
 	{
 		ParseMesh(m_ListNode[iNodeIdx], iNodeIdx);

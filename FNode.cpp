@@ -40,12 +40,12 @@ void FNode::CreateIndexData(MeshMap* pMap)
 	m_IndexList.resize(dwNumCells * 2 * 3); //mesh * 2 * 3(vertex)
 	int iIndex = 0;
 
-	m_Box.vMin.x = pMap->m_ListVertex[dwLB].pos.x;
+	m_Box.vMin.x = pMap->GetListVertex()[dwLB].pos.x;
 	m_Box.vMin.y = 100000.0f;
-	m_Box.vMin.z = pMap->m_ListVertex[dwLB].pos.z;
-	m_Box.vMax.x = pMap->m_ListVertex[dwRT].pos.x;
+	m_Box.vMin.z = pMap->GetListVertex()[dwLB].pos.z;
+	m_Box.vMax.x = pMap->GetListVertex()[dwRT].pos.x;
 	m_Box.vMax.y = -100000.0f;
-	m_Box.vMax.z = pMap->m_ListVertex[dwRT].pos.z;
+	m_Box.vMax.z = pMap->GetListVertex()[dwRT].pos.z;
 
 	for (int dwRow = 0; dwRow < dwNumRowCell; dwRow++)
 	{
@@ -60,13 +60,13 @@ void FNode::CreateIndexData(MeshMap* pMap)
 
 			for (DWORD dwVertex = 0; dwVertex < 6; dwVertex++)
 			{
-				if (m_Box.vMin.y > pMap->m_ListVertex[m_IndexList[iIndex + dwVertex]].pos.y)
+				if (m_Box.vMin.y > pMap->GetListVertex()[m_IndexList[iIndex + dwVertex]].pos.y)
 				{
-					m_Box.vMin.y = pMap->m_ListVertex[m_IndexList[iIndex + dwVertex]].pos.y;
+					m_Box.vMin.y = pMap->GetListVertex()[m_IndexList[iIndex + dwVertex]].pos.y;
 				}
-				if (m_Box.vMax.y < pMap->m_ListVertex[m_IndexList[iIndex + dwVertex]].pos.y)
+				if (m_Box.vMax.y < pMap->GetListVertex()[m_IndexList[iIndex + dwVertex]].pos.y)
 				{
-					m_Box.vMax.y = pMap->m_ListVertex[m_IndexList[iIndex + dwVertex]].pos.y;
+					m_Box.vMax.y = pMap->GetListVertex()[m_IndexList[iIndex + dwVertex]].pos.y;
 				}
 			}
 			iIndex += 6;
