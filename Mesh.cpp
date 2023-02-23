@@ -1,5 +1,4 @@
 #include "Mesh.h"
-
 std::vector<object>& Mesh::GetListVertex()
 {
 	return m_ListVertex;

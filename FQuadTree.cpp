@@ -154,11 +154,15 @@ void FQuadTree::Render()
         _EngineSystem.GetRenderSystem()->SetConstantBuffer(m_pPixelShader, m_pConstantBuffer);
         _EngineSystem.GetRenderSystem()->SetVertexShader(m_pVertexShader);
         _EngineSystem.GetRenderSystem()->SetPixelShader(m_pPixelShader);
-        _EngineSystem.GetRenderSystem()->SetVertexBuffer(m_pMesh->GetVertexBuffer()[0]);
-        g_pDeviceContext->IASetIndexBuffer(m_pDrawLeafNodeList[idx]->m_pIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
-        _EngineSystem.GetRenderSystem()->setTexture(m_pVertexShader, m_pMaterial->GetListTexture(idx), m_pMaterial->GetNumTexture(idx));
-        _EngineSystem.GetRenderSystem()->setTexture(m_pPixelShader, m_pMaterial->GetListTexture(idx), m_pMaterial->GetNumTexture(idx));
-        _EngineSystem.GetRenderSystem()->drawIndexedTriangleList(m_pDrawLeafNodeList[idx]->m_dwFace * 3, 0, 0);
-        //g_pDeviceContext->DrawIndexed(node->m_dwFace * 3, 0, 0);
+
+        for (int item = 0; item < m_pMesh->GetVertexBuffer().size(); item++)
+        {
+            _EngineSystem.GetRenderSystem()->SetVertexBuffer(m_pMesh->GetVertexBuffer()[item]);
+            g_pDeviceContext->IASetIndexBuffer(m_pDrawLeafNodeList[idx]->m_pIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
+            _EngineSystem.GetRenderSystem()->setTexture(m_pVertexShader, m_pMaterial->GetListTexture(item), m_pMaterial->GetNumTexture(item));
+            _EngineSystem.GetRenderSystem()->setTexture(m_pPixelShader, m_pMaterial->GetListTexture(item), m_pMaterial->GetNumTexture(item));
+            _EngineSystem.GetRenderSystem()->drawIndexedTriangleList(m_pDrawLeafNodeList[idx]->m_dwFace * 3, 0, 0);
+        }
+       
     }
 }

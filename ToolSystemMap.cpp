@@ -43,11 +43,7 @@ void ToolSystemMap::CreateFbxObject(std::wstring szFullPath, XMVECTOR vPos)
     cc.matView = m_pCamera->m_matCamera;
     cc.matProj = m_pCamera->m_matProj;
 
-    std::wstring defaultDir = L"../../data/fbx/";
-    
-    
-    
-        
+   
     Object* pObject;
     pObject = _ObjectSystem.CreateObject();
     pObject->SetConstantData(cc);
@@ -55,6 +51,8 @@ void ToolSystemMap::CreateFbxObject(std::wstring szFullPath, XMVECTOR vPos)
     pObject->SetMesh(pMesh);
     pObject->SetMaterial(pMaterial);
     pObject->SetShader(pVertexShader, pPixelShader);
+
+    std::wstring defaultDir = L"../../data/fbx/";
     for (int idx = 0; idx < pFBXFile->m_ListNode.size(); idx++)
     {
         if (!pFBXFile->m_ListNode[idx]->m_ListTexture.size())
@@ -134,6 +132,7 @@ void ToolSystemMap::CreateSimpleObject(int iChkIdx, XMVECTOR vPos)
     _EngineSystem.GetRenderSystem()->ReleaseBlob();
 
     Mesh* pMesh = new Mesh();
+    Material* pMaterial = new Material();
     pMesh->SetVertexBuffer(pVertexBuffer);
     pMesh->SetIndexBuffer(pIndexBuffer);
     constant cc;
@@ -152,14 +151,16 @@ void ToolSystemMap::CreateSimpleObject(int iChkIdx, XMVECTOR vPos)
     pObject->SetConstantData(cc);
     pObject->SetTransform({ vPos , {0, 0, 0}, {1, 1, 1} });
     pObject->SetMesh(pMesh);
+    pObject->SetMaterial(pMaterial);
     pObject->SetShader(pVertexShader, pPixelShader);
-    //pObject->SetTexture(listTexture, m_ListTexture.size() - iChkIdx);
+    pObject->m_pMaterial->SetTexture(listTexture, m_ListTexture.size()-iChkIdx);
 }
 
 void ToolSystemMap::CreateSimpleMap(int iWidth, int iHeight, float fDistance)
 {
 
     MeshMap* pMapMesh = new MeshMap(iWidth, iHeight, fDistance);
+    Material* pMaterial = new Material();
 
     void* shader_byte_code = nullptr;
     size_t size_shader = 0;
@@ -191,8 +192,9 @@ void ToolSystemMap::CreateSimpleMap(int iWidth, int iHeight, float fDistance)
     m_pQuadTree->SetConstantData(cc);
     m_pQuadTree->SetTransform({ {0, 0, 0} , {0, 0, 0}, {1, 1, 1} });
     m_pQuadTree->SetMesh(pMapMesh);
+    m_pQuadTree->SetMaterial(pMaterial);
     m_pQuadTree->SetShader(pVertexShader, pPixelShader);
-    //m_pQuadTree->SetTexture(listTexture, m_ListTexture.size());
+    m_pQuadTree->m_pMaterial->SetTexture(listTexture, m_ListTexture.size());
     _ObjectSystem.AddObject(m_pQuadTree);
 }
 

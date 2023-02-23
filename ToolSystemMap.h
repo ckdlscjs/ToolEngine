@@ -1,9 +1,8 @@
 #pragma once
 #include "stdafx.h"
 #include "ObjectSystem.h"
-#include "FBXSystem.h"
 #include "CameraSystem.h"
-
+#include "FBXSystem.h"
 #include "MeshMap.h"
 #include "FQuadTree.h"
 

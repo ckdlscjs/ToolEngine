@@ -28,5 +28,7 @@ public:
 	Camera* m_pCamera = nullptr;
 	std::vector<FNode*> m_pLeafNodeList;
 	std::vector<FNode*> m_pDrawLeafNodeList;
+	friend class FNode;
+	friend class ToolSystemMap;
 };
 
