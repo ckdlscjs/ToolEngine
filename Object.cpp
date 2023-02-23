@@ -5,11 +5,9 @@
 
 T_BOX Object::CreateBoundingBox()
 {
-#undef max
-#undef min
 	
-	XMVECTOR minVertex = XMVectorReplicate(std::numeric_limits<float>::max());
-	XMVECTOR maxVertex = XMVectorReplicate(std::numeric_limits<float>::min());
+	XMVECTOR minVertex = XMVectorReplicate((std::numeric_limits<float>::max)());
+	XMVECTOR maxVertex = XMVectorReplicate((std::numeric_limits<float>::min)());
 
 	for (const auto& vertex : m_pMesh->GetListVertex())
 	{
@@ -24,6 +22,10 @@ T_BOX Object::CreateBoundingBox()
 	XMFLOAT3 min;
 	XMStoreFloat3(&max, maxVertex);
 	XMStoreFloat3(&min, minVertex);
+	if (max.y < _Epsilon)
+		max.y = 0;
+	if (min.y < _Epsilon)
+		max.y = 0;
 	box.Set(max, min);
 	return box;
 }

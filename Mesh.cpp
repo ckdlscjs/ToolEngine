@@ -18,6 +18,23 @@ std::vector<IndexBuffer*>& Mesh::GetIndexBuffer()
 	return m_ListIndexBuffer;
 }
 
+void Mesh::SetVertexList(void* vertices, int iSize)
+{
+	for (int i = 0; i < iSize; i++)
+	{
+		m_ListVertex.push_back(*((object*)vertices + i));
+	}
+}
+
+
+void Mesh::SetIndexList(void* indices, int iSize)
+{
+	for (int i = 0; i < iSize; i++)
+	{
+		m_ListIndex.push_back(*((unsigned int*)indices + i));
+	}
+}
+
 void Mesh::SetVertexBuffer(VertexBuffer* pVertexBuffer)
 {
 	m_ListVertexBuffer.push_back(pVertexBuffer);

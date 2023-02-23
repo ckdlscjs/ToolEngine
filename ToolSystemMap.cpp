@@ -33,9 +33,10 @@ void ToolSystemMap::CreateFbxObject(std::wstring szFullPath, XMVECTOR vPos)
     FBXFile* pFBXFile = _FBXSystem.LoadFile(_towm(szFullPath).c_str());
     Object* pObject = _ObjectSystem.CreateObject();
     Mesh* pMesh = new Mesh();
+ 
     Material* pMaterial = new Material();
  
-    void* shader_byte_code = nullptr;
+    void* shader_byte_code = nullptr;  
     size_t size_shader = 0;
 
     _EngineSystem.GetRenderSystem()->CompileShader(L"DefaultVertexShader.hlsl", "vsmain", "vs_5_0", &shader_byte_code, &size_shader);
@@ -139,6 +140,8 @@ void ToolSystemMap::CreateSimpleObject(int iChkIdx, XMVECTOR vPos)
 
     Object* pObject = _ObjectSystem.CreateObject();
     Mesh* pMesh = new Mesh();
+    pMesh->SetVertexList(vertex_list, size_vertex_list);
+    pMesh->SetIndexList(index_list, size_index_list);
     Material* pMaterial = new Material();
 
     void* shader_byte_code = nullptr;
@@ -167,6 +170,9 @@ void ToolSystemMap::CreateSimpleObject(int iChkIdx, XMVECTOR vPos)
     pObject->SetMaterial(pMaterial);
     pObject->SetShader(pVertexShader, pPixelShader);
     pObject->m_pMaterial->SetTexture(listTexture, 1);
+
+    if (m_pQuadTree)
+        m_pQuadTree->AddObject(pObject);
 
 }
 
@@ -201,7 +207,6 @@ void ToolSystemMap::CreateSimpleMap(int iWidth, int iHeight, float fDistance, in
     listTexture[0] = _EngineSystem.GetTextureSystem()->CreateTextureFromFile(m_ListTexture[iChkIdx].c_str());
 
     m_pQuadTree = new FQuadTree(m_pCamera, pMapMesh);
-
     m_pQuadTree->SetConstantData(cc);
     m_pQuadTree->SetTransform({ {0, 0, 0} , {0, 0, 0}, {1, 1, 1} });
     m_pQuadTree->SetMesh(pMapMesh);

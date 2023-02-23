@@ -173,10 +173,24 @@ bool FQuadTree::GetObjectPicking()
         {
             for (auto object : node->m_pDynamicObjectList)
             {
-                if (object->Intersect(m_Select, 5.0f))
+                UINT index = 0;
+                UINT iNumFace = object->m_pMesh->GetListIndex().size() / 3;
+                for (UINT face = 0; face < iNumFace; face++)
                 {
-                    
-                    return true;
+                    UINT i0 = object->m_pMesh->GetListIndex()[index + 0];
+                    UINT i1 = object->m_pMesh->GetListIndex()[index + 1];
+                    UINT i2 = object->m_pMesh->GetListIndex()[index + 2];
+                    XMFLOAT3 v0 = object->m_pMesh->GetListVertex()[i0].pos;
+                    XMFLOAT3 v1 = object->m_pMesh->GetListVertex()[i1].pos;
+                    XMFLOAT3 v2 = object->m_pMesh->GetListVertex()[i2].pos;
+                    XMVECTOR v_0 = XMVector3TransformCoord(XMLoadFloat3(&v0), object->constantData.matWorld);
+                    XMVECTOR v_1 = XMVector3TransformCoord(XMLoadFloat3(&v1), object->constantData.matWorld);
+                    XMVECTOR v_2 = XMVector3TransformCoord(XMLoadFloat3(&v2), object->constantData.matWorld);
+                    if (m_Select.ChkPick(v_0, v_1, v_2))
+                    {
+                        return true;
+                    }
+                    index += 3;
                 }
             }
         }
@@ -228,7 +242,7 @@ void FQuadTree::Update()
 
     if (m_bObjectPicking && GetObjectPicking())
     {
-        OutputDebugStringA("aaa\n");
+        OutputDebugStringA("ÇÇÅ·\n");
     }
 }
 
