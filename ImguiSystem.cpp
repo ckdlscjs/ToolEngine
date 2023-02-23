@@ -61,7 +61,7 @@ void ImguiSystem::Update()
         {
             if (ImGui::Button("CreateMap"))
             {
-                _ToolSystemMap.CreateSimpleMap(iMapSize + 1, iMapSize + 1, fMapDistance);
+                _ToolSystemMap.CreateSimpleMap(iMapSize + 1, iMapSize + 1, fMapDistance, image_current_idx);
             }
             ImGui::InputInt("MapSize", &iMapSize);
             ImGui::InputFloat("ShellDistance", &fMapDistance);

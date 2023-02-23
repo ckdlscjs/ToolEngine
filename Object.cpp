@@ -1,5 +1,6 @@
 #include "Object.h"
 #include "CameraSystem.h"
+#include "FBXSystem.h"
 void Object::SetTransform(Transform transform)
 {
 	m_Transform = transform;
@@ -73,7 +74,6 @@ void Object::Render()
 		//_EngineSystem.GetRenderSystem()->drawTriangleList(m_pMesh->GetVertexBuffer()[idx]->GetSizeList(), 0);
 		_EngineSystem.GetRenderSystem()->drawIndexedTriangleList(m_pMesh->GetIndexBuffer()[idx]->getSizeIndexList(), 0, 0);
 	}
-
 }
 
 Object::Object()

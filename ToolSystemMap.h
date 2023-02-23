@@ -1,7 +1,8 @@
 #pragma once
 #include "stdafx.h"
-#include "ObjectSystem.h"
 #include "CameraSystem.h"
+#include "ObjectSystem.h"
+#include "MaterialSystem.h"
 #include "FBXSystem.h"
 #include "MeshMap.h"
 #include "FQuadTree.h"
@@ -14,7 +15,7 @@ public:
 	void SelectImage(int iChkIdx, bool bPicking);
 	void CreateFbxObject(std::wstring szFullPath, XMVECTOR vPos);
 	void CreateSimpleObject(int iChkIdx, XMVECTOR vPos);
-	void CreateSimpleMap(int iWidth, int iHeight,float fDistance);
+	void CreateSimpleMap(int iWidth, int iHeight,float fDistance, int iChkIdx);
 	void DeleteSimpleMap();
 	void OpenFile();
 	void SaveFile(std::wstring szFullPath);

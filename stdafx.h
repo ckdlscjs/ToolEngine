@@ -89,6 +89,24 @@ static std::string GetSplitFile(std::string szFullPath)
 		return szFullPath.substr(pos + 1);
 }
 
+static std::wstring GetSplitName(std::wstring szFullPath)
+{
+	size_t pos = szFullPath.find_last_of(L"/\\");
+	if (pos == std::wstring::npos)
+		return szFullPath;
+	else
+		return szFullPath.substr(pos + 1);
+}
+
+static std::wstring GetSplitFile(std::wstring szFullPath)
+{
+	size_t pos = szFullPath.find_last_of(L"/.");
+	if (pos == std::wstring::npos)
+		return szFullPath;
+	else
+		return szFullPath.substr(pos + 1);
+}
+
 struct object
 {
 	XMFLOAT3 pos;

@@ -33,6 +33,7 @@ public:
 	Object();
 	virtual ~Object();
 protected:
+	std::wstring m_szFullPath;
 	Transform m_Transform;
 	Mesh* m_pMesh;
 	Material* m_pMaterial;

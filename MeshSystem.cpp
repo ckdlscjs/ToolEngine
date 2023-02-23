@@ -1,5 +1,6 @@
 #include "MeshSystem.h"
 
+
 MeshSystem::MeshSystem() : ResourceSystem()
 {
 	std::cout << "Initialize : MeshSystem" << std::endl;
@@ -14,7 +15,6 @@ Mesh* MeshSystem::CreateMeshFromFile(const wchar_t* szFilePath)
 {
 	return (Mesh*)CreateResourceFromFile(szFilePath);
 }
-
 
 Resource* MeshSystem::CreateResourceFromFileConcrete(const wchar_t* szFilePath)
 {
