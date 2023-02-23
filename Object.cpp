@@ -1,11 +1,12 @@
 #include "Object.h"
 #include "CameraSystem.h"
 #include "FBXSystem.h"
-#undef max
-#undef min
+
 
 T_BOX Object::CreateBoundingBox()
 {
+#undef max
+#undef min
 	
 	XMVECTOR minVertex = XMVectorReplicate(std::numeric_limits<float>::max());
 	XMVECTOR maxVertex = XMVectorReplicate(std::numeric_limits<float>::min());

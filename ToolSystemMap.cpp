@@ -158,8 +158,6 @@ void ToolSystemMap::CreateSimpleObject(int iChkIdx, XMVECTOR vPos)
     pMesh->SetVertexBuffer(pVertexBuffer);
     pMesh->SetIndexBuffer(pIndexBuffer);
 
-    
-
     Texture** listTexture = new Texture*[1];
     listTexture[0] = _EngineSystem.GetTextureSystem()->CreateTextureFromFile(m_ListTexture[iChkIdx].c_str());
     
@@ -169,6 +167,7 @@ void ToolSystemMap::CreateSimpleObject(int iChkIdx, XMVECTOR vPos)
     pObject->SetMaterial(pMaterial);
     pObject->SetShader(pVertexShader, pPixelShader);
     pObject->m_pMaterial->SetTexture(listTexture, 1);
+
 }
 
 void ToolSystemMap::CreateSimpleMap(int iWidth, int iHeight, float fDistance, int iChkIdx)
