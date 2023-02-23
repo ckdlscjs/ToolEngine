@@ -2,6 +2,8 @@
 #include "EngineSystem.h"
 #include "Mesh.h"
 #include "Material.h"
+#include "FSelect.h"
+
 struct Transform
 {
 	XMVECTOR position;
@@ -19,6 +21,8 @@ enum CULL_MODE
 class Object
 {
 public:
+	T_BOX CreateBoundingBox();
+	bool Intersect(FSelect& select, float distance);
 	void SetTransform(Transform transform);
 	void SetMesh(Mesh* pMesh);
 	void SetMaterial(Material* pMaterial);
@@ -33,6 +37,7 @@ public:
 	Object();
 	virtual ~Object();
 protected:
+	T_BOX m_Box;
 	std::wstring m_szFullPath;
 	Transform m_Transform;
 	Mesh* m_pMesh;
@@ -48,5 +53,6 @@ protected:
 	/// </summary>
 	friend class FNode;
 	friend class ToolSystemMap;
+	friend class FQuadTree;
 };
 

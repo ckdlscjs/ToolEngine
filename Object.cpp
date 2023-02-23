@@ -1,6 +1,55 @@
 #include "Object.h"
 #include "CameraSystem.h"
 #include "FBXSystem.h"
+#undef max
+#undef min
+
+T_BOX Object::CreateBoundingBox()
+{
+	
+	XMVECTOR minVertex = XMVectorReplicate(std::numeric_limits<float>::max());
+	XMVECTOR maxVertex = XMVectorReplicate(std::numeric_limits<float>::min());
+
+	for (const auto& vertex : m_pMesh->GetListVertex())
+	{
+		XMVECTOR v = XMLoadFloat3(&vertex.pos);
+
+		minVertex = XMVectorMin(minVertex, v);
+		maxVertex = XMVectorMax(maxVertex, v);
+	}
+
+	T_BOX box;
+	XMFLOAT3 max;
+	XMFLOAT3 min;
+	XMStoreFloat3(&max, maxVertex);
+	XMStoreFloat3(&min, minVertex);
+	box.Set(max, min);
+	return box;
+}
+
+bool Object::Intersect(FSelect& select, float distance)
+{
+	for (auto node : m_pMesh->GetListIndex())
+	{
+		UINT index = 0;
+		UINT iNumFace = m_pMesh->GetListIndex().size() / 3;
+		for (UINT face = 0; face < iNumFace; face++)
+		{
+			UINT i0 = m_pMesh->GetListIndex()[index + 0];
+			UINT i1 = m_pMesh->GetListIndex()[index + 1];
+			UINT i2 = m_pMesh->GetListIndex()[index + 2];
+			XMFLOAT3 v0 = m_pMesh->GetListVertex()[i0].pos;
+			XMFLOAT3 v1 = m_pMesh->GetListVertex()[i1].pos;
+			XMFLOAT3 v2 = m_pMesh->GetListVertex()[i2].pos;
+			if (select.ChkPick(XMLoadFloat3(&v0), XMLoadFloat3(&v1), XMLoadFloat3(&v2)))
+			{
+				return true;
+			}
+			index += 3;
+		}
+	}
+	return false;
+}
 void Object::SetTransform(Transform transform)
 {
 	m_Transform = transform;
@@ -20,6 +69,7 @@ void Object::SetTransform(Transform transform)
 void Object::SetMesh(Mesh* pMesh)
 {
 	m_pMesh = pMesh;
+	m_Box = CreateBoundingBox();
 }
 
 void Object::SetMaterial(Material* pMaterial)

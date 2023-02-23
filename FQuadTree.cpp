@@ -91,11 +91,11 @@ FNode* FQuadTree::FindNode(FNode* pNode, Object* pObj)
     {
         if (pNode->m_pChild[i] != nullptr)
         {
-            /*if (TCollision::RectToInRect(pNode->m_pChild[i]->m_rt, pObj->m_rt))
+            if (TCollision::BoxToBox(pNode->m_pChild[i]->m_Box, pObj->m_Box));
             {
                 pNode = FindNode(pNode->m_pChild[i], pObj);
                 break;
-            }*/
+            }
         }
     }
     return pNode;
@@ -138,7 +138,6 @@ FNode* FQuadTree::VisibleNode(FNode* pNode)
 
 bool FQuadTree::GetInterSection()
 {
- 
     //교점체크
     if ((_InputSystem.GetKey(VK_RBUTTON) == KEY_STATE::KEY_DOWN))
     {
@@ -159,6 +158,26 @@ bool FQuadTree::GetInterSection()
                     return true;
                 }
                 index += 3;
+            }
+        }
+    }
+    return false;
+}
+
+bool FQuadTree::GetObjectPicking()
+{
+    //교점체크
+    if ((_InputSystem.GetKey(VK_RBUTTON) == KEY_STATE::KEY_DOWN))
+    {
+        for (auto node : m_pDrawLeafNodeList)
+        {
+            for (auto object : node->m_pDynamicObjectList)
+            {
+                if (object->Intersect(m_Select, 5.0f))
+                {
+                    
+                    return true;
+                }
             }
         }
     }
@@ -207,9 +226,9 @@ void FQuadTree::Update()
         }
     }
 
-    if (m_bObjectPicking && GetInterSection())
+    if (m_bObjectPicking && GetObjectPicking())
     {
-
+        OutputDebugStringA("aaa\n");
     }
 }
 

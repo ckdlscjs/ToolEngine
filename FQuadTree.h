@@ -2,8 +2,8 @@
 #include "FNode.h"
 #include "MeshMap.h"
 #include "Object.h"
-//picking temp
 #include "FSelect.h"
+//picking temp
 class FQuadTree : public Object
 {
 
@@ -19,6 +19,7 @@ public:
 	void	Reset(FNode* pNode);
 	FNode*	VisibleNode(FNode* pNode);
 	bool	GetInterSection();
+	bool	GetObjectPicking();
 	void	Update();
 	void	Render();
 public:

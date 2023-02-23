@@ -25,6 +25,11 @@ void ToolSystemMap::SelectObject(bool bPicking)
 
 void ToolSystemMap::CreateFbxObject(std::wstring szFullPath, XMVECTOR vPos)
 {
+    constant cc;
+    cc.matWorld = XMMatrixIdentity();
+    cc.matView = m_pCamera->m_matCamera;
+    cc.matProj = m_pCamera->m_matProj;
+
     FBXFile* pFBXFile = _FBXSystem.LoadFile(_towm(szFullPath).c_str());
     Object* pObject = _ObjectSystem.CreateObject();
     Mesh* pMesh = new Mesh();
@@ -50,16 +55,16 @@ void ToolSystemMap::CreateFbxObject(std::wstring szFullPath, XMVECTOR vPos)
     PixelShader* pPixelShader = _EngineSystem.GetRenderSystem()->CreatePixelShader(shader_byte_code, size_shader);
     _EngineSystem.GetRenderSystem()->ReleaseBlob();
     
-    constant cc;
-    cc.matWorld = XMMatrixIdentity();
-    cc.matView = m_pCamera->m_matCamera;
-    cc.matProj = m_pCamera->m_matProj;
+    
 
     pObject->SetConstantData(cc);
     pObject->SetTransform({ vPos , {0, 0, 0}, {1, 1, 1} });
     pObject->SetMesh(pMesh);
     pObject->SetMaterial(pMaterial);
     pObject->SetShader(pVertexShader, pPixelShader);
+
+    if(m_pQuadTree)
+        m_pQuadTree->AddObject(pObject);
 
     std::wstring defaultDir = L"../../data/fbx/";
     for (int idx = 0; idx < pFBXFile->m_ListNode.size(); idx++)
@@ -127,6 +132,11 @@ void ToolSystemMap::CreateSimpleObject(int iChkIdx, XMVECTOR vPos)
     };
     UINT size_index_list = ARRAYSIZE(index_list);
     
+    constant cc;
+    cc.matWorld = XMMatrixIdentity();
+    cc.matView = m_pCamera->m_matCamera;
+    cc.matProj = m_pCamera->m_matProj;
+
     Object* pObject = _ObjectSystem.CreateObject();
     Mesh* pMesh = new Mesh();
     Material* pMaterial = new Material();
@@ -147,14 +157,12 @@ void ToolSystemMap::CreateSimpleObject(int iChkIdx, XMVECTOR vPos)
    
     pMesh->SetVertexBuffer(pVertexBuffer);
     pMesh->SetIndexBuffer(pIndexBuffer);
-    constant cc;
-    cc.matWorld = XMMatrixIdentity();
-    cc.matView = m_pCamera->m_matCamera;
-    cc.matProj = m_pCamera->m_matProj;
+
+    
 
     Texture** listTexture = new Texture*[1];
     listTexture[0] = _EngineSystem.GetTextureSystem()->CreateTextureFromFile(m_ListTexture[iChkIdx].c_str());
-
+    
     pObject->SetConstantData(cc);
     pObject->SetTransform({ vPos , {0, 0, 0}, {1, 1, 1} });
     pObject->SetMesh(pMesh);
@@ -165,6 +173,11 @@ void ToolSystemMap::CreateSimpleObject(int iChkIdx, XMVECTOR vPos)
 
 void ToolSystemMap::CreateSimpleMap(int iWidth, int iHeight, float fDistance, int iChkIdx)
 {
+    constant cc;
+    cc.matWorld = XMMatrixIdentity();
+    cc.matView = m_pCamera->m_matCamera;
+    cc.matProj = m_pCamera->m_matProj;
+
     MeshMap* pMapMesh = new MeshMap(iWidth, iHeight, fDistance);
     Material* pMaterial = new Material();
 
@@ -183,16 +196,13 @@ void ToolSystemMap::CreateSimpleMap(int iWidth, int iHeight, float fDistance, in
 
     pMapMesh->SetVertexBuffer(pVertexBuffer);
     pMapMesh->SetIndexBuffer(pIndexBuffer);
-    constant cc;
-    cc.matWorld = XMMatrixIdentity();
-    cc.matView = m_pCamera->m_matCamera;
-    cc.matProj = m_pCamera->m_matProj;
+    
 
     Texture** listTexture = new Texture * [1];
     listTexture[0] = _EngineSystem.GetTextureSystem()->CreateTextureFromFile(m_ListTexture[iChkIdx].c_str());
 
     m_pQuadTree = new FQuadTree(m_pCamera, pMapMesh);
-    
+
     m_pQuadTree->SetConstantData(cc);
     m_pQuadTree->SetTransform({ {0, 0, 0} , {0, 0, 0}, {1, 1, 1} });
     m_pQuadTree->SetMesh(pMapMesh);
