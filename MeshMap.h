@@ -8,7 +8,7 @@ struct face_info
 };
 struct vertex_info
 {
-	std::vector<UINT > faceIndexArray;
+	std::vector<UINT> faceIndexArray;
 	XMVECTOR vNormal;
 };
 
@@ -31,8 +31,8 @@ public:
 	std::vector<object> m_ListVertex;
 	std::vector<unsigned int> m_ListIndex;
 	std::vector<vertex_info> m_ListVertexInfo;	//정점과 노말벡터
-	std::vector<face_info> m_FaceNormals;	//법선노말
-	std::vector<DWORD> m_dwIndexList;	//인덱스정보
+	std::vector<face_info> m_ListFaceNormal;	//법선노말
+	std::vector<DWORD> m_dwListIndex;	//인덱스정보
 	std::vector<float> m_fHeightList;	//맵의y높이정보
 	float m_fShellY = 1.0f;
 	float m_fShellDistance = 1.0f;

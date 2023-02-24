@@ -78,17 +78,17 @@ void MeshMap::LoadHeightMap(ID3D11Device* pDevice, ID3D11DeviceContext* pContext
 
 void MeshMap::GenerateVertexNormal()
 {
-    m_FaceNormals.resize(m_dwFace);
+    m_ListFaceNormal.resize(m_dwFace);
     UINT iFace = 0;
     for (UINT i = 0; i < m_ListIndex.size(); i += 3)
     {
         UINT i0 = m_ListIndex[i + 0];
         UINT i1 = m_ListIndex[i + 1];
         UINT i2 = m_ListIndex[i + 2];
-        m_FaceNormals[iFace].vertexArray[0] = i0;
-        m_FaceNormals[iFace].vertexArray[1] = i1;
-        m_FaceNormals[iFace].vertexArray[2] = i2;
-        m_FaceNormals[iFace++].vNormal = ComputeFaceNormal(i0, i1, i2);
+        m_ListFaceNormal[iFace].vertexArray[0] = i0;
+        m_ListFaceNormal[iFace].vertexArray[1] = i1;
+        m_ListFaceNormal[iFace].vertexArray[2] = i2;
+        m_ListFaceNormal[iFace++].vNormal = ComputeFaceNormal(i0, i1, i2);
     }
 
     m_ListVertexInfo.resize(m_dwNumRows * m_dwNumColumns);
@@ -96,7 +96,7 @@ void MeshMap::GenerateVertexNormal()
     {
         for (UINT i = 0; i < m_ListVertexInfo[iVertex].faceIndexArray.size(); i++)
         {
-            UINT i0 = m_dwIndexList[iVertex * 3 + i];
+            UINT i0 = m_dwListIndex[iVertex * 3 + i];
             m_ListVertexInfo[i0].faceIndexArray.push_back(iVertex);
         }
     }
@@ -125,12 +125,12 @@ void MeshMap::ComputeVertexNormal(UINT iVertex)
     for (UINT i = 0; i < m_ListVertexInfo[iVertex].faceIndexArray.size(); i++)
     {
         UINT faceindex = m_ListVertexInfo[iVertex].faceIndexArray[i];
-        UINT i0 = m_FaceNormals[faceindex].vertexArray[0];
-        UINT i1 = m_FaceNormals[faceindex].vertexArray[1];
-        UINT i2 = m_FaceNormals[faceindex].vertexArray[2];
-        m_FaceNormals[faceindex].vNormal = ComputeFaceNormal(i0, i1, i2);
+        UINT i0 = m_ListFaceNormal[faceindex].vertexArray[0];
+        UINT i1 = m_ListFaceNormal[faceindex].vertexArray[1];
+        UINT i2 = m_ListFaceNormal[faceindex].vertexArray[2];
+        m_ListFaceNormal[faceindex].vNormal = ComputeFaceNormal(i0, i1, i2);
 
-        m_ListVertexInfo[iVertex].vNormal += m_FaceNormals[faceindex].vNormal;
+        m_ListVertexInfo[iVertex].vNormal += m_ListFaceNormal[faceindex].vNormal;
     }
     m_ListVertexInfo[iVertex].vNormal = XMVector3Normalize(m_ListVertexInfo[iVertex].vNormal); //최종적인 특정 정점의 정점노말값(최대6면)
     XMStoreFloat3(&m_ListVertex[iVertex].normal, m_ListVertexInfo[iVertex].vNormal);
@@ -197,8 +197,8 @@ MeshMap::MeshMap(UINT iWidth, UINT iHeight, float fShellDistance)
             iIndex += 6;
         }
     }
-    m_dwIndexList.resize(m_ListIndex.size());
-    m_dwFace = m_ListIndex.size() / 3;
+    m_dwListIndex.resize(m_ListIndex.size());
+    m_dwFace = m_dwListIndex.size() / 3;
     GenerateVertexNormal();
 }
 MeshMap::~MeshMap()
