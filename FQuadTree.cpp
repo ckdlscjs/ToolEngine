@@ -146,7 +146,7 @@ bool FQuadTree::GetInterSection()
     //교점체크
     if ((_InputSystem.GetKey(VK_RBUTTON) == KEY_STATE::KEY_DOWN))
     {
-        for (auto node : m_pDrawLeafNodeList)
+        for (const auto& node : m_pDrawLeafNodeList)
         {
             UINT index = 0;
             UINT iNumFace = node->m_IndexList.size() / 3;

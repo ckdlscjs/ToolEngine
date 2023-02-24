@@ -49,6 +49,7 @@
     <ClInclude Include="MaterialSystem.h" />
     <ClInclude Include="MeshMap.h" />
     <ClInclude Include="Mesh.h" />
+    <ClInclude Include="MeshNode.h" />
     <ClInclude Include="MeshSystem.h" />
     <ClInclude Include="Object.h" />
     <ClInclude Include="PixelShader.h" />
@@ -100,6 +101,7 @@
     <ClCompile Include="MaterialSystem.cpp" />
     <ClCompile Include="MeshMap.cpp" />
     <ClCompile Include="Mesh.cpp" />
+    <ClCompile Include="MeshNode.cpp" />
     <ClCompile Include="MeshSystem.cpp" />
     <ClCompile Include="Object.cpp" />
     <ClCompile Include="PixelShader.cpp" />

@@ -28,7 +28,9 @@ public:
 	DWORD m_dwNumRows;
 	DWORD m_dwNumColumns;
 	DWORD m_dwFace;
-	std::vector<vertex_info> m_VertexInfo;	//정점과 노말벡터
+	std::vector<object> m_ListVertex;
+	std::vector<unsigned int> m_ListIndex;
+	std::vector<vertex_info> m_ListVertexInfo;	//정점과 노말벡터
 	std::vector<face_info> m_FaceNormals;	//법선노말
 	std::vector<DWORD> m_dwIndexList;	//인덱스정보
 	std::vector<float> m_fHeightList;	//맵의y높이정보

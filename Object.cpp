@@ -9,12 +9,15 @@ T_BOX Object::CreateBoundingBox()
 	XMVECTOR minVertex = XMVectorReplicate((std::numeric_limits<float>::max)());
 	XMVECTOR maxVertex = XMVectorReplicate((std::numeric_limits<float>::min)());
 
-	for (const auto& vertex : m_pMesh->GetListVertex())
+	for (const auto& node : m_pMesh->GetMeshNodeList())
 	{
-		XMVECTOR v = XMLoadFloat3(&vertex.pos);
+		for (const auto& vertex : node->GetListVertex())
+		{
+			XMVECTOR v = XMLoadFloat3(&vertex.pos);
 
-		minVertex = XMVectorMin(minVertex, v);
-		maxVertex = XMVectorMax(maxVertex, v);
+			minVertex = XMVectorMin(minVertex, v);
+			maxVertex = XMVectorMax(maxVertex, v);
+		}
 	}
 
 	T_BOX box;
@@ -32,18 +35,18 @@ T_BOX Object::CreateBoundingBox()
 
 bool Object::Intersect(FSelect& select, float distance)
 {
-	for (auto node : m_pMesh->GetListIndex())
+	for (const auto& node : m_pMesh->GetMeshNodeList())
 	{
 		UINT index = 0;
-		UINT iNumFace = m_pMesh->GetListIndex().size() / 3;
+		UINT iNumFace = node->GetListIndex().size() / 3;
 		for (UINT face = 0; face < iNumFace; face++)
 		{
-			UINT i0 = m_pMesh->GetListIndex()[index + 0];
-			UINT i1 = m_pMesh->GetListIndex()[index + 1];
-			UINT i2 = m_pMesh->GetListIndex()[index + 2];
-			XMFLOAT3 v0 = m_pMesh->GetListVertex()[i0].pos;
-			XMFLOAT3 v1 = m_pMesh->GetListVertex()[i1].pos;
-			XMFLOAT3 v2 = m_pMesh->GetListVertex()[i2].pos;
+			UINT i0 = node->GetListIndex()[index + 0];
+			UINT i1 = node->GetListIndex()[index + 1];
+			UINT i2 = node->GetListIndex()[index + 2];
+			XMFLOAT3 v0 = node->GetListVertex()[i0].pos;
+			XMFLOAT3 v1 = node->GetListVertex()[i1].pos;
+			XMFLOAT3 v2 = node->GetListVertex()[i2].pos;
 			if (select.ChkPick(XMLoadFloat3(&v0), XMLoadFloat3(&v1), XMLoadFloat3(&v2)))
 			{
 				return true;
@@ -125,14 +128,14 @@ void Object::Render()
 	_EngineSystem.GetRenderSystem()->SetConstantBuffer(m_pPixelShader, m_pConstantBuffer);
 	_EngineSystem.GetRenderSystem()->SetVertexShader(m_pVertexShader);
 	_EngineSystem.GetRenderSystem()->SetPixelShader(m_pPixelShader);
-	for (int idx = 0; idx < m_pMesh->GetVertexBuffer().size(); idx++)
+	for (int idxNode = 0; idxNode < m_pMesh->GetMeshNodeList().size(); idxNode++)
 	{
-		_EngineSystem.GetRenderSystem()->SetVertexBuffer(m_pMesh->GetVertexBuffer()[idx]);
-		_EngineSystem.GetRenderSystem()->SetIndexBuffer(m_pMesh->GetIndexBuffer()[idx]);
-		_EngineSystem.GetRenderSystem()->setTexture(m_pVertexShader, m_pMaterial->GetListTexture(idx), m_pMaterial->GetNumTexture(idx));
-		_EngineSystem.GetRenderSystem()->setTexture(m_pPixelShader, m_pMaterial->GetListTexture(idx), m_pMaterial->GetNumTexture(idx));
+		_EngineSystem.GetRenderSystem()->SetVertexBuffer(m_pMesh->GetMeshNodeList()[idxNode]->GetVertexBuffer());
+		_EngineSystem.GetRenderSystem()->SetIndexBuffer(m_pMesh->GetMeshNodeList()[idxNode]->GetIndexBuffer());
+		_EngineSystem.GetRenderSystem()->setTexture(m_pVertexShader, m_pMaterial->GetListTexture(idxNode), m_pMaterial->GetNumTexture(idxNode));
+		_EngineSystem.GetRenderSystem()->setTexture(m_pPixelShader, m_pMaterial->GetListTexture(idxNode), m_pMaterial->GetNumTexture(idxNode));
 		//_EngineSystem.GetRenderSystem()->drawTriangleList(m_pMesh->GetVertexBuffer()[idx]->GetSizeList(), 0);
-		_EngineSystem.GetRenderSystem()->drawIndexedTriangleList(m_pMesh->GetIndexBuffer()[idx]->getSizeIndexList(), 0, 0);
+		_EngineSystem.GetRenderSystem()->drawIndexedTriangleList(m_pMesh->GetMeshNodeList()[idxNode]->GetIndexBuffer()->getSizeIndexList(), 0, 0);
 	}
 }
 

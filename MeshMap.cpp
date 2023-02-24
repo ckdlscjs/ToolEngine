@@ -91,16 +91,16 @@ void MeshMap::GenerateVertexNormal()
         m_FaceNormals[iFace++].vNormal = ComputeFaceNormal(i0, i1, i2);
     }
 
-    m_VertexInfo.resize(m_dwNumRows * m_dwNumColumns);
-    for (UINT iVertex = 0; iVertex < m_VertexInfo.size(); iVertex++)
+    m_ListVertexInfo.resize(m_dwNumRows * m_dwNumColumns);
+    for (UINT iVertex = 0; iVertex < m_ListVertexInfo.size(); iVertex++)
     {
-        for (UINT i = 0; i < m_VertexInfo[iVertex].faceIndexArray.size(); i++)
+        for (UINT i = 0; i < m_ListVertexInfo[iVertex].faceIndexArray.size(); i++)
         {
             UINT i0 = m_dwIndexList[iVertex * 3 + i];
-            m_VertexInfo[i0].faceIndexArray.push_back(iVertex);
+            m_ListVertexInfo[i0].faceIndexArray.push_back(iVertex);
         }
     }
-   	for (UINT iVertex = 0; iVertex < m_VertexInfo.size(); iVertex++)
+   	for (UINT iVertex = 0; iVertex < m_ListVertexInfo.size(); iVertex++)
 	{
 		ComputeVertexNormal(iVertex);
 	}
@@ -122,18 +122,18 @@ XMVECTOR MeshMap::ComputeFaceNormal(UINT i0, UINT i1, UINT i2)
 
 void MeshMap::ComputeVertexNormal(UINT iVertex)
 {
-    for (UINT i = 0; i < m_VertexInfo[iVertex].faceIndexArray.size(); i++)
+    for (UINT i = 0; i < m_ListVertexInfo[iVertex].faceIndexArray.size(); i++)
     {
-        UINT faceindex = m_VertexInfo[iVertex].faceIndexArray[i];
+        UINT faceindex = m_ListVertexInfo[iVertex].faceIndexArray[i];
         UINT i0 = m_FaceNormals[faceindex].vertexArray[0];
         UINT i1 = m_FaceNormals[faceindex].vertexArray[1];
         UINT i2 = m_FaceNormals[faceindex].vertexArray[2];
         m_FaceNormals[faceindex].vNormal = ComputeFaceNormal(i0, i1, i2);
 
-        m_VertexInfo[iVertex].vNormal += m_FaceNormals[faceindex].vNormal;
+        m_ListVertexInfo[iVertex].vNormal += m_FaceNormals[faceindex].vNormal;
     }
-    m_VertexInfo[iVertex].vNormal = XMVector3Normalize(m_VertexInfo[iVertex].vNormal); //최종적인 특정 정점의 정점노말값(최대6면)
-    XMStoreFloat3(&m_ListVertex[iVertex].normal, m_VertexInfo[iVertex].vNormal);
+    m_ListVertexInfo[iVertex].vNormal = XMVector3Normalize(m_ListVertexInfo[iVertex].vNormal); //최종적인 특정 정점의 정점노말값(최대6면)
+    XMStoreFloat3(&m_ListVertex[iVertex].normal, m_ListVertexInfo[iVertex].vNormal);
 //#ifdef _DEBUG
 //    XMFLOAT3 vLight = { -1, 0, 0 };
 //    XMFLOAT3 vTarget = { 0, 0, 0 };

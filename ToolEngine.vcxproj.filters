@@ -100,6 +100,9 @@
     <Filter Include="WindowSystem">
       <UniqueIdentifier>{ebb6abe7-7bb6-4986-a162-6c171c91c5ff}</UniqueIdentifier>
     </Filter>
+    <Filter Include="EngineSystem\ObjectSystem\MeshSystem\MeshNode">
+      <UniqueIdentifier>{fe92f711-f3b8-492c-85f6-69c25eb63973}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="WindowSystem.h">
@@ -247,6 +250,9 @@
     <ClInclude Include="TCollision.h">
       <Filter>PhysicsSystem</Filter>
     </ClInclude>
+    <ClInclude Include="MeshNode.h">
+      <Filter>EngineSystem\ObjectSystem\MeshSystem\MeshNode</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WindowSystem.cpp">
@@ -387,6 +393,9 @@
     </ClCompile>
     <ClCompile Include="TCollision.cpp">
       <Filter>PhysicsSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="MeshNode.cpp">
+      <Filter>EngineSystem\ObjectSystem\MeshSystem\MeshNode</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
