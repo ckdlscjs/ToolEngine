@@ -15,6 +15,7 @@ FQuadTree::FQuadTree(Camera* pCamera, MeshMap* pMap, int iMaxDepth)
 FQuadTree::~FQuadTree()
 {
     if (m_pRootNode != nullptr) delete m_pRootNode;
+    if (m_pMap) delete m_pMap;
 }
 
 
@@ -242,7 +243,7 @@ void FQuadTree::Update()
                     m_pMap->GetListVertex()[iVertex].pos.y += fdot;/* *nodelist.size();*/
                 }
             }
-            for (auto node : nodelist)
+            for (const auto& node : nodelist)
             {
                 node->CreateIndexData(m_pMap);
             }
