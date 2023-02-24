@@ -36,7 +36,6 @@ void MeshMap::UpdateBuffer(Camera* pCamera)
     g_pDeviceContext->UpdateSubresource(m_pIndexBuffer->m_pBuffer, 0, nullptr, &m_dwIndexList.at(0), 0, 0);*/
 }
 
-
 void MeshMap::LoadHeightMap(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, std::wstring szFullPath)
 {
     ID3D11Resource* pTexture;

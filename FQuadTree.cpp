@@ -158,9 +158,6 @@ bool FQuadTree::GetInterSection()
                 XMFLOAT3 v0 = m_pMap->GetListVertex()[i0].pos;
                 XMFLOAT3 v1 = m_pMap->GetListVertex()[i1].pos;
                 XMFLOAT3 v2 = m_pMap->GetListVertex()[i2].pos;
-                XMVECTOR v_0 = XMVector3TransformCoord(XMLoadFloat3(&v0), constantData.matWorld);
-                XMVECTOR v_1 = XMVector3TransformCoord(XMLoadFloat3(&v1), constantData.matWorld);
-                XMVECTOR v_2 = XMVector3TransformCoord(XMLoadFloat3(&v2), constantData.matWorld);
                 if (m_Select.ChkPick(XMLoadFloat3(&v0), XMLoadFloat3(&v1), XMLoadFloat3(&v2)))
                 {
                     return true;
@@ -250,7 +247,7 @@ void FQuadTree::Update()
                 node->CreateIndexData(m_pMap);
             }
             m_pMap->GenerateVertexNormal();
-            _EngineSystem.GetRenderSystem()->UpdateVertexBuffer(m_pMap->m_pVertexBuffer, &m_pMap->GetListVertex());
+            _EngineSystem.GetRenderSystem()->UpdateVertexBuffer(m_pMap->m_pVertexBuffer, &m_pMap->GetListVertex()[0]);
         }
     }
 
