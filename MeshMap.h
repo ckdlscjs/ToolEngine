@@ -15,7 +15,8 @@ struct vertex_info
 class MeshMap : public Mesh
 {
 public:
-
+	std::vector<object>& GetListVertex();
+	std::vector<DWORD>& GetListIndex();
 	void	UpdateBuffer(Camera* pCamera);
 	void	LoadHeightMap(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, std::wstring szFullPath);	//높이맵을만드는함수
 	void	GenerateVertexNormal();																		//각 버텍스정점의 법선노말생성
@@ -28,12 +29,13 @@ public:
 	DWORD m_dwNumRows;
 	DWORD m_dwNumColumns;
 	DWORD m_dwFace;
-	std::vector<object> m_ListVertex;
-	std::vector<unsigned int> m_ListIndex;
-	std::vector<vertex_info> m_ListVertexInfo;	//정점과 노말벡터
-	std::vector<face_info> m_ListFaceNormal;	//법선노말
-	std::vector<DWORD> m_dwListIndex;	//인덱스정보
-	std::vector<float> m_fHeightList;	//맵의y높이정보
+	VertexBuffer* m_pVertexBuffer;
+	IndexBuffer* m_pIndexBuffer;
+	std::vector<object> m_ListVertex;	//정점정보
+	std::vector<DWORD> m_ListIndex; //인덱스정보
+	std::vector<float> m_fHeightList;	//높이맵의높이정보
+	std::vector<vertex_info> m_ListVertexInfo;	//정점법선노말
+	std::vector<face_info> m_ListFaceNormal;	//표면법선노말
 	float m_fShellY = 1.0f;
 	float m_fShellDistance = 1.0f;
 	float m_fShellTexCount = 1.0f;

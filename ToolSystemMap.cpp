@@ -47,8 +47,8 @@ void ToolSystemMap::CreateFbxObject(std::wstring szFullPath, XMVECTOR vPos)
             continue;
         VertexBuffer* pVertexBuffer = _EngineSystem.GetRenderSystem()->CreateVertexBuffer(&pFBXFile->m_ListNode[idx]->m_ListVertexPNCT[0], sizeof(object), pFBXFile->m_ListNode[idx]->m_ListVertexPNCT.size(), shader_byte_code, size_shader);
         IndexBuffer* pIndexBuffer = _EngineSystem.GetRenderSystem()->CreateIndexBuffer(&pFBXFile->m_ListNode[idx]->m_ListIndex[0], pFBXFile->m_ListNode[idx]->m_ListIndex.size());
-        pMesh->SetVertexBuffer(pVertexBuffer);
-        pMesh->SetIndexBuffer(pIndexBuffer);
+        /*pMesh->SetVertexBuffer(pVertexBuffer);
+        pMesh->SetIndexBuffer(pIndexBuffer);*/
     }
     _EngineSystem.GetRenderSystem()->ReleaseBlob();
 
@@ -140,8 +140,6 @@ void ToolSystemMap::CreateSimpleObject(int iChkIdx, XMVECTOR vPos)
 
     Object* pObject = _ObjectSystem.CreateObject();
     Mesh* pMesh = new Mesh();
-    pMesh->SetVertexList(vertex_list, size_vertex_list);
-    pMesh->SetIndexList(index_list, size_index_list);
     Material* pMaterial = new Material();
 
     void* shader_byte_code = nullptr;
@@ -157,9 +155,7 @@ void ToolSystemMap::CreateSimpleObject(int iChkIdx, XMVECTOR vPos)
     PixelShader* pPixelShader = _EngineSystem.GetRenderSystem()->CreatePixelShader(shader_byte_code, size_shader);
     _EngineSystem.GetRenderSystem()->ReleaseBlob();
 
-   
-    pMesh->SetVertexBuffer(pVertexBuffer);
-    pMesh->SetIndexBuffer(pIndexBuffer);
+    pMesh->SetMeshNode(vertex_list, size_vertex_list, pVertexBuffer, index_list, size_index_list, pIndexBuffer);
 
     Texture** listTexture = new Texture*[1];
     listTexture[0] = _EngineSystem.GetTextureSystem()->CreateTextureFromFile(m_ListTexture[iChkIdx].c_str());
@@ -199,9 +195,7 @@ void ToolSystemMap::CreateSimpleMap(int iWidth, int iHeight, float fDistance, in
     PixelShader* pPixelShader = _EngineSystem.GetRenderSystem()->CreatePixelShader(shader_byte_code, size_shader);
     _EngineSystem.GetRenderSystem()->ReleaseBlob();
 
-    pMapMesh->SetVertexBuffer(pVertexBuffer);
-    pMapMesh->SetIndexBuffer(pIndexBuffer);
-    
+    pMapMesh->m_pVertexBuffer = pVertexBuffer;
 
     Texture** listTexture = new Texture * [1];
     listTexture[0] = _EngineSystem.GetTextureSystem()->CreateTextureFromFile(m_ListTexture[iChkIdx].c_str());

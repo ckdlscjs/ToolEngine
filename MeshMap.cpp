@@ -1,4 +1,12 @@
 #include "MeshMap.h"
+std::vector<object>& MeshMap::GetListVertex()
+{
+    return m_ListVertex;
+}
+std::vector<DWORD>& MeshMap::GetListIndex()
+{
+    return m_ListIndex;
+}
 void MeshMap::UpdateBuffer(Camera* pCamera)
 {
    /* m_dwFace = 0;
@@ -79,27 +87,29 @@ void MeshMap::LoadHeightMap(ID3D11Device* pDevice, ID3D11DeviceContext* pContext
 void MeshMap::GenerateVertexNormal()
 {
     m_ListFaceNormal.resize(m_dwFace);
-    UINT iFace = 0;
-    for (UINT i = 0; i < m_ListIndex.size(); i += 3)
+    for (UINT iFace = 0; iFace < m_ListFaceNormal.size(); iFace++)
     {
-        UINT i0 = m_ListIndex[i + 0];
-        UINT i1 = m_ListIndex[i + 1];
-        UINT i2 = m_ListIndex[i + 2];
+        UINT i0 = m_ListIndex[iFace * 3 + 0];
+        UINT i1 = m_ListIndex[iFace * 3 + 1];
+        UINT i2 = m_ListIndex[iFace * 3 + 2];
         m_ListFaceNormal[iFace].vertexArray[0] = i0;
         m_ListFaceNormal[iFace].vertexArray[1] = i1;
         m_ListFaceNormal[iFace].vertexArray[2] = i2;
-        m_ListFaceNormal[iFace++].vNormal = ComputeFaceNormal(i0, i1, i2);
+        m_ListFaceNormal[iFace].vNormal = ComputeFaceNormal(i0, i1, i2);
     }
 
-    m_ListVertexInfo.resize(m_dwNumRows * m_dwNumColumns);
-    for (UINT iVertex = 0; iVertex < m_ListVertexInfo.size(); iVertex++)
+    m_ListVertexInfo.resize(m_dwNumRows * m_dwNumColumns);  //VertexInfo Resize
+    for (UINT iFace = 0; iFace < m_ListVertexInfo.size(); iFace++)
     {
-        for (UINT i = 0; i < m_ListVertexInfo[iVertex].faceIndexArray.size(); i++)
-        {
-            UINT i0 = m_dwListIndex[iVertex * 3 + i];
-            m_ListVertexInfo[i0].faceIndexArray.push_back(iVertex);
-        }
+        
+        UINT v0 = m_ListFaceNormal[iFace].vertexArray[0];
+        UINT v1 = m_ListFaceNormal[iFace].vertexArray[1];
+        UINT v2 = m_ListFaceNormal[iFace].vertexArray[2];
+        m_ListVertexInfo[v0].faceIndexArray.push_back(iFace);
+        m_ListVertexInfo[v1].faceIndexArray.push_back(iFace);
+        m_ListVertexInfo[v2].faceIndexArray.push_back(iFace);
     }
+
    	for (UINT iVertex = 0; iVertex < m_ListVertexInfo.size(); iVertex++)
 	{
 		ComputeVertexNormal(iVertex);
@@ -125,10 +135,10 @@ void MeshMap::ComputeVertexNormal(UINT iVertex)
     for (UINT i = 0; i < m_ListVertexInfo[iVertex].faceIndexArray.size(); i++)
     {
         UINT faceindex = m_ListVertexInfo[iVertex].faceIndexArray[i];
-        UINT i0 = m_ListFaceNormal[faceindex].vertexArray[0];
+        /*UINT i0 = m_ListFaceNormal[faceindex].vertexArray[0];
         UINT i1 = m_ListFaceNormal[faceindex].vertexArray[1];
         UINT i2 = m_ListFaceNormal[faceindex].vertexArray[2];
-        m_ListFaceNormal[faceindex].vNormal = ComputeFaceNormal(i0, i1, i2);
+        m_ListFaceNormal[faceindex].vNormal = ComputeFaceNormal(i0, i1, i2);*/
 
         m_ListVertexInfo[iVertex].vNormal += m_ListFaceNormal[faceindex].vNormal;
     }
@@ -197,11 +207,11 @@ MeshMap::MeshMap(UINT iWidth, UINT iHeight, float fShellDistance)
             iIndex += 6;
         }
     }
-    m_dwListIndex.resize(m_ListIndex.size());
-    m_dwFace = m_dwListIndex.size() / 3;
+    m_dwFace = m_ListIndex.size() / 3;
     GenerateVertexNormal();
 }
 MeshMap::~MeshMap()
 {
-
+    if(m_pVertexBuffer) delete m_pVertexBuffer;
+    if(m_pIndexBuffer) delete m_pIndexBuffer;
 }

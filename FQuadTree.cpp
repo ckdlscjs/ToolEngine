@@ -155,9 +155,9 @@ bool FQuadTree::GetInterSection()
                 UINT i0 = node->m_IndexList[index + 0];
                 UINT i1 = node->m_IndexList[index + 1];
                 UINT i2 = node->m_IndexList[index + 2];
-                XMFLOAT3 v0 = m_pMesh->GetListVertex()[i0].pos;
-                XMFLOAT3 v1 = m_pMesh->GetListVertex()[i1].pos;
-                XMFLOAT3 v2 = m_pMesh->GetListVertex()[i2].pos;
+                XMFLOAT3 v0 = m_pMap->GetListVertex()[i0].pos;
+                XMFLOAT3 v1 = m_pMap->GetListVertex()[i1].pos;
+                XMFLOAT3 v2 = m_pMap->GetListVertex()[i2].pos;
                 XMVECTOR v_0 = XMVector3TransformCoord(XMLoadFloat3(&v0), constantData.matWorld);
                 XMVECTOR v_1 = XMVector3TransformCoord(XMLoadFloat3(&v1), constantData.matWorld);
                 XMVECTOR v_2 = XMVector3TransformCoord(XMLoadFloat3(&v2), constantData.matWorld);
@@ -177,30 +177,34 @@ bool FQuadTree::GetObjectPicking()
     //교점체크
     if ((_InputSystem.GetKey(VK_RBUTTON) == KEY_STATE::KEY_DOWN))
     {
-        for (auto node : m_pDrawLeafNodeList)
+        for (const auto& node : m_pDrawLeafNodeList)
         {
-            for (auto object : node->m_pDynamicObjectList)
+            for (const auto& object : node->m_pDynamicObjectList)
             {
-                UINT index = 0;
-                UINT iNumFace = object->m_pMesh->GetListIndex().size() / 3;
-                for (UINT face = 0; face < iNumFace; face++)
+                for (const auto& mesh : object->m_pMesh->GetMeshNodeList())
                 {
-                    UINT i0 = object->m_pMesh->GetListIndex()[index + 0];
-                    UINT i1 = object->m_pMesh->GetListIndex()[index + 1];
-                    UINT i2 = object->m_pMesh->GetListIndex()[index + 2];
-                    XMFLOAT3 v0 = object->m_pMesh->GetListVertex()[i0].pos;
-                    XMFLOAT3 v1 = object->m_pMesh->GetListVertex()[i1].pos;
-                    XMFLOAT3 v2 = object->m_pMesh->GetListVertex()[i2].pos;
-                    XMVECTOR v_0 = XMVector3TransformCoord(XMLoadFloat3(&v0), object->constantData.matWorld);
-                    XMVECTOR v_1 = XMVector3TransformCoord(XMLoadFloat3(&v1), object->constantData.matWorld);
-                    XMVECTOR v_2 = XMVector3TransformCoord(XMLoadFloat3(&v2), object->constantData.matWorld);
-                    if (m_Select.ChkPick(v_0, v_1, v_2))
+                    UINT index = 0;
+                    UINT iNumFace = mesh->GetListIndex().size() / 3;
+                    for (UINT face = 0; face < iNumFace; face++)
                     {
-                        pPickingObj = object;
-                        return true;
+                        UINT i0 = mesh->GetListIndex()[index + 0];
+                        UINT i1 = mesh->GetListIndex()[index + 1];
+                        UINT i2 = mesh->GetListIndex()[index + 2];
+                        XMFLOAT3 v0 = mesh->GetListVertex()[i0].pos;
+                        XMFLOAT3 v1 = mesh->GetListVertex()[i1].pos;
+                        XMFLOAT3 v2 = mesh->GetListVertex()[i2].pos;
+                        XMVECTOR v_0 = XMVector3TransformCoord(XMLoadFloat3(&v0), object->constantData.matWorld);
+                        XMVECTOR v_1 = XMVector3TransformCoord(XMLoadFloat3(&v1), object->constantData.matWorld);
+                        XMVECTOR v_2 = XMVector3TransformCoord(XMLoadFloat3(&v2), object->constantData.matWorld);
+                        if (m_Select.ChkPick(v_0, v_1, v_2))
+                        {
+                            pPickingObj = object;
+                            return true;
+                        }
+                        index += 3;
                     }
-                    index += 3;
                 }
+                
             }
         }
     }
@@ -217,6 +221,7 @@ void FQuadTree::Update()
     {
         _ToolSystemMap.CreateSimpleObject(m_iChkIdx, m_Select.m_vIntersection);
     }
+
     if (m_bSclupting && GetInterSection())
     {
         std::vector<FNode*> nodelist;
@@ -237,8 +242,7 @@ void FQuadTree::Update()
                 {
                     float fValue = (fDistance / 30.0f) * 90.0f;
                     float fdot = cosf(_DegreeToRadian(fValue));
-                    m_pMap->GetListVertex()[iVertex].pos.y += fdot * nodelist.size();
-                    //m_pMap->ComputeVertexNormal(iVertex);
+                    m_pMap->GetListVertex()[iVertex].pos.y += fdot;/* *nodelist.size();*/
                 }
             }
             for (auto node : nodelist)
@@ -246,7 +250,7 @@ void FQuadTree::Update()
                 node->CreateIndexData(m_pMap);
             }
             m_pMap->GenerateVertexNormal();
-            _EngineSystem.GetRenderSystem()->UpdateVertexBuffer(m_pMap->GetVertexBuffer()[0], &m_pMap->m_ListVertex[0]);
+            _EngineSystem.GetRenderSystem()->UpdateVertexBuffer(m_pMap->m_pVertexBuffer, &m_pMap->GetListVertex());
         }
     }
 
@@ -264,15 +268,10 @@ void FQuadTree::Render()
         _EngineSystem.GetRenderSystem()->SetConstantBuffer(m_pPixelShader, m_pConstantBuffer);
         _EngineSystem.GetRenderSystem()->SetVertexShader(m_pVertexShader);
         _EngineSystem.GetRenderSystem()->SetPixelShader(m_pPixelShader);
-
-        for (int item = 0; item < m_pMesh->GetVertexBuffer().size(); item++)
-        {
-            _EngineSystem.GetRenderSystem()->SetVertexBuffer(m_pMesh->GetVertexBuffer()[item]);
-            g_pDeviceContext->IASetIndexBuffer(m_pDrawLeafNodeList[idx]->m_pIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
-            _EngineSystem.GetRenderSystem()->setTexture(m_pVertexShader, m_pMaterial->GetListTexture(item), m_pMaterial->GetNumTexture(item));
-            _EngineSystem.GetRenderSystem()->setTexture(m_pPixelShader, m_pMaterial->GetListTexture(item), m_pMaterial->GetNumTexture(item));
-            _EngineSystem.GetRenderSystem()->drawIndexedTriangleList(m_pDrawLeafNodeList[idx]->m_dwFace * 3, 0, 0);
-        }
-       
+        _EngineSystem.GetRenderSystem()->SetVertexBuffer(m_pMap->m_pVertexBuffer);
+        g_pDeviceContext->IASetIndexBuffer(m_pDrawLeafNodeList[idx]->m_pIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
+        _EngineSystem.GetRenderSystem()->setTexture(m_pVertexShader, m_pMaterial->GetListTexture(0), m_pMaterial->GetNumTexture(0));
+        _EngineSystem.GetRenderSystem()->setTexture(m_pPixelShader, m_pMaterial->GetListTexture(0), m_pMaterial->GetNumTexture(0));
+        _EngineSystem.GetRenderSystem()->drawIndexedTriangleList(m_pDrawLeafNodeList[idx]->m_dwFace * 3, 0, 0);
     }
 }
