@@ -30,6 +30,7 @@ VS_OUTPUT vsmain(VS_INPUT input)
 	VS_OUTPUT output = (VS_OUTPUT)0;
 	output.position = mul(input.position, matWorld);	//World	Transform
 	output.direction_to_camera = normalize(output.position.xyz - m_camera_position.xyz);
+	//output.direction_to_camera = normalize(m_camera_position.xyz - output.position.xyz);
 	output.position = mul(output.position, matView);	//View	Transform
 	output.position = mul(output.position, matProj);	//Proj	Transform
 

@@ -83,9 +83,19 @@ void FBXFile::ParseMesh(FBXNode* pNode, int nodeIdx)
 	if (pFbxLayer->GetMaterials() != nullptr)
 		MaterialSet = pFbxLayer->GetMaterials();
 
-	std::string szFileName;
+
+
+
+	if (pFbxNode->GetNodeAttribute() && pFbxNode->GetNodeAttribute()->GetAttributeType() == FbxNodeAttribute::eNurbsSurface) 
+	{
+		/*FbxFileTexture* texture = std::static_pointer_cast<FbxFileTexture*>(pFbxNode->GetNodeAttribute());
+		std::wstring textureName = texture->GetFileName();*/
+	}
+
+
+	std::wstring szFileName;
 	int iNumMtrl = pFbxNode->GetMaterialCount();
-	std::vector<std::string>   texFullNameList;
+	std::vector<std::wstring>   texFullNameList;
 	texFullNameList.resize(iNumMtrl);
 	pNode->m_ListTexture.resize(iNumMtrl);
 	for (int iMtrl = 0; iMtrl < iNumMtrl; iMtrl++)
@@ -97,10 +107,13 @@ void FBXFile::ParseMesh(FBXNode* pNode, int nodeIdx)
 			auto property = pSurface->FindProperty(FbxSurfaceMaterial::sDiffuse);
 			if (property.IsValid())
 			{
+				
 				const FbxFileTexture* tex = property.GetSrcObject<FbxFileTexture>(0);
 				if (tex)
 				{
-					szFileName = tex->GetFileName();
+					std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
+					std::wstring strW = converter.from_bytes(tex->GetFileName());
+					szFileName = strW;
 					texFullNameList[iMtrl] = szFileName;
 				}
 			}
@@ -112,13 +125,13 @@ void FBXFile::ParseMesh(FBXNode* pNode, int nodeIdx)
 	pNode->m_ListIndex.resize(iNumMtrl);
 	if (iNumMtrl == 1)
 	{
-		pNode->m_ListTexture[0] = _tomw(GetSplitName(szFileName));
+		pNode->m_ListTexture[0] = GetSplitName(szFileName);
 	}
 	if (iNumMtrl > 1)
 	{
 		for (int iTex = 0; iTex < iNumMtrl; iTex++)
 		{
-			pNode->m_ListTexture[iTex] = _tomw(GetSplitName(texFullNameList[iTex]));
+			pNode->m_ListTexture[iTex] = GetSplitName(texFullNameList[iTex]);
 		}
 	}
 	

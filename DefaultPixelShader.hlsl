@@ -23,13 +23,13 @@ float4 psmain(PS_INPUT input) : SV_TARGET
 	float4 tex = TextureColor.Sample(TextureSamplerColor, input.tex);
 
 	//AmbientLight
-	float ka = 0.1f;
+	float ka = 0.2f;
 	float3 ia = float3(1.0f, 1.0f, 1.0f);
 	ia *= tex.rgb;
 	float3 ambient_light = ka * ia;
 
 	//DiffuseLight
-	float kd = 0.7f;
+	float kd = 0.8f;
 	float3 id = float3(1.0f, 1.0f, 1.0f);
 	id *= tex.rgb;
 	float amount_diffuse_light = max(0.0f, dot(m_light_direction.xyz, input.normal));

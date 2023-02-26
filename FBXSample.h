@@ -12,7 +12,7 @@ namespace fbxsample
     public:
         void sample()
         {
-            const char* szFileName = "../../data/fbx/dragon/dragon.fbx";
+            const char* szFileName = "../../data/fbx/paimon.fbx";
             FbxManager* pFbxManager = FbxManager::Create();
             FbxImporter* pImporter = FbxImporter::Create(pFbxManager, "");
             pImporter->Initialize(szFileName, -1, nullptr);
