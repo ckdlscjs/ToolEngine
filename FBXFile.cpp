@@ -82,16 +82,8 @@ void FBXFile::ParseMesh(FBXNode* pNode, int nodeIdx)
 		VertexNormalSet = pFbxLayer->GetNormals();
 	if (pFbxLayer->GetMaterials() != nullptr)
 		MaterialSet = pFbxLayer->GetMaterials();
-
-
-
-
-	if (pFbxNode->GetNodeAttribute() && pFbxNode->GetNodeAttribute()->GetAttributeType() == FbxNodeAttribute::eNurbsSurface) 
-	{
-		/*FbxFileTexture* texture = std::static_pointer_cast<FbxFileTexture*>(pFbxNode->GetNodeAttribute());
-		std::wstring textureName = texture->GetFileName();*/
-	}
-
+	
+	bool bChinese = false;
 
 	std::wstring szFileName;
 	int iNumMtrl = pFbxNode->GetMaterialCount();
@@ -125,13 +117,15 @@ void FBXFile::ParseMesh(FBXNode* pNode, int nodeIdx)
 	pNode->m_ListIndex.resize(iNumMtrl);
 	if (iNumMtrl == 1)
 	{
-		pNode->m_ListTexture[0] = GetSplitName(szFileName);
+		//pNode->m_ListTexture[0] = GetSplitName(szFileName);
+		pNode->m_ListTexture[0] = szFileName;
 	}
 	if (iNumMtrl > 1)
 	{
 		for (int iTex = 0; iTex < iNumMtrl; iTex++)
 		{
-			pNode->m_ListTexture[iTex] = GetSplitName(texFullNameList[iTex]);
+			//pNode->m_ListTexture[iTex] = GetSplitName(texFullNameList[iTex]);
+			pNode->m_ListTexture[iTex] = texFullNameList[iTex];
 		}
 	}
 	

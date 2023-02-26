@@ -63,7 +63,8 @@ void ToolSystemMap::CreateFbxObject(std::wstring szFullPath, XMVECTOR vPos)
             }
             else
             {
-                std::wstring szFullPath = defaultDir + pFBXFile->m_ListNode[nodeCount]->m_ListTexture[nodeMaterialCount];
+                //std::wstring szFullPath = defaultDir + pFBXFile->m_ListNode[nodeCount]->m_ListTexture[nodeMaterialCount];
+                std::wstring szFullPath = pFBXFile->m_ListNode[nodeCount]->m_ListTexture[nodeMaterialCount];
                 listTex.push_back(_EngineSystem.GetTextureSystem()->CreateTextureFromFile(szFullPath.c_str()));
             }
             pMaterial->SetList(listTex);

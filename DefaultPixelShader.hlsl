@@ -40,12 +40,12 @@ float4 psmain(PS_INPUT input) : SV_TARGET
 	float3 is = float3(1.0f, 1.0f, 1.0f);
 	is *= tex.rgb;
 	float3 reflected_light = reflect(m_light_direction.xyz, input.normal);
-	float shininess = 30.0f;
+	float shininess = 10.0f;
 	float amount_specular_light = pow(max(0.0f, dot(reflected_light, input.direction_to_camera)), shininess);
 
 	float3 specular_light = ks * amount_specular_light * is;
 
 	float3 final_light = ambient_light + diffuse_light + specular_light;
 
-	return float4(final_light, 1.0f);
+	return tex;
 }
