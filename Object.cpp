@@ -132,9 +132,8 @@ void Object::Render()
 	{
 		_EngineSystem.GetRenderSystem()->SetVertexBuffer(m_pMesh->GetMeshNodeList()[idxNode]->GetVertexBuffer());
 		_EngineSystem.GetRenderSystem()->SetIndexBuffer(m_pMesh->GetMeshNodeList()[idxNode]->GetIndexBuffer());
-		_EngineSystem.GetRenderSystem()->setTexture(m_pVertexShader, m_pMaterial->GetListTexture(idxNode), m_pMaterial->GetNumTexture(idxNode));
-		_EngineSystem.GetRenderSystem()->setTexture(m_pPixelShader, m_pMaterial->GetListTexture(idxNode), m_pMaterial->GetNumTexture(idxNode));
-		//_EngineSystem.GetRenderSystem()->drawTriangleList(m_pMesh->GetVertexBuffer()[idx]->GetSizeList(), 0);
+		_EngineSystem.GetRenderSystem()->setTexture(m_pVertexShader, m_pMaterial->GetListTexture(idxNode), m_pMaterial->GetListTexture(idxNode).size());
+		_EngineSystem.GetRenderSystem()->setTexture(m_pPixelShader, m_pMaterial->GetListTexture(idxNode), m_pMaterial->GetListTexture(idxNode).size());
 		_EngineSystem.GetRenderSystem()->drawIndexedTriangleList(m_pMesh->GetMeshNodeList()[idxNode]->GetIndexBuffer()->getSizeIndexList(), 0, 0);
 	}
 }

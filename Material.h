@@ -4,15 +4,14 @@
 class Material
 {
 public:
-	unsigned int GetNumTexture(int nodeIdx);
-	Texture** GetListTexture(int nodeIdx);
-	void SetTexture(Texture** ppListTex, unsigned int iNumTextures);
+	void SetList(std::vector<Texture*> listTex);
+	std::vector<Texture*>& GetListTexture(int iNodeIdx);
+	void SetTexture(Texture* pTexture, unsigned int iNodeIdx);
 public:
 	Material();
 	~Material();
 private:
-	std::vector<Texture**> m_ListTextures;
-	std::vector<unsigned int> m_ListNumTextures;
+	std::vector<std::vector<Texture*>> m_ListTextures;
 	friend class Object;
 };
 

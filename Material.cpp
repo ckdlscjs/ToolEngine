@@ -1,16 +1,15 @@
 #include "Material.h"
-unsigned int Material::GetNumTexture(int nodeIdx)
+void Material::SetList(std::vector<Texture*> listTex)
 {
-	return m_ListNumTextures[nodeIdx];
+	m_ListTextures.push_back(listTex);
 }
-Texture** Material::GetListTexture(int nodeIdx)
+std::vector<Texture*>& Material::GetListTexture(int iNodeIdx)
 {
-	return m_ListTextures[nodeIdx];
+	return m_ListTextures[iNodeIdx];
 }
-void Material::SetTexture(Texture** ppListTex, unsigned int iNumTextures)
+void Material::SetTexture(Texture* pTexture, unsigned int iNodeIdx)
 {
-	m_ListTextures.push_back(ppListTex);
-	m_ListNumTextures.push_back(iNumTextures);
+	m_ListTextures[iNodeIdx].push_back(pTexture);
 }
 
 Material::Material()
@@ -22,7 +21,6 @@ Material::~Material()
 {
 	for (auto iter = m_ListTextures.begin(); iter != m_ListTextures.end(); )
 	{
-		delete (*iter);
 		iter = m_ListTextures.erase(iter);
 	}
 	m_ListTextures.clear();

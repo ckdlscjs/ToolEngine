@@ -44,6 +44,5 @@ public:
 	FbxNode* m_pRootNode;
 	std::vector<FBXNode*> m_ListNode;
 	std::unordered_map<FBXNode*, unsigned int> m_mapNode;
-	
 };
 

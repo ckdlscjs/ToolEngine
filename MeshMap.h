@@ -24,7 +24,7 @@ public:
 	void	ComputeVertexNormal(UINT iVertex);
 public:
 	MeshMap(UINT iWidth, UINT iHeight, float fShellDistance);
-	~MeshMap();
+	virtual ~MeshMap();
 public:
 	DWORD m_dwNumRows;
 	DWORD m_dwNumColumns;

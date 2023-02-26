@@ -14,8 +14,7 @@ FQuadTree::FQuadTree(Camera* pCamera, MeshMap* pMap, int iMaxDepth)
 
 FQuadTree::~FQuadTree()
 {
-    if (m_pRootNode != nullptr) delete m_pRootNode;
-    if (m_pMap) delete m_pMap;
+    if (m_pRootNode) delete m_pRootNode;
 }
 
 
@@ -97,7 +96,7 @@ FNode* FQuadTree::FindNode(FNode* pNode, Object* pObj)
     {
         if (pNode->m_pChild[i] != nullptr)
         {
-            if (TCollision::BoxToBox(pNode->m_pChild[i]->m_Box, pObj->m_Box));
+            if (TCollision::BoxToBox(pNode->m_pChild[i]->m_Box, pObj->m_Box))
             {
                 pNode = FindNode(pNode->m_pChild[i], pObj);
                 break;
@@ -268,8 +267,8 @@ void FQuadTree::Render()
         _EngineSystem.GetRenderSystem()->SetPixelShader(m_pPixelShader);
         _EngineSystem.GetRenderSystem()->SetVertexBuffer(m_pMap->m_pVertexBuffer);
         g_pDeviceContext->IASetIndexBuffer(m_pDrawLeafNodeList[idx]->m_pIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
-        _EngineSystem.GetRenderSystem()->setTexture(m_pVertexShader, m_pMaterial->GetListTexture(0), m_pMaterial->GetNumTexture(0));
-        _EngineSystem.GetRenderSystem()->setTexture(m_pPixelShader, m_pMaterial->GetListTexture(0), m_pMaterial->GetNumTexture(0));
+        _EngineSystem.GetRenderSystem()->setTexture(m_pVertexShader, m_pMaterial->GetListTexture(0), m_pMaterial->GetListTexture(0).size());
+        _EngineSystem.GetRenderSystem()->setTexture(m_pPixelShader, m_pMaterial->GetListTexture(0), m_pMaterial->GetListTexture(0).size());
         _EngineSystem.GetRenderSystem()->drawIndexedTriangleList(m_pDrawLeafNodeList[idx]->m_dwFace * 3, 0, 0);
     }
 }

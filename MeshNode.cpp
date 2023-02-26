@@ -20,6 +20,11 @@ IndexBuffer* MeshNode::GetIndexBuffer()
 	return m_pIndexBuffer;
 }
 
+//void MeshNode::SetTexture(Texture* pTexture)
+//{
+//	m_pTexture = pTexture;
+//}
+
 void MeshNode::SetVertexList(void* vertices, int iSize)
 {
 	for (int i = 0; i < iSize; i++)

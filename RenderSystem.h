@@ -19,7 +19,8 @@ public:
 	void CreateRasterizeState(ID3D11Device* pDevice);
 
 	/*Shader Block*/
-	void CompileShader(const wchar_t* szFilePath, const char* entryPointName, const char* shaderVersion, void** shaderCode, size_t* shaderSize);
+	void CompileVertexShader(const wchar_t* szFilePath, const char* entryPointName, const char* shaderVersion, void** shaderCode, size_t* shaderSize);
+	void CompilePixelShader(const wchar_t* szFilePath, const char* entryPointName, const char* shaderVersion, void** shaderCode, size_t* shaderSize);
 	void ReleaseBlob();
 	VertexShader* CreateVertexShader(const void* pCodeShader, size_t iSizeShader);
 	PixelShader* CreatePixelShader(const void* pCodeShader, size_t iSizeShader);
@@ -45,8 +46,8 @@ public:
 	void UpdateConstantBuffer(ConstantBuffer* pConstantBuffer, void* pBuffer);
 	void SetVertexShader(VertexShader* pVertexShader);
 	void SetPixelShader(PixelShader* pPixelShader);
-	void setTexture(const VertexShader* pVertexShader, Texture* const* ppListTex, unsigned int iNumTextures, unsigned int iNumStart = 0);
-	void setTexture(const PixelShader* pPixelShader, Texture* const* ppListTex, unsigned int iNumTextures, unsigned int iNumStart = 0);
+	void setTexture(const VertexShader* pVertexShader, const std::vector<Texture*>& pListTex, unsigned int iNumTextures, unsigned int iNumStart = 0);
+	void setTexture(const PixelShader* pPixelShader, const std::vector<Texture*>& pListTex, unsigned int iNumTextures, unsigned int iNumStart = 0);
 
 	/*Draw Block*/
 	void drawTriangleList(UINT iCountVertex, UINT iStartVertexLocation);
@@ -67,7 +68,8 @@ private:
 	Device* m_pCDevice;
 	SwapChain* m_pCSwapChain;
 	RasterizerState* m_pCRasterizerState;
-	ID3DBlob* m_pBlobCode;
+	ID3DBlob* m_pVSBlobCode;
+	ID3DBlob* m_pPSBlobCode;
 	ID3DBlob* m_pBlobErr;
 	bool m_bWireFrame;
 

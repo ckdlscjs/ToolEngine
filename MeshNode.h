@@ -1,7 +1,7 @@
 #pragma once
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
-
+#include "Texture.h"
 class MeshNode
 {
 public:
@@ -9,6 +9,7 @@ public:
 	std::vector<unsigned int>& GetListIndex();
 	VertexBuffer* GetVertexBuffer();
 	IndexBuffer* GetIndexBuffer();
+	//void SetTexture(Texture* pTexture);
 private:
 	void SetVertexList(void* vertices, int iSize);
 	void SetIndexList(void* indices, int iSize);
@@ -21,6 +22,7 @@ private:
 	std::vector<object> m_ListVertex;
 	VertexBuffer* m_pVertexBuffer;
 	std::vector<unsigned int> m_ListIndex;
+	//Texture* m_pTexture;
 	IndexBuffer* m_pIndexBuffer;
 };
 

@@ -33,58 +33,55 @@ void ToolSystemMap::CreateFbxObject(std::wstring szFullPath, XMVECTOR vPos)
     FBXFile* pFBXFile = _FBXSystem.LoadFile(_towm(szFullPath).c_str());
     Object* pObject = _ObjectSystem.CreateObject();
     Mesh* pMesh = new Mesh();
- 
     Material* pMaterial = new Material();
  
     void* shader_byte_code = nullptr;  
     size_t size_shader = 0;
-
-    _EngineSystem.GetRenderSystem()->CompileShader(L"DefaultVertexShader.hlsl", "vsmain", "vs_5_0", &shader_byte_code, &size_shader);
+    _EngineSystem.GetRenderSystem()->CompileVertexShader(L"DefaultVertexShader.hlsl", "vsmain", "vs_5_0", &shader_byte_code, &size_shader);
     VertexShader* pVertexShader = _EngineSystem.GetRenderSystem()->CreateVertexShader(shader_byte_code, size_shader);
-    for (int idx = 0; idx < pFBXFile->m_ListNode.size(); idx++)
+    
+    std::wstring defaultDir = L"../../data/fbx/";
+   
+    for (int nodeCount = 0; nodeCount < pFBXFile->m_ListNode.size(); nodeCount++)
     {
-        if (!pFBXFile->m_ListNode[idx]->m_ListVertexPNCT.size())
-            continue;
-        VertexBuffer* pVertexBuffer = _EngineSystem.GetRenderSystem()->CreateVertexBuffer(&pFBXFile->m_ListNode[idx]->m_ListVertexPNCT[0], sizeof(object), pFBXFile->m_ListNode[idx]->m_ListVertexPNCT.size(), shader_byte_code, size_shader);
-        IndexBuffer* pIndexBuffer = _EngineSystem.GetRenderSystem()->CreateIndexBuffer(&pFBXFile->m_ListNode[idx]->m_ListIndex[0], pFBXFile->m_ListNode[idx]->m_ListIndex.size());
-        /*pMesh->SetVertexBuffer(pVertexBuffer);
-        pMesh->SetIndexBuffer(pIndexBuffer);*/
+        for (int nodeMaterialCount = 0; nodeMaterialCount < pFBXFile->m_ListNode[nodeCount]->m_ListVertexPNCT.size(); nodeMaterialCount++)
+        {
+            if (!pFBXFile->m_ListNode[nodeCount]->m_ListVertexPNCT[nodeMaterialCount].size())
+                continue;
+            void* vertices = &pFBXFile->m_ListNode[nodeCount]->m_ListVertexPNCT[nodeMaterialCount][0];
+            UINT iSizeVertices = pFBXFile->m_ListNode[nodeCount]->m_ListVertexPNCT[nodeMaterialCount].size();
+            void* indices = &pFBXFile->m_ListNode[nodeCount]->m_ListIndex[nodeMaterialCount][0];
+            UINT iSizeIndices = pFBXFile->m_ListNode[nodeCount]->m_ListIndex[nodeMaterialCount].size();
+            VertexBuffer* pVertexBuffer = _EngineSystem.GetRenderSystem()->CreateVertexBuffer(vertices, sizeof(object), iSizeVertices, shader_byte_code, size_shader);
+            IndexBuffer* pIndexBuffer = _EngineSystem.GetRenderSystem()->CreateIndexBuffer(indices, iSizeIndices);
+            pMesh->SetMeshNode(vertices, iSizeVertices, pVertexBuffer, indices, iSizeIndices, pIndexBuffer);
+            
+            std::vector<Texture*> listTex;
+            if (pFBXFile->m_ListNode[nodeCount]->m_ListTexture[nodeMaterialCount].empty())
+            {
+                listTex.push_back(nullptr);
+            }
+            else
+            {
+                std::wstring szFullPath = defaultDir + pFBXFile->m_ListNode[nodeCount]->m_ListTexture[nodeMaterialCount];
+                listTex.push_back(_EngineSystem.GetTextureSystem()->CreateTextureFromFile(szFullPath.c_str()));
+            }
+            pMaterial->SetList(listTex);
+        }
     }
-    _EngineSystem.GetRenderSystem()->ReleaseBlob();
 
-    _EngineSystem.GetRenderSystem()->CompileShader(L"DefaultPixelShader.hlsl", "psmain", "ps_5_0", &shader_byte_code, &size_shader);
+    _EngineSystem.GetRenderSystem()->CompilePixelShader(L"DefaultPixelShader.hlsl", "psmain", "ps_5_0", &shader_byte_code, &size_shader);
     PixelShader* pPixelShader = _EngineSystem.GetRenderSystem()->CreatePixelShader(shader_byte_code, size_shader);
+    pObject->SetShader(pVertexShader, pPixelShader);
     _EngineSystem.GetRenderSystem()->ReleaseBlob();
     
-    
-
     pObject->SetConstantData(cc);
     pObject->SetTransform({ vPos , {0, 0, 0}, {1, 1, 1} });
     pObject->SetMesh(pMesh);
     pObject->SetMaterial(pMaterial);
-    pObject->SetShader(pVertexShader, pPixelShader);
-
-    if(m_pQuadTree)
+   
+    if (m_pQuadTree)
         m_pQuadTree->AddObject(pObject);
-
-    std::wstring defaultDir = L"../../data/fbx/";
-    for (int idx = 0; idx < pFBXFile->m_ListNode.size(); idx++)
-    {
-        if (!pFBXFile->m_ListNode[idx]->m_ListTexture.size())
-            continue;
-        Texture** listTexture = new Texture * [pFBXFile->m_ListNode[idx]->m_ListTexture.size()];
-        for (int item = 0; item < pFBXFile->m_ListNode[idx]->m_ListTexture.size(); item++)
-        {
-            if (pFBXFile->m_ListNode[idx]->m_ListTexture[item].empty())
-            {
-                listTexture[item] = 0;
-                continue;
-            }
-            std::wstring szFullPath = defaultDir + pFBXFile->m_ListNode[idx]->m_ListTexture[item];
-            listTexture[item] = _EngineSystem.GetTextureSystem()->CreateTextureFromFile(szFullPath.c_str());
-        }
-        pObject->m_pMaterial->SetTexture(listTexture, pFBXFile->m_ListNode[idx]->m_ListTexture.size());
-    }
 }
 
 void ToolSystemMap::CreateSimpleObject(int iChkIdx, XMVECTOR vPos)
@@ -145,31 +142,28 @@ void ToolSystemMap::CreateSimpleObject(int iChkIdx, XMVECTOR vPos)
     void* shader_byte_code = nullptr;
     size_t size_shader = 0;
 
-    _EngineSystem.GetRenderSystem()->CompileShader(L"DefaultVertexShader.hlsl", "vsmain", "vs_5_0", &shader_byte_code, &size_shader);
+    _EngineSystem.GetRenderSystem()->CompileVertexShader(L"DefaultVertexShader.hlsl", "vsmain", "vs_5_0", &shader_byte_code, &size_shader);
     VertexShader* pVertexShader = _EngineSystem.GetRenderSystem()->CreateVertexShader(shader_byte_code, size_shader);
     VertexBuffer* pVertexBuffer = _EngineSystem.GetRenderSystem()->CreateVertexBuffer(vertex_list, sizeof(object), size_vertex_list, shader_byte_code, size_shader);
     IndexBuffer* pIndexBuffer = _EngineSystem.GetRenderSystem()->CreateIndexBuffer(index_list, size_index_list);
-    _EngineSystem.GetRenderSystem()->ReleaseBlob();
-
-    _EngineSystem.GetRenderSystem()->CompileShader(L"DefaultPixelShader.hlsl", "psmain", "ps_5_0", &shader_byte_code, &size_shader);
+    _EngineSystem.GetRenderSystem()->CompilePixelShader(L"DefaultPixelShader.hlsl", "psmain", "ps_5_0", &shader_byte_code, &size_shader);
     PixelShader* pPixelShader = _EngineSystem.GetRenderSystem()->CreatePixelShader(shader_byte_code, size_shader);
     _EngineSystem.GetRenderSystem()->ReleaseBlob();
 
     pMesh->SetMeshNode(vertex_list, size_vertex_list, pVertexBuffer, index_list, size_index_list, pIndexBuffer);
 
-    Texture** listTexture = new Texture*[1];
-    listTexture[0] = _EngineSystem.GetTextureSystem()->CreateTextureFromFile(m_ListTexture[iChkIdx].c_str());
+    std::vector<Texture*> listTex;
+    listTex.push_back(_EngineSystem.GetTextureSystem()->CreateTextureFromFile(m_ListTexture[iChkIdx].c_str()));
+    pMaterial->SetList(listTex);
     
     pObject->SetConstantData(cc);
     pObject->SetTransform({ vPos , {0, 0, 0}, {1, 1, 1} });
     pObject->SetMesh(pMesh);
     pObject->SetMaterial(pMaterial);
     pObject->SetShader(pVertexShader, pPixelShader);
-    pObject->m_pMaterial->SetTexture(listTexture, 1);
 
     if (m_pQuadTree)
         m_pQuadTree->AddObject(pObject);
-
 }
 
 void ToolSystemMap::CreateSimpleMap(int iWidth, int iHeight, float fDistance, int iChkIdx)
@@ -185,20 +179,20 @@ void ToolSystemMap::CreateSimpleMap(int iWidth, int iHeight, float fDistance, in
     void* shader_byte_code = nullptr;
     size_t size_shader = 0;
 
-    _EngineSystem.GetRenderSystem()->CompileShader(L"DefaultVertexShader.hlsl", "vsmain", "vs_5_0", &shader_byte_code, &size_shader);
+    _EngineSystem.GetRenderSystem()->CompileVertexShader(L"DefaultVertexShader.hlsl", "vsmain", "vs_5_0", &shader_byte_code, &size_shader);
     VertexShader* pVertexShader = _EngineSystem.GetRenderSystem()->CreateVertexShader(shader_byte_code, size_shader);
     VertexBuffer* pVertexBuffer = _EngineSystem.GetRenderSystem()->CreateVertexBuffer(&pMapMesh->GetListVertex()[0], sizeof(object), pMapMesh->GetListVertex().size(), shader_byte_code, size_shader);
     IndexBuffer* pIndexBuffer = _EngineSystem.GetRenderSystem()->CreateIndexBuffer(&pMapMesh->GetListIndex()[0], pMapMesh->GetListIndex().size());
-    _EngineSystem.GetRenderSystem()->ReleaseBlob();
-
-    _EngineSystem.GetRenderSystem()->CompileShader(L"DefaultPixelShader.hlsl", "psmain", "ps_5_0", &shader_byte_code, &size_shader);
+    _EngineSystem.GetRenderSystem()->CompilePixelShader(L"DefaultPixelShader.hlsl", "psmain", "ps_5_0", &shader_byte_code, &size_shader);
     PixelShader* pPixelShader = _EngineSystem.GetRenderSystem()->CreatePixelShader(shader_byte_code, size_shader);
     _EngineSystem.GetRenderSystem()->ReleaseBlob();
 
     pMapMesh->m_pVertexBuffer = pVertexBuffer;
+    pMapMesh->m_pIndexBuffer = pIndexBuffer;
 
-    Texture** listTexture = new Texture * [1];
-    listTexture[0] = _EngineSystem.GetTextureSystem()->CreateTextureFromFile(m_ListTexture[iChkIdx].c_str());
+    std::vector<Texture*> listTex;
+    listTex.push_back(_EngineSystem.GetTextureSystem()->CreateTextureFromFile(m_ListTexture[iChkIdx].c_str()));
+    pMaterial->SetList(listTex);
 
     m_pQuadTree = new FQuadTree(m_pCamera, pMapMesh);
     m_pQuadTree->SetConstantData(cc);
@@ -206,7 +200,6 @@ void ToolSystemMap::CreateSimpleMap(int iWidth, int iHeight, float fDistance, in
     m_pQuadTree->SetMesh(pMapMesh);
     m_pQuadTree->SetMaterial(pMaterial);
     m_pQuadTree->SetShader(pVertexShader, pPixelShader);
-    m_pQuadTree->m_pMaterial->SetTexture(listTexture, 1);
     _ObjectSystem.AddObject(m_pQuadTree);
 }
 

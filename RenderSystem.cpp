@@ -2,22 +2,37 @@
 #include "WindowSystem.h"
 #include "ImguiSystem.h"
 
-void RenderSystem::CompileShader(const wchar_t* szFilePath, const char* entryPointName, const char* shaderVersion, void** shaderCode, size_t* shaderSize)
+void RenderSystem::CompileVertexShader(const wchar_t* szFilePath, const char* entryPointName, const char* shaderVersion, void** shaderCode, size_t* shaderSize)
 {
-    if (FAILED(D3DCompileFromFile(szFilePath, nullptr, nullptr, entryPointName, shaderVersion, NULL, NULL, &m_pBlobCode, &m_pBlobErr)))
+    if (FAILED(D3DCompileFromFile(szFilePath, nullptr, nullptr, entryPointName, shaderVersion, NULL, NULL, &m_pVSBlobCode, &m_pBlobErr)))
     {
         OutputDebugStringA((char*)m_pBlobErr->GetBufferPointer());
         if (m_pBlobErr) m_pBlobErr->Release();
-        if (m_pBlobCode) m_pBlobCode->Release();
-		throw std::exception("Shader not create successfully");
+        if (m_pVSBlobCode) m_pVSBlobCode->Release();
+		throw std::exception("VertexShader not create successfully");
     }
-    *shaderCode = m_pBlobCode->GetBufferPointer();
-    *shaderSize = m_pBlobCode->GetBufferSize();
+    *shaderCode = m_pVSBlobCode->GetBufferPointer();
+    *shaderSize = m_pVSBlobCode->GetBufferSize();
 }
+
+void RenderSystem::CompilePixelShader(const wchar_t* szFilePath, const char* entryPointName, const char* shaderVersion, void** shaderCode, size_t* shaderSize)
+{
+	if (FAILED(D3DCompileFromFile(szFilePath, nullptr, nullptr, entryPointName, shaderVersion, NULL, NULL, &m_pPSBlobCode, &m_pBlobErr)))
+	{
+		OutputDebugStringA((char*)m_pBlobErr->GetBufferPointer());
+		if (m_pBlobErr) m_pBlobErr->Release();
+		if (m_pVSBlobCode) m_pPSBlobCode->Release();
+		throw std::exception("PixelShader not create successfully");
+	}
+	*shaderCode = m_pPSBlobCode->GetBufferPointer();
+	*shaderSize = m_pPSBlobCode->GetBufferSize();
+}
+
 
 void RenderSystem::ReleaseBlob()
 {
-	if (m_pBlobCode) m_pBlobCode->Release();
+	if (m_pPSBlobCode) m_pPSBlobCode->Release();
+	if (m_pVSBlobCode) m_pVSBlobCode->Release();
 	if (m_pBlobErr) m_pBlobErr->Release();
 }
 
@@ -192,34 +207,35 @@ void RenderSystem::SetPixelShader(PixelShader* pPixelShader)
 	m_pCDevice->m_pImmediateContext->PSSetShader(pPixelShader->m_pPixelShader, nullptr, 0);
 }
 
-void RenderSystem::setTexture(const VertexShader* pVertexShader, Texture* const *ppListTex, unsigned int iNumTextures, unsigned int iNumStart)
+void RenderSystem::setTexture(const VertexShader* pVertexShader, const std::vector<Texture*>& pListTex, unsigned int iNumTextures, unsigned int iNumStart)
 {
 	ID3D11ShaderResourceView* listResources[32] = { 0, };
 	for (int idx = 0; idx < iNumTextures; idx++)
 	{
-		if (!ppListTex[idx])
+		if (pListTex[idx] == nullptr)
 			listResources[idx] = 0;
 		else
-			listResources[idx] = ppListTex[idx]->m_pShaderResourceView;
+			listResources[idx] = pListTex[idx]->m_pShaderResourceView;
+
 	}
 	m_pCDevice->m_pImmediateContext->VSSetShaderResources(0, iNumTextures, listResources);
 }
 
-void RenderSystem::setTexture(const PixelShader* pPixelShader, Texture* const* ppListTex, unsigned int iNumTextures, unsigned int iNumStart)
+void RenderSystem::setTexture(const PixelShader* pPixelShader, const std::vector<Texture*>& pListTex, unsigned int iNumTextures, unsigned int iNumStart)
 {
 	ID3D11ShaderResourceView* listResources[32] = { 0, };
 	ID3D11SamplerState* listSamplers[32] = { 0, };
 	for (int idx = 0; idx < iNumTextures; idx++)
 	{
-		if (!ppListTex[idx])
+		if (pListTex[idx] == nullptr)
 		{
 			listResources[idx] = 0;
 			listSamplers[idx] = 0;
 		}
 		else
 		{
-			listResources[idx] = ppListTex[idx + iNumStart]->m_pShaderResourceView;
-			listSamplers[idx] = ppListTex[idx + iNumStart]->m_pSamplerState;
+			listResources[idx] = pListTex[idx + iNumStart]->m_pShaderResourceView;
+			listSamplers[idx] = pListTex[idx + iNumStart]->m_pSamplerState;
 		}
 	}
 	m_pCDevice->m_pImmediateContext->PSSetShaderResources(0, iNumTextures, listResources);
