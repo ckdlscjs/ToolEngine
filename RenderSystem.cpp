@@ -187,6 +187,11 @@ void RenderSystem::SetConstantBuffer(PixelShader* pPixelShader, ConstantBuffer* 
 	m_pCDevice->m_pImmediateContext->PSSetConstantBuffers(0, 1, &pConstantBuffer->m_pBuffer);
 }
 
+void RenderSystem::UpdateIndexBuffer(IndexBuffer* pIndexBuffer, void* pBuffer)
+{
+	m_pCDevice->m_pImmediateContext->UpdateSubresource(pIndexBuffer->m_pBuffer, NULL, NULL, pBuffer, NULL, NULL);
+}
+
 void RenderSystem::UpdateVertexBuffer(VertexBuffer* pVertexBuffer, void* pBuffer)
 {
 	m_pCDevice->m_pImmediateContext->UpdateSubresource(pVertexBuffer->m_pBuffer, NULL, NULL, pBuffer, NULL, NULL);

@@ -27,8 +27,10 @@ T_BOX Object::CreateBoundingBox()
 	XMStoreFloat3(&min, minVertex);
 	if (max.y < _Epsilon)
 		max.y = 0;
-	if (min.y < _Epsilon)
-		max.y = 0;
+	XMFLOAT3 pos;
+	XMStoreFloat3(&pos, m_Transform.position);
+	max += pos;
+	min += pos;
 	box.Set(max, min);
 	return box;
 }

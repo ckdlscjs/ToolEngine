@@ -8,6 +8,7 @@ class FQuadTree : public Object
 {
 
 public:
+	void	UpdateNode(FNode* pNode);
 	Object* GetPickingObject();
 	UINT	SelectVertexList(T_BOX& box, std::vector<FNode*>& selectNodeList);
 	void	PickingMap(int iChkIdx, bool bPicking);

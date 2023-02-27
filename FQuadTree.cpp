@@ -18,6 +18,15 @@ FQuadTree::~FQuadTree()
 }
 
 
+void FQuadTree::UpdateNode(FNode* pNode)
+{
+    pNode->CreateIndexData(m_pMap);
+    if (pNode->m_bLeaf)
+        return;
+    for (int iChild = 0; iChild < 4; iChild++)
+        UpdateNode(pNode->m_pChild[iChild]);
+}
+
 Object* FQuadTree::GetPickingObject()
 {
     return pPickingObj;
@@ -178,18 +187,18 @@ bool FQuadTree::GetObjectPicking()
         {
             for (const auto& object : node->m_pDynamicObjectList)
             {
-                for (const auto& mesh : object->m_pMesh->GetMeshNodeList())
+                for (const auto& meshnode : object->m_pMesh->GetMeshNodeList())
                 {
                     UINT index = 0;
-                    UINT iNumFace = mesh->GetListIndex().size() / 3;
+                    UINT iNumFace = meshnode->GetListIndex().size() / 3;
                     for (UINT face = 0; face < iNumFace; face++)
                     {
-                        UINT i0 = mesh->GetListIndex()[index + 0];
-                        UINT i1 = mesh->GetListIndex()[index + 1];
-                        UINT i2 = mesh->GetListIndex()[index + 2];
-                        XMFLOAT3 v0 = mesh->GetListVertex()[i0].pos;
-                        XMFLOAT3 v1 = mesh->GetListVertex()[i1].pos;
-                        XMFLOAT3 v2 = mesh->GetListVertex()[i2].pos;
+                        UINT i0 = meshnode->GetListIndex()[index + 0];
+                        UINT i1 = meshnode->GetListIndex()[index + 1];
+                        UINT i2 = meshnode->GetListIndex()[index + 2];
+                        XMFLOAT3 v0 = meshnode->GetListVertex()[i0].pos;
+                        XMFLOAT3 v1 = meshnode->GetListVertex()[i1].pos;
+                        XMFLOAT3 v2 = meshnode->GetListVertex()[i2].pos;
                         XMVECTOR v_0 = XMVector3TransformCoord(XMLoadFloat3(&v0), object->constantData.matWorld);
                         XMVECTOR v_1 = XMVector3TransformCoord(XMLoadFloat3(&v1), object->constantData.matWorld);
                         XMVECTOR v_2 = XMVector3TransformCoord(XMLoadFloat3(&v2), object->constantData.matWorld);
@@ -239,13 +248,10 @@ void FQuadTree::Update()
                 {
                     float fValue = (fDistance / 30.0f) * 90.0f;
                     float fdot = cosf(_DegreeToRadian(fValue));
-                    m_pMap->GetListVertex()[iVertex].pos.y += fdot;/* *nodelist.size();*/
+                    m_pMap->GetListVertex()[iVertex].pos.y += fdot; /** nodelist.size();*/
                 }
             }
-            for (const auto& node : nodelist)
-            {
-                node->CreateIndexData(m_pMap);
-            }
+            UpdateNode(m_pRootNode);
             m_pMap->GenerateVertexNormal();
             _EngineSystem.GetRenderSystem()->UpdateVertexBuffer(m_pMap->m_pVertexBuffer, &m_pMap->GetListVertex()[0]);
         }

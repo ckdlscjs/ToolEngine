@@ -281,7 +281,7 @@ static XMFLOAT3 operator+=(XMFLOAT3& a, XMFLOAT3& b)
 {
 	a.x += b.x;
 	a.y += b.y;
-	a.y += b.z;
+	a.z += b.z;
 	return a;
 }
 
