@@ -15,7 +15,17 @@ Texture::Texture(const wchar_t* szFullPath) : Resource(szFullPath)
 	else
 		result = DirectX::LoadFromWICFile(szFullPath, DirectX::WIC_FLAGS_IGNORE_SRGB, nullptr, image_data);
 	if (FAILED(result))
-		throw std::exception("LoadTexture not successfully");
+	{
+		std::wstring defaultDir = L"../../data/fbx/";
+		defaultDir += GetSplitName(szFullPath);
+		if (GetSplitFile(_towm(szFullPath)) == "tga")
+			result = DirectX::LoadFromTGAFile(defaultDir.c_str(), nullptr, image_data);
+		else
+			result = DirectX::LoadFromWICFile(defaultDir.c_str(), DirectX::WIC_FLAGS_IGNORE_SRGB, nullptr, image_data);
+
+		if (FAILED(result))
+			throw std::exception("LoadTexture not successfully");
+	}
 	result = DirectX::CreateTexture(g_pDevice, image_data.GetImages(), image_data.GetImageCount(), image_data.GetMetadata(), &m_pTexture);
 	if (FAILED(result))
 		throw std::exception("Texture not create successfully");

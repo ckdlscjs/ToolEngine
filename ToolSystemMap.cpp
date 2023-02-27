@@ -40,7 +40,7 @@ void ToolSystemMap::CreateFbxObject(std::wstring szFullPath, XMVECTOR vPos)
     _EngineSystem.GetRenderSystem()->CompileVertexShader(L"DefaultVertexShader.hlsl", "vsmain", "vs_5_0", &shader_byte_code, &size_shader);
     VertexShader* pVertexShader = _EngineSystem.GetRenderSystem()->CreateVertexShader(shader_byte_code, size_shader);
     
-    std::wstring defaultDir = L"../../data/fbx/";
+    
    
     for (int nodeCount = 0; nodeCount < pFBXFile->m_ListNode.size(); nodeCount++)
     {

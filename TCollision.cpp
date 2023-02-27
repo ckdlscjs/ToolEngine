@@ -88,10 +88,11 @@ TCollisionType   TCollision::BoxToBox(T_BOX& a, T_BOX& b)
     float fMinY;    float fMaxY;
     float fMinZ;    float fMaxZ;
     fMinX = a.vMin.x < b.vMin.x ? a.vMin.x : b.vMin.x;
-    fMinY = a.vMin.y < b.vMin.y ? a.vMin.y : b.vMin.y;
     fMaxX = a.vMax.x > b.vMax.x ? a.vMax.x : b.vMax.x;
+
+    fMinY = a.vMin.y < b.vMin.y ? a.vMin.y : b.vMin.y;
     fMaxY = a.vMax.y > b.vMax.y ? a.vMax.y : b.vMax.y;
-    
+
     fMinZ = a.vMin.z < b.vMin.z ? a.vMin.z : b.vMin.z;
     fMaxZ = a.vMax.z > b.vMax.z ? a.vMax.z : b.vMax.z;
 
