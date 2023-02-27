@@ -251,6 +251,15 @@ void FQuadTree::Update()
                     m_pMap->GetListVertex()[iVertex].pos.y += fdot; /** nodelist.size();*/
                 }
             }
+
+            for (const auto& node : nodelist)
+            {
+                for (const auto& object : node->m_pDynamicObjectList)
+                {
+                    //updateObj;
+                }
+            }
+
             UpdateNode(m_pRootNode);
             m_pMap->GenerateVertexNormal();
             _EngineSystem.GetRenderSystem()->UpdateVertexBuffer(m_pMap->m_pVertexBuffer, &m_pMap->GetListVertex()[0]);

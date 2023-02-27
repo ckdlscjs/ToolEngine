@@ -18,6 +18,8 @@ public:
 	std::vector<object>& GetListVertex();
 	std::vector<DWORD>& GetListIndex();
 	void	UpdateBuffer(Camera* pCamera);
+	float	GetHeightmap(int row, int col);
+	float	GetHeight(float fPosX, float fPosZ);
 	void	LoadHeightMap(ID3D11Device* pDevice, ID3D11DeviceContext* pContext, std::wstring szFullPath);	//높이맵을만드는함수
 	void	GenerateVertexNormal();																		//각 버텍스정점의 법선노말생성
 	XMVECTOR ComputeFaceNormal(UINT i0, UINT i1, UINT i2);

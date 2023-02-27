@@ -332,3 +332,8 @@ static bool operator>=(XMFLOAT3& a, XMFLOAT3& b)
 	else
 		return false;
 }
+
+static float Lerp(float fStart, float fEnd, float fTangent)
+{
+	return fStart - (fStart * fTangent) + (fEnd * fTangent);
+}
