@@ -269,7 +269,7 @@ void FQuadTree::Update()
     if (m_bObjectPicking && GetObjectPicking())
     {
 
-    }
+    }   
 }
 
 void FQuadTree::Render()

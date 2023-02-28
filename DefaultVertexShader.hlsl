@@ -13,6 +13,7 @@ struct VS_OUTPUT
 	float3 normal : NORMAL0;
 	float4 color : COLOR0;
 	float3 direction_to_camera : TEXCOORD1;
+	float4 m_light_direction : TEXCOORD2;
 };
 
 //if using row_major, not transpose in cpp
@@ -34,6 +35,7 @@ VS_OUTPUT vsmain(VS_INPUT input)
 	output.position = mul(output.position, matView);	//View	Transform
 	output.position = mul(output.position, matProj);	//Proj	Transform
 
+	output.m_light_direction = float4(output.direction_to_camera,1.0f);
 	output.tex = input.tex;
 	output.normal = input.normal;
 	output.color = input.color;
