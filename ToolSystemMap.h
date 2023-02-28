@@ -14,6 +14,7 @@ public:
 	void SetWireframe(bool bWireFrame);
 	void SelectImage(int iChkIdx, bool bPicking);
 	void SelectSculpt(bool bPicking);
+	void SelectFbxObject(bool bPicking);
 	void SelectObject(bool bPicking);
 	void CreateFbxObject(std::wstring szFullPath, XMVECTOR vPos);
 	void CreateSimpleObject(int iChkIdx, XMVECTOR vPos);
