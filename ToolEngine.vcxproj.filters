@@ -211,9 +211,6 @@
     <ClInclude Include="Frustum.h">
       <Filter>CameraSystem\Frustum</Filter>
     </ClInclude>
-    <ClInclude Include="sylCollision.h">
-      <Filter>PhysicsSystem</Filter>
-    </ClInclude>
     <ClInclude Include="FNode.h">
       <Filter>ToolSystem\ToolSystemMap\MapObject</Filter>
     </ClInclude>
@@ -354,9 +351,6 @@
     </ClCompile>
     <ClCompile Include="Frustum.cpp">
       <Filter>CameraSystem\Frustum</Filter>
-    </ClCompile>
-    <ClCompile Include="sylCollision.cpp">
-      <Filter>PhysicsSystem</Filter>
     </ClCompile>
     <ClCompile Include="FNode.cpp">
       <Filter>ToolSystem\ToolSystemMap\MapObject</Filter>

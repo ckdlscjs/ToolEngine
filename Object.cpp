@@ -120,9 +120,7 @@ void Object::Update()
 		XMVectorGetY(_CameraSystem.GetCurrentCamera()->m_matWorld.r[3]),
 		XMVectorGetZ(_CameraSystem.GetCurrentCamera()->m_matWorld.r[3]),
 		XMVectorGetW(_CameraSystem.GetCurrentCamera()->m_matWorld.r[3]));
-	
 	_EngineSystem.GetRenderSystem()->UpdateConstantBuffer(m_pConstantBuffer, &constantData);
-	
 }
 
 void Object::Render()

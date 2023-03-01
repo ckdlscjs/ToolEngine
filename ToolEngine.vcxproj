@@ -61,7 +61,6 @@
     <ClInclude Include="stb_image.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="SwapChain.h" />
-    <ClInclude Include="sylCollision.h" />
     <ClInclude Include="TCollision.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="TextureSystem.h" />
@@ -111,7 +110,6 @@
     <ClCompile Include="ObjectSystem.cpp" />
     <ClCompile Include="ResourceSystem.cpp" />
     <ClCompile Include="SwapChain.cpp" />
-    <ClCompile Include="sylCollision.cpp" />
     <ClCompile Include="TCollision.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="TextureSystem.cpp" />
