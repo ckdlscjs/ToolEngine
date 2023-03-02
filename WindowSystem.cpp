@@ -81,7 +81,7 @@ bool WindowSystem::Initialize()
 		WS_OVERLAPPEDWINDOW,
 		CW_USEDEFAULT,
 		CW_USEDEFAULT,
-		1024, 768,
+		1280, 960,
 		NULL, NULL, NULL, NULL);
 
 	//CreationWindowFail

@@ -58,6 +58,18 @@ bool Object::Intersect(FSelect& select, float distance)
 	}
 	return false;
 }
+XMVECTOR Object::GetPosition()
+{
+	return m_Transform.position;
+}
+XMVECTOR Object::GetRotation()
+{
+	return m_Transform.rotation;
+}
+XMVECTOR Object::GetScale()
+{
+	return m_Transform.scale;
+}
 void Object::SetTransform(Transform transform)
 {
 	m_Transform = transform;

@@ -32,8 +32,8 @@ public:
 
 public:
 	bool m_bSclupting;
-	float m_fSculptRadius = 30.0f;
-	float m_fSculptIntensity = 90.0f;
+	float m_fSculptRadius = 10.0f;
+	float m_fSculptIntensity = 10.0f;
 	bool m_bMapPicking;
 
 	bool m_bObjectPicking;

@@ -220,9 +220,9 @@ bool FQuadTree::GetObjectPicking()
                         index += 3;
                     }
                 }
-                
             }
         }
+        pPickingObj = nullptr;
     }
     return false;
 }
@@ -249,7 +249,10 @@ void FQuadTree::Update()
         box.Set(vMax, vMin);
         if (SelectVertexList(box, nodelist) > 0)
         {
-            for (UINT iVertex = 0; iVertex < m_pMap->GetListVertex().size(); iVertex++)
+            //for (UINT iVertex = 0; iVertex < m_pMap->GetListVertex().size(); iVertex++)
+            int iVertex = nodelist[0]->m_IndexList[0];
+            int iVertexSize = nodelist[nodelist.size() - 1]->m_IndexList[nodelist[nodelist.size() - 1]->m_IndexList.size() - 1];
+            for (iVertex; iVertex < iVertexSize; iVertex++)
             {
                 XMFLOAT3 v0 = m_pMap->GetListVertex()[iVertex].pos;
                 XMVECTOR v = XMLoadFloat3(&v0) - m_Select.m_vIntersection;
@@ -261,12 +264,14 @@ void FQuadTree::Update()
                     m_pMap->GetListVertex()[iVertex].pos.y += fdot * m_fSculptIntensity;
                 }
             }
-
+           
             for (const auto& node : nodelist)
             {
                 for (const auto& object : node->m_pDynamicObjectList)
                 {
-                    //updateObj;
+                    XMFLOAT3 pos;
+                    XMStoreFloat3(&pos, object->GetPosition());
+                    object->SetTransform({ {pos.x, m_pMap->GetHeight(pos.x, pos.z), pos.z}, object->GetRotation(), object->GetScale() });
                 }
             }
 
@@ -279,7 +284,7 @@ void FQuadTree::Update()
     if (m_bObjectPicking && GetObjectPicking())
     {
 
-    }   
+    }
 }
 
 void FQuadTree::Render()

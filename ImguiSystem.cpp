@@ -2,6 +2,7 @@
 #include "EngineSystem.h"
 #include "WindowSystem.h"
 #include "ToolSystemMap.h"
+#include "InputSystem.h"
 
 // Forward declare message handler from imgui_impl_win32.cpp
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
@@ -235,21 +236,37 @@ void ImguiSystem::Update()
             }
             ImGui::Dummy({ 0, 10 });
 
-            if (_ToolSystemMap.m_pQuadTree != nullptr)
+            if (bOjbectPicking&&_InputSystem.GetKey(VK_RBUTTON) == KEY_STATE::KEY_DOWN)
             {
-                if (_ToolSystemMap.m_pQuadTree->GetPickingObject() != nullptr)
+                if (_ToolSystemMap.m_pQuadTree != nullptr)
                 {
-                    pObject = _ToolSystemMap.m_pQuadTree->GetPickingObject();
-                    XMVECTOR v_scale, v_rotation, v_translation;
-                    XMMatrixDecompose(&v_scale, &v_rotation, &v_translation, pObject->constantData.matWorld);
-                    scale[0] = v_scale.m128_f32[0]; scale[1] = v_scale.m128_f32[1]; scale[2] = v_scale.m128_f32[2];
-                    rotation[0] = v_rotation.m128_f32[0]; rotation[1] = v_rotation.m128_f32[1]; rotation[2] = v_rotation.m128_f32[2];
-                    position[0] = v_translation.m128_f32[0]; position[1] = v_translation.m128_f32[1]; position[2] = v_translation.m128_f32[2];
+                    if (_ToolSystemMap.m_pQuadTree->GetPickingObject() != nullptr)
+                    {
+                        pObject = _ToolSystemMap.m_pQuadTree->GetPickingObject();
+                        XMVECTOR v_scale, v_rotation, v_translation;
+                        XMMatrixDecompose(&v_scale, &v_rotation, &v_translation, pObject->constantData.matWorld);
+                        scale[0] = v_scale.m128_f32[0]; scale[1] = v_scale.m128_f32[1]; scale[2] = v_scale.m128_f32[2];
+                        rotation[0] = v_rotation.m128_f32[0]; rotation[1] = v_rotation.m128_f32[1]; rotation[2] = v_rotation.m128_f32[2];
+                        position[0] = v_translation.m128_f32[0]; position[1] = v_translation.m128_f32[1]; position[2] = v_translation.m128_f32[2];
+                    }
+                    else
+                    {
+                        scale[0] = 0; scale[1] = 0; scale[2] = 0;
+                        rotation[0] = 0; rotation[1] = 0; rotation[2] = 0;
+                        position[0] = 0; position[1] = 0; position[2] = 0;
+                    }
                 }
             }
             if (ImGui::Button("Object"))
             {
-               
+                if (_ToolSystemMap.m_pQuadTree != nullptr)
+                {
+                    if (_ToolSystemMap.m_pQuadTree->GetPickingObject() != nullptr)
+                    {
+                        pObject = _ToolSystemMap.m_pQuadTree->GetPickingObject();
+                        pObject->SetTransform({ {position[0], position[1],position[2]}, {rotation[0],rotation[1],rotation[2]}, {scale[0],scale[1],scale[2]} });
+                    }
+                }
             }
             ImGui::InputFloat3("scale", scale);
             ImGui::InputFloat3("rotation", rotation);

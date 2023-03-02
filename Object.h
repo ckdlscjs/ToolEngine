@@ -23,6 +23,9 @@ class Object
 public:
 	T_BOX CreateBoundingBox();
 	bool Intersect(FSelect& select, float distance);
+	XMVECTOR GetPosition();
+	XMVECTOR GetRotation();
+	XMVECTOR GetScale();
 	void SetTransform(Transform transform);
 	void SetMesh(Mesh* pMesh);
 	void SetMaterial(Material* pMaterial);
