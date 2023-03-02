@@ -12,6 +12,7 @@ public:
 	Object* GetPickingObject();
 	UINT	SelectVertexList(T_BOX& box, std::vector<FNode*>& selectNodeList);
 	void	SetPickingMap(int iChkIdx, bool bPicking);
+	void	SetPickingFbx(int iChkIdx, bool bPicking);
 	void	SetPickingObject(bool bPicking);
 	void	SetPickingSculpt(bool bPicking);
 	void	SetSculptRadius(float fRadius);

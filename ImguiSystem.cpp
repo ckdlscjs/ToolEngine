@@ -44,7 +44,8 @@ void ImguiSystem::Update()
             if (ImGui::Checkbox("MapPicking", &bMapPicking))
             {
                 ~bMapPicking;
-                _ToolSystemMap.SelectImage(image_current_idx, bMapPicking);
+                //_ToolSystemMap.SelectImage(image_current_idx, bMapPicking);
+                _ToolSystemMap.SelectFbxObject(fbx_current_idx, bMapPicking);
             }
 
             if (ImGui::Checkbox("OjbectPicking", &bOjbectPicking))

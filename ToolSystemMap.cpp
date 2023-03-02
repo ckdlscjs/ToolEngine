@@ -17,10 +17,12 @@ void ToolSystemMap::SelectSculpt(bool bPicking)
         m_pQuadTree->SetPickingSculpt(bPicking);
 }
 
-void ToolSystemMap::SelectFbxObject(bool bPicking)
+void ToolSystemMap::SelectFbxObject(int iChkIdx, bool bPicking)
 {
-
+    if (m_pQuadTree)
+        m_pQuadTree->SetPickingFbx(iChkIdx, bPicking);
 }
+
 
 void ToolSystemMap::SelectObject(bool bPicking)
 {

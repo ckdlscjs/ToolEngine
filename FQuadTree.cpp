@@ -150,6 +150,12 @@ void FQuadTree::SetPickingMap(int iChkIdx, bool bPicking)
     m_bMapPicking = bPicking;
 }
 
+void FQuadTree::SetPickingFbx(int iChkIdx, bool bPicking)
+{
+    m_iChkIdx = iChkIdx;
+    m_bMapPicking = bPicking;
+}
+
 void FQuadTree::SetPickingObject(bool bPicking)
 {
     m_bObjectPicking = bPicking;
@@ -334,7 +340,8 @@ void FQuadTree::Update()
     m_Select.SetMatrix(nullptr, &m_pCamera->m_matCamera, &m_pCamera->m_matProj);
     if (m_bMapPicking && GetInterSection())
     {
-        _ToolSystemMap.CreateSimpleObject(m_iChkIdx, m_Select.m_vIntersection);
+        //_ToolSystemMap.CreateSimpleObject(m_iChkIdx, m_Select.m_vIntersection);
+        _ToolSystemMap.CreateFbxObject(_ToolSystemMap.m_ListFbx[m_iChkIdx], m_Select.m_vIntersection);
     }
 
     if (m_bObjectPicking && (_InputSystem.GetKey(VK_RBUTTON) == KEY_STATE::KEY_DOWN))
