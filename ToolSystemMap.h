@@ -16,6 +16,7 @@ public:
 	void SelectSculpt(bool bPicking);
 	void SelectFbxObject(bool bPicking);
 	void SelectObject(bool bPicking);
+	void SelectSplatting(int iChkIdx, bool bSplatting);
 	void SetSculptRadius(float fRadius);
 	void SetSculptIntensity(float fIntensity);
 	void CreateFbxObject(std::wstring szFullPath, XMVECTOR vPos);

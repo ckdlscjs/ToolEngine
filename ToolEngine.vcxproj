@@ -29,6 +29,7 @@
     <ClInclude Include="FBXNode.h" />
     <ClInclude Include="FBXSample.h" />
     <ClInclude Include="FBXSystem.h" />
+    <ClInclude Include="FileSystem.h" />
     <ClInclude Include="FNode.h" />
     <ClInclude Include="FQuadTree.h" />
     <ClInclude Include="Frustum.h" />
@@ -80,6 +81,7 @@
     <ClCompile Include="FBXNode.cpp" />
     <ClCompile Include="FBXSample.cpp" />
     <ClCompile Include="FBXSystem.cpp" />
+    <ClCompile Include="FileSystem.cpp" />
     <ClCompile Include="FNode.cpp" />
     <ClCompile Include="FQuadTree.cpp" />
     <ClCompile Include="Frustum.cpp" />

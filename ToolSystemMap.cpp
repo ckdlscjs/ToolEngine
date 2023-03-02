@@ -8,13 +8,13 @@ void ToolSystemMap::SetWireframe(bool bWireFrame)
 void ToolSystemMap::SelectImage(int iChkIdx, bool bPicking)
 {
     if(m_pQuadTree)
-        m_pQuadTree->PickingMap(iChkIdx, bPicking);
+        m_pQuadTree->SetPickingMap(iChkIdx, bPicking);
 }
 
 void ToolSystemMap::SelectSculpt(bool bPicking)
 {
     if (m_pQuadTree)
-        m_pQuadTree->PickingSculpt(bPicking);
+        m_pQuadTree->SetPickingSculpt(bPicking);
 }
 
 void ToolSystemMap::SelectFbxObject(bool bPicking)
@@ -25,7 +25,14 @@ void ToolSystemMap::SelectFbxObject(bool bPicking)
 void ToolSystemMap::SelectObject(bool bPicking)
 {
     if (m_pQuadTree)
-        m_pQuadTree->PickingObject(bPicking);
+        m_pQuadTree->SetPickingObject(bPicking);
+}
+
+void ToolSystemMap::SelectSplatting(int iChkIdx, bool bSplatting)
+{
+    if (m_pQuadTree)
+        int a;
+        /*m_pQuadTree->PickingObject(bPicking);*/
 }
 
 void ToolSystemMap::SetSculptRadius(float fRadius)
@@ -179,6 +186,7 @@ void ToolSystemMap::CreateSimpleObject(int iChkIdx, XMVECTOR vPos)
     pObject->SetMesh(pMesh);
     pObject->SetMaterial(pMaterial);
     pObject->SetShader(pVertexShader, pPixelShader);
+    //pObject->SetShaderName(L"DefaultVertexShader.hlsl", L"DefaultPixelShader.hlsl");
 
     if (m_pQuadTree)
         m_pQuadTree->AddObject(pObject);

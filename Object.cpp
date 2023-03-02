@@ -103,6 +103,12 @@ void Object::SetShader(VertexShader* pVertexShader, PixelShader* pPixelShader)
 	m_pPixelShader = pPixelShader;
 }
 
+void Object::SetShaderName(std::wstring vsName, std::wstring psName)
+{
+	m_szVSName = vsName;
+	m_szPSName = psName;
+}
+
 void Object::SelectTexture(int iChkTex)
 {
 	m_iDefaultTexture = iChkTex == -1 ? 0 : iChkTex;
@@ -126,7 +132,6 @@ CULL_MODE Object::GetCullMode()
 void Object::Update()
 {
 	constantData.matView = _CameraSystem.GetCurrentCamera()->m_matCamera;
-	//constantData.m_light_direction = XMFLOAT4(-1, -1, 0, 0);
 	constantData.m_camera_position = XMFLOAT4(
 		XMVectorGetX(_CameraSystem.GetCurrentCamera()->m_matWorld.r[3]),
 		XMVectorGetY(_CameraSystem.GetCurrentCamera()->m_matWorld.r[3]),
@@ -150,6 +155,25 @@ void Object::Render()
 		_EngineSystem.GetRenderSystem()->drawIndexedTriangleList(m_pMesh->GetMeshNodeList()[idxNode]->GetIndexBuffer()->getSizeIndexList(), 0, 0);
 	}
 }
+
+void Object::DeSerialize() const
+{
+	
+}
+
+void Object::Serialize() const
+{
+	/*std::ofstream os("trans.bin");
+	os << << std::endl;
+	os.close();
+
+	Transform trans;
+	std::ifstream is("trans.bin");
+	
+
+	is.close();*/
+}
+
 
 Object::Object()
 {

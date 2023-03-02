@@ -103,6 +103,9 @@
     <Filter Include="EngineSystem\ObjectSystem\MeshSystem\MeshNode">
       <UniqueIdentifier>{fe92f711-f3b8-492c-85f6-69c25eb63973}</UniqueIdentifier>
     </Filter>
+    <Filter Include="FileSystem">
+      <UniqueIdentifier>{eba61a5b-381e-47f7-92e3-f908b64805ee}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="WindowSystem.h">
@@ -250,6 +253,7 @@
     <ClInclude Include="MeshNode.h">
       <Filter>EngineSystem\ObjectSystem\MeshSystem\MeshNode</Filter>
     </ClInclude>
+    <ClInclude Include="FileSystem.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WindowSystem.cpp">
@@ -391,6 +395,7 @@
     <ClCompile Include="MeshNode.cpp">
       <Filter>EngineSystem\ObjectSystem\MeshSystem\MeshNode</Filter>
     </ClCompile>
+    <ClCompile Include="FileSystem.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="imgui.ini">

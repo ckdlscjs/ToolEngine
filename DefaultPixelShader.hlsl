@@ -1,4 +1,7 @@
 Texture2D TextureColor : register(t0);
+//Texture2D g_txMaskTex : register(t1);
+//Texture2D g_txTex2 : register(t2);
+
 sampler TextureSamplerColor : register(s0);
 
 struct PS_INPUT

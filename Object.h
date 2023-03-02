@@ -30,12 +30,16 @@ public:
 	void SetMesh(Mesh* pMesh);
 	void SetMaterial(Material* pMaterial);
 	void SetShader(VertexShader* pVertexShader, PixelShader* pPixelShader);
+	void SetShaderName(std::wstring vsName, std::wstring psName);
 	void SelectTexture(int iChkTex = -1);
 	void SetConstantData(constant cc);
 	void SetCullMode(CULL_MODE mode);
 	CULL_MODE GetCullMode();
 	virtual void Update();
 	virtual void Render();
+public:
+	void DeSerialize() const;
+	void Serialize() const;
 public:
 	Object();
 	virtual ~Object();
@@ -45,7 +49,9 @@ protected:
 	Transform m_Transform;
 	Mesh* m_pMesh;
 	Material* m_pMaterial;
+	std::wstring m_szVSName;
 	VertexShader* m_pVertexShader;
+	std::wstring m_szPSName;
 	PixelShader* m_pPixelShader;
 	constant constantData;
 	ConstantBuffer* m_pConstantBuffer;

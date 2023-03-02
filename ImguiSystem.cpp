@@ -29,6 +29,7 @@ void ImguiSystem::Update()
     static bool bMapPicking = false;
     static bool bOjbectPicking = false;
     static bool bSculptPicking = false;
+    static bool bSplatting = false;
     static float fSculptRadius = 10.0f;
     static float fSculptIntensity = 10.0f;
     ImGui::Begin("Demo");
@@ -56,6 +57,12 @@ void ImguiSystem::Update()
             {
                 ~bSculptPicking;
                 _ToolSystemMap.SelectSculpt(bSculptPicking);
+            }
+
+            if (ImGui::Checkbox("Splatting", &bSplatting))
+            {
+                ~bSplatting;
+                _ToolSystemMap.SelectSplatting(image_current_idx, bSplatting);
             }
         }
         ImGui::Dummy({ 0, 10 });

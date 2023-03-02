@@ -123,6 +123,8 @@ struct constant
 	XMMATRIX matProj;
 	XMFLOAT4 m_light_direction;
 	XMFLOAT4 m_camera_position;
+	//XMINT2 m_world_size;
+	//float cell_distance;
 };
 
 struct iw_data

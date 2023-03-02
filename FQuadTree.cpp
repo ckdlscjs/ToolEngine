@@ -1,6 +1,102 @@
 #include "FQuadTree.h"
 #include "ToolSystemMap.h"
 #include "InputSystem.h"
+#include "WindowSystem.h"
+
+HRESULT FQuadTree::CreateAlphaTexture(DWORD dwWidth, DWORD dwHeight)
+{
+    HRESULT hr;
+    D3D11_TEXTURE2D_DESC desc;
+    ZeroMemory(&desc, sizeof(desc));
+    desc.Width = dwWidth;
+    desc.Height = dwHeight;
+    desc.MipLevels = 1;
+    desc.ArraySize = 1;
+    desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    desc.SampleDesc.Count = 1;
+    desc.SampleDesc.Quality = 0;
+    desc.Usage = D3D11_USAGE_DEFAULT;
+    desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+    desc.CPUAccessFlags = 0;
+    desc.MiscFlags = 0;
+
+    m_fAlphaData = new BYTE[dwWidth * dwHeight * 4];
+    for (UINT z = 0; z < dwHeight; z++)
+    {
+        for (UINT x = 0; x < dwWidth; x++)
+        {
+            BYTE* pixel = &m_fAlphaData[dwWidth * z * 4 + x * 4];
+            pixel[0] = 0;//r
+            pixel[1] = 0;//g
+            pixel[2] = 0;//b
+            pixel[3] = 0;//a
+        }
+    }
+    D3D11_SUBRESOURCE_DATA initData;
+    initData.pSysMem = m_fAlphaData;
+    initData.SysMemPitch = sizeof(BYTE) * 4 * dwWidth;
+    initData.SysMemSlicePitch = 0;
+    if (FAILED(hr = g_pDevice->CreateTexture2D(&desc, &initData, &m_pMaskAlphaTexture)))
+    {
+        return hr;
+    }
+    if (FAILED(hr = g_pDevice->CreateShaderResourceView(m_pMaskAlphaTexture, NULL, &m_pMaskAlphaSrv)))
+    {
+        return hr;
+    }
+
+    return hr;
+}
+
+void FQuadTree::Splatting(XMVECTOR vIntersection, UINT iSplattingTexIndex, float fSplattingRadius)
+{
+  
+    UINT const DataSize = sizeof(BYTE) * 4;
+    UINT const RowPitch = DataSize * 1024;
+    UINT const DepthPitch = 0;
+
+    // pick data    ->  texture data
+    // 0 ~ 64      ->   0 ~ 1
+    // - 32 ~ +32  ->   0 ~ 1024 -> 0 ~ 1
+    XMFLOAT2 vTexIndex;
+    XMFLOAT2 vUV;
+    XMFLOAT2 vMaxSize = { (float)m_pMap->m_dwNumColumns , (float)m_pMap->m_dwNumRows };
+
+    XMFLOAT3 vTexPos;
+    XMFLOAT3 vPickPos;
+    XMStoreFloat3(&vPickPos, vIntersection);
+
+    for (UINT y = 0; y < g_pWindow->GetClientWindowRect().bottom; y++)
+    {
+        vTexIndex.y = y;
+        for (UINT x = 0; x < g_pWindow->GetClientWindowRect().right; x++)
+        {
+            vTexIndex.x = x;
+            // -1 ~ +1
+            vUV = XMFLOAT2((vTexIndex.x / (float)g_pWindow->GetClientWindowRect().right) * 2.0f - 1.0f,
+                -(vTexIndex.y / (float)g_pWindow->GetClientWindowRect().bottom * 2.0f - 1.0f));
+            // -32 ~ +32
+            vTexPos = XMFLOAT3(vUV.x * vMaxSize.x, 0.0f, vUV.y * vMaxSize.y);
+            BYTE* pixel = &m_fAlphaData[g_pWindow->GetClientWindowRect().bottom * y * 4 + x * 4];
+            vPickPos -= vTexPos;
+            float fRadius = XMVectorGetX(XMVector3Length(XMLoadFloat3(&vPickPos)));
+
+            if (fRadius < fSplattingRadius)
+            {
+                float fDot = 1.0f - (fRadius / fSplattingRadius);
+                if (iSplattingTexIndex == 0 && (fDot * 255) > pixel[0])
+                    pixel[0] = fDot * 255;// (cosf(g_fGameTimer) * 0.5f + 0.5f) * 255.0f;
+                if (iSplattingTexIndex == 1 && (fDot * 255) > pixel[1])
+                    pixel[1] = fDot * 255;//g
+                if (iSplattingTexIndex == 2 && (fDot * 255) > pixel[2])
+                    pixel[2] = fDot * 255;//b
+                if (iSplattingTexIndex == 3 && (fDot * 255) > pixel[3])
+                    pixel[3] = fDot * 255;//a
+            }
+        }
+    }
+    g_pDeviceContext->UpdateSubresource(m_pMaskAlphaTexture, 0, nullptr, m_fAlphaData, RowPitch, DepthPitch);
+}
 
 FQuadTree::FQuadTree(Camera* pCamera, MeshMap* pMap, int iMaxDepth)
 {
@@ -48,18 +144,18 @@ UINT FQuadTree::SelectVertexList(T_BOX& box, std::vector<FNode*>& selectNodeList
     return selectNodeList.size();
 }
 
-void FQuadTree::PickingMap(int iChkIdx, bool bPicking)
+void FQuadTree::SetPickingMap(int iChkIdx, bool bPicking)
 {
     m_iChkIdx = iChkIdx;
     m_bMapPicking = bPicking;
 }
 
-void FQuadTree::PickingObject(bool bPicking)
+void FQuadTree::SetPickingObject(bool bPicking)
 {
     m_bObjectPicking = bPicking;
 }
 
-void FQuadTree::PickingSculpt(bool bPicking)
+void FQuadTree::SetPickingSculpt(bool bPicking)
 {
     m_bSclupting = bPicking;
 }
@@ -72,6 +168,11 @@ void FQuadTree::SetSculptRadius(float fRadius)
 void FQuadTree::SetSculptIntensity(float fIntensity)
 {
     m_fSculptIntensity = fIntensity;
+}
+
+void FQuadTree::SetSplatting(bool bSplatting)
+{
+    m_bSplatting = bSplatting;
 }
 
 BOOL FQuadTree::AddObject(Object* pObj)
@@ -188,42 +289,39 @@ bool FQuadTree::GetInterSection()
     return false;
 }
 
-bool FQuadTree::GetObjectPicking()
+bool FQuadTree::ObjectPicking()
 {
     //교점체크
-    if ((_InputSystem.GetKey(VK_RBUTTON) == KEY_STATE::KEY_DOWN))
+    for (const auto& node : m_pDrawLeafNodeList)
     {
-        for (const auto& node : m_pDrawLeafNodeList)
+        for (const auto& object : node->m_pDynamicObjectList)
         {
-            for (const auto& object : node->m_pDynamicObjectList)
+            for (const auto& meshnode : object->m_pMesh->GetMeshNodeList())
             {
-                for (const auto& meshnode : object->m_pMesh->GetMeshNodeList())
+                UINT index = 0;
+                UINT iNumFace = meshnode->GetListIndex().size() / 3;
+                for (UINT face = 0; face < iNumFace; face++)
                 {
-                    UINT index = 0;
-                    UINT iNumFace = meshnode->GetListIndex().size() / 3;
-                    for (UINT face = 0; face < iNumFace; face++)
+                    UINT i0 = meshnode->GetListIndex()[index + 0];
+                    UINT i1 = meshnode->GetListIndex()[index + 1];
+                    UINT i2 = meshnode->GetListIndex()[index + 2];
+                    XMFLOAT3 v0 = meshnode->GetListVertex()[i0].pos;
+                    XMFLOAT3 v1 = meshnode->GetListVertex()[i1].pos;
+                    XMFLOAT3 v2 = meshnode->GetListVertex()[i2].pos;
+                    XMVECTOR v_0 = XMVector3TransformCoord(XMLoadFloat3(&v0), object->constantData.matWorld);
+                    XMVECTOR v_1 = XMVector3TransformCoord(XMLoadFloat3(&v1), object->constantData.matWorld);
+                    XMVECTOR v_2 = XMVector3TransformCoord(XMLoadFloat3(&v2), object->constantData.matWorld);
+                    if (m_Select.ChkPick(v_0, v_1, v_2))
                     {
-                        UINT i0 = meshnode->GetListIndex()[index + 0];
-                        UINT i1 = meshnode->GetListIndex()[index + 1];
-                        UINT i2 = meshnode->GetListIndex()[index + 2];
-                        XMFLOAT3 v0 = meshnode->GetListVertex()[i0].pos;
-                        XMFLOAT3 v1 = meshnode->GetListVertex()[i1].pos;
-                        XMFLOAT3 v2 = meshnode->GetListVertex()[i2].pos;
-                        XMVECTOR v_0 = XMVector3TransformCoord(XMLoadFloat3(&v0), object->constantData.matWorld);
-                        XMVECTOR v_1 = XMVector3TransformCoord(XMLoadFloat3(&v1), object->constantData.matWorld);
-                        XMVECTOR v_2 = XMVector3TransformCoord(XMLoadFloat3(&v2), object->constantData.matWorld);
-                        if (m_Select.ChkPick(v_0, v_1, v_2))
-                        {
-                            pPickingObj = object;
-                            return true;
-                        }
-                        index += 3;
+                        pPickingObj = object;
+                        return true;
                     }
+                    index += 3;
                 }
             }
         }
-        pPickingObj = nullptr;
     }
+    pPickingObj = nullptr;
     return false;
 }
 
@@ -236,6 +334,11 @@ void FQuadTree::Update()
     if (m_bMapPicking && GetInterSection())
     {
         _ToolSystemMap.CreateSimpleObject(m_iChkIdx, m_Select.m_vIntersection);
+    }
+
+    if (m_bObjectPicking && (_InputSystem.GetKey(VK_RBUTTON) == KEY_STATE::KEY_DOWN))
+    {
+        ObjectPicking();
     }
 
     if (m_bSclupting && GetInterSection())
@@ -281,9 +384,9 @@ void FQuadTree::Update()
         }
     }
 
-    if (m_bObjectPicking && GetObjectPicking())
+    if (m_bSplatting && GetInterSection())
     {
-
+        Splatting(m_Select.m_vIntersection, m_iChkIdx);
     }
 }
 
