@@ -12,5 +12,6 @@ private:
 	ID3D11ShaderResourceView* m_pShaderResourceView;
 	ID3D11SamplerState* m_pSamplerState;
 	friend class RenderSystem;
+	friend class FQuadTree;
 };
 

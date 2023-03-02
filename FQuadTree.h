@@ -16,7 +16,7 @@ public:
 	void	SetPickingSculpt(bool bPicking);
 	void	SetSculptRadius(float fRadius);
 	void	SetSculptIntensity(float fIntensity);
-	void	SetSplatting(bool bSplatting);
+	void	SetSplatting(int iChkIdx, bool bSplatting);
 	BOOL	AddObject(Object* pObj);
 	void	BuildTree(FNode* pNode, MeshMap* pMap);
 	BOOL	IsSubDivide(FNode* pNode);
@@ -32,7 +32,6 @@ public:
 	BYTE* m_fAlphaData;
 	ID3D11Texture2D* m_pMaskAlphaTexture;
 	ID3D11ShaderResourceView* m_pMaskAlphaSrv;
-	Texture* m_pTextureSplatting;
 	HRESULT CreateAlphaTexture(DWORD dwWidth, DWORD dwHeight);
 	void    Splatting(XMVECTOR vIntersection, UINT iSplattingTexIndex, float fSplattingRadius = 5.0f);
 

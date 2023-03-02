@@ -31,8 +31,7 @@ void ToolSystemMap::SelectObject(bool bPicking)
 void ToolSystemMap::SelectSplatting(int iChkIdx, bool bSplatting)
 {
     if (m_pQuadTree)
-        int a;
-        /*m_pQuadTree->PickingObject(bPicking);*/
+        m_pQuadTree->SetSplatting(iChkIdx, bSplatting);
 }
 
 void ToolSystemMap::SetSculptRadius(float fRadius)

@@ -45,12 +45,12 @@ float MeshMap::GetHeight(float fPosX, float fPosZ)
 {
     // fPosX/fPosZ의 위치에 해당하는 높이맵셀을 찾는다.
     // m_iNumCols와m_iNumRows은 가로/세로의 실제 크기값임.
-    float fCellX = (float)(m_dwNumColumns * m_fShellDistance / 2.0f + fPosX);
-    float fCellZ = (float)(m_dwNumRows * m_fShellDistance / 2.0f - fPosZ);
+    float fCellX = (float)(m_dwNumColumns * m_fCellDistance / 2.0f + fPosX);
+    float fCellZ = (float)(m_dwNumRows * m_fCellDistance / 2.0f - fPosZ);
 
     // 셀의 크기로 나누어 0~1 단위의 값으로 바꾸어 높이맵 배열에 접근한다.
-    fCellX /= (float)m_fShellDistance;
-    fCellZ /= (float)m_fShellDistance;
+    fCellX /= (float)m_fCellDistance;
+    fCellZ /= (float)m_fCellDistance;
 
     // fCellX, fCellZ 값보다 작거나 같은 최대 정수( 소수부분을 잘라낸다.)
     float fVertexCol = ::floorf(fCellX);
@@ -206,9 +206,9 @@ void MeshMap::ComputeVertexNormal(UINT iVertex)
     XMStoreFloat3(&m_ListVertex[iVertex].normal, m_ListVertexInfo[iVertex].vNormal);
 }
 
-MeshMap::MeshMap(UINT iWidth, UINT iHeight, float fShellDistance)
+MeshMap::MeshMap(UINT iWidth, UINT iHeight, float fCellDistance)
 {
-    m_fShellDistance = fShellDistance;
+    m_fCellDistance = fCellDistance;
     m_dwNumRows = iHeight;
     m_dwNumColumns = iWidth;
     m_ListVertex.resize(m_dwNumRows * m_dwNumColumns);
@@ -223,10 +223,10 @@ MeshMap::MeshMap(UINT iWidth, UINT iHeight, float fShellDistance)
             float radRow = _DegreeToRadian(iRow);
             m_ListVertex[iRow * m_dwNumColumns + iCol].pos =
             {
-                (float)(iCol - iHalfWidth) * m_fShellDistance,
+                (float)(iCol - iHalfWidth) * m_fCellDistance,
                 //cosf(iCol) * fShellY + sinf(iRow) * fShellY,
                 0.0f,
-                (float)(iHalfHeight - iRow) * m_fShellDistance
+                (float)(iHalfHeight - iRow) * m_fCellDistance
             };
             if (m_fHeightList.size())
             {

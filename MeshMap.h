@@ -39,7 +39,7 @@ public:
 	std::vector<vertex_info> m_ListVertexInfo;	//정점법선노말
 	std::vector<face_info> m_ListFaceNormal;	//표면법선노말
 	float m_fShellY = 1.0f;
-	float m_fShellDistance = 1.0f;
+	float m_fCellDistance = 1.0f;
 	float m_fShellTexCount = 1.0f;
 	friend class FNode;
 	friend class FQuadTree;
