@@ -14,6 +14,8 @@ public:
 	void	PickingMap(int iChkIdx, bool bPicking);
 	void	PickingObject(bool bPicking);
 	void	PickingSculpt(bool bPicking);
+	void	SetSculptRadius(float fRadius);
+	void	SetSculptIntensity(float fIntensity);
 	BOOL	AddObject(Object* pObj);
 	void	BuildTree(FNode* pNode, MeshMap* pMap);
 	BOOL	IsSubDivide(FNode* pNode);
@@ -30,7 +32,10 @@ public:
 
 public:
 	bool m_bSclupting;
+	float m_fSculptRadius = 30.0f;
+	float m_fSculptIntensity = 90.0f;
 	bool m_bMapPicking;
+
 	bool m_bObjectPicking;
 	Object* pPickingObj;
 	int m_iChkIdx;

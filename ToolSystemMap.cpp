@@ -28,6 +28,18 @@ void ToolSystemMap::SelectObject(bool bPicking)
         m_pQuadTree->PickingObject(bPicking);
 }
 
+void ToolSystemMap::SetSculptRadius(float fRadius)
+{
+    if (m_pQuadTree)
+        m_pQuadTree->SetSculptRadius(fRadius);
+}
+
+void ToolSystemMap::SetSculptIntensity(float fIntensity)
+{
+    if (m_pQuadTree)
+        m_pQuadTree->SetSculptIntensity(fIntensity);
+}
+
 void ToolSystemMap::CreateFbxObject(std::wstring szFullPath, XMVECTOR vPos)
 {
     constant cc;

@@ -64,6 +64,16 @@ void FQuadTree::PickingSculpt(bool bPicking)
     m_bSclupting = bPicking;
 }
 
+void FQuadTree::SetSculptRadius(float fRadius)
+{
+    m_fSculptRadius = fRadius;
+}
+
+void FQuadTree::SetSculptIntensity(float fIntensity)
+{
+    m_fSculptIntensity = fIntensity;
+}
+
 BOOL FQuadTree::AddObject(Object* pObj)
 {
     FNode* pFindNode = FindNode(m_pRootNode, pObj);
@@ -244,11 +254,11 @@ void FQuadTree::Update()
                 XMFLOAT3 v0 = m_pMap->GetListVertex()[iVertex].pos;
                 XMVECTOR v = XMLoadFloat3(&v0) - m_Select.m_vIntersection;
                 float fDistance = XMVectorGetX(XMVector3Length(v));
-                if (fDistance <= 30.0f)
+                if (fDistance <= m_fSculptRadius)
                 {
-                    float fValue = (fDistance / 30.0f) * 90.0f;
+                    float fValue = (fDistance / m_fSculptRadius) * 90.0f;
                     float fdot = cosf(_DegreeToRadian(fValue));
-                    m_pMap->GetListVertex()[iVertex].pos.y += fdot; /** nodelist.size();*/
+                    m_pMap->GetListVertex()[iVertex].pos.y += fdot * m_fSculptIntensity;
                 }
             }
 

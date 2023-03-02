@@ -28,6 +28,8 @@ void ImguiSystem::Update()
     static bool bMapPicking = false;
     static bool bOjbectPicking = false;
     static bool bSculptPicking = false;
+    static float fSculptRadius = 10.0f;
+    static float fSculptIntensity = 10.0f;
     ImGui::Begin("Demo");
     {
         {
@@ -58,19 +60,19 @@ void ImguiSystem::Update()
         ImGui::Dummy({ 0, 10 });
 
         {
-            if (ImGui::Button("CreateObject"))
-                _ToolSystemMap.CreateFbxObject(_ToolSystemMap.m_ListFbx[fbx_current_idx], _CameraSystem.GetCurrentCamera()->m_vCameraPos);
-
-        }
-        ImGui::Dummy({ 0, 10 });
-
-        {
             if (ImGui::Button("CreateMap"))
             {
                 _ToolSystemMap.CreateSimpleMap(iMapSize + 1, iMapSize + 1, fMapDistance, image_current_idx);
             }
             ImGui::InputInt("MapSize", &iMapSize);
+
             ImGui::InputFloat("ShellDistance", &fMapDistance);
+
+            if (ImGui::InputFloat("Radius", &fSculptRadius))
+                _ToolSystemMap.SetSculptRadius(fSculptRadius);
+
+            if (ImGui::InputFloat("Intensity", &fSculptIntensity))
+                _ToolSystemMap.SetSculptIntensity(fSculptIntensity);
         }
         ImGui::Dummy({ 0, 10 });
 
@@ -81,25 +83,52 @@ void ImguiSystem::Update()
             }
         }
         ImGui::Dummy({ 0, 10 });
+        if (ImGui::Button("Open ImgFile"))
+            ifd::FileDialog::Instance().Open("ImageOpenDialog", "Open a Image", "Image file (*.png;*.jpg;*.jpeg;*.bmp;*.tga){.png,.jpg,.jpeg,.bmp,.tga},.*", true);
+        /*if (ImGui::Button("Open directory"))
+            ifd::FileDialog::Instance().Open("DirectoryOpenDialog", "Open a directory", "");
+        if (ImGui::Button("Save file"))
+            ifd::FileDialog::Instance().Save("ShaderSaveDialog", "Save a shader", "*.sprj {.sprj}");*/
 
+        if (ImGui::BeginListBox("listbox 1"))
+        {
+            for (int n = 0; n < _ToolSystemMap.m_ListTexture.size(); n++)
+            {
+                std::string fullpath = _towm(_ToolSystemMap.m_ListTexture[n]);
+
+                std::string content = GetSplitName(fullpath);
+
+                const bool is_selected = (image_current_idx == n);
+                if (ImGui::Selectable(content.c_str(), is_selected))
+                {
+                    image_current_idx = n;
+                    _ToolSystemMap.SelectImage(image_current_idx, bMapPicking);
+                }
+
+                // Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
+                if (is_selected)
+                    ImGui::SetItemDefaultFocus();
+            }
+            ImGui::EndListBox();
+        }
        
-        {
-            if (ImGui::Button("open"))
-            {
-                ifd::FileDialog::Instance().Open("ShaderOpenDialog", "Open a shader", "*.sav {.sav}", true);
-                _ToolSystemMap.OpenFile();
-            }
-        }
-        ImGui::Dummy({ 0, 10 });
+        //{
+        //    if (ImGui::Button("open"))
+        //    {
+        //        ifd::FileDialog::Instance().Open("ShaderOpenDialog", "Open a shader", "*.sav {.sav}", true);
+        //        _ToolSystemMap.OpenFile();
+        //    }
+        //}
+        //ImGui::Dummy({ 0, 10 });
 
-        {
-            if (ImGui::Button("save"))
-            {
-                ifd::FileDialog::Instance().Save("ShaderSaveDialog", "Save a shader", "*.txt {.txt}");
-                //_ToolSystemMap.SaveFile();
-            }
-        }
-        ImGui::Dummy({ 0, 10 });
+        //{
+        //    if (ImGui::Button("save"))
+        //    {
+        //        ifd::FileDialog::Instance().Save("ShaderSaveDialog", "Save a shader", "*.txt {.txt}");
+        //        //_ToolSystemMap.SaveFile();
+        //    }
+        //}
+        //ImGui::Dummy({ 0, 10 });
 
     }
     ImGui::End();
@@ -154,34 +183,12 @@ void ImguiSystem::Update()
 
     // Simple window
     ImGui::Begin("Control Panel");
-    if (ImGui::Button("Open ImgFile"))
-        ifd::FileDialog::Instance().Open("ImageOpenDialog", "Open a Image", "Image file (*.png;*.jpg;*.jpeg;*.bmp;*.tga){.png,.jpg,.jpeg,.bmp,.tga},.*", true);
-    /*if (ImGui::Button("Open directory"))
-        ifd::FileDialog::Instance().Open("DirectoryOpenDialog", "Open a directory", "");
-    if (ImGui::Button("Save file"))
-        ifd::FileDialog::Instance().Save("ShaderSaveDialog", "Save a shader", "*.sprj {.sprj}");*/
-  
-    if (ImGui::BeginListBox("listbox 1"))
     {
-        for (int n = 0; n < _ToolSystemMap.m_ListTexture.size(); n++)
-        {
-            std::string fullpath = _towm(_ToolSystemMap.m_ListTexture[n]);
+        if (ImGui::Button("CreateObject"))
+            _ToolSystemMap.CreateFbxObject(_ToolSystemMap.m_ListFbx[fbx_current_idx], _CameraSystem.GetCurrentCamera()->m_vCameraPos);
 
-            std::string content = GetSplitName(fullpath);
-                
-            const bool is_selected = (image_current_idx == n);
-            if (ImGui::Selectable(content.c_str(), is_selected))
-            {
-                image_current_idx = n;
-                _ToolSystemMap.SelectImage(image_current_idx, bMapPicking);
-            }
-                
-            // Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
-            if (is_selected)
-                ImGui::SetItemDefaultFocus();
-        }
-        ImGui::EndListBox();
     }
+    ImGui::Dummy({ 0, 10 });
     if (ImGui::Button("Open Fbxfile"))
         ifd::FileDialog::Instance().Open("FbxOpenDialog", "Open a Fbx", "Fbx file (*.fbx;*.FBX){.fbx,.FBX},.*", true);
     if (ImGui::BeginListBox("listbox 2"))
