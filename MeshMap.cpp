@@ -160,9 +160,8 @@ void MeshMap::GenerateVertexNormal()
     }
 
     m_ListVertexInfo.resize(m_dwNumRows * m_dwNumColumns);  //VertexInfo Resize
-    for (UINT iFace = 0; iFace < m_ListVertexInfo.size(); iFace++)
+    for (UINT iFace = 0; iFace < m_ListFaceNormal.size(); iFace++)
     {
-        
         UINT v0 = m_ListFaceNormal[iFace].vertexArray[0];
         UINT v1 = m_ListFaceNormal[iFace].vertexArray[1];
         UINT v2 = m_ListFaceNormal[iFace].vertexArray[2];
@@ -205,14 +204,6 @@ void MeshMap::ComputeVertexNormal(UINT iVertex)
     }
     m_ListVertexInfo[iVertex].vNormal = XMVector3Normalize(m_ListVertexInfo[iVertex].vNormal); //최종적인 특정 정점의 정점노말값(최대6면)
     XMStoreFloat3(&m_ListVertex[iVertex].normal, m_ListVertexInfo[iVertex].vNormal);
-//#ifdef _DEBUG
-//    XMFLOAT3 vLight = { -1, 0, 0 };
-//    XMFLOAT3 vTarget = { 0, 0, 0 };
-//    XMFLOAT3 vDir = vTarget - vLight;
-//    XMStoreFloat3(&vLight, XMVector3Normalize(XMLoadFloat3(&vLight)));
-//    float fDot = XMVectorGetX(XMVector3Dot(-XMLoadFloat3(&vLight), XMLoadFloat3(&m_ListVertex[iVertex].normal)));
-//    m_ListVertex[iVertex].color = { fDot + 0.3f ,fDot + 0.3f ,fDot + 0.3f , 1 };
-//#endif
 }
 
 MeshMap::MeshMap(UINT iWidth, UINT iHeight, float fShellDistance)

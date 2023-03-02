@@ -215,6 +215,19 @@ void ImguiSystem::Update()
     ImGui::Begin("Control Panel2");
     {
         {
+            {
+                XMVECTOR pos = _ToolSystemMap.m_pCamera->m_vCameraPos;
+                float cam_pos[3] = { XMVectorGetX(pos),XMVectorGetY(pos),XMVectorGetZ(pos) };
+                XMVECTOR dir = _ToolSystemMap.m_pCamera->m_vCameraDir;
+                float cam_dir[3] = { XMVectorGetX(dir),XMVectorGetY(dir),XMVectorGetZ(dir) };
+                XMVECTOR up = _ToolSystemMap.m_pCamera->m_vCameraUp;
+                float cam_up[3] = { XMVectorGetX(up),XMVectorGetY(up),XMVectorGetZ(up) };
+                ImGui::InputFloat3("cam_pos", cam_pos);
+                ImGui::InputFloat3("cam_dir", cam_dir);
+                ImGui::InputFloat3("cam_up", cam_up);
+            }
+            ImGui::Dummy({ 0, 10 });
+
             if (_ToolSystemMap.m_pQuadTree != nullptr)
             {
                 if (_ToolSystemMap.m_pQuadTree->GetPickingObject() != nullptr)

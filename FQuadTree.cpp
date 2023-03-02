@@ -274,13 +274,13 @@ void FQuadTree::Update()
 
 void FQuadTree::Render()
 {
+    _EngineSystem.GetRenderSystem()->SetConstantBuffer(m_pVertexShader, m_pConstantBuffer);
+    _EngineSystem.GetRenderSystem()->SetConstantBuffer(m_pPixelShader, m_pConstantBuffer);
+    _EngineSystem.GetRenderSystem()->SetVertexShader(m_pVertexShader);
+    _EngineSystem.GetRenderSystem()->SetPixelShader(m_pPixelShader);
+    _EngineSystem.GetRenderSystem()->SetVertexBuffer(m_pMap->m_pVertexBuffer);
     for (int idx = 0;  idx < m_pDrawLeafNodeList.size(); idx++)
     {
-        _EngineSystem.GetRenderSystem()->SetConstantBuffer(m_pVertexShader, m_pConstantBuffer);
-        _EngineSystem.GetRenderSystem()->SetConstantBuffer(m_pPixelShader, m_pConstantBuffer);
-        _EngineSystem.GetRenderSystem()->SetVertexShader(m_pVertexShader);
-        _EngineSystem.GetRenderSystem()->SetPixelShader(m_pPixelShader);
-        _EngineSystem.GetRenderSystem()->SetVertexBuffer(m_pMap->m_pVertexBuffer);
         g_pDeviceContext->IASetIndexBuffer(m_pDrawLeafNodeList[idx]->m_pIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
         _EngineSystem.GetRenderSystem()->setTexture(m_pVertexShader, m_pMaterial->GetListTexture(0), m_pMaterial->GetListTexture(0).size());
         _EngineSystem.GetRenderSystem()->setTexture(m_pPixelShader, m_pMaterial->GetListTexture(0), m_pMaterial->GetListTexture(0).size());

@@ -71,7 +71,6 @@ void EntrySystem::Update()
 
 void EntrySystem::Render()
 {
- 
     _ObjectSystem.Render();
     _ImguiSystem.Render();
     _EngineSystem.Render();

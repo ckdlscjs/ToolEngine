@@ -36,8 +36,8 @@ VS_OUTPUT vsmain(VS_INPUT input)
 	output.position = mul(output.position, matProj);	//Proj	Transform
 
 	output.m_light_direction = float4(output.direction_to_camera,1.0f);
-	output.tex = input.tex;
 	output.normal = input.normal;
+	output.tex = input.tex;
 	output.color = input.color;
 	return output;
 }
