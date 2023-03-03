@@ -112,6 +112,7 @@ void ImguiSystem::Update()
                 {
                     image_current_idx = n;
                     _ToolSystemMap.SelectImage(image_current_idx, bMapPicking);
+                    _ToolSystemMap.SelectSplatting(image_current_idx, bSplatting);
                 }
 
                 // Set the initial focus when opening the combo (scrolling + keyboard navigation focus)

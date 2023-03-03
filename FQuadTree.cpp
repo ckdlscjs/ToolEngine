@@ -51,7 +51,7 @@ HRESULT FQuadTree::CreateAlphaTexture(DWORD dwWidth, DWORD dwHeight)
 void FQuadTree::Splatting(XMVECTOR vIntersection, UINT iSplattingTexIndex, float fSplattingRadius)
 {
     UINT const DataSize = sizeof(BYTE) * 4;
-    UINT const RowPitch = DataSize * 1024;
+    UINT const RowPitch = DataSize * m_pMap->m_dwNumRows;
     UINT const DepthPitch = 0;
 
     // pick data    ->  texture data
@@ -59,37 +59,36 @@ void FQuadTree::Splatting(XMVECTOR vIntersection, UINT iSplattingTexIndex, float
     // - 32 ~ +32  ->   0 ~ 1024 -> 0 ~ 1
     XMFLOAT2 vTexIndex;
     XMFLOAT2 vUV;
-    XMFLOAT2 vMaxSize = { (float)(m_pMap->m_dwNumColumns / 2) , (float)(m_pMap->m_dwNumRows / 2) };
-    UINT     iTexSize = 1024;
+    XMFLOAT2 vMaxSize = { (float)(m_pMap->m_dwNumRows / 2), (float)(m_pMap->m_dwNumColumns / 2) };
     XMFLOAT3 vTexPos;
     XMFLOAT3 vPickPos;
     XMStoreFloat3(&vPickPos, vIntersection);
 
-    for (UINT y = 0; y < iTexSize; y++)
+    for (UINT y = 0; y < m_pMap->m_dwNumColumns; y++)
     {
         vTexIndex.y = y;
-        for (UINT x = 0; x < iTexSize; x++)
+        for (UINT x = 0; x < m_pMap->m_dwNumRows; x++)
         {
             vTexIndex.x = x;
             // tex uv 0 ~ 1 to -1 ~ 1
-            vUV = XMFLOAT2((vTexIndex.x / (float)iTexSize) * 2.0f - 1.0f,
-                -(vTexIndex.y / (float)iTexSize * 2.0f - 1.0f));
+            vUV = XMFLOAT2((vTexIndex.x / (float)m_pMap->m_dwNumRows) * 2.0f - 1.0f,
+                -(vTexIndex.y / (float)m_pMap->m_dwNumColumns * 2.0f - 1.0f));
             // 맵사이즈크기만큼
             vTexPos = XMFLOAT3(vUV.x * vMaxSize.x, 0.0f, vUV.y * vMaxSize.y);  //x and z
-            BYTE* pixel = &m_fAlphaData[iTexSize * y * 4 + x * 4];
+            BYTE* pixel = &m_fAlphaData[m_pMap->m_dwNumRows * y * 4 + x * 4];
             XMFLOAT3 radius =  vPickPos - vTexPos;
             float fRadius = XMVectorGetX(XMVector3Length(XMLoadFloat3(&radius)));
 
             if (fRadius < fSplattingRadius)
             {
                 float fDot = 1.0f - (fRadius / fSplattingRadius); //지점부터 범위까지, splattingRadius가 기준, 멀어질수록 fdot의값이 작아져 연해진다
-                if (iSplattingTexIndex == 0 && (fDot * 255) > pixel[0])
+                if ((fDot * 255) > pixel[0])
                     pixel[0] = fDot * 255;//r
-                if (iSplattingTexIndex == 0 && (fDot * 255) > pixel[1])
+                if ((fDot * 255) > pixel[1])
                     pixel[1] = fDot * 255;//g
-                if (iSplattingTexIndex == 0 && (fDot * 255) > pixel[2])
+                if ((fDot * 255) > pixel[2])
                     pixel[2] = fDot * 255;//b
-                if (iSplattingTexIndex == 0 && (fDot * 255) > pixel[3])
+                if ((fDot * 255) > pixel[3])
                     pixel[3] = fDot * 255;//a
             }
         }
@@ -109,7 +108,7 @@ FQuadTree::FQuadTree(Camera* pCamera, MeshMap* pMap, int iMaxDepth)
     m_constantDataMap.matProj = XMMatrixIdentity();
     m_pConstantBuffer = _EngineSystem.GetRenderSystem()->CreateConstantBuffer(&m_constantDataMap, sizeof(m_constantDataMap));
 
-    CreateAlphaTexture(1024, 1024);
+    CreateAlphaTexture(m_pMap->m_dwNumRows, m_pMap->m_dwNumColumns);
     BuildTree(m_pRootNode, pMap);
 }
 
