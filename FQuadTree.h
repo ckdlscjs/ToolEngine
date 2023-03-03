@@ -1,16 +1,13 @@
 #pragma once
 #include "FNode.h"
 #include "MeshMap.h"
-#include "Object.h"
 #include "FSelect.h"
-//picking temp
-class FQuadTree : public Object
+#include "Object.h"
+
+class FQuadTree
 {
 
 public:
-	void	UpdateNode(FNode* pNode);
-	Object* GetPickingObject();
-	UINT	SelectVertexList(T_BOX& box, std::vector<FNode*>& selectNodeList);
 	void	SetPickingMap(int iChkIdx, bool bPicking);
 	void	SetPickingFbx(int iChkIdx, bool bPicking);
 	void	SetPickingObject(bool bPicking);
@@ -18,6 +15,16 @@ public:
 	void	SetSculptRadius(float fRadius);
 	void	SetSculptIntensity(float fIntensity);
 	void	SetSplatting(int iChkIdx, bool bSplatting);
+
+	void	SetTransform(Transform transform);
+	void	SetMaterial(Material* pMaterial);
+	void	SetTexture(Texture* pTexture);
+	void	SetShader(VertexShader* pVertexShader, PixelShader* pPixelShader);
+	void	SetShaderName(std::wstring vsName, std::wstring psName);
+	void	SetConstantData(constant_map cc);
+	UINT	SelectVertexList(T_BOX& box, std::vector<FNode*>& selectNodeList);
+	void	UpdateNode(FNode* pNode);
+	Object* GetPickingObject();
 	BOOL	AddObject(Object* pObj);
 	void	BuildTree(FNode* pNode, MeshMap* pMap);
 	BOOL	IsSubDivide(FNode* pNode);
@@ -41,6 +48,7 @@ public:
 	~FQuadTree();
 
 public:
+
 	bool m_bSclupting;
 	float m_fSculptRadius = 10.0f;
 	float m_fSculptIntensity = 10.0f;
@@ -52,13 +60,23 @@ public:
 	bool m_bSplatting;
 
 	int m_iChkIdx;
-	FNode* m_pRootNode;
 	int m_iMaxDepth;
+	FNode* m_pRootNode;
 	FSelect m_Select;
 	MeshMap* m_pMap = nullptr;
+	Material* m_pMaterial;
+	Texture* m_pTexture;
+	Transform m_Transform;
+	constant_map m_constantDataMap;
+	ConstantBuffer* m_pConstantBuffer;
+	std::wstring m_szVSName;
+	VertexShader* m_pVertexShader;
+	std::wstring m_szPSName;
+	PixelShader* m_pPixelShader;
 	Camera* m_pCamera = nullptr;
 	std::vector<FNode*> m_pLeafNodeList;
 	std::vector<FNode*> m_pDrawLeafNodeList;
+
 	friend class FNode;
 	friend class ToolSystemMap;
 };

@@ -33,7 +33,7 @@ float4 psmain(PS_INPUT input) : SV_TARGET
 	float kd = 0.8f;
 	float3 id = float3(1.0f, 1.0f, 1.0f);
 	id *= tex.rgb;
-	
+
 	float amount_diffuse_light = max(0.0f, dot(input.normal , -input.m_light_direction.xyz));
 	float3 diffuse_light = kd * amount_diffuse_light * id;
 
@@ -47,7 +47,7 @@ float4 psmain(PS_INPUT input) : SV_TARGET
 
 	float3 specular_light = ks * amount_specular_light * is;
 
-	float3 final_light = ambient_light + diffuse_light +specular_light;
+	float3 final_light = ambient_light + diffuse_light + specular_light;
 
 	return float4(final_light, 1.0f);
 }

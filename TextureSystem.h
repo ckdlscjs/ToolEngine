@@ -4,6 +4,7 @@
 class TextureSystem : public ResourceSystem
 {
 public:
+	Texture* GetTexture(std::wstring szName);
 	TextureSystem();
 	~TextureSystem();
 	Texture* CreateTextureFromFile(const wchar_t* szFilePath);

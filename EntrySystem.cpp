@@ -65,6 +65,7 @@ void EntrySystem::Update()
     /*POINT pt = _InputSystem.GetPos();
    std::cout << pt.x << " | " << pt.y << std::endl;*/
     _ImguiSystem.Update();
+    _ToolSystemMap.Update();
     _ObjectSystem.Update();
 
 }
@@ -72,6 +73,7 @@ void EntrySystem::Update()
 void EntrySystem::Render()
 {
     _ObjectSystem.Render();
+    _ToolSystemMap.Render();
     _ImguiSystem.Render();
     _EngineSystem.Render();
 }

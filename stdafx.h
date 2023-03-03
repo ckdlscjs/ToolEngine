@@ -123,6 +123,16 @@ struct constant
 	XMMATRIX matProj;
 	XMFLOAT4 m_light_direction;
 	XMFLOAT4 m_camera_position;
+};
+
+__declspec(align(16))
+struct constant_map
+{
+	XMMATRIX matWorld;
+	XMMATRIX matView;
+	XMMATRIX matProj;
+	XMFLOAT4 m_light_direction;
+	XMFLOAT4 m_camera_position;
 	XMFLOAT2 m_world_size;
 	float m_cell_distance;
 };

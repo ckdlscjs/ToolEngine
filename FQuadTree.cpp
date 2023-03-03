@@ -103,13 +103,27 @@ FQuadTree::FQuadTree(Camera* pCamera, MeshMap* pMap, int iMaxDepth)
     m_pMap = pMap;
     m_iMaxDepth = iMaxDepth;
     m_pRootNode = new FNode(nullptr, pMap, 0, m_pMap->m_dwNumColumns - 1, m_pMap->m_dwNumRows * (m_pMap->m_dwNumColumns - 1), m_pMap->m_dwNumRows * m_pMap->m_dwNumColumns - 1);
+
+    m_constantDataMap.matWorld = XMMatrixIdentity();
+    m_constantDataMap.matView = XMMatrixIdentity();
+    m_constantDataMap.matProj = XMMatrixIdentity();
+    m_pConstantBuffer = _EngineSystem.GetRenderSystem()->CreateConstantBuffer(&m_constantDataMap, sizeof(m_constantDataMap));
+
     CreateAlphaTexture(1024, 1024);
     BuildTree(m_pRootNode, pMap);
 }
 
 FQuadTree::~FQuadTree()
 {
+    if (m_pMap) delete m_pMap;
+    if (m_pMaterial) delete m_pMaterial;
+    if (m_fAlphaData) delete m_fAlphaData;
+    if (m_pMaskAlphaTexture) m_pMaskAlphaTexture->Release();
+    if (m_pMaskAlphaSrv) m_pMaskAlphaSrv->Release();
     if (m_pRootNode) delete m_pRootNode;
+    if (m_pConstantBuffer) delete m_pConstantBuffer;
+    if (m_pVertexShader) delete m_pVertexShader;
+    if (m_pPixelShader) delete m_pPixelShader;
 }
 
 
@@ -179,6 +193,50 @@ void FQuadTree::SetSplatting(int iChkIdx, bool bSplatting)
 {
     m_iChkIdx = iChkIdx;
     m_bSplatting = bSplatting;
+}
+
+void FQuadTree::SetTransform(Transform transform)
+{
+    m_Transform = transform;
+
+    XMVECTOR scale = m_Transform.scale;
+    XMFLOAT3 rotateAngle;
+    XMStoreFloat3(&rotateAngle, m_Transform.rotation);
+    XMVECTOR rotation =
+        XMQuaternionRotationRollPitchYaw(
+            _DegreeToRadian(rotateAngle.x),
+            _DegreeToRadian(rotateAngle.y),
+            _DegreeToRadian(rotateAngle.z));
+    XMVECTOR translation = m_Transform.position;
+    m_constantDataMap.matWorld = XMMatrixTransformation({ 0,0,0,1 }, { 0,0,0,1 }, scale, { 0,0,0,1 }, rotation, translation);
+}
+
+
+void FQuadTree::SetMaterial(Material* pMaterial)
+{
+    m_pMaterial = pMaterial;
+}
+
+void FQuadTree::SetTexture(Texture* pTexture)
+{
+    m_pTexture = pTexture;
+}
+
+void FQuadTree::SetShader(VertexShader* pVertexShader, PixelShader* pPixelShader)
+{
+    m_pVertexShader = pVertexShader;
+    m_pPixelShader = pPixelShader;
+}
+
+void FQuadTree::SetShaderName(std::wstring vsName, std::wstring psName)
+{
+    m_szVSName = vsName;
+    m_szPSName = psName;
+}
+
+void FQuadTree::SetConstantData(constant_map cc)
+{
+    m_constantDataMap = cc;
 }
 
 BOOL FQuadTree::AddObject(Object* pObj)
@@ -333,7 +391,16 @@ bool FQuadTree::ObjectPicking()
 
 void FQuadTree::Update()
 {
-    Object::Update();
+    m_constantDataMap.matView = _CameraSystem.GetCurrentCamera()->m_matCamera;
+    m_constantDataMap.m_camera_position = XMFLOAT4(
+        XMVectorGetX(_CameraSystem.GetCurrentCamera()->m_matWorld.r[3]),
+        XMVectorGetY(_CameraSystem.GetCurrentCamera()->m_matWorld.r[3]),
+        XMVectorGetZ(_CameraSystem.GetCurrentCamera()->m_matWorld.r[3]),
+        XMVectorGetW(_CameraSystem.GetCurrentCamera()->m_matWorld.r[3]));
+    m_constantDataMap.m_world_size = XMFLOAT2(m_pMap->m_dwNumColumns, m_pMap->m_dwNumRows);
+    m_constantDataMap.m_cell_distance = m_pMap->m_fCellDistance;
+    _EngineSystem.GetRenderSystem()->UpdateConstantBuffer(m_pConstantBuffer, &m_constantDataMap);
+
     m_pDrawLeafNodeList.clear();
     VisibleNode(m_pRootNode); //Àç±Í·Î VisibleNodeÃ¼Å©
     m_Select.SetMatrix(nullptr, &m_pCamera->m_matCamera, &m_pCamera->m_matProj);
@@ -393,9 +460,7 @@ void FQuadTree::Update()
 
     if (m_bSplatting && GetInterSection())
     {
-        constantData.m_world_size = XMFLOAT2(m_pMap->m_dwNumColumns, m_pMap->m_dwNumRows);
-        constantData.m_cell_distance = m_pMap->m_fCellDistance;
-        _EngineSystem.GetRenderSystem()->UpdateConstantBuffer(m_pConstantBuffer, &constantData);
+       
         Splatting(m_Select.m_vIntersection, m_iChkIdx);
     }
 }
@@ -407,13 +472,13 @@ void FQuadTree::Render()
     _EngineSystem.GetRenderSystem()->SetVertexShader(m_pVertexShader);
     _EngineSystem.GetRenderSystem()->SetPixelShader(m_pPixelShader);
     _EngineSystem.GetRenderSystem()->SetVertexBuffer(m_pMap->m_pVertexBuffer);
-    g_pDeviceContext->PSSetShaderResources(1, 1, &m_pMaskAlphaSrv);
-    g_pDeviceContext->PSSetShaderResources(2, 1, &m_pMaterial->GetListTexture(0)[m_iChkIdx]->m_pShaderResourceView);
+    /*g_pDeviceContext->PSSetShaderResources(1, 1, &m_pMaskAlphaSrv);
+    g_pDeviceContext->PSSetShaderResources(2, 1, &m_pMaterial->GetListTexture(0)[m_iChkIdx]->m_pShaderResourceView);*/
     for (int idx = 0;  idx < m_pDrawLeafNodeList.size(); idx++)
     {
         g_pDeviceContext->IASetIndexBuffer(m_pDrawLeafNodeList[idx]->m_pIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
-        _EngineSystem.GetRenderSystem()->setTexture(m_pVertexShader, m_pMaterial->GetListTexture(0), m_pMaterial->GetListTexture(0).size());
-        _EngineSystem.GetRenderSystem()->setTexture(m_pPixelShader, m_pMaterial->GetListTexture(0), m_pMaterial->GetListTexture(0).size());
+        _EngineSystem.GetRenderSystem()->setTexture(m_pVertexShader, m_pTexture);
+        _EngineSystem.GetRenderSystem()->setTexture(m_pPixelShader, m_pTexture);
         _EngineSystem.GetRenderSystem()->drawIndexedTriangleList(m_pDrawLeafNodeList[idx]->m_dwFace * 3, 0, 0);
     }
 }

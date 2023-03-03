@@ -1,5 +1,12 @@
 #include "TextureSystem.h"
 
+Texture* TextureSystem::GetTexture(std::wstring szName)
+{
+	Texture* ret = nullptr;
+	ret = (Texture*)m_mapResources.find(szName)->second;
+	return ret;
+}
+
 TextureSystem::TextureSystem() : ResourceSystem()
 {
 	std::cout << "Initialize : TextureSystem" << std::endl;

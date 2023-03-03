@@ -106,6 +106,12 @@
     <Filter Include="FileSystem">
       <UniqueIdentifier>{eba61a5b-381e-47f7-92e3-f908b64805ee}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shaders\Fbx">
+      <UniqueIdentifier>{937b7ff4-a54b-4698-a6e5-f0592c0429ae}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders\Map">
+      <UniqueIdentifier>{f50213c8-47c0-45b4-874f-c2fa2cc7d9a8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="WindowSystem.h">
@@ -413,6 +419,18 @@
     </FxCompile>
     <FxCompile Include="DefaultPixelShader.hlsl">
       <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="FbxPixelShader.hlsl">
+      <Filter>Shaders\Fbx</Filter>
+    </FxCompile>
+    <FxCompile Include="FbxVertexShader.hlsl">
+      <Filter>Shaders\Fbx</Filter>
+    </FxCompile>
+    <FxCompile Include="MapPixelShader.hlsl">
+      <Filter>Shaders\Map</Filter>
+    </FxCompile>
+    <FxCompile Include="MapVertexShader.hlsl">
+      <Filter>Shaders\Map</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>

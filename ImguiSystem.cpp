@@ -293,8 +293,12 @@ void ImguiSystem::Update()
     if (ifd::FileDialog::Instance().IsDone("ImageOpenDialog")) {
         if (ifd::FileDialog::Instance().HasResult()) {
             const std::vector<std::filesystem::path>& res = ifd::FileDialog::Instance().GetResults();
-            for(int idx = 0; idx < res.size(); idx++)
-                _ToolSystemMap.m_ListTexture.push_back(res[idx].wstring()); 
+            for (int idx = 0; idx < res.size(); idx++)
+            {
+                _EngineSystem.GetTextureSystem()->CreateTextureFromFile(res[idx].wstring().c_str());
+                _ToolSystemMap.m_ListTexture.push_back(res[idx].wstring());
+            }
+                
             //for (const auto& r : res) // ShaderOpenDialog supports multiselection
             //{
             //   printf("OPEN[%s]\n", r.u8string().c_str()); 

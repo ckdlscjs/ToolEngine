@@ -27,7 +27,7 @@ public:
 	void SaveFile(std::wstring szFullPath);
 public:
 	void Update();
-	//void Render();
+	void Render();
 public:
 	ToolSystemMap();
 	~ToolSystemMap();
