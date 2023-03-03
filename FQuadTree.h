@@ -14,7 +14,7 @@ public:
 	void	SetPickingSculpt(bool bPicking);
 	void	SetSculptRadius(float fRadius);
 	void	SetSculptIntensity(float fIntensity);
-	void	SetSplatting(int iChkIdx, bool bSplatting);
+	void	SetSplatting(Texture* pTexture, bool bSplatting);
 
 	void	SetTransform(Transform transform);
 	void	SetMaterial(Material* pMaterial);
@@ -58,6 +58,7 @@ public:
 	Object* pPickingObj;
 
 	bool m_bSplatting;
+	Texture* m_pTextureSplatting;
 
 	int m_iChkIdx;
 	int m_iMaxDepth;
@@ -66,6 +67,7 @@ public:
 	MeshMap* m_pMap = nullptr;
 	Material* m_pMaterial;
 	Texture* m_pTexture;
+	
 	Transform m_Transform;
 	constant_map m_constantDataMap;
 	ConstantBuffer* m_pConstantBuffer;

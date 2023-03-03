@@ -33,7 +33,7 @@ void ToolSystemMap::SelectObject(bool bPicking)
 void ToolSystemMap::SelectSplatting(int iChkIdx, bool bSplatting)
 {
     if (m_pQuadTree)
-        m_pQuadTree->SetSplatting(iChkIdx, bSplatting);
+        m_pQuadTree->SetSplatting(_EngineSystem.GetTextureSystem()->GetTexture(_ToolSystemMap.m_ListTexture[iChkIdx]), bSplatting);
 }
 
 void ToolSystemMap::SetSculptRadius(float fRadius)

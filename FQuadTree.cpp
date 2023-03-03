@@ -189,9 +189,9 @@ void FQuadTree::SetSculptIntensity(float fIntensity)
     m_fSculptIntensity = fIntensity;
 }
 
-void FQuadTree::SetSplatting(int iChkIdx, bool bSplatting)
+void FQuadTree::SetSplatting(Texture* pTexture, bool bSplatting)
 {
-    m_iChkIdx = iChkIdx;
+    m_pTextureSplatting = pTexture;
     m_bSplatting = bSplatting;
 }
 
@@ -460,7 +460,6 @@ void FQuadTree::Update()
 
     if (m_bSplatting && GetInterSection())
     {
-       
         Splatting(m_Select.m_vIntersection, m_iChkIdx);
     }
 }
@@ -472,8 +471,12 @@ void FQuadTree::Render()
     _EngineSystem.GetRenderSystem()->SetVertexShader(m_pVertexShader);
     _EngineSystem.GetRenderSystem()->SetPixelShader(m_pPixelShader);
     _EngineSystem.GetRenderSystem()->SetVertexBuffer(m_pMap->m_pVertexBuffer);
-    /*g_pDeviceContext->PSSetShaderResources(1, 1, &m_pMaskAlphaSrv);
-    g_pDeviceContext->PSSetShaderResources(2, 1, &m_pMaterial->GetListTexture(0)[m_iChkIdx]->m_pShaderResourceView);*/
+    if (m_bSplatting)
+    {
+        g_pDeviceContext->PSSetShaderResources(1, 1, &m_pMaskAlphaSrv);
+        g_pDeviceContext->PSSetShaderResources(2, 1, &m_pTextureSplatting->m_pShaderResourceView);
+    }
+    
     for (int idx = 0;  idx < m_pDrawLeafNodeList.size(); idx++)
     {
         g_pDeviceContext->IASetIndexBuffer(m_pDrawLeafNodeList[idx]->m_pIndexBuffer, DXGI_FORMAT_R32_UINT, 0);

@@ -226,9 +226,9 @@ void RenderSystem::setTexture(const VertexShader* pVertexShader, const std::vect
 	m_pCDevice->m_pImmediateContext->VSSetShaderResources(0, iNumTextures, listResources);
 }
 
-void RenderSystem::setTexture(const VertexShader* pVertexShader, const Texture* pTexture)
+void RenderSystem::setTexture(const VertexShader* pVertexShader, const Texture* pTexture, unsigned int iNumSlot)
 {
-	m_pCDevice->m_pImmediateContext->VSSetShaderResources(0, 1, &pTexture->m_pShaderResourceView);
+	m_pCDevice->m_pImmediateContext->VSSetShaderResources(iNumSlot, 1, &pTexture->m_pShaderResourceView);
 }
 
 void RenderSystem::setTexture(const PixelShader* pPixelShader, const std::vector<Texture*>& pListTex, unsigned int iNumTextures, unsigned int iNumStart)
@@ -252,11 +252,12 @@ void RenderSystem::setTexture(const PixelShader* pPixelShader, const std::vector
 	m_pCDevice->m_pImmediateContext->PSSetSamplers(0, iNumTextures, listSamplers);
 }
 
-void RenderSystem::setTexture(const PixelShader* pPixelShader, const Texture* pTexture)
+void RenderSystem::setTexture(const PixelShader* pPixelShader, const Texture* pTexture, unsigned int iNumSlot)
 {
-	m_pCDevice->m_pImmediateContext->PSSetShaderResources(0, 1, &pTexture->m_pShaderResourceView);
-	m_pCDevice->m_pImmediateContext->PSSetSamplers(0, 1, &pTexture->m_pSamplerState);
+	m_pCDevice->m_pImmediateContext->PSSetShaderResources(iNumSlot, 1, &pTexture->m_pShaderResourceView);
+	m_pCDevice->m_pImmediateContext->PSSetSamplers(iNumSlot, 1, &pTexture->m_pSamplerState);
 }
+
 
 void RenderSystem::drawTriangleList(UINT iCountVertex, UINT iStartVertexLocation)
 {

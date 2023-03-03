@@ -48,9 +48,9 @@ public:
 	void SetVertexShader(VertexShader* pVertexShader);
 	void SetPixelShader(PixelShader* pPixelShader);
 	void setTexture(const VertexShader* pVertexShader, const std::vector<Texture*>& pListTex, unsigned int iNumTextures, unsigned int iNumStart = 0);
-	void setTexture(const VertexShader* pVertexShader, const Texture* pTexture);
+	void setTexture(const VertexShader* pVertexShader, const Texture* pTexture, unsigned int iNumSlot = 0);
 	void setTexture(const PixelShader* pPixelShader, const std::vector<Texture*>& pListTex, unsigned int iNumTextures, unsigned int iNumStart = 0);
-	void setTexture(const PixelShader* pPixelShader, const Texture* pTexture);
+	void setTexture(const PixelShader* pPixelShader, const Texture* pTexture, unsigned int iNumSlot = 0);
 
 	/*Draw Block*/
 	void drawTriangleList(UINT iCountVertex, UINT iStartVertexLocation);

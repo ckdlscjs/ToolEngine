@@ -75,7 +75,7 @@ void ImguiSystem::Update()
             }
             ImGui::InputInt("MapSize", &iMapSize);
 
-            ImGui::InputFloat("ShellDistance", &fMapDistance);
+            ImGui::InputFloat("CellDistance", &fMapDistance);
 
             if (ImGui::InputFloat("Radius", &fSculptRadius))
                 _ToolSystemMap.SetSculptRadius(fSculptRadius);
