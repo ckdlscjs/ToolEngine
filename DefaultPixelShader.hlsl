@@ -12,7 +12,7 @@ struct PS_INPUT
 	float4 color : COLOR0;
 	float3 direction_to_camera : TEXCOORD1;
 	float4 m_light_direction : TEXCOORD2;
-	float3 w : TEXCOORD3;
+	float3 world : TEXCOORD3;
 	float4 tex2 : TEXCOORD4;
 };
 
@@ -27,8 +27,18 @@ cbuffer constant : register(b0)
 float4 psmain(PS_INPUT input) : SV_TARGET
 {
 	float4 tex = TextureColor.Sample(TextureSamplerColor, input.tex);
-	/*float4 mask = g_txMaskTex.Sample(TextureSamplerColor, input.tex);
-	float4 tex2 = */
+	float4 mask = g_txMaskTex.Sample(TextureSamplerColor, input.tex.xy);
+	float4 tex2 = g_txTex2.SampleLevel(TextureSamplerColor, input.tex.xy * 1.0f, 0) * mask.r;
+	tex2 = g_txTex2.SampleLevel(TextureSamplerColor, input.tex.xy * 1.0f, 0) * mask.g;
+	tex2 = g_txTex2.SampleLevel(TextureSamplerColor, input.tex.xy * 1.0f, 0) * mask.b;
+	tex2 = g_txTex2.SampleLevel(TextureSamplerColor, input.tex.xy * 1.0f, 0) * mask.a;
+
+	float4 fBlendColor = 0;
+	fBlendColor.r = tex2.r;
+	fBlendColor.g = tex2.g;
+	fBlendColor.b = tex2.b;
+	fBlendColor.a = tex2.a;
+
 	//AmbientLight
 	float ka = 0.1f;
 	float3 ia = float3(1.0f, 1.0f, 1.0f);
@@ -55,5 +65,5 @@ float4 psmain(PS_INPUT input) : SV_TARGET
 
 	float3 final_light = ambient_light + diffuse_light +specular_light;
 
-	return float4(final_light, 1.0f);
+	return float4(fBlendColor.rgb * final_light, 1.0f);
 }
