@@ -5,6 +5,7 @@
 class MeshSystem : public ResourceSystem
 {
 public:
+	Mesh* GetMesh(std::wstring szName);
 	MeshSystem();
 	~MeshSystem();
 	Mesh* CreateMeshFromFile(const wchar_t* szFilePath);
