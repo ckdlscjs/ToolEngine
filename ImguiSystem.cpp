@@ -20,7 +20,7 @@ void ImguiSystem::Update()
     ImGui::NewFrame();
     //ImGui::DockSpaceOverViewport(ImGui::GetMainViewport());
 
-
+    static int splat_current_idx = 0;
     static int image_current_idx = 0; // Here we store our selection data as an index.
     static int fbx_current_idx = 0; // Here we store our selection data as an index.
     static int iMapSize = 4;
@@ -63,7 +63,30 @@ void ImguiSystem::Update()
             if (ImGui::Checkbox("Splatting", &bSplatting))
             {
                 ~bSplatting;
-                _ToolSystemMap.SelectSplatting(image_current_idx, bSplatting);
+                _ToolSystemMap.SelectSplatting(splat_current_idx, bSplatting);
+            }
+            if (ImGui::Button("Open SplatImage"))
+                ifd::FileDialog::Instance().Open("SplatOpenDialog", "Open a Image", "Image file (*.png;*.jpg;*.jpeg;*.bmp;*.tga){.png,.jpg,.jpeg,.bmp,.tga},.*", true);
+            if (ImGui::BeginListBox("SplattingImage", { 200, 100 }))
+            {
+                for (int n = 0; n < _ToolSystemMap.m_ListTextureSplatting.size(); n++)
+                {
+                    std::string fullpath = _towm(_ToolSystemMap.m_ListTextureSplatting[n]);
+
+                    std::string content = GetSplitName(fullpath);
+
+                    const bool is_selected = (splat_current_idx == n);
+                    if (ImGui::Selectable(content.c_str(), is_selected))
+                    {
+                        splat_current_idx = n;
+                        _ToolSystemMap.SelectSplatting(splat_current_idx, bSplatting);
+                    }
+
+                    // Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
+                    if (is_selected)
+                        ImGui::SetItemDefaultFocus();
+                }
+                ImGui::EndListBox();
             }
         }
         ImGui::Dummy({ 0, 10 });
@@ -112,7 +135,6 @@ void ImguiSystem::Update()
                 {
                     image_current_idx = n;
                     _ToolSystemMap.SelectImage(image_current_idx, bMapPicking);
-                    _ToolSystemMap.SelectSplatting(image_current_idx, bSplatting);
                 }
 
                 // Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
@@ -288,9 +310,23 @@ void ImguiSystem::Update()
     // Using the generic BeginListBox() API, you have full control over how to display the combo contents.
         // (your selection data could be an index, a pointer to the object, an id for the object, a flag intrusively
         // stored in the object itself, etc.)
-    
-   
+        // 
     // file dialogs
+    if (ifd::FileDialog::Instance().IsDone("SplatOpenDialog")) {
+        if (ifd::FileDialog::Instance().HasResult()) {
+            if (_ToolSystemMap.m_ListTextureSplatting.size() < 4)
+            {
+                const std::vector<std::filesystem::path>& res = ifd::FileDialog::Instance().GetResults();
+                for (int idx = 0; idx < res.size(); idx++)
+                {
+                    _ToolSystemMap.SetSplattingTexture(_EngineSystem.GetTextureSystem()->CreateTextureFromFile(res[idx].wstring().c_str()));
+                    _ToolSystemMap.m_ListTextureSplatting.push_back(res[idx].wstring());
+                }
+            }   
+        }
+        ifd::FileDialog::Instance().Close();
+    }
+  
     if (ifd::FileDialog::Instance().IsDone("ImageOpenDialog")) {
         if (ifd::FileDialog::Instance().HasResult()) {
             const std::vector<std::filesystem::path>& res = ifd::FileDialog::Instance().GetResults();
@@ -299,11 +335,6 @@ void ImguiSystem::Update()
                 _EngineSystem.GetTextureSystem()->CreateTextureFromFile(res[idx].wstring().c_str());
                 _ToolSystemMap.m_ListTexture.push_back(res[idx].wstring());
             }
-                
-            //for (const auto& r : res) // ShaderOpenDialog supports multiselection
-            //{
-            //   printf("OPEN[%s]\n", r.u8string().c_str()); 
-            //}
         }
         ifd::FileDialog::Instance().Close();
     }
@@ -315,10 +346,6 @@ void ImguiSystem::Update()
             const std::vector<std::filesystem::path>& res = ifd::FileDialog::Instance().GetResults();
             for (int idx = 0; idx < res.size(); idx++)
                 _ToolSystemMap.m_ListFbx.push_back(res[idx].wstring());
-            //for (const auto& r : res) // ShaderOpenDialog supports multiselection
-            //{
-            //   printf("OPEN[%s]\n", r.u8string().c_str()); 
-            //}
         }
         ifd::FileDialog::Instance().Close();
     }

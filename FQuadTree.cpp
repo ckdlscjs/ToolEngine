@@ -82,13 +82,13 @@ void FQuadTree::Splatting(XMVECTOR vIntersection, UINT iSplattingTexIndex, float
             if (fRadius < fSplattingRadius)
             {
                 float fDot = 1.0f - (fRadius / fSplattingRadius); //지점부터 범위까지, splattingRadius가 기준, 멀어질수록 fdot의값이 작아져 연해진다
-                if ((fDot * 255) > pixel[0])
+                if (iSplattingTexIndex == 0 && (fDot * 255) > pixel[0])
                     pixel[0] = fDot * 255;//r
-                if ((fDot * 255) > pixel[1])
+                if (iSplattingTexIndex == 1 && (fDot * 255) > pixel[1])
                     pixel[1] = fDot * 255;//g
-                if ((fDot * 255) > pixel[2])
+                if (iSplattingTexIndex == 2 && (fDot * 255) > pixel[2])
                     pixel[2] = fDot * 255;//b
-                if ((fDot * 255) > pixel[3])
+                if (iSplattingTexIndex == 3 && (fDot * 255) > pixel[3])
                     pixel[3] = fDot * 255;//a
             }
         }
@@ -188,9 +188,14 @@ void FQuadTree::SetSculptIntensity(float fIntensity)
     m_fSculptIntensity = fIntensity;
 }
 
-void FQuadTree::SetSplatting(Texture* pTexture, bool bSplatting)
+void FQuadTree::SetSplattingTexture(Texture* pTexture)
 {
-    m_pTextureSplatting = pTexture;
+    m_ListTextrueSplatting.push_back(pTexture);
+}
+
+void FQuadTree::SetSplatting(int iChkIdx, bool bSplatting)
+{
+    m_iChkIdx = iChkIdx;
     m_bSplatting = bSplatting;
 }
 
@@ -470,17 +475,19 @@ void FQuadTree::Render()
     _EngineSystem.GetRenderSystem()->SetVertexShader(m_pVertexShader);
     _EngineSystem.GetRenderSystem()->SetPixelShader(m_pPixelShader);
     _EngineSystem.GetRenderSystem()->SetVertexBuffer(m_pMap->m_pVertexBuffer);
+    _EngineSystem.GetRenderSystem()->setTexture(m_pVertexShader, m_pTexture);
+    _EngineSystem.GetRenderSystem()->setTexture(m_pPixelShader, m_pTexture);
+    g_pDeviceContext->PSSetShaderResources(1, 1, &m_pMaskAlphaSrv);
     if (m_bSplatting)
     {
-        g_pDeviceContext->PSSetShaderResources(1, 1, &m_pMaskAlphaSrv);
-        g_pDeviceContext->PSSetShaderResources(2, 1, &m_pTextureSplatting->m_pShaderResourceView);
+        for (int idx = 0; idx < m_ListTextrueSplatting.size(); idx++)
+            g_pDeviceContext->PSSetShaderResources(2 + idx, 1, &m_ListTextrueSplatting[idx]->m_pShaderResourceView);
     }
     
     for (int idx = 0;  idx < m_pDrawLeafNodeList.size(); idx++)
     {
+       
         g_pDeviceContext->IASetIndexBuffer(m_pDrawLeafNodeList[idx]->m_pIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
-        _EngineSystem.GetRenderSystem()->setTexture(m_pVertexShader, m_pTexture);
-        _EngineSystem.GetRenderSystem()->setTexture(m_pPixelShader, m_pTexture);
         _EngineSystem.GetRenderSystem()->drawIndexedTriangleList(m_pDrawLeafNodeList[idx]->m_dwFace * 3, 0, 0);
     }
 }

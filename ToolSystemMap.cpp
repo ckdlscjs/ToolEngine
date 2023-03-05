@@ -30,10 +30,16 @@ void ToolSystemMap::SelectObject(bool bPicking)
         m_pQuadTree->SetPickingObject(bPicking);
 }
 
+void ToolSystemMap::SetSplattingTexture(Texture* pTexture)
+{
+    if (m_pQuadTree)
+        m_pQuadTree->SetSplattingTexture(pTexture);
+}
+
 void ToolSystemMap::SelectSplatting(int iChkIdx, bool bSplatting)
 {
     if (m_pQuadTree)
-        m_pQuadTree->SetSplatting(_EngineSystem.GetTextureSystem()->GetTexture(_ToolSystemMap.m_ListTexture[iChkIdx]), bSplatting);
+        m_pQuadTree->SetSplatting(iChkIdx, bSplatting);
 }
 
 void ToolSystemMap::SetSculptRadius(float fRadius)

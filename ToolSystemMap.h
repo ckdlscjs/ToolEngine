@@ -16,6 +16,7 @@ public:
 	void SelectSculpt(bool bPicking);
 	void SelectFbxObject(int iChkIdx, bool bPicking);
 	void SelectObject(bool bPicking);
+	void SetSplattingTexture(Texture* pTexture);
 	void SelectSplatting(int iChkIdx, bool bSplatting);
 	void SetSculptRadius(float fRadius);
 	void SetSculptIntensity(float fIntensity);
@@ -34,6 +35,7 @@ public:
 private:
 	Camera* m_pCamera;
 	FQuadTree* m_pQuadTree;
+	std::vector<std::wstring> m_ListTextureSplatting;
 	std::vector<std::wstring> m_ListTexture;
 	std::vector<std::wstring> m_ListFbx;
 	friend class ImguiSystem;

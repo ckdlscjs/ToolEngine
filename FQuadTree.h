@@ -14,7 +14,8 @@ public:
 	void	SetPickingSculpt(bool bPicking);
 	void	SetSculptRadius(float fRadius);
 	void	SetSculptIntensity(float fIntensity);
-	void	SetSplatting(Texture* pTexture, bool bSplatting);
+	void	SetSplattingTexture(Texture* pTexture);
+	void	SetSplatting(int iChkIdx, bool bSplatting);
 
 	void	SetTransform(Transform transform);
 	void	SetMaterial(Material* pMaterial);
@@ -58,7 +59,7 @@ public:
 	Object* pPickingObj;
 
 	bool m_bSplatting;
-	Texture* m_pTextureSplatting;
+	std::vector<Texture*> m_ListTextrueSplatting;
 
 	int m_iChkIdx;
 	int m_iMaxDepth;

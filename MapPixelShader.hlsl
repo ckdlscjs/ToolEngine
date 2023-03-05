@@ -1,6 +1,9 @@
 Texture2D TextureColor : register(t0);
 Texture2D g_txMaskTex : register(t1);
 Texture2D g_txTex2 : register(t2);
+Texture2D g_txTex3 : register(t3);
+Texture2D g_txTex4 : register(t4);
+Texture2D g_txTex5 : register(t5);
 
 sampler TextureSamplerColor : register(s0);
 
@@ -27,31 +30,30 @@ cbuffer constant : register(b0)
 float4 psmain(PS_INPUT input) : SV_TARGET
 {
 	float4 tex = TextureColor.Sample(TextureSamplerColor, input.tex);
-
+	float4 tex2 = TextureColor.Sample(TextureSamplerColor, input.tex2);
 	float4 mask = g_txMaskTex.Sample(TextureSamplerColor, input.tex.xy);
 
-	float4 tex2;
-	tex2.r = g_txTex2.SampleLevel(TextureSamplerColor, input.tex.xy * 1.0f, 0) * mask.r;
-	tex2.g = g_txTex2.SampleLevel(TextureSamplerColor, input.tex.xy * 1.0f, 0) * mask.g;
-	tex2.b = g_txTex2.SampleLevel(TextureSamplerColor, input.tex.xy * 1.0f, 0) * mask.b;
-	tex2.a = g_txTex2.SampleLevel(TextureSamplerColor, input.tex.xy * 1.0f, 0) * mask.a;
+	float4 vColorTile = g_txTex2.SampleLevel(TextureSamplerColor, input.tex.xy * 1.0f, 0) * mask.r;
+	vColorTile += g_txTex3.SampleLevel(TextureSamplerColor, input.tex.xy * 1.0f, 0) * mask.g;
+	vColorTile += g_txTex4.SampleLevel(TextureSamplerColor, input.tex.xy * 1.0f, 0) * mask.b;
+	vColorTile += g_txTex5.SampleLevel(TextureSamplerColor, input.tex.xy * 1.0f, 0) * mask.a;
 
 	float4 fBlendColor = 0;
-	fBlendColor.r = max(tex2.r, fBlendColor.r);
-	fBlendColor.g = max(tex2.g, fBlendColor.g);
-	fBlendColor.b = max(tex2.b, fBlendColor.b);
-	fBlendColor.a = max(tex2.a, fBlendColor.a);
+	fBlendColor.r = max(tex2.r, vColorTile.r);
+	fBlendColor.g = max(tex2.g, vColorTile.g);
+	fBlendColor.b = max(tex2.b, vColorTile.b);
+	fBlendColor.a = min(tex2.a, vColorTile.a);
 
 	//AmbientLight
 	float ka = 0.1f;
 	float3 ia = float3(1.0f, 1.0f, 1.0f);
-	ia *= tex2.rgb;
+	ia *= fBlendColor.rgb;
 	float3 ambient_light = ka * ia;
 
 	//DiffuseLight
 	float kd = 0.8f;
 	float3 id = float3(1.0f, 1.0f, 1.0f);
-	id *= tex2.rgb;
+	id *= fBlendColor.rgb;
 
 	float amount_diffuse_light = max(0.0f, dot(input.normal , -input.m_light_direction.xyz));
 	float3 diffuse_light = kd * amount_diffuse_light * id;
@@ -59,7 +61,7 @@ float4 psmain(PS_INPUT input) : SV_TARGET
 	//SpecularLight
 	float ks = 1.0f;
 	float3 is = float3(1.0f, 1.0f, 1.0f);
-	is *= tex2.rgb;
+	is *= fBlendColor.rgb;
 	float3 reflected_light = reflect(input.m_light_direction.xyz, input.normal);
 	float shininess = 10.0f;
 	float amount_specular_light = pow(max(0.0f, dot(reflected_light, input.direction_to_camera)), shininess);
