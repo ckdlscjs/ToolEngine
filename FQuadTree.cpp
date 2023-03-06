@@ -332,7 +332,7 @@ FNode* FQuadTree::VisibleNode(FNode* pNode)
 bool FQuadTree::GetInterSection()
 {
     //교점체크
-    if ((_InputSystem.GetKey(VK_RBUTTON) == KEY_STATE::KEY_DOWN))
+    if ((_InputSystem.GetKey(VK_RBUTTON) == KEY_STATE::KEY_DOWN || (_InputSystem.GetKey(VK_RBUTTON) == KEY_STATE::KEY_HOLD)))
     {
         for (const auto& node : m_pDrawLeafNodeList)
         {

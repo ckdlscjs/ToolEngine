@@ -27,22 +27,26 @@ cbuffer constant : register(b0)
 	float4 m_light_direction;
 };
 
+float3 blend(float4 texture1, float a1, float4 texture2, float a2) 
+{ 
+	float depth = 0.2; 
+	float ma = max(texture1.a + a1, texture2.a + a2) - depth; 
+	float b1 = max(texture1.a + a1 - ma, 0); 
+	float b2 = max(texture2.a + a2 - ma, 0); 
+	return (texture1.rgb * b1 + texture2.rgb * b2) / (b1 + b2); 
+}
+
 float4 psmain(PS_INPUT input) : SV_TARGET
 {
 	float4 tex = TextureColor.Sample(TextureSamplerColor, input.tex);
-	float4 tex2 = TextureColor.Sample(TextureSamplerColor, input.tex2);
 	float4 mask = g_txMaskTex.Sample(TextureSamplerColor, input.tex.xy);
-
-	float4 vColorTile = g_txTex2.SampleLevel(TextureSamplerColor, input.tex.xy * 1.0f, 0) * mask.r;
-	vColorTile += g_txTex3.SampleLevel(TextureSamplerColor, input.tex.xy * 1.0f, 0) * mask.g;
-	vColorTile += g_txTex4.SampleLevel(TextureSamplerColor, input.tex.xy * 1.0f, 0) * mask.b;
-	vColorTile += g_txTex5.SampleLevel(TextureSamplerColor, input.tex.xy * 1.0f, 0) * mask.a;
-
-	float4 fBlendColor = 0;
-	fBlendColor.r = max(tex2.r, vColorTile.r);
-	fBlendColor.g = max(tex2.g, vColorTile.g);
-	fBlendColor.b = max(tex2.b, vColorTile.b);
-	fBlendColor.a = min(tex2.a, vColorTile.a);
+	float4 fColorTile_r = g_txTex2.Sample(TextureSamplerColor, input.tex) * mask.r;
+	float4 fColorTile_g = g_txTex3.Sample(TextureSamplerColor, input.tex) * mask.g;
+	float4 fColorTile_b = g_txTex4.Sample(TextureSamplerColor, input.tex) * mask.b;
+	float4 fColorTile_a = g_txTex5.Sample(TextureSamplerColor, input.tex) * mask.a;
+	float fTotalWeight = mask.r + mask.g + mask.b + mask.a;
+	float4 fBlendColor = fColorTile_r + fColorTile_g + fColorTile_b + fColorTile_a;
+	fBlendColor = ((1.0f - fTotalWeight / 4) * tex.a) > fTotalWeight ? (1.0f - fTotalWeight / 4.0f) * tex : fBlendColor;
 
 	//AmbientLight
 	float ka = 0.1f;
@@ -70,5 +74,5 @@ float4 psmain(PS_INPUT input) : SV_TARGET
 
 	float3 final_light = ambient_light + diffuse_light + specular_light;
 
-	return float4(final_light, 1.0f);
+	return float4(final_light.rgb, 1.0f);
 }
