@@ -3,6 +3,10 @@ void Material::SetList(std::vector<Texture*> listTex)
 {
 	m_ListTextures.push_back(listTex);
 }
+bool Material::IsEmpty()
+{
+	return m_ListTextures.empty();
+}
 std::vector<Texture*>& Material::GetListTexture(int iNodeIdx)
 {
 	return m_ListTextures[iNodeIdx];

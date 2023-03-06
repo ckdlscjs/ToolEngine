@@ -1,5 +1,10 @@
 #include "Mesh.h"
 
+bool Mesh::IsEmpty()
+{
+	return m_ListMeshNode.empty();
+}
+
 void Mesh::SetMeshNode(void* vertices, int iSizeVertices, VertexBuffer* pVertexBuffer, void* indices, int iSizeIndices, IndexBuffer* pIndexBuffer)
 {
 	m_ListMeshNode.push_back(new MeshNode(vertices, iSizeVertices, pVertexBuffer, indices, iSizeIndices, pIndexBuffer));

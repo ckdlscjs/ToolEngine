@@ -5,6 +5,7 @@
 class Mesh : public Resource
 {
 public:
+	bool IsEmpty();
 	void SetMeshNode(void* vertices, int iSizeVertices, VertexBuffer* pVertexBuffer, void* indices, int iSizeIndices, IndexBuffer* pIndexBuffer);
 	std::vector<MeshNode*>& GetMeshNodeList();
 public:

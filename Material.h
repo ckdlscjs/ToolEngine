@@ -5,6 +5,7 @@ class Material
 {
 public:
 	void SetList(std::vector<Texture*> listTex);
+	bool IsEmpty();
 	std::vector<Texture*>& GetListTexture(int iNodeIdx);
 	void SetTexture(Texture* pTexture, unsigned int iNodeIdx);
 public:
