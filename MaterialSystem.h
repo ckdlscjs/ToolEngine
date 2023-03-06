@@ -5,15 +5,13 @@
 class MaterialSystem : Singleton<MaterialSystem>
 {
 public:
-	Material* CreateMaterial();
-	void AddMaterial(Material* pMaterial);
-	void DeleteMaterial(Material* pMaterial);
+	Material* CreateMaterial(std::wstring szMtrlName);
+	void DeleteMaterial(std::wstring szMtrlName);
 public:
 	MaterialSystem();
 	~MaterialSystem();
 private:
-	std::unordered_set<Material*> m_ListMaterial;
+	std::unordered_map<std::wstring, Material*> m_ListMaterial;
 	friend class ToolSystemMap;
-	
 };
 #define _MaterialSystem Singleton<MaterialSystem>::GetInstance()

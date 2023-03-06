@@ -109,10 +109,6 @@ void Object::SetShaderName(std::wstring vsName, std::wstring psName)
 	m_szPSName = psName;
 }
 
-void Object::SelectTexture(int iChkTex)
-{
-	m_iDefaultTexture = iChkTex == -1 ? 0 : iChkTex;
-}
 
 void Object::SetConstantData(constant cc)
 {
@@ -185,8 +181,6 @@ Object::Object()
 
 Object::~Object()
 {
-	if (m_pMesh) delete m_pMesh;						//delete manager need fix
-	if (m_pMaterial) delete m_pMaterial;				//delete manager need fix
 	if (m_pConstantBuffer) delete m_pConstantBuffer;
 	if (m_pVertexShader) delete m_pVertexShader;
 	if (m_pPixelShader) delete m_pPixelShader;

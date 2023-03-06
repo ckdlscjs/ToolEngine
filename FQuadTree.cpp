@@ -114,8 +114,6 @@ FQuadTree::FQuadTree(Camera* pCamera, MeshMap* pMap, int iMaxDepth)
 
 FQuadTree::~FQuadTree()
 {
-    if (m_pMap) delete m_pMap;
-    if (m_pMaterial) delete m_pMaterial;
     if (m_fAlphaData) delete m_fAlphaData;
     if (m_pMaskAlphaTexture) m_pMaskAlphaTexture->Release();
     if (m_pMaskAlphaSrv) m_pMaskAlphaSrv->Release();

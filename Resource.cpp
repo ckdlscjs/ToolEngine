@@ -4,7 +4,7 @@ Resource::Resource()
 {
 }
 
-Resource::Resource(const wchar_t* szFullPath) : m_szFullPath(szFullPath)
+Resource::Resource(std::wstring szFullPath) : m_szFullPath(szFullPath)
 {
 }
 

@@ -31,7 +31,6 @@ public:
 	void SetMaterial(Material* pMaterial);
 	void SetShader(VertexShader* pVertexShader, PixelShader* pPixelShader);
 	void SetShaderName(std::wstring vsName, std::wstring psName);
-	void SelectTexture(int iChkTex = -1);
 	void SetConstantData(constant cc);
 	void SetCullMode(CULL_MODE mode);
 	CULL_MODE GetCullMode();
@@ -50,16 +49,13 @@ protected:
 	Mesh* m_pMesh;
 	Material* m_pMaterial;
 	std::wstring m_szVSName;
-	VertexShader* m_pVertexShader;
 	std::wstring m_szPSName;
+	VertexShader* m_pVertexShader;
 	PixelShader* m_pPixelShader;
 	constant constantData;
 	ConstantBuffer* m_pConstantBuffer;
 	CULL_MODE m_CullMode;
-	unsigned int m_iDefaultTexture;
-	/// <summary>
-	/// /////
-	/// </summary>
+
 	friend class FQuadTree;
 	friend class FNode;
 	friend class ToolSystemMap;

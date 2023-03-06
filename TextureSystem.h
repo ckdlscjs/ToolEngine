@@ -7,10 +7,10 @@ public:
 	Texture* GetTexture(std::wstring szName);
 	TextureSystem();
 	~TextureSystem();
-	Texture* CreateTextureFromFile(const wchar_t* szFilePath);
+	Texture* CreateTextureFromFile(std::wstring szFilePath);
 protected:
 	// ResourceSystem을(를) 통해 상속됨
-	virtual Resource* CreateResourceFromFileConcrete(const wchar_t* szFilePath) override;
+	virtual Resource* CreateResourceFromFileConcrete(std::wstring szFilePath) override;
 	friend class RenderSystem;
 };
 

@@ -17,12 +17,12 @@ TextureSystem::~TextureSystem()
 	std::cout << "Release : TextureSystem" << std::endl;
 }
 
-Texture* TextureSystem::CreateTextureFromFile(const wchar_t* szFilePath)
+Texture* TextureSystem::CreateTextureFromFile(std::wstring szFilePath)
 {
 	return (Texture*)CreateResourceFromFile(szFilePath);
 }
 
-Resource* TextureSystem::CreateResourceFromFileConcrete(const wchar_t* szFilePath)
+Resource* TextureSystem::CreateResourceFromFileConcrete(std::wstring szFilePath)
 {
 	Texture* pTexutre = new Texture(szFilePath);
 	return pTexutre;

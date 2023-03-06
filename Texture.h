@@ -5,7 +5,7 @@ class Texture : public Resource
 {
 public:
 	Texture();
-	Texture(const wchar_t* szFullPath);
+	Texture(std::wstring szFullPath);
 	~Texture();
 private:
 	ID3D11Resource* m_pTexture;

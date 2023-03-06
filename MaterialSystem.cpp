@@ -1,21 +1,27 @@
 #include "MaterialSystem.h"
 
-Material* MaterialSystem::CreateMaterial()
+Material* MaterialSystem::CreateMaterial(std::wstring szMtrlName)
 {
+	if (!m_ListMaterial.empty())
+	{
+		auto iter = m_ListMaterial.find(szMtrlName);
+		if (iter != m_ListMaterial.end())
+			return iter->second;
+	}
+	
 	Material* pMaterial = new Material();
-	m_ListMaterial.insert(pMaterial);
+	m_ListMaterial.insert(std::make_pair(szMtrlName, pMaterial));
 	return pMaterial;
 }
 
-void MaterialSystem::AddMaterial(Material* pMaterial)
+void MaterialSystem::DeleteMaterial(std::wstring szMtrlName)
 {
-	m_ListMaterial.insert(pMaterial);
-}
-
-void MaterialSystem::DeleteMaterial(Material* pMaterial)
-{
-	m_ListMaterial.erase(pMaterial);
-	delete pMaterial;
+	auto iter = m_ListMaterial.find(szMtrlName);
+	if (iter->second != nullptr)
+	{
+		delete iter->second;
+		m_ListMaterial.erase(iter);
+	}
 }
 
 MaterialSystem::MaterialSystem()
@@ -28,7 +34,7 @@ MaterialSystem::~MaterialSystem()
 	std::cout << "Release : MaterialSystem" << std::endl;
 	for (auto iter = m_ListMaterial.begin(); iter != m_ListMaterial.end(); )
 	{
-		delete (*iter);
+		delete iter->second;
 		iter = m_ListMaterial.erase(iter);
 	}
 	m_ListMaterial.clear();

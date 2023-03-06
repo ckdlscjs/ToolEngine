@@ -4,16 +4,16 @@ Texture::Texture() : Resource()
 
 }
 
-Texture::Texture(const wchar_t* szFullPath) : Resource(szFullPath)
+Texture::Texture(std::wstring szFullPath) : Resource(szFullPath)
 {
 	DirectX::ScratchImage image_data;
 	HRESULT result = CoInitialize(nullptr);	//WhyConinitialize
 	if (FAILED(result))
 		throw std::exception("Coninitialize not successfully");
-	if (GetSplitFile(_towm(szFullPath)) == "tga")
-		result = DirectX::LoadFromTGAFile(szFullPath, nullptr, image_data);
+	if (GetSplitFile(_towm(szFullPath.c_str())) == "tga")
+		result = DirectX::LoadFromTGAFile(szFullPath.c_str(), nullptr, image_data);
 	else
-		result = DirectX::LoadFromWICFile(szFullPath, DirectX::WIC_FLAGS_IGNORE_SRGB, nullptr, image_data);
+		result = DirectX::LoadFromWICFile(szFullPath.c_str(), DirectX::WIC_FLAGS_IGNORE_SRGB, nullptr, image_data);
 	if (FAILED(result))
 	{
 		std::wstring defaultDir = L"../../data/fbx/";

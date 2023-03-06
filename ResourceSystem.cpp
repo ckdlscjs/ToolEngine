@@ -24,7 +24,7 @@ ResourceSystem::~ResourceSystem()
 	}
 }
 
-Resource* ResourceSystem::CreateResourceFromFile(const wchar_t* szFilePath)
+Resource* ResourceSystem::CreateResourceFromFile(std::wstring szFilePath)
 {
 #if (_MSC_VER >= 1900 && _MSC_VER <= 1916)  || ( _MSC_VER >= 1920 && __cplusplus <= 201402L) 
 	std::wstring szFullPath = std::experimental::filesystem::absolute(szFilePath);

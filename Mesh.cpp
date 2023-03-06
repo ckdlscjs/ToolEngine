@@ -14,7 +14,7 @@ Mesh::Mesh() : Resource()
 {
 
 }
-Mesh::Mesh(const wchar_t* szFullPath) : Resource(szFullPath)
+Mesh::Mesh(std::wstring szFullPath) : Resource(szFullPath)
 {
 
 }
