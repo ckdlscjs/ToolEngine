@@ -218,15 +218,17 @@ void ToolSystemMap::CreateSimpleMap(int iWidth, int iHeight, float fDistance, in
     _EngineSystem.GetMeshSystem()->AddResource(L"MapMesh", pMapMesh);
     Material* pMaterial = _MaterialSystem.CreateMaterial(L"MapMtrl");
 
-    void* shader_byte_code = nullptr;
-    size_t size_shader = 0;
+    void* shader_byte_code_vs = nullptr;
+    void* shader_byte_code_ps = nullptr;
+    size_t size_shader_vs = 0;
+    size_t size_shader_ps = 0;
 
-    _EngineSystem.GetRenderSystem()->CompileVertexShader(L"MapVertexShader.hlsl", "vsmain", "vs_5_0", &shader_byte_code, &size_shader);
-    VertexShader* pVertexShader = _EngineSystem.GetRenderSystem()->CreateVertexShader(shader_byte_code, size_shader);
-    _EngineSystem.GetRenderSystem()->CompilePixelShader(L"MapPixelShader.hlsl", "psmain", "ps_5_0", &shader_byte_code, &size_shader);
-    PixelShader* pPixelShader = _EngineSystem.GetRenderSystem()->CreatePixelShader(shader_byte_code, size_shader);
+    _EngineSystem.GetRenderSystem()->CompileVertexShader(L"MapVertexShader.hlsl", "vsmain", "vs_5_0", &shader_byte_code_vs, &size_shader_vs);
+    VertexShader* pVertexShader = _EngineSystem.GetRenderSystem()->CreateVertexShader(shader_byte_code_vs, size_shader_vs);
+    _EngineSystem.GetRenderSystem()->CompilePixelShader(L"MapPixelShader.hlsl", "psmain", "ps_5_0", &shader_byte_code_ps, &size_shader_ps);
+    PixelShader* pPixelShader = _EngineSystem.GetRenderSystem()->CreatePixelShader(shader_byte_code_ps, size_shader_ps);
 
-    VertexBuffer* pVertexBuffer = _EngineSystem.GetRenderSystem()->CreateVertexBuffer(&pMapMesh->GetListVertex()[0], sizeof(object), pMapMesh->GetListVertex().size(), shader_byte_code, size_shader);
+    VertexBuffer* pVertexBuffer = _EngineSystem.GetRenderSystem()->CreateVertexBuffer(&pMapMesh->GetListVertex()[0], sizeof(object), pMapMesh->GetListVertex().size(), shader_byte_code_vs, size_shader_vs);
     IndexBuffer* pIndexBuffer = _EngineSystem.GetRenderSystem()->CreateIndexBuffer(&pMapMesh->GetListIndex()[0], pMapMesh->GetListIndex().size());
    
     _EngineSystem.GetRenderSystem()->ReleaseBlob();

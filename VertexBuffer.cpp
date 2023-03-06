@@ -44,3 +44,4 @@ VertexBuffer::~VertexBuffer()
 	if(m_pBuffer) m_pBuffer->Release();
 	if(m_pInputLayout) m_pInputLayout->Release();
 }
+ 
