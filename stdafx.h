@@ -2,6 +2,7 @@
 #define _SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING
 // STL
 #include <iostream>
+#include <sstream>
 #include <memory>
 #include <vector>
 #include <map>
@@ -113,6 +114,50 @@ struct object
 	XMFLOAT2 tex;
 	XMFLOAT3 normal;
 	XMFLOAT4 color;
+	friend std::ostream& operator<<(std::ostream& os, const object& object)
+	{
+		os << "position:" << object.pos.x << " " << object.pos.y << " " << object.pos.z << ", ";
+		os << "texcoord:" << object.tex.x << " " << object.tex.y << ", ";
+		os << "normal:" << object.normal.x << " " << object.normal.y << " " << object.normal.z << ", ";
+		os << "color:" << object.color.x << " " << object.color.y << " " << object.color.z << " " << object.color.w;
+		return os;
+	}
+
+	friend std::istringstream& operator>>(std::istringstream& is, object& object)
+	{
+		// "pos: x y z, tex: x y, normal: x y z, color: r g b a"와 같은 형태의 문자열에서 필드 값을 추출합니다.
+		std::string line;
+		std::getline(is, line);
+
+		// pos 값을 추출합니다.
+		size_t pos_start = line.find("position:") + strlen("position:");
+		size_t pos_end = line.find(",", pos_start);
+		std::string pos_str = line.substr(pos_start, pos_end - pos_start);
+		std::istringstream pos_stream(pos_str);
+		pos_stream >> object.pos.x >> object.pos.y >> object.pos.z;
+
+		// tex 값을 추출합니다.
+		size_t tex_start = line.find("texcoord:") + strlen("texcoord:");
+		size_t tex_end = line.find(",", tex_start);
+		std::string tex_str = line.substr(tex_start, tex_end - tex_start);
+		std::istringstream tex_stream(tex_str);
+		tex_stream >> object.tex.x >> object.tex.y;
+
+		// normal 값을 추출합니다.
+		size_t normal_start = line.find("normal:") + strlen("normal:");
+		size_t normal_end = line.find(",", normal_start);
+		std::string normal_str = line.substr(normal_start, normal_end - normal_start);
+		std::istringstream normal_stream(normal_str);
+		normal_stream >> object.normal.x >> object.normal.y >> object.normal.z;
+
+		// color 값을 추출합니다.
+		size_t color_start = line.find("color:") + strlen("color:");
+		std::string color_str = line.substr(color_start);
+		std::istringstream color_stream(color_str);
+		color_stream >> object.color.x >> object.color.y >> object.color.z >> object.color.w;
+
+		return is;
+	}
 };
 
 __declspec(align(16))
@@ -348,4 +393,8 @@ static bool operator>=(XMFLOAT3& a, XMFLOAT3& b)
 static float Lerp(float fStart, float fEnd, float fTangent)
 {
 	return fStart - (fStart * fTangent) + (fEnd * fTangent);
+}
+
+static std::ostream& operator<<(std::ostream& os, const std::wstring& str) {
+	return os << std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>>{}.to_bytes(str);
 }

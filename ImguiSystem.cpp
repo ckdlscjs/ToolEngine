@@ -144,23 +144,21 @@ void ImguiSystem::Update()
             ImGui::EndListBox();
         }
        
-        //{
-        //    if (ImGui::Button("open"))
-        //    {
-        //        ifd::FileDialog::Instance().Open("ShaderOpenDialog", "Open a shader", "*.sav {.sav}", true);
-        //        _ToolSystemMap.OpenFile();
-        //    }
-        //}
-        //ImGui::Dummy({ 0, 10 });
+        {
+            if (ImGui::Button("LoadMap"))
+            {
+                ifd::FileDialog::Instance().Open("LoadMapDialog", "Open a map", "*.map {.map}", true);
+            }
+        }
+        ImGui::Dummy({ 0, 10 });
 
-        //{
-        //    if (ImGui::Button("save"))
-        //    {
-        //        ifd::FileDialog::Instance().Save("ShaderSaveDialog", "Save a shader", "*.txt {.txt}");
-        //        //_ToolSystemMap.SaveFile();
-        //    }
-        //}
-        //ImGui::Dummy({ 0, 10 });
+        {
+            if (ImGui::Button("SaveMap"))
+            {
+                ifd::FileDialog::Instance().Save("SaveMapDialog", "Save a map", "*.map {.map}");
+            }
+        }
+        ImGui::Dummy({ 0, 10 });
 
     }
     ImGui::End();
@@ -311,8 +309,9 @@ void ImguiSystem::Update()
         // (your selection data could be an index, a pointer to the object, an id for the object, a flag intrusively
         // stored in the object itself, etc.)
         // 
-    // file dialogs
+    // file dialogsw
     if (ifd::FileDialog::Instance().IsDone("SplatOpenDialog")) {
+
         if (ifd::FileDialog::Instance().HasResult()) {
             if (_ToolSystemMap.m_ListTextureSplatting.size() < 4)
             {
@@ -322,11 +321,11 @@ void ImguiSystem::Update()
                     _ToolSystemMap.SetSplattingTexture(_EngineSystem.GetTextureSystem()->CreateTextureFromFile(res[idx].wstring().c_str()));
                     _ToolSystemMap.m_ListTextureSplatting.push_back(res[idx].wstring());
                 }
-            }   
+            }
         }
         ifd::FileDialog::Instance().Close();
     }
-  
+       
     if (ifd::FileDialog::Instance().IsDone("ImageOpenDialog")) {
         if (ifd::FileDialog::Instance().HasResult()) {
             const std::vector<std::filesystem::path>& res = ifd::FileDialog::Instance().GetResults();
@@ -350,19 +349,18 @@ void ImguiSystem::Update()
         ifd::FileDialog::Instance().Close();
     }
 
-    /*if (ifd::FileDialog::Instance().IsDone("DirectoryOpenDialog")) {
+    if (ifd::FileDialog::Instance().IsDone("LoadMapDialog")) {
         if (ifd::FileDialog::Instance().HasResult()) {
-            std::string res = ifd::FileDialog::Instance().GetResult().u8string();
-            printf("DIRECTORY[%s]\n", res.c_str());
+            std::wstring res = ifd::FileDialog::Instance().GetResult().wstring();
+            _ToolSystemMap.OpenFile(res);
         }
         ifd::FileDialog::Instance().Close();
-    }*/
+    }
 
-    if (ifd::FileDialog::Instance().IsDone("ShaderSaveDialog")) {
+    if (ifd::FileDialog::Instance().IsDone("SaveMapDialog")) {
         if (ifd::FileDialog::Instance().HasResult()) {
             std::wstring res = ifd::FileDialog::Instance().GetResult().wstring();
             _ToolSystemMap.SaveFile(res);
-            //printf("SAVE[%s]\n", res.c_str());
         }
         ifd::FileDialog::Instance().Close();
     }

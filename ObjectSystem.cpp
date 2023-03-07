@@ -1,8 +1,12 @@
 #include "ObjectSystem.h"
 
-Object* ObjectSystem::CreateObject()
+Object* ObjectSystem::CreateObject(std::wstring szFullPath)
 {
-	Object* pObject = new Object();
+	Object* pObject = nullptr;
+	if (szFullPath.empty())
+		pObject = new Object();
+	else
+		pObject = new Object(szFullPath);
 	m_ListObject.insert(pObject);
 	return pObject;
 }

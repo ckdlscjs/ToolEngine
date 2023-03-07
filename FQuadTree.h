@@ -20,8 +20,7 @@ public:
 	void	SetTransform(Transform transform);
 	void	SetMaterial(Material* pMaterial);
 	void	SetTexture(Texture* pTexture);
-	void	SetShader(VertexShader* pVertexShader, PixelShader* pPixelShader);
-	void	SetShaderName(std::wstring vsName, std::wstring psName);
+	void	SetShader(std::wstring vsPath, VertexShader* pVertexShader, std::wstring psPath, PixelShader* pPixelShader);
 	void	SetConstantData(constant_map cc);
 	UINT	SelectVertexList(T_BOX& box, std::vector<FNode*>& selectNodeList);
 	void	UpdateNode(FNode* pNode);
@@ -45,6 +44,9 @@ public:
 	void    Splatting(XMVECTOR vIntersection, UINT iSplattingTexIndex, float fSplattingRadius = 5.0f);
 
 public:
+	void DeSerialize(std::wstring szFile);
+	void Serialize(std::ofstream& os) const;
+
 	FQuadTree(Camera* pCamera, MeshMap* pMap, int iMaxDepth = 2);
 	~FQuadTree();
 
@@ -59,7 +61,7 @@ public:
 	Object* pPickingObj;
 
 	bool m_bSplatting;
-	std::vector<Texture*> m_ListTextrueSplatting;
+	std::vector<Texture*> m_ListTextureSplatting;
 
 	int m_iChkIdx;
 	int m_iMaxDepth;
@@ -72,9 +74,9 @@ public:
 	Transform m_Transform;
 	constant_map m_constantDataMap;
 	ConstantBuffer* m_pConstantBuffer;
-	std::wstring m_szVSName;
+	std::wstring m_szVSPath;
 	VertexShader* m_pVertexShader;
-	std::wstring m_szPSName;
+	std::wstring m_szPSPath;
 	PixelShader* m_pPixelShader;
 	Camera* m_pCamera = nullptr;
 	std::vector<FNode*> m_pLeafNodeList;

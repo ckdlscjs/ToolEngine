@@ -62,7 +62,7 @@ void ToolSystemMap::CreateFbxObject(std::wstring szFullPath, XMVECTOR vPos)
     cc.matProj = m_pCamera->m_matProj;
 
     FBXFile* pFBXFile = _FBXSystem.LoadFile(_towm(szFullPath).c_str());
-    Object* pObject = _ObjectSystem.CreateObject();
+    Object* pObject = _ObjectSystem.CreateObject(szFullPath);
     Mesh* pMesh = _EngineSystem.GetMeshSystem()->CreateMeshFromFile(szFullPath);
     Material* pMaterial = _MaterialSystem.CreateMaterial(szFullPath);
 
@@ -226,16 +226,18 @@ void ToolSystemMap::CreateSimpleMap(int iWidth, int iHeight, float fDistance, in
 
     MeshMap* pMapMesh = new MeshMap(iWidth, iHeight, fDistance);
     _EngineSystem.GetMeshSystem()->AddResource(L"MapMesh", pMapMesh);
-    Material* pMaterial = _MaterialSystem.CreateMaterial(L"MapMtrl");
+    //Material* pMaterial = _MaterialSystem.CreateMaterial(L"MapMtrl");
 
+    std::wstring szVSPath = L"MapVertexShader.hlsl";
+    std::wstring szPSPath = L"MapPixelShader.hlsl";
     void* shader_byte_code_vs = nullptr;
     void* shader_byte_code_ps = nullptr;
     size_t size_shader_vs = 0;
     size_t size_shader_ps = 0;
 
-    _EngineSystem.GetRenderSystem()->CompileVertexShader(L"MapVertexShader.hlsl", "vsmain", "vs_5_0", &shader_byte_code_vs, &size_shader_vs);
+    _EngineSystem.GetRenderSystem()->CompileVertexShader(szVSPath.c_str(), "vsmain", "vs_5_0", &shader_byte_code_vs, &size_shader_vs);
     VertexShader* pVertexShader = _EngineSystem.GetRenderSystem()->CreateVertexShader(shader_byte_code_vs, size_shader_vs);
-    _EngineSystem.GetRenderSystem()->CompilePixelShader(L"MapPixelShader.hlsl", "psmain", "ps_5_0", &shader_byte_code_ps, &size_shader_ps);
+    _EngineSystem.GetRenderSystem()->CompilePixelShader(szPSPath.c_str(), "psmain", "ps_5_0", &shader_byte_code_ps, &size_shader_ps);
     PixelShader* pPixelShader = _EngineSystem.GetRenderSystem()->CreatePixelShader(shader_byte_code_ps, size_shader_ps);
 
     VertexBuffer* pVertexBuffer = _EngineSystem.GetRenderSystem()->CreateVertexBuffer(&pMapMesh->GetListVertex()[0], sizeof(object), pMapMesh->GetListVertex().size(), shader_byte_code_vs, size_shader_vs);
@@ -246,19 +248,19 @@ void ToolSystemMap::CreateSimpleMap(int iWidth, int iHeight, float fDistance, in
     pMapMesh->m_pVertexBuffer = pVertexBuffer;
     pMapMesh->m_pIndexBuffer = pIndexBuffer;
 
-    if (pMaterial->IsEmpty())
+    /*if (pMaterial->IsEmpty())
     {
         std::vector<Texture*> listTex;
         listTex.push_back(_EngineSystem.GetTextureSystem()->GetTexture(m_ListTexture[iChkIdx].c_str()));
         pMaterial->SetList(listTex);
-    }
+    }*/
    
     m_pQuadTree = new FQuadTree(m_pCamera, pMapMesh);
     m_pQuadTree->SetConstantData(cc);
     m_pQuadTree->SetTransform({ {0, 0, 0} , {0, 0, 0}, {1, 1, 1} });
     m_pQuadTree->SetTexture(_EngineSystem.GetTextureSystem()->GetTexture(m_ListTexture[iChkIdx].c_str()));
-    m_pQuadTree->SetMaterial(pMaterial);
-    m_pQuadTree->SetShader(pVertexShader, pPixelShader);
+    //m_pQuadTree->SetMaterial(pMaterial);
+    m_pQuadTree->SetShader(szVSPath, pVertexShader, szPSPath, pPixelShader);
 }
 
 void ToolSystemMap::DeleteSimpleMap()
@@ -267,18 +269,116 @@ void ToolSystemMap::DeleteSimpleMap()
         delete m_pQuadTree;
 }
 
-void ToolSystemMap::OpenFile()
+void ToolSystemMap::OpenFile(std::wstring szFullPath)
 {
+    Texture* pTexture = nullptr;
+    UINT iMaxDepth = 0;
+    std::wstring szVSPath;
+    std::wstring szPSPath;
+    void* shader_byte_code_vs = nullptr;
+    void* shader_byte_code_ps = nullptr;
+    size_t size_shader_vs = 0;
+    size_t size_shader_ps = 0;
+    MeshMap* pMapMesh = new MeshMap();
+    BYTE* fAlphaData;
+    std::ifstream is(szFullPath);
+    std::string line;
+    while (std::getline(is, line))
+    {
+        std::istringstream iss(line);
+        std::string fieldName;
+        if (std::getline(iss, fieldName, ':'))
+        {
+            if (fieldName == "m_pTexture")
+            {
+                std::string textureName;
+                iss >> textureName;
+                pTexture = _EngineSystem.GetTextureSystem()->CreateTextureFromFile(_tomw(textureName));
+                m_ListTexture.push_back(_tomw(textureName));
+            }
+            else if (fieldName == "m_ListTextureSplatting")
+            {
+                std::string texturesStr;
+                std::getline(iss, texturesStr);
+                std::stringstream texturesStream(texturesStr);
+                std::string texturePath;
+                while (std::getline(texturesStream, texturePath, ','))
+                {
+                    if (texturePath.size() > 1)
+                    {
+                        texturePath.erase(std::remove(texturePath.begin(), texturePath.end(), ' '), texturePath.end());
+                        auto texture = _EngineSystem.GetTextureSystem()->CreateTextureFromFile(_tomw(texturePath));
+                        m_ListTextureSplatting.emplace_back(texture->GetTextureName());
+                    }
+                }
+            }
+            else if (fieldName == "m_iMaxDepth")
+            {
+                iss >> iMaxDepth;
+            }
+            else if (fieldName == "m_szVSName")
+            {
+                std::string str;
+                std::getline(iss, str);
+                szVSPath = _tomw(str);
+            }
+            else if (fieldName == "m_szPSName")
+            {
+                std::string str;
+                std::getline(iss, str);
+                szPSPath = _tomw(str);
+            }
+            else if (fieldName == "m_pMap")
+            {
+                is >> pMapMesh;
+                std::getline(is, line);
+            }
+            else if (fieldName == "m_fAlphaData")
+            {
+                fAlphaData = new BYTE[pMapMesh->m_dwNumRows * pMapMesh->m_dwNumColumns * 4];
+                for (int idx = 0; idx < pMapMesh->m_dwNumRows * pMapMesh->m_dwNumColumns * 4; idx++)
+                {
+                    is >> fAlphaData[idx];
+                }
+            }
+        }
+    }
+    is.close();
+
+    constant_map cc;
+    cc.matWorld = XMMatrixIdentity();
+    cc.matView = m_pCamera->m_matCamera;
+    cc.matProj = m_pCamera->m_matProj;
+
+    _EngineSystem.GetMeshSystem()->AddResource(L"MapMesh", pMapMesh);
+
+    _EngineSystem.GetRenderSystem()->CompileVertexShader(szVSPath.c_str(), "vsmain", "vs_5_0", &shader_byte_code_vs, &size_shader_vs);
+    VertexShader* pVertexShader = _EngineSystem.GetRenderSystem()->CreateVertexShader(shader_byte_code_vs, size_shader_vs);
+    _EngineSystem.GetRenderSystem()->CompilePixelShader(szPSPath.c_str(), "psmain", "ps_5_0", &shader_byte_code_ps, &size_shader_ps);
+    PixelShader* pPixelShader = _EngineSystem.GetRenderSystem()->CreatePixelShader(shader_byte_code_ps, size_shader_ps);
+
+    VertexBuffer* pVertexBuffer = _EngineSystem.GetRenderSystem()->CreateVertexBuffer(&pMapMesh->GetListVertex()[0], sizeof(object), pMapMesh->GetListVertex().size(), shader_byte_code_vs, size_shader_vs);
+    IndexBuffer* pIndexBuffer = _EngineSystem.GetRenderSystem()->CreateIndexBuffer(&pMapMesh->GetListIndex()[0], pMapMesh->GetListIndex().size());
+
+    _EngineSystem.GetRenderSystem()->ReleaseBlob();
+
+    pMapMesh->m_pVertexBuffer = pVertexBuffer;
+    pMapMesh->m_pIndexBuffer = pIndexBuffer;
+
+    m_pQuadTree = new FQuadTree(m_pCamera, pMapMesh, iMaxDepth);
+    m_pQuadTree->SetConstantData(cc);
+    m_pQuadTree->SetTransform({ {0, 0, 0} , {0, 0, 0}, {1, 1, 1} });
+    m_pQuadTree->SetTexture(pTexture);
+    for (const auto& texture : m_ListTextureSplatting)
+        m_pQuadTree->SetSplattingTexture(_EngineSystem.GetTextureSystem()->GetTexture(texture));
+    m_pQuadTree->SetShader(szVSPath, pVertexShader, szPSPath, pPixelShader);
 }
 
 void ToolSystemMap::SaveFile(std::wstring szFullPath)
 {
-    std::ofstream outfile(szFullPath);
-    for (auto object : _ObjectSystem.m_ListObject)
-    {
-        outfile.write(reinterpret_cast<char*>(object), sizeof(Object));
-    }
-    outfile.close();
+    std::ofstream os(szFullPath);
+    m_pQuadTree->Serialize(os);
+    os.close();
 }
 
 void ToolSystemMap::Update()

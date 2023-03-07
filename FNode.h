@@ -17,6 +17,7 @@ public:
 	std::vector<FNode*> m_pChild;
 	std::vector<Object*> m_pStaticObjectList;
 	std::vector<Object*> m_pDynamicObjectList;
+	//friend std::ofstream& operator<<(std::ostream& os, const FNode& pNode);
 public:
 	void		CreateChildNode(FNode* pParent, MeshMap* pMap);
 	void		CreateIndexData(MeshMap* pMap);

@@ -1,10 +1,14 @@
 #include "Texture.h"
+std::wstring Texture::GetTextureName()
+{
+	return m_szFullPath;
+}
 Texture::Texture() : Resource()
 {
 
 }
 
-Texture::Texture(std::wstring szFullPath) : Resource(szFullPath)
+Texture::Texture(std::wstring szFullPath) : Resource(szFullPath), m_szFullPath(szFullPath)
 {
 	DirectX::ScratchImage image_data;
 	HRESULT result = CoInitialize(nullptr);	//WhyConinitialize

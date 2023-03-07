@@ -139,3 +139,8 @@ FNode::~FNode()
 	m_pChild[2] = nullptr;
 	m_pChild[3] = nullptr;
 }
+
+//std::ofstream& operator<<(std::ostream& os, const FNode& pNode)
+//{
+//	os<<
+//}

@@ -9,6 +9,13 @@ struct Transform
 	XMVECTOR position;
 	XMVECTOR rotation;
 	XMVECTOR scale;
+	friend std::ostream& operator<<(std::ostream& os, const Transform& transform)
+	{
+		os << "position:" << XMVectorGetX(transform.position) << " " << XMVectorGetY(transform.position) << " " << XMVectorGetZ(transform.position) << ", ";
+		os << "rotation:" << XMVectorGetX(transform.rotation) << " " << XMVectorGetY(transform.rotation) << " " << XMVectorGetZ(transform.rotation) << ", ";
+		os << "scale:" << XMVectorGetX(transform.scale) << " " << XMVectorGetY(transform.scale) << " " << XMVectorGetZ(transform.scale);
+		return os;
+	}
 };
 
 enum CULL_MODE
@@ -38,8 +45,9 @@ public:
 	virtual void Render();
 public:
 	void DeSerialize() const;
-	void Serialize() const;
+	void Serialize(std::ostream& os) const;
 public:
+	Object(std::wstring szFullPath);
 	Object();
 	virtual ~Object();
 protected:

@@ -219,24 +219,21 @@ MeshMap::MeshMap(UINT iWidth, UINT iHeight, float fCellDistance)
     {
         for (int iCol = 0; iCol < m_dwNumColumns; iCol++)
         {
-            float radCol = _DegreeToRadian(iCol);
-            float radRow = _DegreeToRadian(iRow);
             m_ListVertex[iRow * m_dwNumColumns + iCol].pos =
             {
                 (float)(iCol - iHalfWidth) * m_fCellDistance,
-                //cosf(iCol) * fShellY + sinf(iRow) * fShellY,
                 0.0f,
                 (float)(iHalfHeight - iRow) * m_fCellDistance
             };
-            if (m_fHeightList.size())
-            {
-                m_ListVertex[iRow * iWidth + iCol].pos.y = m_fHeightList[iRow * m_dwNumRows + iCol] * 100.0f; //헤이트맵사용
-            }
+            //if (m_fHeightList.size())
+            //{
+            //    m_ListVertex[iRow * iWidth + iCol].pos.y = m_fHeightList[iRow * m_dwNumRows + iCol] * 100.0f; //헤이트맵사용
+            //}
                 
             m_ListVertex[iRow * m_dwNumColumns + iCol].color = { 1, 1, 1, 1 };
             m_ListVertex[iRow * m_dwNumColumns + iCol].tex =
-            { ((float)iCol / (float)(iWidth - 1)) * m_fShellTexCount,
-              ((float)iRow / (float)(iHeight - 1)) * m_fShellTexCount };
+            { ((float)iCol / (float)(iWidth - 1)),
+              ((float)iRow / (float)(iHeight - 1)) };
         }
     }
     m_ListIndex.resize((m_dwNumRows - 1) * (m_dwNumColumns - 1) * 2 * 3.0f);
@@ -262,8 +259,88 @@ MeshMap::MeshMap(UINT iWidth, UINT iHeight, float fCellDistance)
     m_dwFace = m_ListIndex.size() / 3;
     GenerateVertexNormal();
 }
+MeshMap::MeshMap()
+{
+  
+}
+
 MeshMap::~MeshMap()
 {
     if(m_pVertexBuffer) delete m_pVertexBuffer;
     if(m_pIndexBuffer) delete m_pIndexBuffer;
+}
+
+std::ostream& operator<<(std::ostream& os, const MeshMap* pMap)
+{
+    os << std::endl;
+    os << "m_dwNumRows:" << pMap->m_dwNumRows << std::endl;
+    os << "m_dwNumColumns:" << pMap->m_dwNumColumns << std::endl;
+    os << "m_fCellDistance:" << pMap->m_fCellDistance << std::endl;
+    os << "m_ListVertex:"<<std::endl;
+    for (const auto& vertex : pMap->m_ListVertex)
+    {
+        os << "vertex:" << vertex << std::endl;
+    }
+    return os;
+}
+
+std::ifstream& operator>>(std::ifstream& is, MeshMap* pMap)
+{
+    std::string line;
+    while (std::getline(is, line))
+    {
+        std::istringstream iss(line);
+        std::string fieldName;
+        if (std::getline(iss, fieldName, ':'))
+        {
+            if (fieldName == "m_dwNumRows")
+            {
+                iss >> pMap->m_dwNumRows;
+            }
+            else if (fieldName == "m_dwNumColumns")
+            {
+                iss >> pMap->m_dwNumColumns;
+            }
+            else if (fieldName == "m_fCellDistance")
+            {
+                iss >> pMap->m_fCellDistance;
+            }
+            else if (fieldName == "m_ListVertex")
+            {
+                std::vector<object> vertices;
+                std::string vertexLine;
+                while (std::getline(is, vertexLine) && vertexLine != "") {
+                    object vertex;
+                    std::istringstream vertexIss(vertexLine);
+                    vertexIss >> vertex;
+                    vertices.push_back(vertex);
+                }
+                pMap->m_ListVertex = vertices;
+            }
+        }
+    }
+
+    pMap->m_ListIndex.resize((pMap->m_dwNumRows - 1) * (pMap->m_dwNumColumns - 1) * 2 * 3.0f);
+
+    UINT iIndex = 0;
+    for (int iRow = 0; iRow < pMap->m_dwNumRows - 1; iRow++)
+    {
+        for (int iCol = 0; iCol < pMap->m_dwNumColumns - 1; iCol++)
+        {
+            UINT iNextRow = iRow + 1;
+            UINT iNextCol = iCol + 1;
+            pMap->m_ListIndex[iIndex + 0] = iRow * pMap->m_dwNumColumns + iCol;
+            pMap->m_ListIndex[iIndex + 1] = pMap->m_ListIndex[iIndex + 0] + 1;
+            pMap->m_ListIndex[iIndex + 2] = iNextRow * pMap->m_dwNumColumns + iCol;
+
+            pMap->m_ListIndex[iIndex + 3] = pMap->m_ListIndex[iIndex + 2];
+            pMap->m_ListIndex[iIndex + 4] = pMap->m_ListIndex[iIndex + 1];
+            pMap->m_ListIndex[iIndex + 5] = pMap->m_ListIndex[iIndex + 3] + 1;
+
+            iIndex += 6;
+        }
+    }
+    pMap->m_dwFace = pMap->m_ListIndex.size() / 3;
+    pMap->GenerateVertexNormal();
+    return is;
 }

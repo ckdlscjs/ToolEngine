@@ -1,0 +1,35 @@
+m_ListTextureSplatting:D:\sylProject\Project41\Assets\Textures\brick_d.jpg D:\sylProject\Project41\Assets\Textures\brick_n.jpg D:\sylProject\Project41\Assets\Textures\earth_color.jpg D:\sylProject\Project41\Assets\Textures\clouds.jpg 
+m_iMaxDepth:2
+m_pMap:m_dwNumRows:5
+m_dwNumColumns:5
+m_fCellDistance:1
+m_ListVertex:vertex:pos:-2 0 2tex:0 0normal:0 1 0color:1 1 1 1
+vertex:pos:-1 0 2tex:0.25 0normal:0 1 0color:1 1 1 1
+vertex:pos:0 0 2tex:0.5 0normal:0 1 0color:1 1 1 1
+vertex:pos:1 0 2tex:0.75 0normal:0 1 0color:1 1 1 1
+vertex:pos:2 0 2tex:1 0normal:0 1 0color:1 1 1 1
+vertex:pos:-2 0 1tex:0 0.25normal:0 1 0color:1 1 1 1
+vertex:pos:-1 0 1tex:0.25 0.25normal:0 1 0color:1 1 1 1
+vertex:pos:0 0 1tex:0.5 0.25normal:0 1 0color:1 1 1 1
+vertex:pos:1 0 1tex:0.75 0.25normal:0 1 0color:1 1 1 1
+vertex:pos:2 0 1tex:1 0.25normal:0 1 0color:1 1 1 1
+vertex:pos:-2 0 0tex:0 0.5normal:0 1 0color:1 1 1 1
+vertex:pos:-1 0 0tex:0.25 0.5normal:0 1 0color:1 1 1 1
+vertex:pos:0 0 0tex:0.5 0.5normal:0 1 0color:1 1 1 1
+vertex:pos:1 0 0tex:0.75 0.5normal:0 1 0color:1 1 1 1
+vertex:pos:2 0 0tex:1 0.5normal:0 1 0color:1 1 1 1
+vertex:pos:-2 0 -1tex:0 0.75normal:0 1 0color:1 1 1 1
+vertex:pos:-1 0 -1tex:0.25 0.75normal:0 1 0color:1 1 1 1
+vertex:pos:0 0 -1tex:0.5 0.75normal:0 1 0color:1 1 1 1
+vertex:pos:1 0 -1tex:0.75 0.75normal:0 1 0color:1 1 1 1
+vertex:pos:2 0 -1tex:1 0.75normal:0 1 0color:1 1 1 1
+vertex:pos:-2 0 -2tex:0 1normal:0 1 0color:1 1 1 1
+vertex:pos:-1 0 -2tex:0.25 1normal:0 1 0color:1 1 1 1
+vertex:pos:0 0 -2tex:0.5 1normal:0 1 0color:1 1 1 1
+vertex:pos:1 0 -2tex:0.75 1normal:0 1 0color:1 1 1 1
+vertex:pos:2 0 -2tex:1 1normal:0 1 0color:1 1 1 1
+
+m_pTexture:D:\sylProject\Project41\Assets\Textures\brick.png
+m_Transform:position:0 0 0rotation:0 0 0scale:1 1 1
+m_szVSName:MapVertexShader.hlsl
+m_szPSName:MapPixelShader.hlsl

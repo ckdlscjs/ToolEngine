@@ -24,8 +24,12 @@ public:
 	void	GenerateVertexNormal();																		//각 버텍스정점의 법선노말생성
 	XMVECTOR ComputeFaceNormal(UINT i0, UINT i1, UINT i2);
 	void	ComputeVertexNormal(UINT iVertex);
+	friend std::ostream& operator<<(std::ostream& os, const MeshMap* pMap);
+	friend std::ifstream& operator>>(std::ifstream& is, MeshMap* pMap);
+
 public:
-	MeshMap(UINT iWidth, UINT iHeight, float fShellDistance);
+	MeshMap();
+	MeshMap(UINT iWidth, UINT iHeight, float fCellDistance);
 	virtual ~MeshMap();
 public:
 	DWORD m_dwNumRows;
@@ -38,9 +42,7 @@ public:
 	std::vector<float> m_fHeightList;	//높이맵의높이정보
 	std::vector<vertex_info> m_ListVertexInfo;	//정점법선노말
 	std::vector<face_info> m_ListFaceNormal;	//표면법선노말
-	float m_fShellY = 1.0f;
 	float m_fCellDistance = 1.0f;
-	float m_fShellTexCount = 1.0f;
 	friend class FNode;
 	friend class FQuadTree;
 	friend class ToolSystemMap;

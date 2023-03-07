@@ -96,6 +96,97 @@ void FQuadTree::Splatting(XMVECTOR vIntersection, UINT iSplattingTexIndex, float
     g_pDeviceContext->UpdateSubresource(m_pMaskAlphaTexture, 0, nullptr, m_fAlphaData, RowPitch, DepthPitch);
 }
 
+void FQuadTree::DeSerialize(std::wstring szFile)
+{
+   /* std::ifstream is(szFile.c_str()); 
+    std::string line;
+
+    while (std::getline(is, line))
+    {
+        std::istringstream iss(line);
+        std::string key;
+
+        if (std::getline(iss, key, ':'))
+        {
+            if (key == "m_ListTextureSplatting")
+            {
+                std::string texturePaths;
+                std::getline(iss, texturePaths);
+
+                std::istringstream textureIss(texturePaths);
+                std::string texturePath;
+
+                while (std::getline(textureIss, texturePath, ','))
+                {
+                    SetSplattingTexture(_EngineSystem.GetTextureSystem()->CreateTextureFromFile(_tomw(texturePath).c_str()));
+                }
+            }
+            else if (key == "m_iMaxDepth")
+            {
+                std::string strValue;
+                std::getline(iss, strValue);
+
+                m_iMaxDepth = std::stoi(strValue);
+            }
+            else if (key == "m_pMap")
+            {
+                std::string texturePaths;
+                std::getline(iss, texturePaths);
+
+                std::istringstream textureIss(texturePaths);
+                std::string texturePath;
+                if (texturePath == "m_dwNumRows")
+                {
+                    std::string strValue;
+                    std::getline(iss, strValue);
+
+                    m_iMaxDepth = std::stoi(strValue);
+                }
+                if (texturePath == "m_dwNumColumns")
+                {
+                    std::string strValue;
+                    std::getline(iss, strValue);
+
+                    m_iMaxDepth = std::stoi(strValue);
+                }
+                if (texturePath == "m_ListVertex")
+                {
+                    std::string strValue;
+                    std::getline(iss, strValue);
+
+                }
+            }
+           
+        }
+    }
+    is.close();*/
+}
+
+void FQuadTree::Serialize(std::ofstream& os) const
+{
+    os << "m_pTexture:" << m_pTexture->GetTextureName() << std::endl;
+
+    os << "m_ListTextureSplatting:";
+    for (const auto& texture : m_ListTextureSplatting)
+    {
+        os << texture->m_szFullPath << ", ";
+    }
+    os << std::endl;
+
+    os << "m_iMaxDepth:" << m_iMaxDepth << std::endl;
+
+    os << "m_szVSName:" << m_szVSPath << std::endl;
+
+    os << "m_szPSName:" << m_szPSPath << std::endl;
+
+    os << "m_pMap:" << m_pMap << std::endl;
+
+    os << "m_fAlphaData:";
+    for (int idx = 0; idx < m_pMap->m_dwNumRows * m_pMap->m_dwNumColumns * 4; idx++)
+        os << m_fAlphaData[idx] << " ";
+    os << std::endl;
+}
+
 FQuadTree::FQuadTree(Camera* pCamera, MeshMap* pMap, int iMaxDepth)
 {
     m_pCamera = pCamera;
@@ -188,7 +279,7 @@ void FQuadTree::SetSculptIntensity(float fIntensity)
 
 void FQuadTree::SetSplattingTexture(Texture* pTexture)
 {
-    m_ListTextrueSplatting.push_back(pTexture);
+    m_ListTextureSplatting.push_back(pTexture);
 }
 
 void FQuadTree::SetSplatting(int iChkIdx, bool bSplatting)
@@ -224,17 +315,14 @@ void FQuadTree::SetTexture(Texture* pTexture)
     m_pTexture = pTexture;
 }
 
-void FQuadTree::SetShader(VertexShader* pVertexShader, PixelShader* pPixelShader)
+void FQuadTree::SetShader(std::wstring vsPath, VertexShader* pVertexShader, std::wstring psPath, PixelShader* pPixelShader)
 {
+    m_szVSPath = vsPath;
     m_pVertexShader = pVertexShader;
+    m_szPSPath = psPath;
     m_pPixelShader = pPixelShader;
 }
 
-void FQuadTree::SetShaderName(std::wstring vsName, std::wstring psName)
-{
-    m_szVSName = vsName;
-    m_szPSName = psName;
-}
 
 void FQuadTree::SetConstantData(constant_map cc)
 {
@@ -478,8 +566,8 @@ void FQuadTree::Render()
     g_pDeviceContext->PSSetShaderResources(1, 1, &m_pMaskAlphaSrv);
     if (m_bSplatting)
     {
-        for (int idx = 0; idx < m_ListTextrueSplatting.size(); idx++)
-            g_pDeviceContext->PSSetShaderResources(2 + idx, 1, &m_ListTextrueSplatting[idx]->m_pShaderResourceView);
+        for (int idx = 0; idx < m_ListTextureSplatting.size(); idx++)
+            g_pDeviceContext->PSSetShaderResources(2 + idx, 1, &m_ListTextureSplatting[idx]->m_pShaderResourceView);
     }
     
     for (int idx = 0;  idx < m_pDrawLeafNodeList.size(); idx++)

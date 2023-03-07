@@ -157,19 +157,26 @@ void Object::DeSerialize() const
 	
 }
 
-void Object::Serialize() const
+void Object::Serialize(std::ostream& os) const
 {
-	/*std::ofstream os("trans.bin");
-	os << << std::endl;
-	os.close();
-
-	Transform trans;
-	std::ifstream is("trans.bin");
-	
-
-	is.close();*/
+	/*os << "FullPath: " << m_szFullPath << std::endl;
+	os << "Transform: " << m_Transform << std::endl;
+	os << "Mesh: " << m_pMesh << std::endl;
+	os << "Material: " << m_pMaterial << std::endl;
+	os << "VSName: " << m_szVSName << std::endl;
+	os << "PSName: " << m_szPSName << std::endl;
+	os << "ConstantData: " << constantData << std::endl;
+	os << "CullMode: " << m_CullMode << std::endl;*/
 }
 
+
+Object::Object(std::wstring szFullPath) : m_szFullPath(szFullPath)
+{
+	constantData.matWorld = XMMatrixIdentity();
+	constantData.matView = XMMatrixIdentity();
+	constantData.matProj = XMMatrixIdentity();
+	m_pConstantBuffer = _EngineSystem.GetRenderSystem()->CreateConstantBuffer(&constantData, sizeof(constantData));
+}
 
 Object::Object()
 {
