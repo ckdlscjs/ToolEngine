@@ -331,7 +331,6 @@ void ToolSystemMap::OpenFile(std::wstring szFullPath)
             else if (fieldName == "m_pMap")
             {
                 is >> pMapMesh;
-                std::getline(is, line);
             }
             else if (fieldName == "m_fAlphaData")
             {

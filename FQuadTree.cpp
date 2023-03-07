@@ -179,7 +179,7 @@ void FQuadTree::Serialize(std::ofstream& os) const
 
     os << "m_szPSName:" << m_szPSPath << std::endl;
 
-    os << "m_pMap:" << m_pMap << std::endl;
+    os << "m_pMap:" << m_pMap;
 
     os << "m_fAlphaData:";
     for (int idx = 0; idx < m_pMap->m_dwNumRows * m_pMap->m_dwNumColumns * 4; idx++)

@@ -320,6 +320,7 @@ std::ifstream& operator>>(std::ifstream& is, MeshMap* pMap)
         }
     }
 
+
     pMap->m_ListIndex.resize((pMap->m_dwNumRows - 1) * (pMap->m_dwNumColumns - 1) * 2 * 3.0f);
 
     UINT iIndex = 0;
