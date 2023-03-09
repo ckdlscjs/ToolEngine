@@ -15,6 +15,8 @@ private:
 	void SetIndexList(void* indices, int iSize);
 	void SetVertexBuffer(VertexBuffer* pVertexBuffer);
 	void SetIndexBuffer(IndexBuffer* pIndexBuffer);
+	friend std::ostream& operator<<(std::ostream& os, const MeshNode* pMeshNode);
+	friend std::ifstream& operator>>(std::ifstream& is, MeshNode* pMeshNode);
 public:
 	MeshNode(void* vertices, int iSizeVertices, VertexBuffer* pVertexBuffer, void* indices, int iSizeIndices, IndexBuffer* pIndexBuffer);
 	~MeshNode();

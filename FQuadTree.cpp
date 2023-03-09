@@ -62,6 +62,7 @@ void FQuadTree::Splatting(XMVECTOR vIntersection, UINT iSplattingTexIndex, float
     // pick data    ->  texture data
     // 0 ~ 64      ->   0 ~ 1
     // - 32 ~ +32  ->   0 ~ 1024 -> 0 ~ 1
+    float fCellDistance = m_pMap->m_fCellDistance;
     XMFLOAT2 vTexIndex;
     XMFLOAT2 vUV;
     XMFLOAT2 vMaxSize = { (float)(m_pMap->m_dwNumRows / 2), (float)(m_pMap->m_dwNumColumns / 2) };
@@ -79,7 +80,7 @@ void FQuadTree::Splatting(XMVECTOR vIntersection, UINT iSplattingTexIndex, float
             vUV = XMFLOAT2((vTexIndex.x / (float)m_pMap->m_dwNumRows) * 2.0f - 1.0f,
                 -(vTexIndex.y / (float)m_pMap->m_dwNumColumns * 2.0f - 1.0f));
             // 맵사이즈크기만큼
-            vTexPos = XMFLOAT3(vUV.x * vMaxSize.x, 0.0f, vUV.y * vMaxSize.y);  //x and z
+            vTexPos = XMFLOAT3(vUV.x * vMaxSize.x * fCellDistance, 0.0f, vUV.y * vMaxSize.y * fCellDistance);  //x and z
             BYTE* pixel = &m_fAlphaData[m_pMap->m_dwNumRows * y * 4 + x * 4];
             XMFLOAT3 radius =  vPickPos - vTexPos;
             float fRadius = XMVectorGetX(XMVector3Length(XMLoadFloat3(&radius)));
@@ -185,6 +186,14 @@ void FQuadTree::Serialize(std::ofstream& os) const
     os << "m_szPSName:" << m_szPSPath << std::endl;
 
     os << "m_pMap:" << m_pMap;
+
+    os << "m_pAllObjectList:" << std::endl;
+    for (const auto& object : m_pAllObjectList)
+    {
+        os << object->m_szFullPath << ", ";
+        os << object->m_Transform;
+        os << std::endl;
+    }
 
     os << "m_fAlphaData:";
     for (int idx = 0; idx < m_pMap->m_dwNumRows * m_pMap->m_dwNumColumns * 4; idx++)
@@ -336,10 +345,13 @@ void FQuadTree::SetConstantData(constant_map cc)
 
 BOOL FQuadTree::AddObject(Object* pObj)
 {
+    m_pAllObjectList.push_back(pObj);
+
     FNode* pFindNode = FindNode(m_pRootNode, pObj);
     if (pFindNode != nullptr)
     {
         pFindNode->m_pDynamicObjectList.push_back(pObj);
+        //pFindNode->m_pStaticObjectList.push_back(pObj);
         return TRUE;
     }
     return FALSE;
@@ -423,7 +435,7 @@ FNode* FQuadTree::VisibleNode(FNode* pNode)
 bool FQuadTree::GetInterSection()
 {
     //교점체크
-    if ((_InputSystem.GetKey(VK_RBUTTON) == KEY_STATE::KEY_DOWN || (_InputSystem.GetKey(VK_RBUTTON) == KEY_STATE::KEY_HOLD)))
+    if ((_InputSystem.GetKey(VK_RBUTTON) == KEY_STATE::KEY_DOWN))
     {
         for (const auto& node : m_pDrawLeafNodeList)
         {

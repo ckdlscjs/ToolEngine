@@ -54,7 +54,7 @@ void ToolSystemMap::SetSculptIntensity(float fIntensity)
         m_pQuadTree->SetSculptIntensity(fIntensity);
 }
 
-void ToolSystemMap::CreateFbxObject(std::wstring szFullPath, XMVECTOR vPos)
+void ToolSystemMap::CreateFbxObject(std::wstring szFullPath, XMVECTOR vPos, XMVECTOR vRot, XMVECTOR vScale)
 {
     constant cc;
     cc.matWorld = XMMatrixIdentity();
@@ -118,7 +118,7 @@ void ToolSystemMap::CreateFbxObject(std::wstring szFullPath, XMVECTOR vPos)
 
     pObject->SetShader(pVertexShader, pPixelShader);
     pObject->SetConstantData(cc);
-    pObject->SetTransform({ vPos , {0, 0, 0}, {1, 1, 1} });
+    pObject->SetTransform({ vPos , vRot, vScale});
     pObject->SetMesh(pMesh);
     pObject->SetMaterial(pMaterial);
    
@@ -332,14 +332,31 @@ void ToolSystemMap::OpenFile(std::wstring szFullPath)
             {
                 is >> pMapMesh;
             }
+            else if (fieldName == "m_pAllObjectList")
+            {
+                std::streampos prevPos;
+                std::string str;
+                while (std::getline(is, str))
+                {
+                    if (str.find("m_fAlphaData:") != std::string::npos)
+                        break;
+                    std::stringstream texturesStream(str);
+                    std::string szFullPath;
+                    std::getline(texturesStream, szFullPath, ',');
+                    Transform transform;
+                    texturesStream >> transform;
+                    CreateFbxObject(_tomw(szFullPath), transform.position, transform.rotation, transform.scale);
+                    prevPos = is.tellg();
+                } 
+            }
             else if (fieldName == "m_fAlphaData")
             {
                 fAlphaData = new BYTE[pMapMesh->m_dwNumRows * pMapMesh->m_dwNumColumns * 4];
                 for (int idx = 0; idx < pMapMesh->m_dwNumRows * pMapMesh->m_dwNumColumns * 4; idx++)
                 {
-                    int rgb = 0;
-                    iss >> rgb;
-                    fAlphaData[idx] = static_cast<uint8_t>(rgb);
+                    int rgba = 0;
+                    iss >> rgba;
+                    fAlphaData[idx] = static_cast<uint8_t>(rgba);
                 }
             }
         }

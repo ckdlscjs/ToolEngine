@@ -157,16 +157,21 @@ void Object::DeSerialize() const
 	
 }
 
-void Object::Serialize(std::ostream& os) const
+void Object::Serialize(std::ofstream& os) const
 {
-	/*os << "FullPath: " << m_szFullPath << std::endl;
-	os << "Transform: " << m_Transform << std::endl;
-	os << "Mesh: " << m_pMesh << std::endl;
-	os << "Material: " << m_pMaterial << std::endl;
-	os << "VSName: " << m_szVSName << std::endl;
-	os << "PSName: " << m_szPSName << std::endl;
-	os << "ConstantData: " << constantData << std::endl;
-	os << "CullMode: " << m_CullMode << std::endl;*/
+	os << "m_szFullPath:" << m_szFullPath << std::endl;
+
+	os << "m_Transform:" << m_Transform << std::endl;
+
+	os << "m_szVSName:" << m_szVSName << std::endl;
+
+	os << "m_szPSName:" << m_szPSName << std::endl;
+
+	os << "m_pMesh:" << m_pMesh;
+
+	os << "m_pMaterial:" << m_pMaterial;
+
+	os << "m_CullMode:" << m_CullMode << std::endl;
 }
 
 

@@ -79,6 +79,7 @@ public:
 	std::wstring m_szPSPath;
 	PixelShader* m_pPixelShader;
 	Camera* m_pCamera = nullptr;
+	std::vector<Object*> m_pAllObjectList;
 	std::vector<FNode*> m_pLeafNodeList;
 	std::vector<FNode*> m_pDrawLeafNodeList;
 

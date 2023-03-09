@@ -33,3 +33,19 @@ Mesh::~Mesh()
 	}
 	m_ListMeshNode.clear();
 }
+
+std::ostream& operator<<(std::ostream& os, const Mesh* pMesh)
+{
+	os << "m_ListMeshNode:" << std::endl;
+	for (const auto& mesh : pMesh->m_ListMeshNode)
+	{
+		os << "mesh:" << mesh << std::endl;
+	}
+	return os;
+}
+
+std::ifstream& operator>>(std::ifstream& is, Mesh* pMesh)
+{
+	// TODO: 여기에 return 문을 삽입합니다.
+	return is;
+}

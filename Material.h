@@ -8,7 +8,8 @@ public:
 	bool IsEmpty();
 	std::vector<Texture*>& GetListTexture(int iNodeIdx);
 	void SetTexture(Texture* pTexture, unsigned int iNodeIdx);
-	friend std::ostream& operator<<(std::ostream& os, const Material& pMaterial);
+	friend std::ostream& operator<<(std::ostream& os, const Material* pMaterial);
+	friend std::ifstream& operator>>(std::ifstream& is, Material* pMaterial);
 public:
 	Material();
 	~Material();

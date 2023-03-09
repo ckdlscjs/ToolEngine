@@ -16,6 +16,77 @@ struct Transform
 		os << "scale:" << XMVectorGetX(transform.scale) << " " << XMVectorGetY(transform.scale) << " " << XMVectorGetZ(transform.scale);
 		return os;
 	}
+	friend std::istringstream& operator>>(std::istringstream& is, Transform& transform)
+	{
+		// "pos: x y z, tex: x y, normal: x y z, color: r g b a"와 같은 형태의 문자열에서 필드 값을 추출합니다.
+		std::string line;
+		std::getline(is, line);
+
+		// pos 값을 추출합니다.
+		size_t pos_start = line.find("position:") + strlen("position:");
+		size_t pos_end = line.find(",", pos_start);
+		std::string pos_str = line.substr(pos_start, pos_end - pos_start);
+		std::istringstream pos_stream(pos_str);
+		XMFLOAT3 position;
+		pos_stream >> position.x >> position.y >> position.z;
+		transform.position = XMLoadFloat3(&position);
+
+		// rotation 값을 추출합니다.
+		size_t rot_start = line.find("rotation:") + strlen("rotation:");
+		size_t rot_end = line.find(",", rot_start);
+		std::string rot_str = line.substr(rot_start, rot_end - rot_start);
+		std::istringstream rot_stream(rot_str);
+		XMFLOAT3 rotation;
+		rot_stream >> rotation.x >> rotation.y >> rotation.z;
+		transform.rotation = XMLoadFloat3(&rotation);
+
+		// scale 값을 추출합니다.
+		size_t scale_start = line.find("scale:") + strlen("scale:");
+		size_t scale_end = line.find(",", scale_start);
+		std::string normal_str = line.substr(scale_start, scale_end - scale_start);
+		std::istringstream scale_stream(normal_str);
+		XMFLOAT3 scale;
+		scale_stream >> scale.x >> scale.y >> scale.z;
+		transform.scale = XMLoadFloat3(&scale);
+
+		return is;
+	}
+
+	friend std::stringstream& operator>>(std::stringstream& is, Transform& transform)
+	{
+		// "pos: x y z, tex: x y, normal: x y z, color: r g b a"와 같은 형태의 문자열에서 필드 값을 추출합니다.
+		std::string line;
+		std::getline(is, line);
+
+		// pos 값을 추출합니다.
+		size_t pos_start = line.find("position:") + strlen("position:");
+		size_t pos_end = line.find(",", pos_start);
+		std::string pos_str = line.substr(pos_start, pos_end - pos_start);
+		std::istringstream pos_stream(pos_str);
+		XMFLOAT3 position;
+		pos_stream >> position.x >> position.y >> position.z;
+		transform.position = XMLoadFloat3(&position);
+
+		// rotation 값을 추출합니다.
+		size_t rot_start = line.find("rotation:") + strlen("rotation:");
+		size_t rot_end = line.find(",", rot_start);
+		std::string rot_str = line.substr(rot_start, rot_end - rot_start);
+		std::istringstream rot_stream(rot_str);
+		XMFLOAT3 rotation;
+		rot_stream >> rotation.x >> rotation.y >> rotation.z;
+		transform.rotation = XMLoadFloat3(&rotation);
+
+		// scale 값을 추출합니다.
+		size_t scale_start = line.find("scale:") + strlen("scale:");
+		size_t scale_end = line.find(",", scale_start);
+		std::string normal_str = line.substr(scale_start, scale_end - scale_start);
+		std::istringstream scale_stream(normal_str);
+		XMFLOAT3 scale;
+		scale_stream >> scale.x >> scale.y >> scale.z;
+		transform.scale = XMLoadFloat3(&scale);
+
+		return is;
+	}
 };
 
 enum CULL_MODE
@@ -45,7 +116,7 @@ public:
 	virtual void Render();
 public:
 	void DeSerialize() const;
-	void Serialize(std::ostream& os) const;
+	void Serialize(std::ofstream& os) const;
 public:
 	Object(std::wstring szFullPath);
 	Object();

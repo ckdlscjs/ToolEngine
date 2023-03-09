@@ -19,7 +19,7 @@ public:
 	void SelectSplatting(int iChkIdx, bool bSplatting);
 	void SetSculptRadius(float fRadius);
 	void SetSculptIntensity(float fIntensity);
-	void CreateFbxObject(std::wstring szFullPath, XMVECTOR vPos);
+	void CreateFbxObject(std::wstring szFullPath, XMVECTOR vPos, XMVECTOR vRot = { 0, 0, 0, 0 }, XMVECTOR vScale = { 1, 1, 1, 0 });
 	void CreateSimpleObject(int iChkIdx, XMVECTOR vPos);
 	void CreateSimpleMap(int iWidth, int iHeight,float fDistance, int iChkIdx);
 	void DeleteSimpleMap();

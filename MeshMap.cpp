@@ -311,7 +311,7 @@ std::ifstream& operator>>(std::ifstream& is, MeshMap* pMap)
                 std::vector<object> vertices;
                 std::string vertexLine;
                 while (std::getline(is, vertexLine) && vertexLine != "") {
-                    if (vertexLine.find("m_fAlphaData:") != std::string::npos)
+                    if (vertexLine.find("m_pAllObjectList:") != std::string::npos)
                         break;
                     object vertex;
                     std::istringstream vertexIss(vertexLine);

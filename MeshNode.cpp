@@ -64,3 +64,21 @@ MeshNode::~MeshNode()
 	if (m_pVertexBuffer) delete m_pVertexBuffer;
 	if (m_pIndexBuffer) delete m_pIndexBuffer;
 }
+
+std::ostream& operator<<(std::ostream& os, const MeshNode* pMeshNode)
+{
+	os << "m_ListVertex:" << std::endl;
+	for (const auto& vertex : pMeshNode->m_ListVertex)
+	{
+		os << "vertex:" << vertex << std::endl;
+	}
+	os << "m_ListIndex:" << std::endl;
+	for (const auto& index : pMeshNode->m_ListIndex)
+		os << index << " ";
+	return os;
+}
+
+std::ifstream& operator>>(std::ifstream& is, MeshNode* pMeshNode)
+{
+	return is;
+}

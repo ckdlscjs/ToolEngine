@@ -150,7 +150,6 @@ void ImguiSystem::Update()
                 ifd::FileDialog::Instance().Open("LoadMapDialog", "Open a map", "*.map {.map}", true);
             }
         }
-        ImGui::Dummy({ 0, 10 });
 
         {
             if (ImGui::Button("SaveMap"))
