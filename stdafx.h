@@ -5,6 +5,7 @@
 #include <sstream>
 #include <memory>
 #include <vector>
+#include <set>
 #include <map>
 #include <exception>
 #include <codecvt>

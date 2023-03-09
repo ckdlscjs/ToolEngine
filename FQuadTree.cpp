@@ -259,15 +259,15 @@ UINT FQuadTree::SelectVertexList(T_BOX& box, std::vector<FNode*>& selectNodeList
     return selectNodeList.size();
 }
 
-void FQuadTree::SetPickingMap(int iChkIdx, bool bPicking)
+void FQuadTree::SetPickingMap(std::wstring szCurrentImage, bool bPicking)
 {
-    m_iChkIdx = iChkIdx;
+    m_szCurrentSplat = szCurrentImage;
     m_bMapPicking = bPicking;
 }
 
-void FQuadTree::SetPickingFbx(int iChkIdx, bool bPicking)
+void FQuadTree::SetPickingFbx(std::wstring szCurrentFbx, bool bPicking)
 {
-    m_iChkIdx = iChkIdx;
+    m_szCurrentFbx = szCurrentFbx;
     m_bMapPicking = bPicking;
 }
 
@@ -296,9 +296,9 @@ void FQuadTree::SetSplattingTexture(Texture* pTexture)
     m_ListTextureSplatting.push_back(pTexture);
 }
 
-void FQuadTree::SetSplatting(int iChkIdx, bool bSplatting)
+void FQuadTree::SetSplatting(std::wstring szCurrentSplat, bool bSplatting)
 {
-    m_iChkIdx = iChkIdx;
+    m_szCurrentSplat = szCurrentSplat;
     m_bSplatting = bSplatting;
 }
 
@@ -435,7 +435,7 @@ FNode* FQuadTree::VisibleNode(FNode* pNode)
 bool FQuadTree::GetInterSection()
 {
     //교점체크
-    if ((_InputSystem.GetKey(VK_RBUTTON) == KEY_STATE::KEY_DOWN))
+    if ((_InputSystem.GetKey(VK_RBUTTON) == KEY_STATE::KEY_DOWN || (_InputSystem.GetKey(VK_RBUTTON) == KEY_STATE::KEY_HOLD)))
     {
         for (const auto& node : m_pDrawLeafNodeList)
         {
@@ -514,7 +514,7 @@ void FQuadTree::Update()
     if (m_bMapPicking && GetInterSection())
     {
         //_ToolSystemMap.CreateSimpleObject(m_iChkIdx, m_Select.m_vIntersection);
-        _ToolSystemMap.CreateFbxObject(_ToolSystemMap.m_ListFbx[m_iChkIdx], m_Select.m_vIntersection);
+        _ToolSystemMap.CreateFbxObject(m_szCurrentFbx, m_Select.m_vIntersection);
     }
 
     if (m_bObjectPicking && (_InputSystem.GetKey(VK_RBUTTON) == KEY_STATE::KEY_DOWN))
@@ -567,7 +567,7 @@ void FQuadTree::Update()
 
     if (m_bSplatting && GetInterSection())
     {
-        Splatting(m_Select.m_vIntersection, m_iChkIdx);
+       // Splatting(m_Select.m_vIntersection, m_iChkIdx);
     }
 }
 

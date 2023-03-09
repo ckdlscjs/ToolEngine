@@ -5,10 +5,10 @@ void ToolSystemMap::SetWireframe(bool bWireFrame)
     _EngineSystem.GetRenderSystem()->SetWireFrame(bWireFrame);
 }
 
-void ToolSystemMap::SelectImage(int iChkIdx, bool bPicking)
+void ToolSystemMap::SelectImage(std::wstring szSelectImage, bool bPicking)
 {
     if(m_pQuadTree)
-        m_pQuadTree->SetPickingMap(iChkIdx, bPicking);
+        m_pQuadTree->SetPickingMap(szSelectImage, bPicking);
 }
 
 void ToolSystemMap::SelectSculpt(bool bPicking)
@@ -17,10 +17,10 @@ void ToolSystemMap::SelectSculpt(bool bPicking)
         m_pQuadTree->SetPickingSculpt(bPicking);
 }
 
-void ToolSystemMap::SelectFbxObject(int iChkIdx, bool bPicking)
+void ToolSystemMap::SelectFbxObject(std::wstring szSelectFbx, bool bPicking)
 {
     if (m_pQuadTree)
-        m_pQuadTree->SetPickingFbx(iChkIdx, bPicking);
+        m_pQuadTree->SetPickingFbx(szSelectFbx, bPicking);
 }
 
 
@@ -36,10 +36,10 @@ void ToolSystemMap::SetSplattingTexture(Texture* pTexture)
         m_pQuadTree->SetSplattingTexture(pTexture);
 }
 
-void ToolSystemMap::SelectSplatting(int iChkIdx, bool bSplatting)
+void ToolSystemMap::SelectSplatting(std::wstring szSelectSplat, bool bSplatting)
 {
     if (m_pQuadTree)
-        m_pQuadTree->SetSplatting(iChkIdx, bSplatting);
+        m_pQuadTree->SetSplatting(szSelectSplat, bSplatting);
 }
 
 void ToolSystemMap::SetSculptRadius(float fRadius)
@@ -128,7 +128,7 @@ void ToolSystemMap::CreateFbxObject(std::wstring szFullPath, XMVECTOR vPos, XMVE
     _EngineSystem.GetRenderSystem()->ReleaseBlob();
 }
 
-void ToolSystemMap::CreateSimpleObject(int iChkIdx, XMVECTOR vPos)
+void ToolSystemMap::CreateSimpleObject(std::wstring szFullPath, XMVECTOR vPos)
 {
     object vertex_list[] =
     {
@@ -201,7 +201,7 @@ void ToolSystemMap::CreateSimpleObject(int iChkIdx, XMVECTOR vPos)
     if (pMaterial->IsEmpty())
     {
         std::vector<Texture*> listTex;
-        listTex.push_back(_EngineSystem.GetTextureSystem()->GetTexture(m_ListTexture[iChkIdx].c_str()));
+        listTex.push_back(_EngineSystem.GetTextureSystem()->GetTexture(szFullPath));
         pMaterial->SetList(listTex);
     }
     
@@ -217,7 +217,7 @@ void ToolSystemMap::CreateSimpleObject(int iChkIdx, XMVECTOR vPos)
     _EngineSystem.GetRenderSystem()->ReleaseBlob();
 }
 
-void ToolSystemMap::CreateSimpleMap(int iWidth, int iHeight, float fDistance, int iChkIdx)
+void ToolSystemMap::CreateSimpleMap(int iWidth, int iHeight, float fDistance, std::wstring szFullPath)
 {
     constant_map cc;
     cc.matWorld = XMMatrixIdentity();
@@ -258,7 +258,7 @@ void ToolSystemMap::CreateSimpleMap(int iWidth, int iHeight, float fDistance, in
     m_pQuadTree = new FQuadTree(m_pCamera, pMapMesh);
     m_pQuadTree->SetConstantData(cc);
     m_pQuadTree->SetTransform({ {0, 0, 0} , {0, 0, 0}, {1, 1, 1} });
-    m_pQuadTree->SetTexture(_EngineSystem.GetTextureSystem()->GetTexture(m_ListTexture[iChkIdx].c_str()));
+    m_pQuadTree->SetTexture(_EngineSystem.GetTextureSystem()->GetTexture(szFullPath));
     //m_pQuadTree->SetMaterial(pMaterial);
     m_pQuadTree->SetShader(szVSPath, pVertexShader, szPSPath, pPixelShader);
 }
@@ -294,7 +294,7 @@ void ToolSystemMap::OpenFile(std::wstring szFullPath)
                 std::string textureName;
                 iss >> textureName;
                 pTexture = _EngineSystem.GetTextureSystem()->CreateTextureFromFile(_tomw(textureName));
-                m_ListTexture.push_back(_tomw(textureName));
+                m_ListTexture.insert(_tomw(textureName));
             }
             else if (fieldName == "m_ListTextureSplatting")
             {
@@ -308,7 +308,7 @@ void ToolSystemMap::OpenFile(std::wstring szFullPath)
                     {
                         texturePath.erase(std::remove(texturePath.begin(), texturePath.end(), ' '), texturePath.end());
                         auto texture = _EngineSystem.GetTextureSystem()->CreateTextureFromFile(_tomw(texturePath));
-                        m_ListTextureSplatting.emplace_back(texture->GetTextureName());
+                        m_ListTextureSplatting.insert(texture->GetTextureName());
                     }
                 }
             }

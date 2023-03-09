@@ -20,9 +20,12 @@ void ImguiSystem::Update()
     ImGui::NewFrame();
     //ImGui::DockSpaceOverViewport(ImGui::GetMainViewport());
 
-    static int splat_current_idx = 0;
-    static int image_current_idx = 0; // Here we store our selection data as an index.
-    static int fbx_current_idx = 0; // Here we store our selection data as an index.
+    static int splat_current_idx = 0; // Here we store our selection data as an index.
+    static int image_current_idx = 0;
+    static int fbx_current_idx = 0; 
+    static std::wstring szCurrentSplat;
+    static std::wstring szCurrentImage;
+    static std::wstring szCurrentFbx;
     static int iMapSize = 4;
     static float fMapDistance = 1.0f;
     static bool bWireFrame = false;
@@ -45,7 +48,7 @@ void ImguiSystem::Update()
             {
                 ~bMapPicking;
                 //_ToolSystemMap.SelectImage(image_current_idx, bMapPicking);
-                _ToolSystemMap.SelectFbxObject(fbx_current_idx, bMapPicking);
+                _ToolSystemMap.SelectFbxObject(szCurrentFbx, bMapPicking);
             }
 
             if (ImGui::Checkbox("OjbectPicking", &bOjbectPicking))
@@ -63,29 +66,45 @@ void ImguiSystem::Update()
             if (ImGui::Checkbox("Splatting", &bSplatting))
             {
                 ~bSplatting;
-                _ToolSystemMap.SelectSplatting(splat_current_idx, bSplatting);
+                _ToolSystemMap.SelectSplatting(szCurrentSplat, bSplatting);
             }
             if (ImGui::Button("Open SplatImage"))
                 ifd::FileDialog::Instance().Open("SplatOpenDialog", "Open a Image", "Image file (*.png;*.jpg;*.jpeg;*.bmp;*.tga){.png,.jpg,.jpeg,.bmp,.tga},.*", true);
             if (ImGui::BeginListBox("SplattingImage", { 200, 100 }))
             {
-                for (int n = 0; n < _ToolSystemMap.m_ListTextureSplatting.size(); n++)
+                for (const auto& str : _ToolSystemMap.m_ListTextureSplatting)
                 {
-                    std::string fullpath = _towm(_ToolSystemMap.m_ListTextureSplatting[n]);
-
-                    std::string content = GetSplitName(fullpath);
-
-                    const bool is_selected = (splat_current_idx == n);
-                    if (ImGui::Selectable(content.c_str(), is_selected))
+                    std::wstring fullpath = str;
+                    std::wstring content = GetSplitName(fullpath);
+                    const bool is_selected = (fullpath == szCurrentSplat);
+                    if (ImGui::Selectable(_towm(content).c_str(), is_selected))
                     {
-                        splat_current_idx = n;
-                        _ToolSystemMap.SelectSplatting(splat_current_idx, bSplatting);
+                        szCurrentSplat = fullpath;
+                        _ToolSystemMap.SelectSplatting(szCurrentSplat, bSplatting);
                     }
 
                     // Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
                     if (is_selected)
                         ImGui::SetItemDefaultFocus();
+
                 }
+                //for (int n = 0; n < _ToolSystemMap.m_ListTextureSplatting.size(); n++)
+                //{
+                //    std::string fullpath = _towm(_ToolSystemMap.m_ListTextureSplatting[n]);
+
+                //    std::string content = GetSplitName(fullpath);
+
+                //    const bool is_selected = (splat_current_idx == n);
+                //    if (ImGui::Selectable(content.c_str(), is_selected))
+                //    {
+                //        splat_current_idx = n;
+                //        _ToolSystemMap.SelectSplatting(splat_current_idx, bSplatting);
+                //    }
+
+                //    // Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
+                //    if (is_selected)
+                //        ImGui::SetItemDefaultFocus();
+                //}
                 ImGui::EndListBox();
             }
         }
@@ -94,7 +113,7 @@ void ImguiSystem::Update()
         {
             if (ImGui::Button("CreateMap"))
             {
-                _ToolSystemMap.CreateSimpleMap(iMapSize + 1, iMapSize + 1, fMapDistance, image_current_idx);
+                _ToolSystemMap.CreateSimpleMap(iMapSize + 1, iMapSize + 1, fMapDistance, szCurrentImage);
             }
             ImGui::InputInt("MapSize", &iMapSize);
 
@@ -122,19 +141,19 @@ void ImguiSystem::Update()
         if (ImGui::Button("Save file"))
             ifd::FileDialog::Instance().Save("ShaderSaveDialog", "Save a shader", "*.sprj {.sprj}");*/
 
-        if (ImGui::BeginListBox("listbox 1"))
+        if (ImGui::BeginListBox("listboxImage"))
         {
-            for (int n = 0; n < _ToolSystemMap.m_ListTexture.size(); n++)
+            for (const auto& texture : _ToolSystemMap.m_ListTexture)
             {
-                std::string fullpath = _towm(_ToolSystemMap.m_ListTexture[n]);
+                std::wstring fullpath = texture;
 
-                std::string content = GetSplitName(fullpath);
+                std::wstring content = GetSplitName(fullpath);
 
-                const bool is_selected = (image_current_idx == n);
-                if (ImGui::Selectable(content.c_str(), is_selected))
+                const bool is_selected = (szCurrentImage == fullpath);
+                if (ImGui::Selectable(_towm(content).c_str(), is_selected))
                 {
-                    image_current_idx = n;
-                    _ToolSystemMap.SelectImage(image_current_idx, bMapPicking);
+                    szCurrentImage = fullpath;
+                    _ToolSystemMap.SelectImage(szCurrentImage, bMapPicking);
                 }
 
                 // Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
@@ -214,24 +233,24 @@ void ImguiSystem::Update()
     ImGui::Begin("Control Panel");
     {
         if (ImGui::Button("CreateObject"))
-            _ToolSystemMap.CreateFbxObject(_ToolSystemMap.m_ListFbx[fbx_current_idx], _CameraSystem.GetCurrentCamera()->m_vCameraPos);
+            _ToolSystemMap.CreateFbxObject(szCurrentFbx, _CameraSystem.GetCurrentCamera()->m_vCameraPos);
 
     }
     ImGui::Dummy({ 0, 10 });
     if (ImGui::Button("Open Fbxfile"))
         ifd::FileDialog::Instance().Open("FbxOpenDialog", "Open a Fbx", "Fbx file (*.fbx;*.FBX){.fbx,.FBX},.*", true);
-    if (ImGui::BeginListBox("listbox 2"))
+    if (ImGui::BeginListBox("listboxFbx"))
     {
-        for (int n = 0; n < _ToolSystemMap.m_ListFbx.size(); n++)
+        for (const auto& fbx : _ToolSystemMap.m_ListFbx)
         {
-            std::string fullpath = _towm(_ToolSystemMap.m_ListFbx[n]);
+            std::wstring fullpath = fbx;
 
-            std::string content = GetSplitName(fullpath);
+            std::wstring content = GetSplitName(fullpath);
 
-            const bool is_selected = (fbx_current_idx == n);
-            if (ImGui::Selectable(content.c_str(), is_selected))
+            const bool is_selected = (szCurrentFbx == fullpath);
+            if (ImGui::Selectable(_towm(content).c_str(), is_selected))
             {
-                fbx_current_idx = n;
+                szCurrentFbx = fullpath;
             }
 
             // Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
@@ -318,7 +337,7 @@ void ImguiSystem::Update()
                 for (int idx = 0; idx < res.size(); idx++)
                 {
                     _ToolSystemMap.SetSplattingTexture(_EngineSystem.GetTextureSystem()->CreateTextureFromFile(res[idx].wstring().c_str()));
-                    _ToolSystemMap.m_ListTextureSplatting.push_back(res[idx].wstring());
+                    _ToolSystemMap.m_ListTextureSplatting.insert(res[idx].wstring());
                 }
             }
         }
@@ -331,7 +350,7 @@ void ImguiSystem::Update()
             for (int idx = 0; idx < res.size(); idx++)
             {
                 _EngineSystem.GetTextureSystem()->CreateTextureFromFile(res[idx].wstring().c_str());
-                _ToolSystemMap.m_ListTexture.push_back(res[idx].wstring());
+                _ToolSystemMap.m_ListTexture.insert(res[idx].wstring());
             }
         }
         ifd::FileDialog::Instance().Close();
@@ -343,7 +362,7 @@ void ImguiSystem::Update()
         if (ifd::FileDialog::Instance().HasResult()) {
             const std::vector<std::filesystem::path>& res = ifd::FileDialog::Instance().GetResults();
             for (int idx = 0; idx < res.size(); idx++)
-                _ToolSystemMap.m_ListFbx.push_back(res[idx].wstring());
+                _ToolSystemMap.m_ListFbx.insert(res[idx].wstring());
         }
         ifd::FileDialog::Instance().Close();
     }

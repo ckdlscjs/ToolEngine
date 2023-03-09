@@ -8,14 +8,14 @@ class FQuadTree
 {
 
 public:
-	void	SetPickingMap(int iChkIdx, bool bPicking);
-	void	SetPickingFbx(int iChkIdx, bool bPicking);
+	void	SetPickingMap(std::wstring szCurrentImage, bool bPicking);
+	void	SetPickingFbx(std::wstring szCurrentFbx, bool bPicking);
 	void	SetPickingObject(bool bPicking);
 	void	SetPickingSculpt(bool bPicking);
 	void	SetSculptRadius(float fRadius);
 	void	SetSculptIntensity(float fIntensity);
 	void	SetSplattingTexture(Texture* pTexture);
-	void	SetSplatting(int iChkIdx, bool bSplatting);
+	void	SetSplatting(std::wstring szCurrentSplat, bool bSplatting);
 
 	void	SetTransform(Transform transform);
 	void	SetMaterial(Material* pMaterial);
@@ -55,15 +55,18 @@ public:
 	bool m_bSclupting;
 	float m_fSculptRadius = 10.0f;
 	float m_fSculptIntensity = 10.0f;
+
 	bool m_bMapPicking;
+	std::wstring m_szCurrentImage;
 
 	bool m_bObjectPicking;
+	std::wstring m_szCurrentFbx;
 	Object* pPickingObj;
 
 	bool m_bSplatting;
+	std::wstring m_szCurrentSplat;
 	std::vector<Texture*> m_ListTextureSplatting;
 
-	int m_iChkIdx;
 	int m_iMaxDepth;
 	FNode* m_pRootNode;
 	FSelect m_Select;
