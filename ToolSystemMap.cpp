@@ -280,7 +280,7 @@ void ToolSystemMap::OpenFile(std::wstring szFullPath)
     size_t size_shader_vs = 0;
     size_t size_shader_ps = 0;
     MeshMap* pMapMesh = new MeshMap();
-    BYTE* fAlphaData;
+    BYTE* fAlphaData = nullptr;
     std::ifstream is(szFullPath);
     std::string line;
     while (std::getline(is, line))
@@ -337,7 +337,9 @@ void ToolSystemMap::OpenFile(std::wstring szFullPath)
                 fAlphaData = new BYTE[pMapMesh->m_dwNumRows * pMapMesh->m_dwNumColumns * 4];
                 for (int idx = 0; idx < pMapMesh->m_dwNumRows * pMapMesh->m_dwNumColumns * 4; idx++)
                 {
-                    is >> fAlphaData[idx];
+                    int rgb = 0;
+                    iss >> rgb;
+                    fAlphaData[idx] = static_cast<uint8_t>(rgb);
                 }
             }
         }
@@ -364,7 +366,7 @@ void ToolSystemMap::OpenFile(std::wstring szFullPath)
     pMapMesh->m_pVertexBuffer = pVertexBuffer;
     pMapMesh->m_pIndexBuffer = pIndexBuffer;
 
-    m_pQuadTree = new FQuadTree(m_pCamera, pMapMesh, iMaxDepth);
+    m_pQuadTree = new FQuadTree(m_pCamera, pMapMesh, iMaxDepth, fAlphaData);
     m_pQuadTree->SetConstantData(cc);
     m_pQuadTree->SetTransform({ {0, 0, 0} , {0, 0, 0}, {1, 1, 1} });
     m_pQuadTree->SetTexture(pTexture);

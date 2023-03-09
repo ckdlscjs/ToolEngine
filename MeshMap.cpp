@@ -286,6 +286,7 @@ std::ostream& operator<<(std::ostream& os, const MeshMap* pMap)
 
 std::ifstream& operator>>(std::ifstream& is, MeshMap* pMap)
 {
+    std::streampos prevPos;
     std::string line;
     while (std::getline(is, line))
     {
@@ -310,12 +311,16 @@ std::ifstream& operator>>(std::ifstream& is, MeshMap* pMap)
                 std::vector<object> vertices;
                 std::string vertexLine;
                 while (std::getline(is, vertexLine) && vertexLine != "") {
+                    if (vertexLine.find("m_fAlphaData:") != std::string::npos)
+                        break;
                     object vertex;
                     std::istringstream vertexIss(vertexLine);
                     vertexIss >> vertex;
                     vertices.push_back(vertex);
+                    prevPos = is.tellg();
                 }
                 pMap->m_ListVertex = vertices;
+                break;
             }
         }
     }
@@ -343,5 +348,6 @@ std::ifstream& operator>>(std::ifstream& is, MeshMap* pMap)
     }
     pMap->m_dwFace = pMap->m_ListIndex.size() / 3;
     pMap->GenerateVertexNormal();
+    is.seekg(prevPos);
     return is;
 }

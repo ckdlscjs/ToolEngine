@@ -3,7 +3,7 @@
 #include "InputSystem.h"
 #include "WindowSystem.h"
 
-HRESULT FQuadTree::CreateAlphaTexture(DWORD dwWidth, DWORD dwHeight)
+HRESULT FQuadTree::CreateAlphaTexture(DWORD dwWidth, DWORD dwHeight, BYTE* fAlphaData)
 {
     HRESULT hr;
     D3D11_TEXTURE2D_DESC desc;
@@ -19,19 +19,24 @@ HRESULT FQuadTree::CreateAlphaTexture(DWORD dwWidth, DWORD dwHeight)
     desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
     desc.CPUAccessFlags = 0;
     desc.MiscFlags = 0;
-
-    m_fAlphaData = new BYTE[dwWidth * dwHeight * 4];
-    for (UINT y = 0; y < dwHeight; y++)
+    if (fAlphaData != nullptr)
+        m_fAlphaData = fAlphaData;
+    else
     {
-        for (UINT x = 0; x < dwWidth; x++)
+        m_fAlphaData = new BYTE[dwWidth * dwHeight * 4];
+        for (UINT y = 0; y < dwHeight; y++)
         {
-            BYTE* pixel = &m_fAlphaData[dwWidth * y * 4 + x * 4];
-            pixel[0] = 0;//r
-            pixel[1] = 0;//g
-            pixel[2] = 0;//b
-            pixel[3] = 0;//a
+            for (UINT x = 0; x < dwWidth; x++)
+            {
+                BYTE* pixel = &m_fAlphaData[dwWidth * y * 4 + x * 4];
+                pixel[0] = 0;//r
+                pixel[1] = 0;//g
+                pixel[2] = 0;//b
+                pixel[3] = 0;//a
+            }
         }
     }
+    
     D3D11_SUBRESOURCE_DATA initData;
     initData.pSysMem = m_fAlphaData;
     initData.SysMemPitch = sizeof(BYTE) * 4 * dwWidth;
@@ -183,11 +188,11 @@ void FQuadTree::Serialize(std::ofstream& os) const
 
     os << "m_fAlphaData:";
     for (int idx = 0; idx < m_pMap->m_dwNumRows * m_pMap->m_dwNumColumns * 4; idx++)
-        os << m_fAlphaData[idx] << " ";
+        os << std::stoi(std::to_string(m_fAlphaData[idx])) << " ";
     os << std::endl;
 }
 
-FQuadTree::FQuadTree(Camera* pCamera, MeshMap* pMap, int iMaxDepth)
+FQuadTree::FQuadTree(Camera* pCamera, MeshMap* pMap, int iMaxDepth, BYTE* fAlphaData)
 {
     m_pCamera = pCamera;
     m_pMap = pMap;
@@ -199,7 +204,7 @@ FQuadTree::FQuadTree(Camera* pCamera, MeshMap* pMap, int iMaxDepth)
     m_constantDataMap.matProj = XMMatrixIdentity();
     m_pConstantBuffer = _EngineSystem.GetRenderSystem()->CreateConstantBuffer(&m_constantDataMap, sizeof(m_constantDataMap));
 
-    CreateAlphaTexture(m_pMap->m_dwNumRows, m_pMap->m_dwNumColumns);
+    CreateAlphaTexture(m_pMap->m_dwNumRows, m_pMap->m_dwNumColumns, fAlphaData);
     BuildTree(m_pRootNode, pMap);
 }
 
@@ -564,11 +569,8 @@ void FQuadTree::Render()
     _EngineSystem.GetRenderSystem()->setTexture(m_pVertexShader, m_pTexture);
     _EngineSystem.GetRenderSystem()->setTexture(m_pPixelShader, m_pTexture);
     g_pDeviceContext->PSSetShaderResources(1, 1, &m_pMaskAlphaSrv);
-    if (m_bSplatting)
-    {
-        for (int idx = 0; idx < m_ListTextureSplatting.size(); idx++)
-            g_pDeviceContext->PSSetShaderResources(2 + idx, 1, &m_ListTextureSplatting[idx]->m_pShaderResourceView);
-    }
+    for (int idx = 0; idx < m_ListTextureSplatting.size(); idx++)
+        g_pDeviceContext->PSSetShaderResources(2 + idx, 1, &m_ListTextureSplatting[idx]->m_pShaderResourceView);
     
     for (int idx = 0;  idx < m_pDrawLeafNodeList.size(); idx++)
     {
