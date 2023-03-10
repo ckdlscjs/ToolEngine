@@ -20,9 +20,9 @@ void ImguiSystem::Update()
     ImGui::NewFrame();
     //ImGui::DockSpaceOverViewport(ImGui::GetMainViewport());
 
-    static int splat_current_idx = 0; // Here we store our selection data as an index.
-    static int image_current_idx = 0;
-    static int fbx_current_idx = 0; 
+    //static int splat_current_idx = 0; // Here we store our selection data as an index.
+    //static int image_current_idx = 0;
+    //static int fbx_current_idx = 0; 
     static std::wstring szCurrentSplat;
     static std::wstring szCurrentImage;
     static std::wstring szCurrentFbx;

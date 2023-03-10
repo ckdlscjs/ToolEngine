@@ -55,7 +55,11 @@ void ResourceSystem::AddResource(std::wstring szName, Resource* pResource)
 
 	auto it = m_mapResources.find(szName);
 	if (it != m_mapResources.end())
-		return;
+	{
+		delete it->second;
+		m_mapResources.erase(it);
+	}
+	
 
 	m_mapResources[szName] = pResource;
 }

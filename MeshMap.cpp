@@ -231,9 +231,8 @@ MeshMap::MeshMap(UINT iWidth, UINT iHeight, float fCellDistance)
             //}
                 
             m_ListVertex[iRow * m_dwNumColumns + iCol].color = { 1, 1, 1, 1 };
-            m_ListVertex[iRow * m_dwNumColumns + iCol].tex =
-            { ((float)iCol / (float)(iWidth - 1)),
-              ((float)iRow / (float)(iHeight - 1)) };
+            //m_ListVertex[iRow * m_dwNumColumns + iCol].tex = { (float)iCol / (float)(iWidth - 1), (float)iRow / (float)(iHeight - 1) };
+            m_ListVertex[iRow * m_dwNumColumns + iCol].tex = { (float)iCol / (float)(iWidth - 1) , (float)iRow / (float)(iHeight - 1) };
         }
     }
     m_ListIndex.resize((m_dwNumRows - 1) * (m_dwNumColumns - 1) * 2 * 3.0f);

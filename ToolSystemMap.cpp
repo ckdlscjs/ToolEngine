@@ -225,7 +225,7 @@ void ToolSystemMap::CreateSimpleMap(int iWidth, int iHeight, float fDistance, st
     cc.matProj = m_pCamera->m_matProj;
 
     MeshMap* pMapMesh = new MeshMap(iWidth, iHeight, fDistance);
-    _EngineSystem.GetMeshSystem()->AddResource(L"MapMesh", pMapMesh);
+    _EngineSystem.GetMeshSystem()->AddResource(szFullPath, pMapMesh);
     //Material* pMaterial = _MaterialSystem.CreateMaterial(L"MapMtrl");
 
     std::wstring szVSPath = L"MapVertexShader.hlsl";
@@ -259,6 +259,7 @@ void ToolSystemMap::DeleteSimpleMap()
 {
     if (m_pQuadTree) 
         delete m_pQuadTree;
+    m_pQuadTree = nullptr;
 }
 
 void ToolSystemMap::OpenFile(std::wstring szFullPath)
