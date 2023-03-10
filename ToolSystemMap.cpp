@@ -247,19 +247,11 @@ void ToolSystemMap::CreateSimpleMap(int iWidth, int iHeight, float fDistance, st
 
     pMapMesh->m_pVertexBuffer = pVertexBuffer;
     pMapMesh->m_pIndexBuffer = pIndexBuffer;
-
-    /*if (pMaterial->IsEmpty())
-    {
-        std::vector<Texture*> listTex;
-        listTex.push_back(_EngineSystem.GetTextureSystem()->GetTexture(m_ListTexture[iChkIdx].c_str()));
-        pMaterial->SetList(listTex);
-    }*/
    
     m_pQuadTree = new FQuadTree(m_pCamera, pMapMesh);
     m_pQuadTree->SetConstantData(cc);
     m_pQuadTree->SetTransform({ {0, 0, 0} , {0, 0, 0}, {1, 1, 1} });
     m_pQuadTree->SetTexture(_EngineSystem.GetTextureSystem()->GetTexture(szFullPath));
-    //m_pQuadTree->SetMaterial(pMaterial);
     m_pQuadTree->SetShader(szVSPath, pVertexShader, szPSPath, pPixelShader);
 }
 
