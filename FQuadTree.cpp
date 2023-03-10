@@ -53,7 +53,7 @@ HRESULT FQuadTree::CreateAlphaTexture(DWORD dwWidth, DWORD dwHeight, BYTE* fAlph
     return hr;
 }
 
-void FQuadTree::Splatting(XMVECTOR vIntersection, UINT iSplattingTexIndex, float fSplattingRadius)
+void FQuadTree::Splatting(XMVECTOR vIntersection, std::wstring szFullPath, float fSplattingRadius)
 {
     UINT const DataSize = sizeof(BYTE) * 4;
     UINT const RowPitch = DataSize * m_pMap->m_dwNumRows;
@@ -88,13 +88,13 @@ void FQuadTree::Splatting(XMVECTOR vIntersection, UINT iSplattingTexIndex, float
             if (fRadius < fSplattingRadius)
             {
                 float fDot = 1.0f - (fRadius / fSplattingRadius); //지점부터 범위까지, splattingRadius가 기준, 멀어질수록 fdot의값이 작아져 연해진다
-                if (iSplattingTexIndex == 0 && (fDot * 255) > pixel[0])
+                if (szFullPath == m_ListTextureSplatting[0]->m_szFullPath && (fDot * 255) > pixel[0])
                     pixel[0] = fDot * 255;//r
-                if (iSplattingTexIndex == 1 && (fDot * 255) > pixel[1])
+                if (szFullPath == m_ListTextureSplatting[1]->m_szFullPath && (fDot * 255) > pixel[1])
                     pixel[1] = fDot * 255;//g
-                if (iSplattingTexIndex == 2 && (fDot * 255) > pixel[2])
+                if (szFullPath == m_ListTextureSplatting[2]->m_szFullPath && (fDot * 255) > pixel[2])
                     pixel[2] = fDot * 255;//b
-                if (iSplattingTexIndex == 3 && (fDot * 255) > pixel[3])
+                if (szFullPath == m_ListTextureSplatting[3]->m_szFullPath && (fDot * 255) > pixel[3])
                     pixel[3] = fDot * 255;//a
             }
         }
@@ -102,104 +102,44 @@ void FQuadTree::Splatting(XMVECTOR vIntersection, UINT iSplattingTexIndex, float
     g_pDeviceContext->UpdateSubresource(m_pMaskAlphaTexture, 0, nullptr, m_fAlphaData, RowPitch, DepthPitch);
 }
 
-void FQuadTree::DeSerialize(std::wstring szFile)
+std::ostream& operator<<(std::ostream& os, const FQuadTree* pQuadTree)
 {
-   /* std::ifstream is(szFile.c_str()); 
-    std::string line;
-
-    while (std::getline(is, line))
-    {
-        std::istringstream iss(line);
-        std::string key;
-
-        if (std::getline(iss, key, ':'))
-        {
-            if (key == "m_ListTextureSplatting")
-            {
-                std::string texturePaths;
-                std::getline(iss, texturePaths);
-
-                std::istringstream textureIss(texturePaths);
-                std::string texturePath;
-
-                while (std::getline(textureIss, texturePath, ','))
-                {
-                    SetSplattingTexture(_EngineSystem.GetTextureSystem()->CreateTextureFromFile(_tomw(texturePath).c_str()));
-                }
-            }
-            else if (key == "m_iMaxDepth")
-            {
-                std::string strValue;
-                std::getline(iss, strValue);
-
-                m_iMaxDepth = std::stoi(strValue);
-            }
-            else if (key == "m_pMap")
-            {
-                std::string texturePaths;
-                std::getline(iss, texturePaths);
-
-                std::istringstream textureIss(texturePaths);
-                std::string texturePath;
-                if (texturePath == "m_dwNumRows")
-                {
-                    std::string strValue;
-                    std::getline(iss, strValue);
-
-                    m_iMaxDepth = std::stoi(strValue);
-                }
-                if (texturePath == "m_dwNumColumns")
-                {
-                    std::string strValue;
-                    std::getline(iss, strValue);
-
-                    m_iMaxDepth = std::stoi(strValue);
-                }
-                if (texturePath == "m_ListVertex")
-                {
-                    std::string strValue;
-                    std::getline(iss, strValue);
-
-                }
-            }
-           
-        }
-    }
-    is.close();*/
-}
-
-void FQuadTree::Serialize(std::ofstream& os) const
-{
-    os << "m_pTexture:" << m_pTexture->GetTextureName() << std::endl;
+    os << "m_pTexture:" << pQuadTree->m_pTexture->GetTextureName() << std::endl;
 
     os << "m_ListTextureSplatting:";
-    for (const auto& texture : m_ListTextureSplatting)
+    for (const auto& texture : pQuadTree->m_ListTextureSplatting)
     {
-        os << texture->m_szFullPath << ", ";
+        os << texture->GetTextureName() << ", ";
     }
     os << std::endl;
 
-    os << "m_iMaxDepth:" << m_iMaxDepth << std::endl;
+    os << "m_iMaxDepth:" << pQuadTree->m_iMaxDepth << std::endl;
 
-    os << "m_szVSName:" << m_szVSPath << std::endl;
+    os << "m_szVSName:" << pQuadTree->m_szVSPath << std::endl;
 
-    os << "m_szPSName:" << m_szPSPath << std::endl;
+    os << "m_szPSName:" << pQuadTree->m_szPSPath << std::endl;
 
-    os << "m_pMap:" << m_pMap;
+    os << "m_pMap:" << pQuadTree->m_pMap;
 
     os << "m_pAllObjectList:" << std::endl;
-    for (const auto& object : m_pAllObjectList)
+    for (const auto& object : pQuadTree->m_pAllObjectList)
     {
-        os << object->m_szFullPath << ", ";
-        os << object->m_Transform;
+        os << object->GetObjectName() << ", ";
+        os << object->GetTransform();
         os << std::endl;
     }
 
     os << "m_fAlphaData:";
-    for (int idx = 0; idx < m_pMap->m_dwNumRows * m_pMap->m_dwNumColumns * 4; idx++)
-        os << std::stoi(std::to_string(m_fAlphaData[idx])) << " ";
+    for (int idx = 0; idx < pQuadTree->m_pMap->m_dwNumRows * pQuadTree->m_pMap->m_dwNumColumns * 4; idx++)
+        os << std::stoi(std::to_string(pQuadTree->m_fAlphaData[idx])) << " ";
     os << std::endl;
+    return os;
 }
+std::ifstream& operator>>(std::ifstream& is, FQuadTree* pQuadTree)
+{
+    return is;
+}
+
 
 FQuadTree::FQuadTree(Camera* pCamera, MeshMap* pMap, int iMaxDepth, BYTE* fAlphaData)
 {
@@ -567,7 +507,7 @@ void FQuadTree::Update()
 
     if (m_bSplatting && GetInterSection())
     {
-       // Splatting(m_Select.m_vIntersection, m_iChkIdx);
+        Splatting(m_Select.m_vIntersection, m_szCurrentSplat);
     }
 }
 
@@ -586,7 +526,6 @@ void FQuadTree::Render()
     
     for (int idx = 0;  idx < m_pDrawLeafNodeList.size(); idx++)
     {
-       
         g_pDeviceContext->IASetIndexBuffer(m_pDrawLeafNodeList[idx]->m_pIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
         _EngineSystem.GetRenderSystem()->drawIndexedTriangleList(m_pDrawLeafNodeList[idx]->m_dwFace * 3, 0, 0);
     }

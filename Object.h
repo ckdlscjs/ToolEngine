@@ -101,6 +101,8 @@ class Object
 public:
 	T_BOX CreateBoundingBox();
 	bool Intersect(FSelect& select, float distance);
+	std::wstring GetObjectName();
+	Transform GetTransform();
 	XMVECTOR GetPosition();
 	XMVECTOR GetRotation();
 	XMVECTOR GetScale();
@@ -115,8 +117,8 @@ public:
 	virtual void Update();
 	virtual void Render();
 public:
-	void DeSerialize() const;
-	void Serialize(std::ofstream& os) const;
+	/*void DeSerialize() const;
+	void Serialize(std::ofstream& os) const;*/
 public:
 	Object(std::wstring szFullPath);
 	Object();

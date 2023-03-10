@@ -41,11 +41,11 @@ public:
 	ID3D11Texture2D* m_pMaskAlphaTexture;
 	ID3D11ShaderResourceView* m_pMaskAlphaSrv;
 	HRESULT CreateAlphaTexture(DWORD dwWidth, DWORD dwHeight, BYTE* fAlphaData);
-	void    Splatting(XMVECTOR vIntersection, UINT iSplattingTexIndex, float fSplattingRadius = 5.0f);
+	void    Splatting(XMVECTOR vIntersection, std::wstring szFullPath, float fSplattingRadius = 5.0f);
 
 public:
-	void DeSerialize(std::wstring szFile);
-	void Serialize(std::ofstream& os) const;
+	friend std::ostream& operator<<(std::ostream& os, const FQuadTree* pQuadTree);
+	friend std::ifstream& operator>>(std::ifstream& is, FQuadTree* pQuadTree);
 
 	FQuadTree(Camera* pCamera, MeshMap* pMap, int iMaxDepth = 2, BYTE* fAlphaData = 0);
 	~FQuadTree();

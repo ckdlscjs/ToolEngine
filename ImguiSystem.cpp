@@ -336,8 +336,9 @@ void ImguiSystem::Update()
                 const std::vector<std::filesystem::path>& res = ifd::FileDialog::Instance().GetResults();
                 for (int idx = 0; idx < res.size(); idx++)
                 {
-                    _ToolSystemMap.SetSplattingTexture(_EngineSystem.GetTextureSystem()->CreateTextureFromFile(res[idx].wstring().c_str()));
-                    _ToolSystemMap.m_ListTextureSplatting.insert(res[idx].wstring());
+                    if(_ToolSystemMap.m_ListTextureSplatting.insert(res[idx].wstring()).second)
+                        _ToolSystemMap.SetSplattingTexture(_EngineSystem.GetTextureSystem()->CreateTextureFromFile(res[idx].wstring().c_str()));
+                        
                 }
             }
         }

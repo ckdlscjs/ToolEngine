@@ -3,6 +3,16 @@
 #include "FBXSystem.h"
 
 
+std::wstring Object::GetObjectName()
+{
+	return m_szFullPath;
+}
+
+Transform Object::GetTransform()
+{
+	return m_Transform;
+}
+
 T_BOX Object::CreateBoundingBox()
 {
 	
@@ -152,27 +162,27 @@ void Object::Render()
 	}
 }
 
-void Object::DeSerialize() const
-{
-	
-}
-
-void Object::Serialize(std::ofstream& os) const
-{
-	os << "m_szFullPath:" << m_szFullPath << std::endl;
-
-	os << "m_Transform:" << m_Transform << std::endl;
-
-	os << "m_szVSName:" << m_szVSName << std::endl;
-
-	os << "m_szPSName:" << m_szPSName << std::endl;
-
-	os << "m_pMesh:" << m_pMesh;
-
-	os << "m_pMaterial:" << m_pMaterial;
-
-	os << "m_CullMode:" << m_CullMode << std::endl;
-}
+//void Object::DeSerialize() const
+//{
+//	
+//}
+//
+//void Object::Serialize(std::ofstream& os) const
+//{
+//	os << "m_szFullPath:" << m_szFullPath << std::endl;
+//
+//	os << "m_Transform:" << m_Transform << std::endl;
+//
+//	os << "m_szVSName:" << m_szVSName << std::endl;
+//
+//	os << "m_szPSName:" << m_szPSName << std::endl;
+//
+//	os << "m_pMesh:" << m_pMesh;
+//
+//	os << "m_pMaterial:" << m_pMaterial;
+//
+//	os << "m_CullMode:" << m_CullMode << std::endl;
+//}
 
 
 Object::Object(std::wstring szFullPath) : m_szFullPath(szFullPath)

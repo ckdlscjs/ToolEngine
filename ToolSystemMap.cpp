@@ -280,6 +280,7 @@ void ToolSystemMap::OpenFile(std::wstring szFullPath)
     size_t size_shader_vs = 0;
     size_t size_shader_ps = 0;
     MeshMap* pMapMesh = new MeshMap();
+    std::unordered_map<std::string, Transform> allObjectList;
     BYTE* fAlphaData = nullptr;
     std::ifstream is(szFullPath);
     std::string line;
@@ -334,7 +335,7 @@ void ToolSystemMap::OpenFile(std::wstring szFullPath)
             }
             else if (fieldName == "m_pAllObjectList")
             {
-                std::streampos prevPos;
+                std::streampos prevPos = is.tellg();
                 std::string str;
                 while (std::getline(is, str))
                 {
@@ -345,9 +346,11 @@ void ToolSystemMap::OpenFile(std::wstring szFullPath)
                     std::getline(texturesStream, szFullPath, ',');
                     Transform transform;
                     texturesStream >> transform;
-                    CreateFbxObject(_tomw(szFullPath), transform.position, transform.rotation, transform.scale);
+                    allObjectList.insert(std::make_pair(szFullPath, transform));
+                    //CreateFbxObject(_tomw(szFullPath), transform.position, transform.rotation, transform.scale);
                     prevPos = is.tellg();
                 } 
+                is.seekg(prevPos);
             }
             else if (fieldName == "m_fAlphaData")
             {
@@ -390,12 +393,20 @@ void ToolSystemMap::OpenFile(std::wstring szFullPath)
     for (const auto& texture : m_ListTextureSplatting)
         m_pQuadTree->SetSplattingTexture(_EngineSystem.GetTextureSystem()->GetTexture(texture));
     m_pQuadTree->SetShader(szVSPath, pVertexShader, szPSPath, pPixelShader);
+
+    for (const auto& obj : allObjectList)
+    {
+        std::string szFullPath = obj.first;
+        m_ListFbx.insert(_tomw(szFullPath));
+        Transform transform = obj.second;
+        CreateFbxObject(_tomw(szFullPath), transform.position, transform.rotation, transform.scale);
+    }
 }
 
 void ToolSystemMap::SaveFile(std::wstring szFullPath)
 {
     std::ofstream os(szFullPath);
-    m_pQuadTree->Serialize(os);
+    os << m_pQuadTree;
     os.close();
 }
 
