@@ -272,6 +272,7 @@ void ToolSystemMap::DeleteSimpleMap()
 void ToolSystemMap::OpenFile(std::wstring szFullPath)
 {
     Texture* pTexture = nullptr;
+    Transform mapTransform = {};
     UINT iMaxDepth = 0;
     std::wstring szVSPath;
     std::wstring szPSPath;
@@ -312,6 +313,10 @@ void ToolSystemMap::OpenFile(std::wstring szFullPath)
                         m_ListTextureSplatting.insert(texture->GetTextureName());
                     }
                 }
+            }
+            else if (fieldName == "m_Transform")
+            {
+                iss >> mapTransform;
             }
             else if (fieldName == "m_iMaxDepth")
             {
@@ -388,7 +393,7 @@ void ToolSystemMap::OpenFile(std::wstring szFullPath)
 
     m_pQuadTree = new FQuadTree(m_pCamera, pMapMesh, iMaxDepth, fAlphaData);
     m_pQuadTree->SetConstantData(cc);
-    m_pQuadTree->SetTransform({ {0, 0, 0} , {0, 0, 0}, {1, 1, 1} });
+    m_pQuadTree->SetTransform({ mapTransform.position, mapTransform.rotation, mapTransform.scale });
     m_pQuadTree->SetTexture(pTexture);
     for (const auto& texture : m_ListTextureSplatting)
         m_pQuadTree->SetSplattingTexture(_EngineSystem.GetTextureSystem()->GetTexture(texture));

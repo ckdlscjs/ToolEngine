@@ -85,15 +85,14 @@ void Object::SetTransform(Transform transform)
 	m_Transform = transform;
 	
 	XMVECTOR scale = m_Transform.scale;
+	XMVECTOR rotation = m_Transform.rotation;
 	XMFLOAT3 rotateAngle;
 	XMStoreFloat3(&rotateAngle, m_Transform.rotation);
-	XMVECTOR rotation =
-		XMQuaternionRotationRollPitchYaw(
-			_DegreeToRadian(rotateAngle.x),
-			_DegreeToRadian(rotateAngle.y),
-			_DegreeToRadian(rotateAngle.z));
 	XMVECTOR translation = m_Transform.position;
-	constantData.matWorld = XMMatrixTransformation({ 0,0,0,1 }, { 0,0,0,1 },scale, { 0,0,0,1 }, rotation, translation);
+	constantData.matWorld = XMMatrixTransformation({ 0,0,0,1 }, { 0,0,0,1 },scale, { 0,0,0,1 }, XMQuaternionRotationRollPitchYaw(
+		_DegreeToRadian(rotateAngle.x),
+		_DegreeToRadian(rotateAngle.y),
+		_DegreeToRadian(rotateAngle.z)), translation);
 }
 
 void Object::SetMesh(Mesh* pMesh)

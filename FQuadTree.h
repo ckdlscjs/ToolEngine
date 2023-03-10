@@ -32,7 +32,7 @@ public:
 	void	Reset(FNode* pNode);
 	FNode*	VisibleNode(FNode* pNode);
 	bool	GetInterSection();
-	bool	ObjectPicking();
+	Object*	ObjectPicking();
 	void	Update();
 	void	Render();
 
@@ -61,7 +61,6 @@ public:
 
 	bool m_bObjectPicking;
 	std::wstring m_szCurrentFbx;
-	Object* pPickingObj;
 
 	bool m_bSplatting;
 	std::wstring m_szCurrentSplat;

@@ -88,23 +88,6 @@ void ImguiSystem::Update()
                         ImGui::SetItemDefaultFocus();
 
                 }
-                //for (int n = 0; n < _ToolSystemMap.m_ListTextureSplatting.size(); n++)
-                //{
-                //    std::string fullpath = _towm(_ToolSystemMap.m_ListTextureSplatting[n]);
-
-                //    std::string content = GetSplitName(fullpath);
-
-                //    const bool is_selected = (splat_current_idx == n);
-                //    if (ImGui::Selectable(content.c_str(), is_selected))
-                //    {
-                //        splat_current_idx = n;
-                //        _ToolSystemMap.SelectSplatting(splat_current_idx, bSplatting);
-                //    }
-
-                //    // Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
-                //    if (is_selected)
-                //        ImGui::SetItemDefaultFocus();
-                //}
                 ImGui::EndListBox();
             }
         }
@@ -265,7 +248,7 @@ void ImguiSystem::Update()
     static float scale[3] = { 0.0f, 0.0f, 0.0f };
     static float rotation[3] = { 0.0f, 0.0f, 0.0f };
     static float position[3] = { 0.0f, 0.0f, 0.0f };
-    Object* pObject;
+    static Object* pObject;
     // Simple window
     ImGui::Begin("Control Panel2");
     {
@@ -282,39 +265,35 @@ void ImguiSystem::Update()
                 ImGui::InputFloat3("cam_up", cam_up);
             }
             ImGui::Dummy({ 0, 10 });
-
-            if (bOjbectPicking&&_InputSystem.GetKey(VK_RBUTTON) == KEY_STATE::KEY_DOWN)
+            if (_ToolSystemMap.m_pQuadTree != nullptr)
             {
-                if (_ToolSystemMap.m_pQuadTree != nullptr)
+                if (bOjbectPicking && _InputSystem.GetKey(VK_RBUTTON) == KEY_STATE::KEY_DOWN)
                 {
-                    if (_ToolSystemMap.m_pQuadTree->GetPickingObject() != nullptr)
+                    if (pObject = _ToolSystemMap.m_pQuadTree->GetPickingObject())
                     {
-                        pObject = _ToolSystemMap.m_pQuadTree->GetPickingObject();
                         XMVECTOR v_scale, v_rotation, v_translation;
-                        XMMatrixDecompose(&v_scale, &v_rotation, &v_translation, pObject->constantData.matWorld);
+                        v_scale = pObject->GetScale();
+                        v_rotation = pObject->GetRotation();
+                        v_translation = pObject->GetPosition();
                         scale[0] = v_scale.m128_f32[0]; scale[1] = v_scale.m128_f32[1]; scale[2] = v_scale.m128_f32[2];
                         rotation[0] = v_rotation.m128_f32[0]; rotation[1] = v_rotation.m128_f32[1]; rotation[2] = v_rotation.m128_f32[2];
                         position[0] = v_translation.m128_f32[0]; position[1] = v_translation.m128_f32[1]; position[2] = v_translation.m128_f32[2];
                     }
                     else
                     {
+                        pObject = nullptr;
                         scale[0] = 0; scale[1] = 0; scale[2] = 0;
                         rotation[0] = 0; rotation[1] = 0; rotation[2] = 0;
                         position[0] = 0; position[1] = 0; position[2] = 0;
                     }
                 }
-            }
-            if (ImGui::Button("Object"))
-            {
-                if (_ToolSystemMap.m_pQuadTree != nullptr)
+                if (ImGui::Button("Object"))
                 {
-                    if (_ToolSystemMap.m_pQuadTree->GetPickingObject() != nullptr)
-                    {
-                        pObject = _ToolSystemMap.m_pQuadTree->GetPickingObject();
+                    if (pObject != nullptr)
                         pObject->SetTransform({ {position[0], position[1],position[2]}, {rotation[0],rotation[1],rotation[2]}, {scale[0],scale[1],scale[2]} });
-                    }
                 }
             }
+            
             ImGui::InputFloat3("scale", scale);
             ImGui::InputFloat3("rotation", rotation);
             ImGui::InputFloat3("position", position);
@@ -338,7 +317,7 @@ void ImguiSystem::Update()
                 {
                     if(_ToolSystemMap.m_ListTextureSplatting.insert(res[idx].wstring()).second)
                         _ToolSystemMap.SetSplattingTexture(_EngineSystem.GetTextureSystem()->CreateTextureFromFile(res[idx].wstring().c_str()));
-                        
+                    szCurrentSplat = res[idx].wstring();
                 }
             }
         }
@@ -352,6 +331,7 @@ void ImguiSystem::Update()
             {
                 _EngineSystem.GetTextureSystem()->CreateTextureFromFile(res[idx].wstring().c_str());
                 _ToolSystemMap.m_ListTexture.insert(res[idx].wstring());
+                szCurrentImage = res[idx].wstring();
             }
         }
         ifd::FileDialog::Instance().Close();
@@ -363,7 +343,10 @@ void ImguiSystem::Update()
         if (ifd::FileDialog::Instance().HasResult()) {
             const std::vector<std::filesystem::path>& res = ifd::FileDialog::Instance().GetResults();
             for (int idx = 0; idx < res.size(); idx++)
+            {
                 _ToolSystemMap.m_ListFbx.insert(res[idx].wstring());
+                szCurrentFbx = res[idx].wstring();
+            }
         }
         ifd::FileDialog::Instance().Close();
     }

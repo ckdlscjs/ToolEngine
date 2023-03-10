@@ -88,14 +88,9 @@ void FQuadTree::Splatting(XMVECTOR vIntersection, std::wstring szFullPath, float
             if (fRadius < fSplattingRadius)
             {
                 float fDot = 1.0f - (fRadius / fSplattingRadius); //지점부터 범위까지, splattingRadius가 기준, 멀어질수록 fdot의값이 작아져 연해진다
-                if (szFullPath == m_ListTextureSplatting[0]->m_szFullPath && (fDot * 255) > pixel[0])
-                    pixel[0] = fDot * 255;//r
-                if (szFullPath == m_ListTextureSplatting[1]->m_szFullPath && (fDot * 255) > pixel[1])
-                    pixel[1] = fDot * 255;//g
-                if (szFullPath == m_ListTextureSplatting[2]->m_szFullPath && (fDot * 255) > pixel[2])
-                    pixel[2] = fDot * 255;//b
-                if (szFullPath == m_ListTextureSplatting[3]->m_szFullPath && (fDot * 255) > pixel[3])
-                    pixel[3] = fDot * 255;//a
+                for(int idx = 0; idx < m_ListTextureSplatting.size(); idx++)
+                    if (szFullPath == m_ListTextureSplatting[idx]->m_szFullPath && (fDot * 255) > pixel[idx])
+                        pixel[idx] = fDot * 255;//rgba -> this size rimited under 4
             }
         }
     }
@@ -112,6 +107,8 @@ std::ostream& operator<<(std::ostream& os, const FQuadTree* pQuadTree)
         os << texture->GetTextureName() << ", ";
     }
     os << std::endl;
+
+    os << "m_Transform:" << pQuadTree->m_Transform << std::endl;
 
     os << "m_iMaxDepth:" << pQuadTree->m_iMaxDepth << std::endl;
 
@@ -180,7 +177,7 @@ void FQuadTree::UpdateNode(FNode* pNode)
 
 Object* FQuadTree::GetPickingObject()
 {
-    return pPickingObj;
+    return ObjectPicking();
 }
 
 UINT FQuadTree::SelectVertexList(T_BOX& box, std::vector<FNode*>& selectNodeList)
@@ -374,33 +371,29 @@ FNode* FQuadTree::VisibleNode(FNode* pNode)
 
 bool FQuadTree::GetInterSection()
 {
-    //교점체크
-    if ((_InputSystem.GetKey(VK_RBUTTON) == KEY_STATE::KEY_DOWN || (_InputSystem.GetKey(VK_RBUTTON) == KEY_STATE::KEY_HOLD)))
+    for (const auto& node : m_pDrawLeafNodeList)
     {
-        for (const auto& node : m_pDrawLeafNodeList)
+        UINT index = 0;
+        UINT iNumFace = node->m_IndexList.size() / 3;
+        for (UINT face = 0; face < iNumFace; face++)
         {
-            UINT index = 0;
-            UINT iNumFace = node->m_IndexList.size() / 3;
-            for (UINT face = 0; face < iNumFace; face++)
+            UINT i0 = node->m_IndexList[index + 0];
+            UINT i1 = node->m_IndexList[index + 1];
+            UINT i2 = node->m_IndexList[index + 2];
+            XMFLOAT3 v0 = m_pMap->GetListVertex()[i0].pos;
+            XMFLOAT3 v1 = m_pMap->GetListVertex()[i1].pos;
+            XMFLOAT3 v2 = m_pMap->GetListVertex()[i2].pos;
+            if (m_Select.ChkPick(XMLoadFloat3(&v0), XMLoadFloat3(&v1), XMLoadFloat3(&v2)))
             {
-                UINT i0 = node->m_IndexList[index + 0];
-                UINT i1 = node->m_IndexList[index + 1];
-                UINT i2 = node->m_IndexList[index + 2];
-                XMFLOAT3 v0 = m_pMap->GetListVertex()[i0].pos;
-                XMFLOAT3 v1 = m_pMap->GetListVertex()[i1].pos;
-                XMFLOAT3 v2 = m_pMap->GetListVertex()[i2].pos;
-                if (m_Select.ChkPick(XMLoadFloat3(&v0), XMLoadFloat3(&v1), XMLoadFloat3(&v2)))
-                {
-                    return true;
-                }
-                index += 3;
+                return true;
             }
+            index += 3;
         }
     }
     return false;
 }
 
-bool FQuadTree::ObjectPicking()
+Object* FQuadTree::ObjectPicking()
 {
     //교점체크
     for (const auto& node : m_pDrawLeafNodeList)
@@ -424,16 +417,14 @@ bool FQuadTree::ObjectPicking()
                     XMVECTOR v_2 = XMVector3TransformCoord(XMLoadFloat3(&v2), object->constantData.matWorld);
                     if (m_Select.ChkPick(v_0, v_1, v_2))
                     {
-                        pPickingObj = object;
-                        return true;
+                        return object;
                     }
                     index += 3;
                 }
             }
         }
     }
-    pPickingObj = nullptr;
-    return false;
+    return nullptr;
 }
 
 void FQuadTree::Update()
@@ -451,18 +442,22 @@ void FQuadTree::Update()
     m_pDrawLeafNodeList.clear();
     VisibleNode(m_pRootNode); //재귀로 VisibleNode체크
     m_Select.SetMatrix(nullptr, &m_pCamera->m_matCamera, &m_pCamera->m_matProj);
-    if (m_bMapPicking && GetInterSection())
+
+    //MapCreateObject's
+    if (m_bMapPicking && (_InputSystem.GetKey(VK_RBUTTON) == KEY_STATE::KEY_DOWN) && GetInterSection())
     {
         //_ToolSystemMap.CreateSimpleObject(m_iChkIdx, m_Select.m_vIntersection);
         _ToolSystemMap.CreateFbxObject(m_szCurrentFbx, m_Select.m_vIntersection);
     }
 
-    if (m_bObjectPicking && (_InputSystem.GetKey(VK_RBUTTON) == KEY_STATE::KEY_DOWN))
+    //ObjectPicking
+    /*if (m_bObjectPicking &&(_InputSystem.GetKey(VK_RBUTTON) == KEY_STATE::KEY_DOWN))
     {
-        ObjectPicking();
-    }
+        pPickingObj = ObjectPicking();
+    }*/
 
-    if (m_bSclupting && GetInterSection())
+    //Sculpting
+    if (m_bSclupting && _InputSystem.GetKey(VK_RBUTTON) && GetInterSection())
     {
         std::vector<FNode*> nodelist;
         T_BOX box;
@@ -473,7 +468,6 @@ void FQuadTree::Update()
         box.Set(vMax, vMin);
         if (SelectVertexList(box, nodelist) > 0)
         {
-            //for (UINT iVertex = 0; iVertex < m_pMap->GetListVertex().size(); iVertex++)
             int iVertex = nodelist[0]->m_IndexList[0];
             int iVertexSize = nodelist[nodelist.size() - 1]->m_IndexList[nodelist[nodelist.size() - 1]->m_IndexList.size() - 1];
             for (iVertex; iVertex < iVertexSize; iVertex++)
@@ -505,7 +499,8 @@ void FQuadTree::Update()
         }
     }
 
-    if (m_bSplatting && GetInterSection())
+    //Splating
+    if (m_bSplatting && _InputSystem.GetKey(VK_RBUTTON) && GetInterSection())
     {
         Splatting(m_Select.m_vIntersection, m_szCurrentSplat);
     }
