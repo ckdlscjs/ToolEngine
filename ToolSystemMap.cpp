@@ -54,6 +54,12 @@ void ToolSystemMap::SetSculptIntensity(float fIntensity)
         m_pQuadTree->SetSculptIntensity(fIntensity);
 }
 
+void ToolSystemMap::SetSplatRadius(float fRadius)
+{
+    if (m_pQuadTree)
+        m_pQuadTree->SetSplatRadius(fRadius);
+}
+
 std::set<std::wstring>& ToolSystemMap::GetListTextureSplatting()
 {
     return m_ListTextureSplatting;
@@ -147,6 +153,8 @@ Object* ToolSystemMap::CreateFbxObject(std::wstring szFullPath, XMVECTOR vPos, X
     pObject->SetTransform({ vPos , vRot, vScale});
     pObject->SetMesh(pMesh);
     pObject->SetMaterial(pMaterial);
+    pObject->SetDrawMode(DRAW_MODE::MODE_SOLID);
+    pObject->SetSpecify(OBJECT_SPECIFY::OBJECT_STATIC);
    
     if (m_pQuadTree)
         m_pQuadTree->AddObject(pObject);
@@ -154,7 +162,7 @@ Object* ToolSystemMap::CreateFbxObject(std::wstring szFullPath, XMVECTOR vPos, X
     return pObject;
 }
 
-Object* ToolSystemMap::CreateSimpleBox(XMVECTOR vPos, float fLength)
+Object* ToolSystemMap::CreateSimpleBox(float fLength, XMVECTOR vPos, XMVECTOR vRot, XMVECTOR vScale)
 {
     float fboxLength = 0.5f * fLength;
     object vertex_list[] =
@@ -206,7 +214,7 @@ Object* ToolSystemMap::CreateSimpleBox(XMVECTOR vPos, float fLength)
     cc.matView = m_pCamera->m_matCamera;
     cc.matProj = m_pCamera->m_matProj;
 
-    Object* pObject = _ObjectSystem.CreateObject();
+    Object* pObject = _ObjectSystem.CreateObject(L"SimpleObjectBox");
     Mesh* pMesh = _EngineSystem.GetMeshSystem()->CreateMeshFromFile(L"SimpleObjectMesh");
 
     void* shader_byte_code_vs = nullptr;
@@ -228,9 +236,10 @@ Object* ToolSystemMap::CreateSimpleBox(XMVECTOR vPos, float fLength)
     
     pObject->SetShader(pVertexShader, pPixelShader);
     pObject->SetConstantData(cc);
-    pObject->SetTransform({ vPos , {0, 0, 0}, {1, 1, 1} });
+    pObject->SetTransform({ vPos , vRot, vScale });
     pObject->SetMesh(pMesh);
     pObject->SetDrawMode(DRAW_MODE::MODE_WIRE);
+    pObject->SetSpecify(OBJECT_SPECIFY::OBJECT_SIMPLE);
 
     if (m_pQuadTree)
         m_pQuadTree->AddObject(pObject);
@@ -274,6 +283,7 @@ FQuadTree* ToolSystemMap::CreateSimpleMap(int iWidth, int iHeight, float fDistan
     m_pQuadTree->SetTexture(_EngineSystem.GetTextureSystem()->GetTexture(szFullPath));
     m_pQuadTree->SetShader(szVSPath, pVertexShader, szPSPath, pPixelShader);
     m_pQuadTree->SetDrawMode(DRAW_MODE::MODE_SOLID);
+    m_pQuadTree->SetSpecify(OBJECT_SPECIFY::OBJECT_MAP);
 
     return m_pQuadTree;
 }
@@ -363,8 +373,8 @@ void ToolSystemMap::OpenFile(std::wstring szFullPath)
                     if (str.find("m_fAlphaData:") != std::string::npos)
                         break;
                     std::stringstream texturesStream(str);
-                    std::string str;
-                    std::getline(texturesStream, str, ',');
+                    std::string strName;
+                    std::getline(texturesStream, strName, ',');
 
                     CULL_MODE cullMode;
                     texturesStream >> cullMode;
@@ -383,10 +393,12 @@ void ToolSystemMap::OpenFile(std::wstring szFullPath)
 
                     Object* pObject = nullptr;
                     if (specifyMode == OBJECT_SPECIFY::OBJECT_SIMPLE)
-                        pObject = CreateSimpleBox(transform.position, 1.0f);
+                        pObject = CreateSimpleBox(1.0f, transform.position, transform.rotation, transform.scale);
                     else if (specifyMode == OBJECT_SPECIFY::OBJECT_STATIC)
+                        pObject = CreateFbxObject(_tomw(strName), transform.position, transform.rotation, transform.scale);
+                    else if (specifyMode == OBJECT_SPECIFY::OBJECT_SKELETON)
                         pObject = CreateFbxObject(_tomw(str), transform.position, transform.rotation, transform.scale);
-                    else if()
+
                     allObjectList.insert(pObject);
                     prevPos = is.tellg();
                 } 
@@ -438,10 +450,9 @@ void ToolSystemMap::OpenFile(std::wstring szFullPath)
 
     for (const auto& obj : allObjectList)
     {
-        std::string szFullPath = obj.first;
-        m_ListFbx.insert(_tomw(szFullPath));
-        Transform transform = obj.second;
-        CreateFbxObject(_tomw(szFullPath), transform.position, transform.rotation, transform.scale);
+        if (obj->GetSpecify() != OBJECT_SPECIFY::OBJECT_SIMPLE)
+            m_ListFbx.insert(obj->GetObjectName());
+        m_pQuadTree->AddObject(obj);
     }
 }
 

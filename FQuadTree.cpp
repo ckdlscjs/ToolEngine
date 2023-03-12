@@ -53,7 +53,7 @@ HRESULT FQuadTree::CreateAlphaTexture(DWORD dwWidth, DWORD dwHeight, BYTE* fAlph
     return hr;
 }
 
-void FQuadTree::Splatting(XMVECTOR vIntersection, std::wstring szFullPath, float fSplattingRadius)
+void FQuadTree::Splatting(XMVECTOR vIntersection, std::wstring szFullPath)
 {
     UINT const DataSize = sizeof(BYTE) * 4;
     UINT const RowPitch = DataSize * m_pMap->m_dwNumRows;
@@ -85,9 +85,9 @@ void FQuadTree::Splatting(XMVECTOR vIntersection, std::wstring szFullPath, float
             XMFLOAT3 radius =  vPickPos - vTexPos;
             float fRadius = XMVectorGetX(XMVector3Length(XMLoadFloat3(&radius)));
 
-            if (fRadius < fSplattingRadius)
+            if (fRadius < m_fSplattingRadius)
             {
-                float fDot = 1.0f - (fRadius / fSplattingRadius); //지점부터 범위까지, splattingRadius가 기준, 멀어질수록 fdot의값이 작아져 연해진다
+                float fDot = 1.0f - (fRadius / m_fSplattingRadius); //지점부터 범위까지, splattingRadius가 기준, 멀어질수록 fdot의값이 작아져 연해진다
                 for(int idx = 0; idx < m_ListTextureSplatting.size(); idx++)
                     if (szFullPath == m_ListTextureSplatting[idx]->m_szFullPath && (fDot * 255) > pixel[idx])
                         pixel[idx] = fDot * 255;//rgba -> this size rimited under 4
@@ -370,6 +370,11 @@ void FQuadTree::SetSculptIntensity(float fIntensity)
     m_fSculptIntensity = fIntensity;
 }
 
+void FQuadTree::SetSplatRadius(float fRadius)
+{
+    m_fSplattingRadius = fRadius;
+}
+
 void FQuadTree::SetSplattingTexture(Texture* pTexture)
 {
     m_ListTextureSplatting.push_back(pTexture);
@@ -603,7 +608,7 @@ void FQuadTree::Update()
     //MapCreateObject simple
     if (m_bSimplePicking && (_InputSystem.GetKey(VK_RBUTTON) == KEY_STATE::KEY_DOWN) && GetInterSection())
     {
-        _ToolSystemMap.CreateSimpleBox(m_Select.m_vIntersection, m_fObjLength);
+        _ToolSystemMap.CreateSimpleBox(m_fObjLength, m_Select.m_vIntersection);
     }
 
     //MapCreateObject fbx

@@ -20,6 +20,8 @@ public:
 	void SelectSplatting(std::wstring szSelectSplat, bool bSplatting);
 	void SetSculptRadius(float fRadius);
 	void SetSculptIntensity(float fIntensity);
+	void SetSplatRadius(float fRadius);
+
 	/*GetBlock*/
 	std::set<std::wstring>& GetListTextureSplatting();
 	std::set<std::wstring>& GetListTexture();
@@ -29,7 +31,7 @@ public:
 
 	/*CreateBlock*/
 	Object* CreateFbxObject(std::wstring szFullPath, XMVECTOR vPos, XMVECTOR vRot = { 0, 0, 0, 0 }, XMVECTOR vScale = { 1, 1, 1, 0 });
-	Object* CreateSimpleBox(XMVECTOR vPos, float fLength);
+	Object* CreateSimpleBox(float fLength, XMVECTOR vPos, XMVECTOR vRot = { 0, 0, 0, 0 }, XMVECTOR vScale = { 1, 1, 1, 0 });
 	FQuadTree* CreateSimpleMap(int iWidth, int iHeight,float fDistance, std::wstring szFullPath);
 	void DeleteSimpleMap();
 

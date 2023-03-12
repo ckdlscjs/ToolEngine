@@ -14,6 +14,7 @@ public:
 	void	SetPickingSculpt(bool bPicking);
 	void	SetSculptRadius(float fRadius);
 	void	SetSculptIntensity(float fIntensity);
+	void	SetSplatRadius(float fRadius);
 	void	SetSplattingTexture(Texture* pTexture);
 	void	SetSplatting(std::wstring szCurrentSplat, bool bSplatting);
 
@@ -44,7 +45,7 @@ public:
 	ID3D11Texture2D* m_pMaskAlphaTexture;
 	ID3D11ShaderResourceView* m_pMaskAlphaSrv;
 	HRESULT CreateAlphaTexture(DWORD dwWidth, DWORD dwHeight, BYTE* fAlphaData);
-	void    Splatting(XMVECTOR vIntersection, std::wstring szFullPath, float fSplattingRadius = 5.0f);
+	void    Splatting(XMVECTOR vIntersection, std::wstring szFullPath);
 
 public:
 	friend std::ostream& operator<<(std::ostream& os, const FQuadTree* pQuadTree);
@@ -69,6 +70,7 @@ public:
 	std::wstring m_szCurrentFbx;
 
 	bool m_bSplatting;
+	float m_fSplattingRadius = 5.0f;
 	std::wstring m_szCurrentSplat;
 	std::vector<Texture*> m_ListTextureSplatting;
 

@@ -236,10 +236,10 @@ Object::~Object()
 std::ostream& operator<<(std::ostream& os, const Object* pObject)
 {
 	os << pObject->m_szFullPath << ", ";
-	os << pObject->m_CullMode << ", ";
-	os << pObject->m_DrawMode << ", ";
-	os << pObject->m_InteractiveMode << ", ";
-	os << pObject->m_Specify << ", ";
+	os << "m_CullMode:" << pObject->m_CullMode << ", ";
+	os << "m_DrawMode:" << pObject->m_DrawMode << ", ";
+	os << "m_InteractiveMode:" << pObject->m_InteractiveMode << ", ";
+	os << "m_Specify:" << pObject->m_Specify << ", ";
 	os << pObject->m_Transform;
 	return os;
 }

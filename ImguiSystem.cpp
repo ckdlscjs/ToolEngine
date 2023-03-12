@@ -26,52 +26,76 @@ void ImguiSystem::Update()
     static int iMapSize = 4;
     static float fMapDistance = 1.0f;
     static bool bWireFrame = false;
-    static bool bFbxObjPicking = false;
-    static bool bSimpleObjPicking = false;
+    static bool bFbxObj = false;
+    static bool bSimpleObj = false;
     static float fSimpleObjLength = 1.0f;
     static bool bOjbectPicking = false;
-    static bool bSculptPicking = false;
+    static bool bSculpt = false;
     static bool bSplatting = false;
     static float fSculptRadius = 10.0f;
     static float fSculptIntensity = 10.0f;
+    static float fSplatRadius = 5.0f;
+
     ImGui::Begin("Demo");
     {
         {
+            //WireFrame
             if (ImGui::Checkbox("WireFrame", &bWireFrame))
             {
                 ~bWireFrame;
                 _ToolSystemMap.SetWireframe(bWireFrame);
             }
-            if (ImGui::Checkbox("SimpleObjPicking", &bSimpleObjPicking))
-            {
-                ~bSimpleObjPicking;
-                _ToolSystemMap.SelectSimple(bSimpleObjPicking, fSimpleObjLength);
-                
-            }
-            ImGui::InputFloat("length", &fSimpleObjLength);
 
-            if (ImGui::Checkbox("FbxObjPicking", &bFbxObjPicking))
+            //SimpleObjPicking
+            if (ImGui::Checkbox("CreateSimpleObj", &bSimpleObj))
             {
-                ~bFbxObjPicking;
-                _ToolSystemMap.SelectFbxObject(szCurrentFbx, bFbxObjPicking);
+                ~bSimpleObj;
+                _ToolSystemMap.SelectSimple(bSimpleObj, fSimpleObjLength);
+            }
+            if (bSimpleObj)
+            {
+                ImGui::InputFloat("length", &fSimpleObjLength);
+            }
+           
+            //FbxObjPicking
+            if (ImGui::Checkbox("CreateFbxObj", &bFbxObj))
+            {
+                ~bFbxObj;
+                _ToolSystemMap.SelectFbxObject(szCurrentFbx, bFbxObj);
             }
 
+            //OjbectPicking
             if (ImGui::Checkbox("OjbectPicking", &bOjbectPicking))
             {
                 ~bOjbectPicking;
                 _ToolSystemMap.SelectObject(bOjbectPicking);
             }
 
-            if (ImGui::Checkbox("SculptPicking", &bSculptPicking))
+            //SculptPicking
+            if (ImGui::Checkbox("SculptPicking", &bSculpt))
             {
-                ~bSculptPicking;
-                _ToolSystemMap.SelectSculpt(bSculptPicking);
+                ~bSculpt;
+                _ToolSystemMap.SelectSculpt(bSculpt);
+            }
+            if (bSculpt)
+            {
+                if (ImGui::InputFloat("SculptRadius", &fSculptRadius))
+                    _ToolSystemMap.SetSculptRadius(fSculptRadius);
+
+                if (ImGui::InputFloat("Intensity", &fSculptIntensity))
+                    _ToolSystemMap.SetSculptIntensity(fSculptIntensity);
             }
 
+            //Splatting
             if (ImGui::Checkbox("Splatting", &bSplatting))
             {
                 ~bSplatting;
                 _ToolSystemMap.SelectSplatting(szCurrentSplat, bSplatting);
+            }
+            if (bSplatting)
+            {
+                if (ImGui::InputFloat("SplatRadius", &fSplatRadius))
+                    _ToolSystemMap.SetSplatRadius(fSplatRadius);
             }
             ImGui::Dummy({ 0, 10 });
 
@@ -114,11 +138,6 @@ void ImguiSystem::Update()
 
             ImGui::InputFloat("CellDistance", &fMapDistance);
 
-            if (ImGui::InputFloat("Radius", &fSculptRadius))
-                _ToolSystemMap.SetSculptRadius(fSculptRadius);
-
-            if (ImGui::InputFloat("Intensity", &fSculptIntensity))
-                _ToolSystemMap.SetSculptIntensity(fSculptIntensity);
         }
         ImGui::Dummy({ 0, 10 });
         

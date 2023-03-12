@@ -131,14 +131,16 @@ static std::ostream& operator<<(std::ostream& os, const CULL_MODE& mode)
 	return os;
 }
 static std::stringstream& operator>>(std::stringstream& is, CULL_MODE& mode)
-{
-	std::string str;
-	std::getline(is, str, ',');
-	if (str == "CULL_MODE_FRONT")
+{	
+	size_t  pos_start = is.str().find("m_CullMode:") + strlen("m_CullMode:");
+	size_t  pos_end = is.str().find(",", pos_start);
+	std::string pos_str = is.str().substr(pos_start, pos_end - pos_start);
+	 
+	if (pos_str == "CULL_MODE_FRONT")
 		mode = CULL_MODE::CULL_MODE_FRONT;
-	else if (str == "CULL_MODE_BACK")
+	else if (pos_str == "CULL_MODE_BACK")
 		mode = CULL_MODE::CULL_MODE_BACK;
-	else if (str == "CULL_MODE_NONE")
+	else if (pos_str == "CULL_MODE_NONE")
 		mode = CULL_MODE::CULL_MODE_NONE;
 
 	return is;
@@ -162,11 +164,12 @@ static std::ostream& operator<<(std::ostream& os, const DRAW_MODE& mode)
 }
 static std::stringstream& operator>>(std::stringstream& is, DRAW_MODE& mode)
 {
-	std::string str;
-	std::getline(is, str, ',');
-	if (str == "MODE_SOLID")
+	size_t  pos_start = is.str().find("m_DrawMode:") + strlen("m_DrawMode:");
+	size_t  pos_end = is.str().find(",", pos_start);
+	std::string pos_str = is.str().substr(pos_start, pos_end - pos_start);
+	if (pos_str == "MODE_SOLID")
 		mode = DRAW_MODE::MODE_SOLID;
-	else if (str == "MODE_WIRE")
+	else if (pos_str == "MODE_WIRE")
 		mode = DRAW_MODE::MODE_WIRE;
 
 	return is;
@@ -190,11 +193,12 @@ static std::ostream& operator<<(std::ostream& os, const INTERACTIVE_MODE& mode)
 }
 static std::stringstream& operator>>(std::stringstream& is, INTERACTIVE_MODE& mode)
 {
-	std::string str;
-	std::getline(is, str, ',');
-	if (str == "MODE_NONE")
+	size_t  pos_start = is.str().find("m_InteractiveMode:") + strlen("m_InteractiveMode:");
+	size_t  pos_end = is.str().find(",", pos_start);
+	std::string pos_str = is.str().substr(pos_start, pos_end - pos_start);
+	if (pos_str == "MODE_NONE")
 		mode = INTERACTIVE_MODE::MODE_NONE;
-	else if (str == "MODE_INTERACTIVE")
+	else if (pos_str == "MODE_INTERACTIVE")
 		mode = INTERACTIVE_MODE::MODE_INTERACTIVE;
 
 	return is;
@@ -224,15 +228,16 @@ static std::ostream& operator<<(std::ostream& os, const OBJECT_SPECIFY& mode)
 }
 static std::stringstream& operator>>(std::stringstream& is, OBJECT_SPECIFY& mode)
 {
-	std::string str;
-	std::getline(is, str, ',');
-	if (str == "OBJECT_STATIC")
+	size_t  pos_start = is.str().find("m_Specify:") + strlen("m_Specify:");
+	size_t  pos_end = is.str().find(",", pos_start);
+	std::string pos_str = is.str().substr(pos_start, pos_end - pos_start);
+	if (pos_str == "OBJECT_STATIC")
 		mode = OBJECT_SPECIFY::OBJECT_STATIC;
-	else if (str == "OBJECT_SKELETON")
+	else if (pos_str == "OBJECT_SKELETON")
 		mode = OBJECT_SPECIFY::OBJECT_SKELETON;
-	else if (str == "OBJECT_SIMPLE")
+	else if (pos_str == "OBJECT_SIMPLE")
 		mode = OBJECT_SPECIFY::OBJECT_SIMPLE;
-	else if (str == "OBJECT_MAP")
+	else if (pos_str == "OBJECT_MAP")
 		mode = OBJECT_SPECIFY::OBJECT_MAP;
 
 	return is;
