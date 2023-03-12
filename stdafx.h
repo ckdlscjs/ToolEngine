@@ -23,6 +23,7 @@
 // DirectX
 #include <d3d11.h>
 #include <d3dcompiler.h>
+#include <DirectXCollision.h> 
 #pragma comment(lib, "d3d11.lib")
 #pragma comment(lib, "d3dcompiler.lib")
 #pragma comment(lib, "dxgi.lib")
@@ -210,6 +211,7 @@ enum class OBJECT_SPECIFY
 	OBJECT_SKELETON,
 	OBJECT_SIMPLE,
 	OBJECT_MAP,
+	OBJECT_SPAWN,
 };
 static std::ostream& operator<<(std::ostream& os, const OBJECT_SPECIFY& mode)
 {
@@ -223,6 +225,8 @@ static std::ostream& operator<<(std::ostream& os, const OBJECT_SPECIFY& mode)
 			os << "OBJECT_SIMPLE"; break;
 		case OBJECT_SPECIFY::OBJECT_MAP:
 			os << "OBJECT_MAP"; break;
+		case OBJECT_SPECIFY::OBJECT_SPAWN:
+			os << "OBJECT_SPAWN"; break;
 	}
 	return os;
 }
@@ -239,6 +243,8 @@ static std::stringstream& operator>>(std::stringstream& is, OBJECT_SPECIFY& mode
 		mode = OBJECT_SPECIFY::OBJECT_SIMPLE;
 	else if (pos_str == "OBJECT_MAP")
 		mode = OBJECT_SPECIFY::OBJECT_MAP;
+	else if (pos_str == "OBJECT_SPAWN")
+		mode = OBJECT_SPECIFY::OBJECT_SPAWN;
 
 	return is;
 }

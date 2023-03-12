@@ -44,8 +44,8 @@ std::ostream& operator<<(std::ostream& os, const Mesh* pMesh)
 	return os;
 }
 
-std::ifstream& operator>>(std::ifstream& is, Mesh* pMesh)
-{
-	// TODO: 여기에 return 문을 삽입합니다.
-	return is;
-}
+//std::ifstream& operator>>(std::ifstream& is, Mesh* pMesh)
+//{
+//	// TODO: 여기에 return 문을 삽입합니다.
+//	return is;
+//}

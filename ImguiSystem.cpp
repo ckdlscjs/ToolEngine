@@ -23,6 +23,7 @@ void ImguiSystem::Update()
     static std::wstring szCurrentSplat;
     static std::wstring szCurrentImage;
     static std::wstring szCurrentFbx;
+    static bool bMouseMove = true;
     static int iMapSize = 4;
     static float fMapDistance = 1.0f;
     static bool bWireFrame = false;
@@ -39,13 +40,13 @@ void ImguiSystem::Update()
     ImGui::Begin("Demo");
     {
         {
+            bMouseMove = (bFbxObj | bSimpleObj | bOjbectPicking | bSculpt | bSplatting) != true ? true : false;
             //WireFrame
             if (ImGui::Checkbox("WireFrame", &bWireFrame))
             {
                 ~bWireFrame;
                 _ToolSystemMap.SetWireframe(bWireFrame);
             }
-
             //SimpleObjPicking
             if (ImGui::Checkbox("CreateSimpleObj", &bSimpleObj))
             {
@@ -193,9 +194,9 @@ void ImguiSystem::Update()
     //}
     //
 
-    // 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
-   /* if (m_show_demo_window)
-        ImGui::ShowDemoWindow(&m_show_demo_window);*/
+    //// 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
+    //if (m_show_demo_window)
+    //    ImGui::ShowDemoWindow(&m_show_demo_window);
    
     //// 2. Show a simple window that we create ourselves. We use a Begin/End pair to create a named window.
     //{
@@ -284,6 +285,7 @@ void ImguiSystem::Update()
                 ImGui::InputFloat3("cam_up", cam_up);
             }
             ImGui::Dummy({ 0, 10 });
+
             if (_ToolSystemMap.GetCurrentQuadTree() != nullptr)
             {
                 if (bOjbectPicking && _InputSystem.GetKey(VK_RBUTTON) == KEY_STATE::KEY_DOWN)
@@ -305,9 +307,7 @@ void ImguiSystem::Update()
                         rotation[0] = 0; rotation[1] = 0; rotation[2] = 0;
                         position[0] = 0; position[1] = 0; position[2] = 0;
                     }
-                }
-
-                
+                }  
             }
             if (ImGui::Button("Object") && pObject != nullptr)
             {
@@ -323,10 +323,12 @@ void ImguiSystem::Update()
                 position[0] = 0; position[1] = 0; position[2] = 0;
                 pObject = nullptr;
             }
-                
-            ImGui::InputFloat3("scale", scale);
-            ImGui::InputFloat3("rotation", rotation);
-            ImGui::InputFloat3("position", position);
+            if(ImGui::DragFloat3("scale", scale) && pObject != nullptr)
+                pObject->SetTransform({ {position[0], position[1],position[2]}, {rotation[0],rotation[1],rotation[2]}, {scale[0],scale[1],scale[2]} });
+            if(ImGui::DragFloat3("rotation", rotation) && pObject != nullptr)
+                pObject->SetTransform({ {position[0], position[1],position[2]}, {rotation[0],rotation[1],rotation[2]}, {scale[0],scale[1],scale[2]} });
+            if(ImGui::DragFloat3("position", position) && pObject != nullptr)
+                pObject->SetTransform({ {position[0], position[1],position[2]}, {rotation[0],rotation[1],rotation[2]}, {scale[0],scale[1],scale[2]} });
         }
         ImGui::Dummy({ 0, 10 });
     }

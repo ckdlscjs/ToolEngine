@@ -30,7 +30,7 @@ public:
 	OBJECT_SPECIFY GetSpecify();
 
 	friend std::ostream& operator<<(std::ostream& os, const Object* pObject);
-	friend std::ifstream& operator>>(std::ifstream& is, Object* pObject);
+	//friend std::ifstream& operator>>(std::ifstream& is, Object* pObject);
 
 public:
 	virtual void Update();

@@ -545,8 +545,11 @@ bool FQuadTree::GetInterSection()
             XMFLOAT3 v0 = m_pMap->GetListVertex()[i0].pos;
             XMFLOAT3 v1 = m_pMap->GetListVertex()[i1].pos;
             XMFLOAT3 v2 = m_pMap->GetListVertex()[i2].pos;
+            float fDist;
             if (m_Select.ChkPick(XMLoadFloat3(&v0), XMLoadFloat3(&v1), XMLoadFloat3(&v2)))
+            //if(DirectX::TriangleTests::Intersects(m_Select.m_Ray.vOrigin, m_Select.m_Ray.vDirection, XMLoadFloat3(&v0), XMLoadFloat3(&v1), XMLoadFloat3(&v2), fDist))
             {
+                //m_Select.m_vIntersection = m_Select.m_Ray.vOrigin + m_Select.m_Ray.vDirection * fDist;
                 return true;
             }
             index += 3;
@@ -606,7 +609,7 @@ void FQuadTree::Update()
     m_Select.SetMatrix(nullptr, &m_pCamera->m_matCamera, &m_pCamera->m_matProj);
 
     //MapCreateObject simple
-    if (m_bSimplePicking && (_InputSystem.GetKey(VK_RBUTTON) == KEY_STATE::KEY_DOWN) && GetInterSection())
+    if (m_bSimplePicking && (_InputSystem.GetKey(VK_RBUTTON) == KEY_STATE::KEY_DOWN) && GetInterSection()) 
     {
         _ToolSystemMap.CreateSimpleBox(m_fObjLength, m_Select.m_vIntersection);
     }

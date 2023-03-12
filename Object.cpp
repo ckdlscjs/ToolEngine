@@ -244,7 +244,7 @@ std::ostream& operator<<(std::ostream& os, const Object* pObject)
 	return os;
 }
 
-std::ifstream& operator>>(std::ifstream& is, Object* pObject)
-{
-	return is;
-}
+//std::ifstream& operator>>(std::ifstream& is, Object* pObject)
+//{
+//	return is;
+//}
