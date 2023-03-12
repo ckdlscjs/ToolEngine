@@ -108,6 +108,220 @@ static std::wstring GetSplitFile(std::wstring szFullPath)
 	else
 		return szFullPath.substr(pos + 1);
 }
+//상호작용을 위한 열거
+
+
+enum class CULL_MODE
+{
+	CULL_MODE_FRONT = 0,
+	CULL_MODE_BACK,
+	CULL_MODE_NONE,
+};
+static std::ostream& operator<<(std::ostream& os, const CULL_MODE& mode)
+{
+	switch (mode)
+	{
+		case CULL_MODE::CULL_MODE_FRONT:
+			os << "CULL_MODE_FRONT"; break;
+		case CULL_MODE::CULL_MODE_BACK:
+			os << "CULL_MODE_BACK"; break;
+		case CULL_MODE::CULL_MODE_NONE:
+			os << "CULL_MODE_NONE"; break;
+	}
+	return os;
+}
+static std::stringstream& operator>>(std::stringstream& is, CULL_MODE& mode)
+{
+	std::string str;
+	std::getline(is, str, ',');
+	if (str == "CULL_MODE_FRONT")
+		mode = CULL_MODE::CULL_MODE_FRONT;
+	else if (str == "CULL_MODE_BACK")
+		mode = CULL_MODE::CULL_MODE_BACK;
+	else if (str == "CULL_MODE_NONE")
+		mode = CULL_MODE::CULL_MODE_NONE;
+
+	return is;
+}
+
+enum class DRAW_MODE
+{
+	MODE_SOLID = 0,
+	MODE_WIRE,
+};
+static std::ostream& operator<<(std::ostream& os, const DRAW_MODE& mode)
+{
+	switch (mode)
+	{
+		case DRAW_MODE::MODE_SOLID : 
+			os << "MODE_SOLID"; break;
+		case DRAW_MODE::MODE_WIRE:
+			os << "MODE_WIRE"; break;
+	}
+	return os;
+}
+static std::stringstream& operator>>(std::stringstream& is, DRAW_MODE& mode)
+{
+	std::string str;
+	std::getline(is, str, ',');
+	if (str == "MODE_SOLID")
+		mode = DRAW_MODE::MODE_SOLID;
+	else if (str == "MODE_WIRE")
+		mode = DRAW_MODE::MODE_WIRE;
+
+	return is;
+}
+
+enum class INTERACTIVE_MODE
+{
+	MODE_NONE = 0,
+	MODE_INTERACTIVE,
+};
+static std::ostream& operator<<(std::ostream& os, const INTERACTIVE_MODE& mode)
+{
+	switch (mode)
+	{
+		case INTERACTIVE_MODE::MODE_NONE:
+			os << "MODE_NONE"; break;
+		case INTERACTIVE_MODE::MODE_INTERACTIVE:
+			os << "MODE_INTERACTIVE"; break;
+	}
+	return os;
+}
+static std::stringstream& operator>>(std::stringstream& is, INTERACTIVE_MODE& mode)
+{
+	std::string str;
+	std::getline(is, str, ',');
+	if (str == "MODE_NONE")
+		mode = INTERACTIVE_MODE::MODE_NONE;
+	else if (str == "MODE_INTERACTIVE")
+		mode = INTERACTIVE_MODE::MODE_INTERACTIVE;
+
+	return is;
+}
+
+enum class OBJECT_SPECIFY
+{
+	OBJECT_STATIC = 0,
+	OBJECT_SKELETON,
+	OBJECT_SIMPLE,
+	OBJECT_MAP,
+};
+static std::ostream& operator<<(std::ostream& os, const OBJECT_SPECIFY& mode)
+{
+	switch (mode)
+	{
+		case OBJECT_SPECIFY::OBJECT_STATIC:
+			os << "OBJECT_STATIC"; break;
+		case OBJECT_SPECIFY::OBJECT_SKELETON:
+			os << "OBJECT_SKELETON"; break;
+		case OBJECT_SPECIFY::OBJECT_SIMPLE:
+			os << "OBJECT_SIMPLE"; break;
+		case OBJECT_SPECIFY::OBJECT_MAP:
+			os << "OBJECT_MAP"; break;
+	}
+	return os;
+}
+static std::stringstream& operator>>(std::stringstream& is, OBJECT_SPECIFY& mode)
+{
+	std::string str;
+	std::getline(is, str, ',');
+	if (str == "OBJECT_STATIC")
+		mode = OBJECT_SPECIFY::OBJECT_STATIC;
+	else if (str == "OBJECT_SKELETON")
+		mode = OBJECT_SPECIFY::OBJECT_SKELETON;
+	else if (str == "OBJECT_SIMPLE")
+		mode = OBJECT_SPECIFY::OBJECT_SIMPLE;
+	else if (str == "OBJECT_MAP")
+		mode = OBJECT_SPECIFY::OBJECT_MAP;
+
+	return is;
+}
+
+struct Transform
+{
+	XMVECTOR position;
+	XMVECTOR rotation;
+	XMVECTOR scale;
+	friend std::ostream& operator<<(std::ostream& os, const Transform& transform)
+	{
+		os << "position:" << XMVectorGetX(transform.position) << " " << XMVectorGetY(transform.position) << " " << XMVectorGetZ(transform.position) << ", ";
+		os << "rotation:" << XMVectorGetX(transform.rotation) << " " << XMVectorGetY(transform.rotation) << " " << XMVectorGetZ(transform.rotation) << ", ";
+		os << "scale:" << XMVectorGetX(transform.scale) << " " << XMVectorGetY(transform.scale) << " " << XMVectorGetZ(transform.scale);
+		return os;
+	}
+	friend std::istringstream& operator>>(std::istringstream& is, Transform& transform)
+	{
+		// "pos: x y z, tex: x y, normal: x y z, color: r g b a"와 같은 형태의 문자열에서 필드 값을 추출합니다.
+		std::string line;
+		std::getline(is, line);
+
+		// pos 값을 추출합니다.
+		size_t pos_start = line.find("position:") + strlen("position:");
+		size_t pos_end = line.find(",", pos_start);
+		std::string pos_str = line.substr(pos_start, pos_end - pos_start);
+		std::istringstream pos_stream(pos_str);
+		XMFLOAT3 position;
+		pos_stream >> position.x >> position.y >> position.z;
+		transform.position = XMLoadFloat3(&position);
+
+		// rotation 값을 추출합니다.
+		size_t rot_start = line.find("rotation:") + strlen("rotation:");
+		size_t rot_end = line.find(",", rot_start);
+		std::string rot_str = line.substr(rot_start, rot_end - rot_start);
+		std::istringstream rot_stream(rot_str);
+		XMFLOAT3 rotation;
+		rot_stream >> rotation.x >> rotation.y >> rotation.z;
+		transform.rotation = XMLoadFloat3(&rotation);
+
+		// scale 값을 추출합니다.
+		size_t scale_start = line.find("scale:") + strlen("scale:");
+		size_t scale_end = line.find(",", scale_start);
+		std::string normal_str = line.substr(scale_start, scale_end - scale_start);
+		std::istringstream scale_stream(normal_str);
+		XMFLOAT3 scale;
+		scale_stream >> scale.x >> scale.y >> scale.z;
+		transform.scale = XMLoadFloat3(&scale);
+
+		return is;
+	}
+
+	friend std::stringstream& operator>>(std::stringstream& is, Transform& transform)
+	{
+		// "pos: x y z, tex: x y, normal: x y z, color: r g b a"와 같은 형태의 문자열에서 필드 값을 추출합니다.
+		std::string line;
+		std::getline(is, line);
+
+		// pos 값을 추출합니다.
+		size_t pos_start = line.find("position:") + strlen("position:");
+		size_t pos_end = line.find(",", pos_start);
+		std::string pos_str = line.substr(pos_start, pos_end - pos_start);
+		std::istringstream pos_stream(pos_str);
+		XMFLOAT3 position;
+		pos_stream >> position.x >> position.y >> position.z;
+		transform.position = XMLoadFloat3(&position);
+
+		// rotation 값을 추출합니다.
+		size_t rot_start = line.find("rotation:") + strlen("rotation:");
+		size_t rot_end = line.find(",", rot_start);
+		std::string rot_str = line.substr(rot_start, rot_end - rot_start);
+		std::istringstream rot_stream(rot_str);
+		XMFLOAT3 rotation;
+		rot_stream >> rotation.x >> rotation.y >> rotation.z;
+		transform.rotation = XMLoadFloat3(&rotation);
+
+		// scale 값을 추출합니다.
+		size_t scale_start = line.find("scale:") + strlen("scale:");
+		size_t scale_end = line.find(",", scale_start);
+		std::string normal_str = line.substr(scale_start, scale_end - scale_start);
+		std::istringstream scale_stream(normal_str);
+		XMFLOAT3 scale;
+		scale_stream >> scale.x >> scale.y >> scale.z;
+		transform.scale = XMLoadFloat3(&scale);
+
+		return is;
+	}
+};
 
 struct object
 {
@@ -160,11 +374,7 @@ struct object
 		return is;
 	}
 };
-enum class DRAW_MODE
-{
-	MODE_SOLID = 0,
-	MODE_WIRE,
-};
+
 
 __declspec(align(16))
 struct constant

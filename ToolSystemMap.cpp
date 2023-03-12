@@ -54,7 +54,32 @@ void ToolSystemMap::SetSculptIntensity(float fIntensity)
         m_pQuadTree->SetSculptIntensity(fIntensity);
 }
 
-void ToolSystemMap::CreateFbxObject(std::wstring szFullPath, XMVECTOR vPos, XMVECTOR vRot, XMVECTOR vScale)
+std::set<std::wstring>& ToolSystemMap::GetListTextureSplatting()
+{
+    return m_ListTextureSplatting;
+}
+
+std::set<std::wstring>& ToolSystemMap::GetListTexture()
+{
+    return m_ListTexture;
+}
+
+std::set<std::wstring>& ToolSystemMap::GetListFbx()
+{
+    return m_ListFbx;
+}
+
+Camera* ToolSystemMap::GetCurrentCamera()
+{
+    return m_pCamera;
+}
+
+FQuadTree* ToolSystemMap::GetCurrentQuadTree()
+{
+    return m_pQuadTree;
+}
+
+Object* ToolSystemMap::CreateFbxObject(std::wstring szFullPath, XMVECTOR vPos, XMVECTOR vRot, XMVECTOR vScale)
 {
     constant cc;
     cc.matWorld = XMMatrixIdentity();
@@ -115,6 +140,7 @@ void ToolSystemMap::CreateFbxObject(std::wstring szFullPath, XMVECTOR vPos, XMVE
             }
         }
     }
+    _EngineSystem.GetRenderSystem()->ReleaseBlob();
 
     pObject->SetShader(pVertexShader, pPixelShader);
     pObject->SetConstantData(cc);
@@ -125,10 +151,10 @@ void ToolSystemMap::CreateFbxObject(std::wstring szFullPath, XMVECTOR vPos, XMVE
     if (m_pQuadTree)
         m_pQuadTree->AddObject(pObject);
 
-    _EngineSystem.GetRenderSystem()->ReleaseBlob();
+    return pObject;
 }
 
-void ToolSystemMap::CreateSimpleBox(XMVECTOR vPos, float fLength)
+Object* ToolSystemMap::CreateSimpleBox(XMVECTOR vPos, float fLength)
 {
     float fboxLength = 0.5f * fLength;
     object vertex_list[] =
@@ -182,7 +208,6 @@ void ToolSystemMap::CreateSimpleBox(XMVECTOR vPos, float fLength)
 
     Object* pObject = _ObjectSystem.CreateObject();
     Mesh* pMesh = _EngineSystem.GetMeshSystem()->CreateMeshFromFile(L"SimpleObjectMesh");
-    //Material* pMaterial = _MaterialSystem.CreateMaterial(L"SimpleObjectMtrl");
 
     void* shader_byte_code_vs = nullptr;
     void* shader_byte_code_ps = nullptr;
@@ -199,27 +224,21 @@ void ToolSystemMap::CreateSimpleBox(XMVECTOR vPos, float fLength)
         IndexBuffer* pIndexBuffer = _EngineSystem.GetRenderSystem()->CreateIndexBuffer(index_list, size_index_list);
         pMesh->SetMeshNode(vertex_list, size_vertex_list, pVertexBuffer, index_list, size_index_list, pIndexBuffer);
     }
-   /* if (pMaterial->IsEmpty())
-    {
-        std::vector<Texture*> listTex;
-        listTex.push_back(_EngineSystem.GetTextureSystem()->GetTexture(szFullPath));
-        pMaterial->SetList(listTex);
-    }*/
+    _EngineSystem.GetRenderSystem()->ReleaseBlob();
     
     pObject->SetShader(pVertexShader, pPixelShader);
     pObject->SetConstantData(cc);
     pObject->SetTransform({ vPos , {0, 0, 0}, {1, 1, 1} });
     pObject->SetMesh(pMesh);
     pObject->SetDrawMode(DRAW_MODE::MODE_WIRE);
-    //pObject->SetMaterial(pMaterial);
 
     if (m_pQuadTree)
         m_pQuadTree->AddObject(pObject);
 
-    _EngineSystem.GetRenderSystem()->ReleaseBlob();
+    return pObject;
 }
 
-void ToolSystemMap::CreateSimpleMap(int iWidth, int iHeight, float fDistance, std::wstring szFullPath)
+FQuadTree* ToolSystemMap::CreateSimpleMap(int iWidth, int iHeight, float fDistance, std::wstring szFullPath)
 {
     constant_map cc;
     cc.matWorld = XMMatrixIdentity();
@@ -228,7 +247,6 @@ void ToolSystemMap::CreateSimpleMap(int iWidth, int iHeight, float fDistance, st
 
     MeshMap* pMapMesh = new MeshMap(iWidth, iHeight, fDistance);
     _EngineSystem.GetMeshSystem()->AddResource(szFullPath, pMapMesh);
-    //Material* pMaterial = _MaterialSystem.CreateMaterial(L"MapMtrl");
 
     std::wstring szVSPath = L"MapVertexShader.hlsl";
     std::wstring szPSPath = L"MapPixelShader.hlsl";
@@ -245,6 +263,7 @@ void ToolSystemMap::CreateSimpleMap(int iWidth, int iHeight, float fDistance, st
     VertexBuffer* pVertexBuffer = _EngineSystem.GetRenderSystem()->CreateVertexBuffer(&pMapMesh->GetListVertex()[0], sizeof(object), pMapMesh->GetListVertex().size(), shader_byte_code_vs, size_shader_vs);
     IndexBuffer* pIndexBuffer = _EngineSystem.GetRenderSystem()->CreateIndexBuffer(&pMapMesh->GetListIndex()[0], pMapMesh->GetListIndex().size());
    
+    _EngineSystem.GetRenderSystem()->ReleaseBlob();
 
     pMapMesh->m_pVertexBuffer = pVertexBuffer;
     pMapMesh->m_pIndexBuffer = pIndexBuffer;
@@ -256,7 +275,7 @@ void ToolSystemMap::CreateSimpleMap(int iWidth, int iHeight, float fDistance, st
     m_pQuadTree->SetShader(szVSPath, pVertexShader, szPSPath, pPixelShader);
     m_pQuadTree->SetDrawMode(DRAW_MODE::MODE_SOLID);
 
-    _EngineSystem.GetRenderSystem()->ReleaseBlob();
+    return m_pQuadTree;
 }
 
 void ToolSystemMap::DeleteSimpleMap()
@@ -278,7 +297,7 @@ void ToolSystemMap::OpenFile(std::wstring szFullPath)
     size_t size_shader_vs = 0;
     size_t size_shader_ps = 0;
     MeshMap* pMapMesh = new MeshMap();
-    std::unordered_map<std::string, Transform> allObjectList;
+    std::unordered_set<Object*> allObjectList;
     BYTE* fAlphaData = nullptr;
     std::ifstream is(szFullPath);
     std::string line;
@@ -344,12 +363,31 @@ void ToolSystemMap::OpenFile(std::wstring szFullPath)
                     if (str.find("m_fAlphaData:") != std::string::npos)
                         break;
                     std::stringstream texturesStream(str);
-                    std::string szFullPath;
-                    std::getline(texturesStream, szFullPath, ',');
+                    std::string str;
+                    std::getline(texturesStream, str, ',');
+
+                    CULL_MODE cullMode;
+                    texturesStream >> cullMode;
+
+                    DRAW_MODE drawMode;
+                    texturesStream >> drawMode;
+
+                    INTERACTIVE_MODE interactiveMode;
+                    texturesStream >> interactiveMode;
+
+                    OBJECT_SPECIFY specifyMode;
+                    texturesStream >> specifyMode;
+
                     Transform transform;
                     texturesStream >> transform;
-                    allObjectList.insert(std::make_pair(szFullPath, transform));
-                    //CreateFbxObject(_tomw(szFullPath), transform.position, transform.rotation, transform.scale);
+
+                    Object* pObject = nullptr;
+                    if (specifyMode == OBJECT_SPECIFY::OBJECT_SIMPLE)
+                        pObject = CreateSimpleBox(transform.position, 1.0f);
+                    else if (specifyMode == OBJECT_SPECIFY::OBJECT_STATIC)
+                        pObject = CreateFbxObject(_tomw(str), transform.position, transform.rotation, transform.scale);
+                    else if()
+                    allObjectList.insert(pObject);
                     prevPos = is.tellg();
                 } 
                 is.seekg(prevPos);
@@ -366,6 +404,7 @@ void ToolSystemMap::OpenFile(std::wstring szFullPath)
             }
         }
     }
+
     is.close();
 
     constant_map cc;

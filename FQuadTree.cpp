@@ -121,9 +121,7 @@ std::ostream& operator<<(std::ostream& os, const FQuadTree* pQuadTree)
     os << "m_pAllObjectList:" << std::endl;
     for (const auto& object : pQuadTree->m_pAllObjectList)
     {
-        os << object->GetObjectName() << ", ";
-        os << object->GetTransform();
-        os << std::endl;
+        os << object << std::endl; 
     }
 
     os << "m_fAlphaData:";
@@ -132,10 +130,154 @@ std::ostream& operator<<(std::ostream& os, const FQuadTree* pQuadTree)
     os << std::endl;
     return os;
 }
-std::ifstream& operator>>(std::ifstream& is, FQuadTree* pQuadTree)
-{
-    return is;
-}
+//std::ifstream& operator>>(std::ifstream& is, FQuadTree* pQuadTree)
+//{
+//    Texture* pTexture = nullptr;
+//    Transform mapTransform = {};
+//    UINT iMaxDepth = 0;
+//    std::wstring szVSPath;
+//    std::wstring szPSPath;
+//    void* shader_byte_code_vs = nullptr;
+//    void* shader_byte_code_ps = nullptr;
+//    size_t size_shader_vs = 0;
+//    size_t size_shader_ps = 0;
+//    MeshMap* pMapMesh = new MeshMap();
+//    std::unordered_map<std::string, Transform> allObjectList;
+//    BYTE* fAlphaData = nullptr;
+//    std::string line;
+//    while (std::getline(is, line))
+//    {
+//        std::istringstream iss(line);
+//        std::string fieldName;
+//        if (std::getline(iss, fieldName, ':'))
+//        {
+//            if (fieldName == "m_pTexture")
+//            {
+//                std::string textureName;
+//                iss >> textureName;
+//                pTexture = _EngineSystem.GetTextureSystem()->CreateTextureFromFile(_tomw(textureName));
+//                _ToolSystemMap.GetListTexture().insert(_tomw(textureName));
+//            }
+//            else if (fieldName == "m_ListTextureSplatting")
+//            {
+//                std::string texturesStr;
+//                std::getline(iss, texturesStr);
+//                std::stringstream texturesStream(texturesStr);
+//                std::string texturePath;
+//                while (std::getline(texturesStream, texturePath, ','))
+//                {
+//                    if (texturePath.size() > 1)
+//                    {
+//                        texturePath.erase(std::remove(texturePath.begin(), texturePath.end(), ' '), texturePath.end());
+//                        auto texture = _EngineSystem.GetTextureSystem()->CreateTextureFromFile(_tomw(texturePath));
+//                        pQuadTree->m_ListTextureSplatting.push_back(texture);
+//                    }
+//                }
+//            }
+//            else if (fieldName == "m_Transform")
+//            {
+//                iss >> mapTransform;
+//            }
+//            else if (fieldName == "m_iMaxDepth")
+//            {
+//                iss >> iMaxDepth;
+//            }
+//            else if (fieldName == "m_szVSName")
+//            {
+//                std::string str;
+//                std::getline(iss, str);
+//                szVSPath = _tomw(str);
+//            }
+//            else if (fieldName == "m_szPSName")
+//            {
+//                std::string str;
+//                std::getline(iss, str);
+//                szPSPath = _tomw(str);
+//            }
+//            else if (fieldName == "m_pMap")
+//            {
+//                is >> pMapMesh;
+//            }
+//            else if (fieldName == "m_pAllObjectList")
+//            {
+//                std::streampos prevPos = is.tellg();
+//                std::string str;
+//                while (std::getline(is, str))
+//                {
+//                    if (str.find("m_fAlphaData:") != std::string::npos)
+//                        break;
+//                    std::stringstream texturesStream(str);
+//                    std::string str;
+//                    std::getline(texturesStream, str, ',');
+//
+//                    CULL_MODE cullMode;
+//                    texturesStream >> cullMode;
+//
+//                    DRAW_MODE drawMode;
+//                    texturesStream >> drawMode;
+//
+//                    INTERACTIVE_MODE interactiveMode;
+//                    texturesStream >> interactiveMode;
+//
+//                    OBJECT_SPECIFY specifyMode;
+//                    texturesStream >> specifyMode;
+//
+//                    Transform transform;
+//                    texturesStream >> transform;
+//                    allObjectList.insert(std::make_pair(str, transform));
+//                    prevPos = is.tellg();
+//                }
+//                is.seekg(prevPos);
+//            }
+//            else if (fieldName == "m_fAlphaData")
+//            {
+//                fAlphaData = new BYTE[pMapMesh->m_dwNumRows * pMapMesh->m_dwNumColumns * 4];
+//                for (int idx = 0; idx < pMapMesh->m_dwNumRows * pMapMesh->m_dwNumColumns * 4; idx++)
+//                {
+//                    int rgba = 0;
+//                    iss >> rgba;
+//                    fAlphaData[idx] = static_cast<uint8_t>(rgba);
+//                }
+//            }
+//        }
+//    }
+//
+//    constant_map cc;
+//    cc.matWorld = XMMatrixIdentity();
+//    cc.matView = pQuadTree->m_pCamera->m_matCamera;
+//    cc.matProj = pQuadTree->m_pCamera->m_matProj;
+//
+//    _EngineSystem.GetMeshSystem()->AddResource(L"MapMesh", pMapMesh);
+//
+//    _EngineSystem.GetRenderSystem()->CompileVertexShader(szVSPath.c_str(), "vsmain", "vs_5_0", &shader_byte_code_vs, &size_shader_vs);
+//    VertexShader* pVertexShader = _EngineSystem.GetRenderSystem()->CreateVertexShader(shader_byte_code_vs, size_shader_vs);
+//    _EngineSystem.GetRenderSystem()->CompilePixelShader(szPSPath.c_str(), "psmain", "ps_5_0", &shader_byte_code_ps, &size_shader_ps);
+//    PixelShader* pPixelShader = _EngineSystem.GetRenderSystem()->CreatePixelShader(shader_byte_code_ps, size_shader_ps);
+//
+//    VertexBuffer* pVertexBuffer = _EngineSystem.GetRenderSystem()->CreateVertexBuffer(&pMapMesh->GetListVertex()[0], sizeof(object), pMapMesh->GetListVertex().size(), shader_byte_code_vs, size_shader_vs);
+//    IndexBuffer* pIndexBuffer = _EngineSystem.GetRenderSystem()->CreateIndexBuffer(&pMapMesh->GetListIndex()[0], pMapMesh->GetListIndex().size());
+//
+//    _EngineSystem.GetRenderSystem()->ReleaseBlob();
+//
+//    pMapMesh->m_pVertexBuffer = pVertexBuffer;
+//    pMapMesh->m_pIndexBuffer = pIndexBuffer;
+//
+//    pQuadTree->SetConstantData(cc);
+//    pQuadTree->SetTransform({ mapTransform.position, mapTransform.rotation, mapTransform.scale });
+//    pQuadTree->SetTexture(pTexture);
+//    pQuadTree->SetShader(szVSPath, pVertexShader, szPSPath, pPixelShader);
+//    pQuadTree->SetDrawMode(DRAW_MODE::MODE_SOLID);
+//
+//    for (const auto& obj : allObjectList)
+//    {
+//        std::string szFullPath = obj.first;
+//        _ToolSystemMap.GetListFbx().insert(_tomw(szFullPath));
+//        Transform transform = obj.second;
+//        _ToolSystemMap.CreateFbxObject(_tomw(szFullPath), transform.position, transform.rotation, transform.scale);
+//    }
+//
+//    return is;
+//}
 
 
 FQuadTree::FQuadTree(Camera* pCamera, MeshMap* pMap, int iMaxDepth, BYTE* fAlphaData)
@@ -283,6 +425,11 @@ void FQuadTree::SetConstantData(constant_map cc)
 void FQuadTree::SetDrawMode(DRAW_MODE mode)
 {
     m_DrawMode = mode;
+}
+
+void FQuadTree::SetSpecify(OBJECT_SPECIFY specify)
+{
+    m_Specify = specify;
 }
 
 BOOL FQuadTree::AddObject(Object* pObj)

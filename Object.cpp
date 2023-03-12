@@ -139,9 +139,29 @@ void Object::SetDrawMode(DRAW_MODE mode)
 	m_DrawMode = mode;
 }
 
+void Object::SetSpecify(OBJECT_SPECIFY specify)
+{
+	m_Specify = specify;
+}
+
 CULL_MODE Object::GetCullMode()
 {
 	return m_CullMode;
+}
+
+INTERACTIVE_MODE Object::GetIntractiveMode()
+{
+	return m_InteractiveMode;
+}
+
+DRAW_MODE Object::GetDrawMode()
+{
+	return m_DrawMode;
+}
+
+OBJECT_SPECIFY Object::GetSpecify()
+{
+	return m_Specify;
 }
 
 void Object::Update()
@@ -206,17 +226,25 @@ Object::Object(std::wstring szFullPath) : m_szFullPath(szFullPath)
 	m_pConstantBuffer = _EngineSystem.GetRenderSystem()->CreateConstantBuffer(&m_ConstantData, sizeof(m_ConstantData));
 }
 
-Object::Object()
-{
-	m_ConstantData.matWorld = XMMatrixIdentity();
-	m_ConstantData.matView = XMMatrixIdentity();
-	m_ConstantData.matProj = XMMatrixIdentity();
-	m_pConstantBuffer = _EngineSystem.GetRenderSystem()->CreateConstantBuffer(&m_ConstantData, sizeof(m_ConstantData));
-}
-
 Object::~Object()
 {
 	if (m_pConstantBuffer) delete m_pConstantBuffer;
 	if (m_pVertexShader) delete m_pVertexShader;
 	if (m_pPixelShader) delete m_pPixelShader;
+}
+
+std::ostream& operator<<(std::ostream& os, const Object* pObject)
+{
+	os << pObject->m_szFullPath << ", ";
+	os << pObject->m_CullMode << ", ";
+	os << pObject->m_DrawMode << ", ";
+	os << pObject->m_InteractiveMode << ", ";
+	os << pObject->m_Specify << ", ";
+	os << pObject->m_Transform;
+	return os;
+}
+
+std::ifstream& operator>>(std::ifstream& is, Object* pObject)
+{
+	return is;
 }

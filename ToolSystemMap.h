@@ -10,7 +10,7 @@
 class ToolSystemMap : public Singleton<ToolSystemMap>
 {
 public:
-	
+	/*SetBlock*/
 	void SetWireframe(bool bWireFrame);
 	void SelectSimple(bool bPicking, float fLength);
 	void SelectSculpt(bool bPicking);
@@ -20,10 +20,19 @@ public:
 	void SelectSplatting(std::wstring szSelectSplat, bool bSplatting);
 	void SetSculptRadius(float fRadius);
 	void SetSculptIntensity(float fIntensity);
-	void CreateFbxObject(std::wstring szFullPath, XMVECTOR vPos, XMVECTOR vRot = { 0, 0, 0, 0 }, XMVECTOR vScale = { 1, 1, 1, 0 });
-	void CreateSimpleBox(XMVECTOR vPos, float fLength);
-	void CreateSimpleMap(int iWidth, int iHeight,float fDistance, std::wstring szFullPath);
+	/*GetBlock*/
+	std::set<std::wstring>& GetListTextureSplatting();
+	std::set<std::wstring>& GetListTexture();
+	std::set<std::wstring>& GetListFbx();
+	Camera* GetCurrentCamera();
+	FQuadTree* GetCurrentQuadTree();
+
+	/*CreateBlock*/
+	Object* CreateFbxObject(std::wstring szFullPath, XMVECTOR vPos, XMVECTOR vRot = { 0, 0, 0, 0 }, XMVECTOR vScale = { 1, 1, 1, 0 });
+	Object* CreateSimpleBox(XMVECTOR vPos, float fLength);
+	FQuadTree* CreateSimpleMap(int iWidth, int iHeight,float fDistance, std::wstring szFullPath);
 	void DeleteSimpleMap();
+
 	void OpenFile(std::wstring szFullPath);
 	void SaveFile(std::wstring szFullPath);
 public:
@@ -38,8 +47,6 @@ private:
 	std::set<std::wstring> m_ListTextureSplatting;
 	std::set<std::wstring> m_ListTexture;
 	std::set<std::wstring> m_ListFbx;
-	friend class ImguiSystem;
-	friend class FQuadTree;
 };
 #define _ToolSystemMap Singleton<ToolSystemMap>::GetInstance()
 

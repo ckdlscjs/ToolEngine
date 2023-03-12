@@ -23,6 +23,7 @@ public:
 	void	SetShader(std::wstring vsPath, VertexShader* pVertexShader, std::wstring psPath, PixelShader* pPixelShader);
 	void	SetConstantData(constant_map cc);
 	void	SetDrawMode(DRAW_MODE mode);
+	void	SetSpecify(OBJECT_SPECIFY specify);
 	UINT	SelectVertexList(T_BOX& box, std::vector<FNode*>& selectNodeList);
 	void	UpdateNode(FNode* pNode);
 	Object* GetPickingObject();
@@ -47,7 +48,7 @@ public:
 
 public:
 	friend std::ostream& operator<<(std::ostream& os, const FQuadTree* pQuadTree);
-	friend std::ifstream& operator>>(std::ifstream& is, FQuadTree* pQuadTree);
+	//friend std::ifstream& operator>>(std::ifstream& is, FQuadTree* pQuadTree);
 
 	FQuadTree(Camera* pCamera, MeshMap* pMap, int iMaxDepth = 2, BYTE* fAlphaData = 0);
 	~FQuadTree();
@@ -87,6 +88,7 @@ public:
 	PixelShader* m_pPixelShader;
 	Camera* m_pCamera = nullptr;
 	DRAW_MODE m_DrawMode = DRAW_MODE::MODE_SOLID;
+	OBJECT_SPECIFY m_Specify = OBJECT_SPECIFY::OBJECT_MAP;
 	std::unordered_set<Object*> m_pAllObjectList;
 	std::vector<FNode*> m_pLeafNodeList;
 	std::vector<FNode*> m_pDrawLeafNodeList;

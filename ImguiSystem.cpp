@@ -79,7 +79,7 @@ void ImguiSystem::Update()
                 ifd::FileDialog::Instance().Open("SplatOpenDialog", "Open a Image", "Image file (*.png;*.jpg;*.jpeg;*.bmp;*.tga){.png,.jpg,.jpeg,.bmp,.tga},.*", true);
             if (ImGui::BeginListBox("SplattingImage", { 200, 100 }))
             {
-                for (const auto& str : _ToolSystemMap.m_ListTextureSplatting)
+                for (const auto& str : _ToolSystemMap.GetListTextureSplatting())
                 {
                     std::wstring fullpath = str;
                     std::wstring content = GetSplitName(fullpath);
@@ -131,7 +131,7 @@ void ImguiSystem::Update()
 
         if (ImGui::BeginListBox("listboxImage"))
         {
-            for (const auto& texture : _ToolSystemMap.m_ListTexture)
+            for (const auto& texture : _ToolSystemMap.GetListTexture())
             {
                 std::wstring fullpath = texture;
 
@@ -224,7 +224,7 @@ void ImguiSystem::Update()
         ifd::FileDialog::Instance().Open("FbxOpenDialog", "Open a Fbx", "Fbx file (*.fbx;*.FBX){.fbx,.FBX},.*", true);
     if (ImGui::BeginListBox("listboxFbx"))
     {
-        for (const auto& fbx : _ToolSystemMap.m_ListFbx)
+        for (const auto& fbx : _ToolSystemMap.GetListFbx())
         {
             std::wstring fullpath = fbx;
 
@@ -254,22 +254,22 @@ void ImguiSystem::Update()
     {
         {
             {
-                XMVECTOR pos = _ToolSystemMap.m_pCamera->m_vCameraPos;
+                XMVECTOR pos = _ToolSystemMap.GetCurrentCamera()->m_vCameraPos;
                 float cam_pos[3] = { XMVectorGetX(pos),XMVectorGetY(pos),XMVectorGetZ(pos) };
-                XMVECTOR dir = _ToolSystemMap.m_pCamera->m_vCameraDir;
+                XMVECTOR dir = _ToolSystemMap.GetCurrentCamera()->m_vCameraDir;
                 float cam_dir[3] = { XMVectorGetX(dir),XMVectorGetY(dir),XMVectorGetZ(dir) };
-                XMVECTOR up = _ToolSystemMap.m_pCamera->m_vCameraUp;
+                XMVECTOR up = _ToolSystemMap.GetCurrentCamera()->m_vCameraUp;
                 float cam_up[3] = { XMVectorGetX(up),XMVectorGetY(up),XMVectorGetZ(up) };
                 ImGui::InputFloat3("cam_pos", cam_pos);
                 ImGui::InputFloat3("cam_dir", cam_dir);
                 ImGui::InputFloat3("cam_up", cam_up);
             }
             ImGui::Dummy({ 0, 10 });
-            if (_ToolSystemMap.m_pQuadTree != nullptr)
+            if (_ToolSystemMap.GetCurrentQuadTree() != nullptr)
             {
                 if (bOjbectPicking && _InputSystem.GetKey(VK_RBUTTON) == KEY_STATE::KEY_DOWN)
                 {
-                    if (pObject = _ToolSystemMap.m_pQuadTree->GetPickingObject())
+                    if (pObject = _ToolSystemMap.GetCurrentQuadTree()->GetPickingObject())
                     {
                         XMVECTOR v_scale, v_rotation, v_translation;
                         v_scale = pObject->GetScale();
@@ -298,7 +298,7 @@ void ImguiSystem::Update()
             if (ImGui::Button("Delete") && pObject != nullptr)
             {
                 _ObjectSystem.DeleteObject(pObject);
-                _ToolSystemMap.m_pQuadTree->DeleteObject(pObject);
+                _ToolSystemMap.GetCurrentQuadTree()->DeleteObject(pObject);
                 scale[0] = 0; scale[1] = 0; scale[2] = 0;
                 rotation[0] = 0; rotation[1] = 0; rotation[2] = 0;
                 position[0] = 0; position[1] = 0; position[2] = 0;
@@ -321,12 +321,12 @@ void ImguiSystem::Update()
     if (ifd::FileDialog::Instance().IsDone("SplatOpenDialog")) {
 
         if (ifd::FileDialog::Instance().HasResult()) {
-            if (_ToolSystemMap.m_ListTextureSplatting.size() < 4)
+            if (_ToolSystemMap.GetListTextureSplatting().size() < 4)
             {
                 const std::vector<std::filesystem::path>& res = ifd::FileDialog::Instance().GetResults();
                 for (int idx = 0; idx < res.size(); idx++)
                 {
-                    if(_ToolSystemMap.m_ListTextureSplatting.insert(res[idx].wstring()).second)
+                    if(_ToolSystemMap.GetListTextureSplatting().insert(res[idx].wstring()).second)
                         _ToolSystemMap.SetSplattingTexture(_EngineSystem.GetTextureSystem()->CreateTextureFromFile(res[idx].wstring().c_str()));
                     szCurrentSplat = res[idx].wstring();
                 }
@@ -341,7 +341,7 @@ void ImguiSystem::Update()
             for (int idx = 0; idx < res.size(); idx++)
             {
                 _EngineSystem.GetTextureSystem()->CreateTextureFromFile(res[idx].wstring().c_str());
-                _ToolSystemMap.m_ListTexture.insert(res[idx].wstring());
+                _ToolSystemMap.GetListTexture().insert(res[idx].wstring());
                 szCurrentImage = res[idx].wstring();
             }
         }
@@ -355,7 +355,7 @@ void ImguiSystem::Update()
             const std::vector<std::filesystem::path>& res = ifd::FileDialog::Instance().GetResults();
             for (int idx = 0; idx < res.size(); idx++)
             {
-                _ToolSystemMap.m_ListFbx.insert(res[idx].wstring());
+                _ToolSystemMap.GetListFbx().insert(res[idx].wstring());
                 szCurrentFbx = res[idx].wstring();
             }
         }
