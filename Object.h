@@ -88,13 +88,20 @@ struct Transform
 		return is;
 	}
 };
+//상호작용을 위한 열거
+enum class INTERACTIVE_MODE
+{
+	MODE_NONE = 0,
+	MODE_INTERACTIVE,
+};
 
-enum CULL_MODE
+enum class CULL_MODE
 {
 	CULL_MODE_FRONT = 0,
 	CULL_MODE_BACK,
 	CULL_MODE_NONE,
 };
+
 
 class Object
 {
@@ -113,6 +120,8 @@ public:
 	void SetShaderName(std::wstring vsName, std::wstring psName);
 	void SetConstantData(constant cc);
 	void SetCullMode(CULL_MODE mode);
+	void SetInteraciveMode(INTERACTIVE_MODE mode);
+	void SetDrawMode(DRAW_MODE mode);
 	CULL_MODE GetCullMode();
 	virtual void Update();
 	virtual void Render();
@@ -123,6 +132,7 @@ public:
 	Object(std::wstring szFullPath);
 	Object();
 	virtual ~Object();
+
 protected:
 	T_BOX m_Box;
 	std::wstring m_szFullPath;
@@ -133,9 +143,11 @@ protected:
 	std::wstring m_szPSName;
 	VertexShader* m_pVertexShader;
 	PixelShader* m_pPixelShader;
-	constant constantData;
+	constant m_ConstantData;
 	ConstantBuffer* m_pConstantBuffer;
-	CULL_MODE m_CullMode;
+	CULL_MODE m_CullMode = CULL_MODE::CULL_MODE_NONE;
+	INTERACTIVE_MODE m_InteractiveMode = INTERACTIVE_MODE::MODE_NONE;
+	DRAW_MODE m_DrawMode = DRAW_MODE::MODE_SOLID;
 
 	friend class FQuadTree;
 	friend class FNode;

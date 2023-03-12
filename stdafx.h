@@ -160,6 +160,11 @@ struct object
 		return is;
 	}
 };
+enum class DRAW_MODE
+{
+	MODE_SOLID = 0,
+	MODE_WIRE,
+};
 
 __declspec(align(16))
 struct constant

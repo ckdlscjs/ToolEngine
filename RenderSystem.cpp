@@ -148,9 +148,9 @@ void RenderSystem::ClearRenderTargetColor(float fRed, float fGreen, float fBlue,
 
 }
 
-void RenderSystem::SetWireFrame(bool bWireFrame)
+void RenderSystem::SetWireFrame(DRAW_MODE drawMode)
 {
-	m_bWireFrame = bWireFrame;
+	m_pCDevice->m_pImmediateContext->RSSetState(drawMode == DRAW_MODE::MODE_SOLID? m_pCRasterizerState->m_pDefaultRSSolid :  m_pCRasterizerState->m_pDefaultRSWireFrame);
 }
 
 void RenderSystem::SetViewport(UINT iWidth, UINT iHeight)
@@ -287,7 +287,7 @@ void RenderSystem::Reset()
 		_ImguiSystem.m_clear_color.w);	//렌터타겟을 지정한 컬러로 초기화
 	// Set viewport of rendertarget in which we have draw
 	RECT rt = g_pWindow->GetClientWindowRect();
-	m_pCDevice->m_pImmediateContext->RSSetState(m_bWireFrame ? m_pCRasterizerState->m_pDefaultRSWireFrame : m_pCRasterizerState->m_pDefaultRSSolid);
+	SetWireFrame(DRAW_MODE::MODE_SOLID);
 	SetViewport(rt.right - rt.left, rt.bottom - rt.top);
 }
 

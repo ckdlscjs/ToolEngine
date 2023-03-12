@@ -6,7 +6,7 @@
 class ObjectSystem : public Singleton<ObjectSystem>
 {
 public:
-	Object* CreateObject(std::wstring szFullPath = 0);
+	Object* CreateObject(std::wstring szFullPath = L"");
 	void AddObject(Object* pObject);
 	void DeleteObject(Object* pObject);
 public:

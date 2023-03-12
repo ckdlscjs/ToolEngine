@@ -72,6 +72,5 @@ float4 psmain(PS_INPUT input) : SV_TARGET
 
 	float3 final_light = ambient_light + diffuse_light + specular_light;
 
-	int a;
 	return float4(final_light.rgb, 1.0f);
 }

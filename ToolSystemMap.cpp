@@ -2,13 +2,13 @@
 
 void ToolSystemMap::SetWireframe(bool bWireFrame)
 {
-    _EngineSystem.GetRenderSystem()->SetWireFrame(bWireFrame);
+    _EngineSystem.GetRenderSystem()->SetWireFrame(bWireFrame ? DRAW_MODE::MODE_WIRE : DRAW_MODE::MODE_SOLID);
 }
 
-void ToolSystemMap::SelectImage(std::wstring szSelectImage, bool bPicking)
+void ToolSystemMap::SelectSimple(bool bPicking, float fLength)
 {
     if(m_pQuadTree)
-        m_pQuadTree->SetPickingMap(szSelectImage, bPicking);
+        m_pQuadTree->SetPickingSimple(bPicking, fLength);
 }
 
 void ToolSystemMap::SelectSculpt(bool bPicking)
@@ -128,21 +128,22 @@ void ToolSystemMap::CreateFbxObject(std::wstring szFullPath, XMVECTOR vPos, XMVE
     _EngineSystem.GetRenderSystem()->ReleaseBlob();
 }
 
-void ToolSystemMap::CreateSimpleObject(std::wstring szFullPath, XMVECTOR vPos)
+void ToolSystemMap::CreateSimpleBox(XMVECTOR vPos, float fLength)
 {
+    float fboxLength = 0.5f * fLength;
     object vertex_list[] =
     {
         //FrontFace
-        {XMFLOAT3(-0.5f,-0.5f,-0.5f),	XMFLOAT2(0,1),		XMFLOAT3(1, 0, 0),		XMFLOAT4(0, 1, 0, 1)},
-        {XMFLOAT3(-0.5f,0.5f,-0.5f), 	XMFLOAT2(0,0),		XMFLOAT3(0, 1, 0),		XMFLOAT4(1, 1, 0, 1)},
-        {XMFLOAT3(0.5f,0.5f,-0.5f), 	XMFLOAT2(1,0),	    XMFLOAT3(0, 0, 1),		XMFLOAT4(1, 0, 0, 1)},
-        {XMFLOAT3(0.5f,-0.5f,-0.5f),	XMFLOAT2(1,1),		XMFLOAT3(1, 1, 0),		XMFLOAT4(0, 0, 1, 1)},
+        {XMFLOAT3(-fboxLength,-fboxLength,-fboxLength),	XMFLOAT2(0,1),		XMFLOAT3(1, 0, 0),		XMFLOAT4(0, 1, 0, 1)},
+        {XMFLOAT3(-fboxLength,fboxLength,-fboxLength), 	XMFLOAT2(0,0),		XMFLOAT3(0, 1, 0),		XMFLOAT4(0, 1, 0, 1)},
+        {XMFLOAT3(fboxLength,fboxLength,-fboxLength), 	XMFLOAT2(1,0),	    XMFLOAT3(0, 0, 1),		XMFLOAT4(0, 1, 0, 1)},
+        {XMFLOAT3(fboxLength,-fboxLength,-fboxLength),	XMFLOAT2(1,1),		XMFLOAT3(1, 1, 0),		XMFLOAT4(0, 1, 0, 1)},
 
         //BackFace
-        {XMFLOAT3(0.5f,-0.5f,0.5f),		XMFLOAT2(0,1),	    XMFLOAT3(1, 0, 0),		XMFLOAT4(0, 1, 0, 1)},
-        {XMFLOAT3(0.5f,0.5f,0.5f),		XMFLOAT2(0,0),	    XMFLOAT3(0, 1, 0),		XMFLOAT4(1, 1, 0, 1)},
-        {XMFLOAT3(-0.5f,0.5f,0.5f), 	XMFLOAT2(1,0),	    XMFLOAT3(0, 0, 1),		XMFLOAT4(1, 0, 0, 1)},
-        {XMFLOAT3(-0.5f,-0.5f,0.5f),	XMFLOAT2(1,1),		XMFLOAT3(1, 1, 0),		XMFLOAT4(0, 0, 1, 1)},
+        {XMFLOAT3(fboxLength,-fboxLength,fboxLength),	XMFLOAT2(0,1),	    XMFLOAT3(1, 0, 0),		XMFLOAT4(0, 1, 0, 1)},
+        {XMFLOAT3(fboxLength,fboxLength,fboxLength),	XMFLOAT2(0,0),	    XMFLOAT3(0, 1, 0),		XMFLOAT4(0, 1, 0, 1)},
+        {XMFLOAT3(-fboxLength,fboxLength,fboxLength), 	XMFLOAT2(1,0),	    XMFLOAT3(0, 0, 1),		XMFLOAT4(0, 1, 0, 1)},
+        {XMFLOAT3(-fboxLength,-fboxLength,fboxLength),	XMFLOAT2(1,1),		XMFLOAT3(1, 1, 0),		XMFLOAT4(0, 1, 0, 1)},
     };
     UINT size_vertex_list = ARRAYSIZE(vertex_list);
 
@@ -181,7 +182,7 @@ void ToolSystemMap::CreateSimpleObject(std::wstring szFullPath, XMVECTOR vPos)
 
     Object* pObject = _ObjectSystem.CreateObject();
     Mesh* pMesh = _EngineSystem.GetMeshSystem()->CreateMeshFromFile(L"SimpleObjectMesh");
-    Material* pMaterial = _MaterialSystem.CreateMaterial(L"SimpleObjectMtrl");
+    //Material* pMaterial = _MaterialSystem.CreateMaterial(L"SimpleObjectMtrl");
 
     void* shader_byte_code_vs = nullptr;
     void* shader_byte_code_ps = nullptr;
@@ -189,7 +190,7 @@ void ToolSystemMap::CreateSimpleObject(std::wstring szFullPath, XMVECTOR vPos)
     size_t size_shader_ps = 0;
     _EngineSystem.GetRenderSystem()->CompileVertexShader(L"FbxVertexShader.hlsl", "vsmain", "vs_5_0", &shader_byte_code_vs, &size_shader_vs);
     VertexShader* pVertexShader = _EngineSystem.GetRenderSystem()->CreateVertexShader(shader_byte_code_vs, size_shader_vs);
-    _EngineSystem.GetRenderSystem()->CompilePixelShader(L"FbxPixelShader.hlsl", "psmain", "ps_5_0", &shader_byte_code_ps, &size_shader_ps);
+    _EngineSystem.GetRenderSystem()->CompilePixelShader(L"SimpleObjectPixelShader.hlsl", "psmain", "ps_5_0", &shader_byte_code_ps, &size_shader_ps);
     PixelShader* pPixelShader = _EngineSystem.GetRenderSystem()->CreatePixelShader(shader_byte_code_ps, size_shader_ps);
     
     if (pMesh->IsEmpty())
@@ -198,18 +199,19 @@ void ToolSystemMap::CreateSimpleObject(std::wstring szFullPath, XMVECTOR vPos)
         IndexBuffer* pIndexBuffer = _EngineSystem.GetRenderSystem()->CreateIndexBuffer(index_list, size_index_list);
         pMesh->SetMeshNode(vertex_list, size_vertex_list, pVertexBuffer, index_list, size_index_list, pIndexBuffer);
     }
-    if (pMaterial->IsEmpty())
+   /* if (pMaterial->IsEmpty())
     {
         std::vector<Texture*> listTex;
         listTex.push_back(_EngineSystem.GetTextureSystem()->GetTexture(szFullPath));
         pMaterial->SetList(listTex);
-    }
+    }*/
     
     pObject->SetShader(pVertexShader, pPixelShader);
     pObject->SetConstantData(cc);
     pObject->SetTransform({ vPos , {0, 0, 0}, {1, 1, 1} });
     pObject->SetMesh(pMesh);
-    pObject->SetMaterial(pMaterial);
+    pObject->SetDrawMode(DRAW_MODE::MODE_WIRE);
+    //pObject->SetMaterial(pMaterial);
 
     if (m_pQuadTree)
         m_pQuadTree->AddObject(pObject);
@@ -243,7 +245,6 @@ void ToolSystemMap::CreateSimpleMap(int iWidth, int iHeight, float fDistance, st
     VertexBuffer* pVertexBuffer = _EngineSystem.GetRenderSystem()->CreateVertexBuffer(&pMapMesh->GetListVertex()[0], sizeof(object), pMapMesh->GetListVertex().size(), shader_byte_code_vs, size_shader_vs);
     IndexBuffer* pIndexBuffer = _EngineSystem.GetRenderSystem()->CreateIndexBuffer(&pMapMesh->GetListIndex()[0], pMapMesh->GetListIndex().size());
    
-    _EngineSystem.GetRenderSystem()->ReleaseBlob();
 
     pMapMesh->m_pVertexBuffer = pVertexBuffer;
     pMapMesh->m_pIndexBuffer = pIndexBuffer;
@@ -253,6 +254,9 @@ void ToolSystemMap::CreateSimpleMap(int iWidth, int iHeight, float fDistance, st
     m_pQuadTree->SetTransform({ {0, 0, 0} , {0, 0, 0}, {1, 1, 1} });
     m_pQuadTree->SetTexture(_EngineSystem.GetTextureSystem()->GetTexture(szFullPath));
     m_pQuadTree->SetShader(szVSPath, pVertexShader, szPSPath, pPixelShader);
+    m_pQuadTree->SetDrawMode(DRAW_MODE::MODE_SOLID);
+
+    _EngineSystem.GetRenderSystem()->ReleaseBlob();
 }
 
 void ToolSystemMap::DeleteSimpleMap()
@@ -391,6 +395,7 @@ void ToolSystemMap::OpenFile(std::wstring szFullPath)
     for (const auto& texture : m_ListTextureSplatting)
         m_pQuadTree->SetSplattingTexture(_EngineSystem.GetTextureSystem()->GetTexture(texture));
     m_pQuadTree->SetShader(szVSPath, pVertexShader, szPSPath, pPixelShader);
+    m_pQuadTree->SetDrawMode(DRAW_MODE::MODE_SOLID);
 
     for (const auto& obj : allObjectList)
     {

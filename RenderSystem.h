@@ -33,7 +33,7 @@ public:
 public:
 	/*Set Block*/
 	void ClearRenderTargetColor(float red, float green, float blue, float alpha);
-	void SetWireFrame(bool bWireFrame);
+	void SetWireFrame(DRAW_MODE drawMode);
 	void SetViewport(UINT iWidth, UINT iHeight);
 	void SetFullScreen(bool bFullscreen, unsigned int iWidth, unsigned int iHeight);
 	void Resize(unsigned int iWidth, unsigned int iHeight);
@@ -74,7 +74,6 @@ private:
 	ID3DBlob* m_pVSBlobCode;
 	ID3DBlob* m_pPSBlobCode;
 	ID3DBlob* m_pBlobErr;
-	bool m_bWireFrame;
 
 	friend class EngineSystem;
 	friend class ImguiSystem;

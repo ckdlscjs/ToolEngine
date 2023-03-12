@@ -20,16 +20,15 @@ void ImguiSystem::Update()
     ImGui::NewFrame();
     //ImGui::DockSpaceOverViewport(ImGui::GetMainViewport());
 
-    //static int splat_current_idx = 0; // Here we store our selection data as an index.
-    //static int image_current_idx = 0;
-    //static int fbx_current_idx = 0; 
     static std::wstring szCurrentSplat;
     static std::wstring szCurrentImage;
     static std::wstring szCurrentFbx;
     static int iMapSize = 4;
     static float fMapDistance = 1.0f;
     static bool bWireFrame = false;
-    static bool bMapPicking = false;
+    static bool bFbxObjPicking = false;
+    static bool bSimpleObjPicking = false;
+    static float fSimpleObjLength = 1.0f;
     static bool bOjbectPicking = false;
     static bool bSculptPicking = false;
     static bool bSplatting = false;
@@ -43,12 +42,18 @@ void ImguiSystem::Update()
                 ~bWireFrame;
                 _ToolSystemMap.SetWireframe(bWireFrame);
             }
-
-            if (ImGui::Checkbox("MapPicking", &bMapPicking))
+            if (ImGui::Checkbox("SimpleObjPicking", &bSimpleObjPicking))
             {
-                ~bMapPicking;
-                //_ToolSystemMap.SelectImage(image_current_idx, bMapPicking);
-                _ToolSystemMap.SelectFbxObject(szCurrentFbx, bMapPicking);
+                ~bSimpleObjPicking;
+                _ToolSystemMap.SelectSimple(bSimpleObjPicking, fSimpleObjLength);
+                
+            }
+            ImGui::InputFloat("length", &fSimpleObjLength);
+
+            if (ImGui::Checkbox("FbxObjPicking", &bFbxObjPicking))
+            {
+                ~bFbxObjPicking;
+                _ToolSystemMap.SelectFbxObject(szCurrentFbx, bFbxObjPicking);
             }
 
             if (ImGui::Checkbox("OjbectPicking", &bOjbectPicking))
@@ -68,6 +73,8 @@ void ImguiSystem::Update()
                 ~bSplatting;
                 _ToolSystemMap.SelectSplatting(szCurrentSplat, bSplatting);
             }
+            ImGui::Dummy({ 0, 10 });
+
             if (ImGui::Button("Open SplatImage"))
                 ifd::FileDialog::Instance().Open("SplatOpenDialog", "Open a Image", "Image file (*.png;*.jpg;*.jpeg;*.bmp;*.tga){.png,.jpg,.jpeg,.bmp,.tga},.*", true);
             if (ImGui::BeginListBox("SplattingImage", { 200, 100 }))
@@ -98,6 +105,11 @@ void ImguiSystem::Update()
             {
                 _ToolSystemMap.CreateSimpleMap(iMapSize + 1, iMapSize + 1, fMapDistance, szCurrentImage);
             }
+            ImGui::SameLine();
+            if (ImGui::Button("DeleteMap"))
+            {
+                _ToolSystemMap.DeleteSimpleMap();
+            }
             ImGui::InputInt("MapSize", &iMapSize);
 
             ImGui::InputFloat("CellDistance", &fMapDistance);
@@ -109,14 +121,7 @@ void ImguiSystem::Update()
                 _ToolSystemMap.SetSculptIntensity(fSculptIntensity);
         }
         ImGui::Dummy({ 0, 10 });
-
-        {
-            if (ImGui::Button("DeleteMap"))
-            {
-                _ToolSystemMap.DeleteSimpleMap();
-            }
-        }
-        ImGui::Dummy({ 0, 10 });
+        
         if (ImGui::Button("Open ImgFile"))
             ifd::FileDialog::Instance().Open("ImageOpenDialog", "Open a Image", "Image file (*.png;*.jpg;*.jpeg;*.bmp;*.tga){.png,.jpg,.jpeg,.bmp,.tga},.*", true);
         /*if (ImGui::Button("Open directory"))
@@ -134,10 +139,7 @@ void ImguiSystem::Update()
 
                 const bool is_selected = (szCurrentImage == fullpath);
                 if (ImGui::Selectable(_towm(content).c_str(), is_selected))
-                {
                     szCurrentImage = fullpath;
-                    _ToolSystemMap.SelectImage(szCurrentImage, bMapPicking);
-                }
 
                 // Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
                 if (is_selected)
@@ -151,9 +153,7 @@ void ImguiSystem::Update()
             {
                 ifd::FileDialog::Instance().Open("LoadMapDialog", "Open a map", "*.map {.map}", true);
             }
-        }
-
-        {
+            ImGui::SameLine();
             if (ImGui::Button("SaveMap"))
             {
                 ifd::FileDialog::Instance().Save("SaveMapDialog", "Save a map", "*.map {.map}");
@@ -287,13 +287,24 @@ void ImguiSystem::Update()
                         position[0] = 0; position[1] = 0; position[2] = 0;
                     }
                 }
-                if (ImGui::Button("Object"))
-                {
-                    if (pObject != nullptr)
-                        pObject->SetTransform({ {position[0], position[1],position[2]}, {rotation[0],rotation[1],rotation[2]}, {scale[0],scale[1],scale[2]} });
-                }
+
+                
             }
-            
+            if (ImGui::Button("Object") && pObject != nullptr)
+            {
+                pObject->SetTransform({ {position[0], position[1],position[2]}, {rotation[0],rotation[1],rotation[2]}, {scale[0],scale[1],scale[2]} });
+            }
+            ImGui::SameLine();
+            if (ImGui::Button("Delete") && pObject != nullptr)
+            {
+                _ObjectSystem.DeleteObject(pObject);
+                _ToolSystemMap.m_pQuadTree->DeleteObject(pObject);
+                scale[0] = 0; scale[1] = 0; scale[2] = 0;
+                rotation[0] = 0; rotation[1] = 0; rotation[2] = 0;
+                position[0] = 0; position[1] = 0; position[2] = 0;
+                pObject = nullptr;
+            }
+                
             ImGui::InputFloat3("scale", scale);
             ImGui::InputFloat3("rotation", rotation);
             ImGui::InputFloat3("position", position);

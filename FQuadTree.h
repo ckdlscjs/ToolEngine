@@ -8,7 +8,7 @@ class FQuadTree
 {
 
 public:
-	void	SetPickingMap(std::wstring szCurrentImage, bool bPicking);
+	void	SetPickingSimple(bool bPicking, float fLength);
 	void	SetPickingFbx(std::wstring szCurrentFbx, bool bPicking);
 	void	SetPickingObject(bool bPicking);
 	void	SetPickingSculpt(bool bPicking);
@@ -22,10 +22,12 @@ public:
 	void	SetTexture(Texture* pTexture);
 	void	SetShader(std::wstring vsPath, VertexShader* pVertexShader, std::wstring psPath, PixelShader* pPixelShader);
 	void	SetConstantData(constant_map cc);
+	void	SetDrawMode(DRAW_MODE mode);
 	UINT	SelectVertexList(T_BOX& box, std::vector<FNode*>& selectNodeList);
 	void	UpdateNode(FNode* pNode);
 	Object* GetPickingObject();
 	BOOL	AddObject(Object* pObj);
+	BOOL	DeleteObject(Object* pObj);
 	void	BuildTree(FNode* pNode, MeshMap* pMap);
 	BOOL	IsSubDivide(FNode* pNode);
 	FNode*	FindNode(FNode* pNode, Object* pObj);
@@ -56,7 +58,10 @@ public:
 	float m_fSculptRadius = 10.0f;
 	float m_fSculptIntensity = 10.0f;
 
-	bool m_bMapPicking;
+	bool m_bSimplePicking;
+	float m_fObjLength = 1.0f;
+
+	bool m_bFbxPicking;
 	std::wstring m_szCurrentImage;
 
 	bool m_bObjectPicking;
@@ -81,7 +86,8 @@ public:
 	std::wstring m_szPSPath;
 	PixelShader* m_pPixelShader;
 	Camera* m_pCamera = nullptr;
-	std::vector<Object*> m_pAllObjectList;
+	DRAW_MODE m_DrawMode = DRAW_MODE::MODE_SOLID;
+	std::unordered_set<Object*> m_pAllObjectList;
 	std::vector<FNode*> m_pLeafNodeList;
 	std::vector<FNode*> m_pDrawLeafNodeList;
 

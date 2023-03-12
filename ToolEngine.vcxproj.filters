@@ -112,6 +112,9 @@
     <Filter Include="Shaders\Map">
       <UniqueIdentifier>{f50213c8-47c0-45b4-874f-c2fa2cc7d9a8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shaders\SimpleObj">
+      <UniqueIdentifier>{057b667d-e656-4eac-b287-db15ca7fb3b7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="WindowSystem.h">
@@ -431,6 +434,9 @@
     </FxCompile>
     <FxCompile Include="MapVertexShader.hlsl">
       <Filter>Shaders\Map</Filter>
+    </FxCompile>
+    <FxCompile Include="SimpleObjectPixelShader.hlsl">
+      <Filter>Shaders\SimpleObj</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>

@@ -89,7 +89,7 @@ void Object::SetTransform(Transform transform)
 	XMFLOAT3 rotateAngle;
 	XMStoreFloat3(&rotateAngle, m_Transform.rotation);
 	XMVECTOR translation = m_Transform.position;
-	constantData.matWorld = XMMatrixTransformation({ 0,0,0,1 }, { 0,0,0,1 },scale, { 0,0,0,1 }, XMQuaternionRotationRollPitchYaw(
+	m_ConstantData.matWorld = XMMatrixTransformation({ 0,0,0,1 }, { 0,0,0,1 },scale, { 0,0,0,1 }, XMQuaternionRotationRollPitchYaw(
 		_DegreeToRadian(rotateAngle.x),
 		_DegreeToRadian(rotateAngle.y),
 		_DegreeToRadian(rotateAngle.z)), translation);
@@ -121,12 +121,22 @@ void Object::SetShaderName(std::wstring vsName, std::wstring psName)
 
 void Object::SetConstantData(constant cc)
 {
-	constantData = cc;
+	m_ConstantData = cc;
 }
 
 void Object::SetCullMode(CULL_MODE mode)
 {
 	m_CullMode = mode;
+}
+
+void Object::SetInteraciveMode(INTERACTIVE_MODE mode)
+{
+	m_InteractiveMode = mode;
+}
+
+void Object::SetDrawMode(DRAW_MODE mode)
+{
+	m_DrawMode = mode;
 }
 
 CULL_MODE Object::GetCullMode()
@@ -136,17 +146,18 @@ CULL_MODE Object::GetCullMode()
 
 void Object::Update()
 {
-	constantData.matView = _CameraSystem.GetCurrentCamera()->m_matCamera;
-	constantData.m_camera_position = XMFLOAT4(
+	m_ConstantData.matView = _CameraSystem.GetCurrentCamera()->m_matCamera;
+	m_ConstantData.m_camera_position = XMFLOAT4(
 		XMVectorGetX(_CameraSystem.GetCurrentCamera()->m_matWorld.r[3]),
 		XMVectorGetY(_CameraSystem.GetCurrentCamera()->m_matWorld.r[3]),
 		XMVectorGetZ(_CameraSystem.GetCurrentCamera()->m_matWorld.r[3]),
 		XMVectorGetW(_CameraSystem.GetCurrentCamera()->m_matWorld.r[3]));
-	_EngineSystem.GetRenderSystem()->UpdateConstantBuffer(m_pConstantBuffer, &constantData);
+	_EngineSystem.GetRenderSystem()->UpdateConstantBuffer(m_pConstantBuffer, &m_ConstantData);
 }
 
 void Object::Render()
 {
+	_EngineSystem.GetRenderSystem()->SetWireFrame(m_DrawMode);
 	_EngineSystem.GetRenderSystem()->SetConstantBuffer(m_pVertexShader, m_pConstantBuffer);
 	_EngineSystem.GetRenderSystem()->SetConstantBuffer(m_pPixelShader, m_pConstantBuffer);
 	_EngineSystem.GetRenderSystem()->SetVertexShader(m_pVertexShader);
@@ -155,8 +166,11 @@ void Object::Render()
 	{
 		_EngineSystem.GetRenderSystem()->SetVertexBuffer(m_pMesh->GetMeshNodeList()[idxNode]->GetVertexBuffer());
 		_EngineSystem.GetRenderSystem()->SetIndexBuffer(m_pMesh->GetMeshNodeList()[idxNode]->GetIndexBuffer());
-		_EngineSystem.GetRenderSystem()->setTexture(m_pVertexShader, m_pMaterial->GetListTexture(idxNode), m_pMaterial->GetListTexture(idxNode).size());
-		_EngineSystem.GetRenderSystem()->setTexture(m_pPixelShader, m_pMaterial->GetListTexture(idxNode), m_pMaterial->GetListTexture(idxNode).size());
+		if (m_pMaterial)
+		{
+			_EngineSystem.GetRenderSystem()->setTexture(m_pVertexShader, m_pMaterial->GetListTexture(idxNode), m_pMaterial->GetListTexture(idxNode).size());
+			_EngineSystem.GetRenderSystem()->setTexture(m_pPixelShader, m_pMaterial->GetListTexture(idxNode), m_pMaterial->GetListTexture(idxNode).size());
+		}
 		_EngineSystem.GetRenderSystem()->drawIndexedTriangleList(m_pMesh->GetMeshNodeList()[idxNode]->GetIndexBuffer()->getSizeIndexList(), 0, 0);
 	}
 }
@@ -186,18 +200,18 @@ void Object::Render()
 
 Object::Object(std::wstring szFullPath) : m_szFullPath(szFullPath)
 {
-	constantData.matWorld = XMMatrixIdentity();
-	constantData.matView = XMMatrixIdentity();
-	constantData.matProj = XMMatrixIdentity();
-	m_pConstantBuffer = _EngineSystem.GetRenderSystem()->CreateConstantBuffer(&constantData, sizeof(constantData));
+	m_ConstantData.matWorld = XMMatrixIdentity();
+	m_ConstantData.matView = XMMatrixIdentity();
+	m_ConstantData.matProj = XMMatrixIdentity();
+	m_pConstantBuffer = _EngineSystem.GetRenderSystem()->CreateConstantBuffer(&m_ConstantData, sizeof(m_ConstantData));
 }
 
 Object::Object()
 {
-	constantData.matWorld = XMMatrixIdentity();
-	constantData.matView = XMMatrixIdentity();
-	constantData.matProj = XMMatrixIdentity();
-	m_pConstantBuffer = _EngineSystem.GetRenderSystem()->CreateConstantBuffer(&constantData, sizeof(constantData));
+	m_ConstantData.matWorld = XMMatrixIdentity();
+	m_ConstantData.matView = XMMatrixIdentity();
+	m_ConstantData.matProj = XMMatrixIdentity();
+	m_pConstantBuffer = _EngineSystem.GetRenderSystem()->CreateConstantBuffer(&m_ConstantData, sizeof(m_ConstantData));
 }
 
 Object::~Object()

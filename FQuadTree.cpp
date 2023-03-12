@@ -196,16 +196,16 @@ UINT FQuadTree::SelectVertexList(T_BOX& box, std::vector<FNode*>& selectNodeList
     return selectNodeList.size();
 }
 
-void FQuadTree::SetPickingMap(std::wstring szCurrentImage, bool bPicking)
+void FQuadTree::SetPickingSimple(bool bPicking, float fLength)
 {
-    m_szCurrentSplat = szCurrentImage;
-    m_bMapPicking = bPicking;
+    m_bSimplePicking = bPicking;
+    m_fObjLength = fLength;
 }
 
 void FQuadTree::SetPickingFbx(std::wstring szCurrentFbx, bool bPicking)
 {
     m_szCurrentFbx = szCurrentFbx;
-    m_bMapPicking = bPicking;
+    m_bFbxPicking = bPicking;
 }
 
 void FQuadTree::SetPickingObject(bool bPicking)
@@ -280,9 +280,14 @@ void FQuadTree::SetConstantData(constant_map cc)
     m_constantDataMap = cc;
 }
 
+void FQuadTree::SetDrawMode(DRAW_MODE mode)
+{
+    m_DrawMode = mode;
+}
+
 BOOL FQuadTree::AddObject(Object* pObj)
 {
-    m_pAllObjectList.push_back(pObj);
+    m_pAllObjectList.insert(pObj);
 
     FNode* pFindNode = FindNode(m_pRootNode, pObj);
     if (pFindNode != nullptr)
@@ -292,6 +297,11 @@ BOOL FQuadTree::AddObject(Object* pObj)
         return TRUE;
     }
     return FALSE;
+}
+
+BOOL FQuadTree::DeleteObject(Object* pObj)
+{
+    return m_pAllObjectList.erase(pObj);
 }
 
 void FQuadTree::BuildTree(FNode* pNode, MeshMap* pMap)
@@ -412,9 +422,9 @@ Object* FQuadTree::ObjectPicking()
                     XMFLOAT3 v0 = meshnode->GetListVertex()[i0].pos;
                     XMFLOAT3 v1 = meshnode->GetListVertex()[i1].pos;
                     XMFLOAT3 v2 = meshnode->GetListVertex()[i2].pos;
-                    XMVECTOR v_0 = XMVector3TransformCoord(XMLoadFloat3(&v0), object->constantData.matWorld);
-                    XMVECTOR v_1 = XMVector3TransformCoord(XMLoadFloat3(&v1), object->constantData.matWorld);
-                    XMVECTOR v_2 = XMVector3TransformCoord(XMLoadFloat3(&v2), object->constantData.matWorld);
+                    XMVECTOR v_0 = XMVector3TransformCoord(XMLoadFloat3(&v0), object->m_ConstantData.matWorld);
+                    XMVECTOR v_1 = XMVector3TransformCoord(XMLoadFloat3(&v1), object->m_ConstantData.matWorld);
+                    XMVECTOR v_2 = XMVector3TransformCoord(XMLoadFloat3(&v2), object->m_ConstantData.matWorld);
                     if (m_Select.ChkPick(v_0, v_1, v_2))
                     {
                         return object;
@@ -443,10 +453,15 @@ void FQuadTree::Update()
     VisibleNode(m_pRootNode); //Àç±Í·Î VisibleNodeÃ¼Å©
     m_Select.SetMatrix(nullptr, &m_pCamera->m_matCamera, &m_pCamera->m_matProj);
 
-    //MapCreateObject's
-    if (m_bMapPicking && (_InputSystem.GetKey(VK_RBUTTON) == KEY_STATE::KEY_DOWN) && GetInterSection())
+    //MapCreateObject simple
+    if (m_bSimplePicking && (_InputSystem.GetKey(VK_RBUTTON) == KEY_STATE::KEY_DOWN) && GetInterSection())
     {
-        //_ToolSystemMap.CreateSimpleObject(m_iChkIdx, m_Select.m_vIntersection);
+        _ToolSystemMap.CreateSimpleBox(m_Select.m_vIntersection, m_fObjLength);
+    }
+
+    //MapCreateObject fbx
+    if (m_bFbxPicking && (_InputSystem.GetKey(VK_RBUTTON) == KEY_STATE::KEY_DOWN) && GetInterSection())
+    {
         _ToolSystemMap.CreateFbxObject(m_szCurrentFbx, m_Select.m_vIntersection);
     }
 
@@ -508,6 +523,7 @@ void FQuadTree::Update()
 
 void FQuadTree::Render()
 {
+    _EngineSystem.GetRenderSystem()->SetWireFrame(m_DrawMode);
     _EngineSystem.GetRenderSystem()->SetConstantBuffer(m_pVertexShader, m_pConstantBuffer);
     _EngineSystem.GetRenderSystem()->SetConstantBuffer(m_pPixelShader, m_pConstantBuffer);
     _EngineSystem.GetRenderSystem()->SetVertexShader(m_pVertexShader);

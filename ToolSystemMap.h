@@ -10,8 +10,9 @@
 class ToolSystemMap : public Singleton<ToolSystemMap>
 {
 public:
+	
 	void SetWireframe(bool bWireFrame);
-	void SelectImage(std::wstring szSelectImage, bool bPicking);
+	void SelectSimple(bool bPicking, float fLength);
 	void SelectSculpt(bool bPicking);
 	void SelectFbxObject(std::wstring szSelectFbx, bool bPicking);
 	void SelectObject(bool bPicking);
@@ -20,7 +21,7 @@ public:
 	void SetSculptRadius(float fRadius);
 	void SetSculptIntensity(float fIntensity);
 	void CreateFbxObject(std::wstring szFullPath, XMVECTOR vPos, XMVECTOR vRot = { 0, 0, 0, 0 }, XMVECTOR vScale = { 1, 1, 1, 0 });
-	void CreateSimpleObject(std::wstring szFullPath, XMVECTOR vPos);
+	void CreateSimpleBox(XMVECTOR vPos, float fLength);
 	void CreateSimpleMap(int iWidth, int iHeight,float fDistance, std::wstring szFullPath);
 	void DeleteSimpleMap();
 	void OpenFile(std::wstring szFullPath);
