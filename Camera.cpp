@@ -1,52 +1,60 @@
 #include "Camera.h"
 #include "WindowSystem.h"
 #include "InputSystem.h"
+void Camera::SetCameraMove(bool bCameraMove)
+{
+	m_bCameraMove = bCameraMove;
+}
 void Camera::Update()
 {
-	if (_InputSystem.GetKey(VK_SPACE) == KEY_STATE::KEY_UP)
+	if (m_bCameraMove)
 	{
-		m_fCameraSpeed = 50.0f;
-	}
-	if (_InputSystem.GetKey(VK_SPACE) == KEY_STATE::KEY_DOWN)
-	{
-		m_fCameraSpeed = 1000.0f;
-	}
-	if (_InputSystem.GetKey('W') || _InputSystem.GetKey('w'))
-	{
-		XMVECTOR v = m_vCameraDir * m_fCameraSpeed * m_fDelta;
-		m_vCameraPos += v;
-	}
-	if (_InputSystem.GetKey('S') || _InputSystem.GetKey('s'))
-	{
-		XMVECTOR v = m_vCameraDir * -m_fCameraSpeed * m_fDelta;
-		m_vCameraPos += v;
-	}
-	if (_InputSystem.GetKey('A') || _InputSystem.GetKey('a'))
-	{
-		XMVECTOR v = m_vCameraRight * -m_fCameraSpeed * m_fDelta;
-		m_vCameraPos += v;
-	}
-	if (_InputSystem.GetKey('D') || _InputSystem.GetKey('d'))
-	{
-		XMVECTOR v = m_vCameraRight * m_fCameraSpeed * m_fDelta;
-		m_vCameraPos += v;
-	}
-	if (_InputSystem.GetKey('Q') || _InputSystem.GetKey('q'))
-	{
-		XMVECTOR v = m_vCameraUp * m_fCameraSpeed * m_fDelta;
-		m_vCameraPos += v;
-	}
-	if (_InputSystem.GetKey('E') || _InputSystem.GetKey('e'))
-	{
-		XMVECTOR v = m_vCameraUp * -m_fCameraSpeed * m_fDelta;
-		m_vCameraPos += v;
-	}
+		if (_InputSystem.GetKey(VK_SPACE) == KEY_STATE::KEY_UP)
+		{
+			m_fCameraSpeed = 50.0f;
+		}
+		if (_InputSystem.GetKey(VK_SPACE) == KEY_STATE::KEY_DOWN)
+		{
+			m_fCameraSpeed = 1000.0f;
+		}
+		if (_InputSystem.GetKey('W') || _InputSystem.GetKey('w'))
+		{
+			XMVECTOR v = m_vCameraDir * m_fCameraSpeed * m_fDelta;
+			m_vCameraPos += v;
+		}
+		if (_InputSystem.GetKey('S') || _InputSystem.GetKey('s'))
+		{
+			XMVECTOR v = m_vCameraDir * -m_fCameraSpeed * m_fDelta;
+			m_vCameraPos += v;
+		}
+		if (_InputSystem.GetKey('A') || _InputSystem.GetKey('a'))
+		{
+			XMVECTOR v = m_vCameraRight * -m_fCameraSpeed * m_fDelta;
+			m_vCameraPos += v;
+		}
+		if (_InputSystem.GetKey('D') || _InputSystem.GetKey('d'))
+		{
+			XMVECTOR v = m_vCameraRight * m_fCameraSpeed * m_fDelta;
+			m_vCameraPos += v;
+		}
+		if (_InputSystem.GetKey('Q') || _InputSystem.GetKey('q'))
+		{
+			XMVECTOR v = m_vCameraUp * m_fCameraSpeed * m_fDelta;
+			m_vCameraPos += v;
+		}
+		if (_InputSystem.GetKey('E') || _InputSystem.GetKey('e'))
+		{
+			XMVECTOR v = m_vCameraUp * -m_fCameraSpeed * m_fDelta;
+			m_vCameraPos += v;
+		}
 
-	if (_InputSystem.GetKey(VK_LBUTTON))
-	{
-		m_fYaw += _InputSystem.m_ptOffSet.x * m_fCameraSpeed * m_fDelta;
-		m_fPitch += _InputSystem.m_ptOffSet.y * m_fCameraSpeed * m_fDelta;
+		if (_InputSystem.GetKey(VK_LBUTTON))
+		{
+			m_fYaw += _InputSystem.m_ptOffSet.x * m_fCameraSpeed * m_fDelta;
+			m_fPitch += _InputSystem.m_ptOffSet.y * m_fCameraSpeed * m_fDelta;
+		}
 	}
+	
 	
 	XMVECTOR scale = XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f);
 	XMVECTOR rotation =
@@ -56,8 +64,6 @@ void Camera::Update()
 			_DegreeToRadian(m_fRoll));
 
 	XMVECTOR translation = m_vCameraPos;
-
-	
 
 	//m_matWorld = XMMatrixScalingFromVector(scale) * XMMatrixRotationX(_DegreeToRadian(m_fPitch)) * XMMatrixRotationY(_DegreeToRadian(m_fYaw)) * XMMatrixRotationZ(_DegreeToRadian(m_fRoll)) * XMMatrixTranslationFromVector(translation);
 	m_matWorld = XMMatrixTransformation({ 0,0,0,0 }, { 0,0,0,0 }, scale, {0,0,0,0}, rotation, translation);

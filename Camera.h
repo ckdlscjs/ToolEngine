@@ -9,12 +9,14 @@ enum MAT_PROJ
 class Camera
 {
 public:
+	void SetCameraMove(bool bCameraMove);
 	void Update();
 public:
 	Camera(std::wstring szCameraName, MAT_PROJ cameraType , XMVECTOR vCameraPos, XMVECTOR vCameraDir, XMVECTOR vCameraUp);
 	~Camera();
 public:
 	std::wstring m_szCameraName;
+	bool  m_bCameraMove = true;
 	float m_fCameraSpeed = 50.0f;
 	float m_fDelta = 0.001f;
 	float m_fYaw = 0.0f;

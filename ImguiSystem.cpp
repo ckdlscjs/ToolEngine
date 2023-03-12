@@ -41,6 +41,7 @@ void ImguiSystem::Update()
     {
         {
             bMouseMove = (bFbxObj | bSimpleObj | bOjbectPicking | bSculpt | bSplatting) != true ? true : false;
+            _ToolSystemMap.GetCurrentCamera()->SetCameraMove(bMouseMove);
             //WireFrame
             if (ImGui::Checkbox("WireFrame", &bWireFrame))
             {
