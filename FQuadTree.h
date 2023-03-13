@@ -19,12 +19,10 @@ public:
 	void	SetSplatting(std::wstring szCurrentSplat, bool bSplatting);
 
 	void	SetTransform(Transform transform);
-	void	SetMaterial(Material* pMaterial);
 	void	SetTexture(Texture* pTexture);
 	void	SetShader(std::wstring vsPath, VertexShader* pVertexShader, std::wstring psPath, PixelShader* pPixelShader);
 	void	SetConstantData(CBufferData_Map cc);
 	void	SetDrawMode(DRAW_MODE mode);
-	void	SetSpecify(OBJECT_SPECIFY specify);
 	UINT	SelectVertexList(T_BOX& box, std::vector<FNode*>& selectNodeList);
 	void	UpdateNode(FNode* pNode);
 	Object* GetPickingObject();
@@ -34,7 +32,7 @@ public:
 	BOOL	IsSubDivide(FNode* pNode);
 	FNode*	FindNode(FNode* pNode, Object* pObj);
 	FNode*	FindCollisionNode(FNode* pNode, Object* pObj);
-	void	Reset(FNode* pNode);
+	void	ClearObjectList(FNode* pNode);
 	FNode*	VisibleNode(FNode* pNode);
 	bool	GetInterSection();
 	Object*	ObjectPicking();
@@ -55,7 +53,6 @@ public:
 	~FQuadTree();
 
 public:
-
 	bool m_bSclupting;
 	float m_fSculptRadius = 10.0f;
 	float m_fSculptIntensity = 10.0f;
@@ -77,19 +74,22 @@ public:
 	int m_iMaxDepth;
 	FNode* m_pRootNode;
 	FSelect m_Select;
+
 	MeshMap* m_pMap = nullptr;
-	Material* m_pMaterial;
 	Texture* m_pTexture;
 	
 	Transform m_Transform;
-	CBufferData_Map m_constantDataMap;
 	ConstantBuffer* m_pConstantBuffer;
+	CBufferData_Map m_constantDataMap;
+
 	std::wstring m_szVSPath;
 	VertexShader* m_pVertexShader;
 	std::wstring m_szPSPath;
 	PixelShader* m_pPixelShader;
+
 	Camera* m_pCamera = nullptr;
 	DRAW_MODE m_DrawMode = DRAW_MODE::MODE_SOLID;
+
 	std::unordered_set<Object*> m_pAllObjectList;
 	std::vector<FNode*> m_pLeafNodeList;
 	std::vector<FNode*> m_pDrawLeafNodeList;

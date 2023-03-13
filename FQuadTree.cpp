@@ -409,12 +409,6 @@ void FQuadTree::SetTransform(Transform transform)
     m_constantDataMap.matWorld = XMMatrixTransformation({ 0,0,0,1 }, { 0,0,0,1 }, scale, { 0,0,0,1 }, rotation, translation);
 }
 
-
-void FQuadTree::SetMaterial(Material* pMaterial)
-{
-    m_pMaterial = pMaterial;
-}
-
 void FQuadTree::SetTexture(Texture* pTexture)
 {
     m_pTexture = pTexture;
@@ -437,11 +431,6 @@ void FQuadTree::SetConstantData(CBufferData_Map cc)
 void FQuadTree::SetDrawMode(DRAW_MODE mode)
 {
     m_DrawMode = mode;
-}
-
-void FQuadTree::SetSpecify(OBJECT_SPECIFY specify)
-{
-    m_Specify = specify;
 }
 
 BOOL FQuadTree::AddObject(Object* pObj)
@@ -521,14 +510,15 @@ FNode* FQuadTree::FindCollisionNode(FNode* pNode, Object* pObj)
     return pNode;
 }
 
-void FQuadTree::Reset(FNode* pNode)
+void FQuadTree::ClearObjectList(FNode* pNode)
 {
     if (pNode == nullptr) return;
     pNode->m_pDynamicObjectList.clear();
-    Reset(pNode->m_pChild[0]);
-    Reset(pNode->m_pChild[1]);
-    Reset(pNode->m_pChild[2]);
-    Reset(pNode->m_pChild[3]);
+    pNode->m_pStaticObjectList.clear();
+    ClearObjectList(pNode->m_pChild[0]);
+    ClearObjectList(pNode->m_pChild[1]);
+    ClearObjectList(pNode->m_pChild[2]);
+    ClearObjectList(pNode->m_pChild[3]);
 }
 
 FNode* FQuadTree::VisibleNode(FNode* pNode)
@@ -635,6 +625,9 @@ Object* FQuadTree::ObjectPicking()
 #include <chrono>
 void FQuadTree::Update()
 {
+    m_pDrawLeafNodeList.clear();
+    //ClearObjectList(m_pRootNode);
+
     m_constantDataMap.matView = _CameraSystem.GetCurrentCamera()->m_matCamera;
     m_constantDataMap.m_camera_position = XMFLOAT4(
         XMVectorGetX(_CameraSystem.GetCurrentCamera()->m_matWorld.r[3]),
@@ -645,7 +638,6 @@ void FQuadTree::Update()
     m_constantDataMap.m_cell_distance = m_pMap->m_fCellDistance;
     _EngineSystem.GetRenderSystem()->UpdateConstantBuffer(m_pConstantBuffer, &m_constantDataMap);
 
-    m_pDrawLeafNodeList.clear();
     VisibleNode(m_pRootNode); //Àç±Í·Î VisibleNodeÃ¼Å©
     m_Select.SetMatrix(nullptr, &m_pCamera->m_matCamera, &m_pCamera->m_matProj);
 
