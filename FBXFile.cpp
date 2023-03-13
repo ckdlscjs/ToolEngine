@@ -168,8 +168,8 @@ void FBXFile::ParseMesh(FBXNode* pNode, int nodeIdx)
 			{
 				int vertexID = iCornerIndex[idxVertFace];
 				FbxVector4 vOrigin = pControlPositions[vertexID];
-				object pnctVertex;
-				iw iwVertex;
+				PNCTVertex pnctVertex;
+				IW iwVertex;
 				FbxVector4 vConvert = geom.MultT(vOrigin);
 
 				pnctVertex.pos.x = vConvert.mData[0];
@@ -227,7 +227,7 @@ void FBXFile::ParseMesh(FBXNode* pNode, int nodeIdx)
 				}
 				else
 				{
-					iw_data* pIW = &pNode->m_ListIW[vertexID];
+					IWData* pIW = &pNode->m_ListIW[vertexID];
 					iwVertex.index.x = pIW->index[0];
 					iwVertex.index.y = pIW->index[1];
 					iwVertex.index.z = pIW->index[2];

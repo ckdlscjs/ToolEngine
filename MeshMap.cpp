@@ -1,5 +1,5 @@
 #include "MeshMap.h"
-std::vector<object>& MeshMap::GetListVertex()
+std::vector<PNCTVertex>& MeshMap::GetListVertex()
 {
     return m_ListVertex;
 }
@@ -307,12 +307,12 @@ std::ifstream& operator>>(std::ifstream& is, MeshMap* pMap)
             }
             else if (fieldName == "m_ListVertex")
             {
-                std::vector<object> vertices;
+                std::vector<PNCTVertex> vertices;
                 std::string vertexLine;
                 while (std::getline(is, vertexLine) && vertexLine != "") {
                     if (vertexLine.find("m_pAllObjectList:") != std::string::npos)
                         break;
-                    object vertex;
+                    PNCTVertex vertex;
                     std::istringstream vertexIss(vertexLine);
                     vertexIss >> vertex;
                     vertices.push_back(vertex);
@@ -350,3 +350,176 @@ std::ifstream& operator>>(std::ifstream& is, MeshMap* pMap)
     is.seekg(prevPos);
     return is;
 }
+
+//void MAPLOAD::OpenFile(std::wstring szFullPath)
+//{
+//    Texture* pTexture = nullptr;
+//    Transform mapTransform = {};
+//    UINT iMaxDepth = 0;
+//    std::wstring szVSPath;
+//    std::wstring szPSPath;
+//    void* shader_byte_code_vs = nullptr;
+//    void* shader_byte_code_ps = nullptr;
+//    size_t size_shader_vs = 0;
+//    size_t size_shader_ps = 0;
+//    MeshMap* pMapMesh = new MeshMap();
+//    std::unordered_set<Object*> allObjectList;
+//    BYTE* fAlphaData = nullptr;
+//    std::ifstream is(szFullPath);
+//    std::string line;
+//    while (std::getline(is, line))
+//    {
+//        std::istringstream iss(line);
+//        std::string fieldName;
+//        if (std::getline(iss, fieldName, ':'))
+//        {
+//            if (fieldName == "m_pTexture")
+//            {
+//                std::string textureName;
+//                iss >> textureName;
+//                pTexture = _EngineSystem.GetTextureSystem()->CreateTextureFromFile(_tomw(textureName));
+//                m_ListTexture.insert(_tomw(textureName));
+//            }
+//            else if (fieldName == "m_ListTextureSplatting")
+//            {
+//                std::string texturesStr;
+//                std::getline(iss, texturesStr);
+//                std::stringstream texturesStream(texturesStr);
+//                std::string texturePath;
+//                while (std::getline(texturesStream, texturePath, ','))
+//                {
+//                    if (texturePath.size() > 1)
+//                    {
+//                        texturePath.erase(std::remove(texturePath.begin(), texturePath.end(), ' '), texturePath.end());
+//                        auto texture = _EngineSystem.GetTextureSystem()->CreateTextureFromFile(_tomw(texturePath));
+//                        m_ListTextureSplatting.insert(texture->GetTextureName());
+//                    }
+//                }
+//            }
+//            else if (fieldName == "m_Transform")
+//            {
+//                iss >> mapTransform;
+//            }
+//            else if (fieldName == "m_iMaxDepth")
+//            {
+//                iss >> iMaxDepth;
+//            }
+//            else if (fieldName == "m_szVSName")
+//            {
+//                std::string str;
+//                std::getline(iss, str);
+//                szVSPath = _tomw(str);
+//            }
+//            else if (fieldName == "m_szPSName")
+//            {
+//                std::string str;
+//                std::getline(iss, str);
+//                szPSPath = _tomw(str);
+//            }
+//            else if (fieldName == "m_pMap")
+//            {
+//                is >> pMapMesh;
+//            }
+//            else if (fieldName == "m_pAllObjectList")
+//            {
+//                std::streampos prevPos = is.tellg();
+//                std::string str;
+//                while (std::getline(is, str))
+//                {
+//                    if (str.find("m_fAlphaData:") != std::string::npos)
+//                        break;
+//                    std::stringstream texturesStream(str);
+//                    std::string strName;
+//                    std::getline(texturesStream, strName, ',');
+//
+//                    CULL_MODE cullMode;
+//                    texturesStream >> cullMode;
+//
+//                    DRAW_MODE drawMode;
+//                    texturesStream >> drawMode;
+//
+//                    INTERACTIVE_MODE interactiveMode;
+//                    texturesStream >> interactiveMode;
+//
+//                    OBJECT_SPECIFY specifyMode;
+//                    texturesStream >> specifyMode;
+//
+//                    Transform transform;
+//                    texturesStream >> transform;
+//
+//                    float length;
+//
+//                    if (specifyMode == OBJECT_SPECIFY::OBJECT_SIMPLE)
+//                    {
+//                        // pos 값을 추출합니다.
+//                        size_t pos_start = texturesStream.str().find("m_fLength:") + strlen("m_fLength:");
+//                        size_t pos_end = texturesStream.str().find(",", pos_start);
+//                        std::string pos_str = texturesStream.str().substr(pos_start, pos_end - pos_start);
+//                        std::istringstream pos_stream(pos_str);
+//                        pos_stream >> length;
+//                    }
+//
+//                    Object* pObject = nullptr;
+//                    if (specifyMode == OBJECT_SPECIFY::OBJECT_SIMPLE)
+//                        pObject = CreateSimpleBox(length, transform.position, transform.rotation, transform.scale);
+//                    else if (specifyMode == OBJECT_SPECIFY::OBJECT_STATIC)
+//                        pObject = CreateFbxObject(_tomw(strName), transform.position, transform.rotation, transform.scale);
+//                    else if (specifyMode == OBJECT_SPECIFY::OBJECT_SKELETON)
+//                        pObject = CreateFbxObject(_tomw(str), transform.position, transform.rotation, transform.scale);
+//
+//                    allObjectList.insert(pObject);
+//                    prevPos = is.tellg();
+//                }
+//                is.seekg(prevPos);
+//            }
+//            else if (fieldName == "m_fAlphaData")
+//            {
+//                fAlphaData = new BYTE[pMapMesh->m_dwNumRows * pMapMesh->m_dwNumColumns * 4];
+//                for (int idx = 0; idx < pMapMesh->m_dwNumRows * pMapMesh->m_dwNumColumns * 4; idx++)
+//                {
+//                    int rgba = 0;
+//                    iss >> rgba;
+//                    fAlphaData[idx] = static_cast<uint8_t>(rgba);
+//                }
+//            }
+//        }
+//    }
+//
+//    is.close();
+//
+//    constant_map cc;
+//    cc.matWorld = XMMatrixIdentity();
+//    cc.matView = m_pCamera->m_matCamera;
+//    cc.matProj = m_pCamera->m_matProj;
+//
+//    _EngineSystem.GetMeshSystem()->AddResource(L"MapMesh", pMapMesh);
+//
+//    _EngineSystem.GetRenderSystem()->CompileVertexShader(szVSPath.c_str(), "vsmain", "vs_5_0", &shader_byte_code_vs, &size_shader_vs);
+//    VertexShader* pVertexShader = _EngineSystem.GetRenderSystem()->CreateVertexShader(shader_byte_code_vs, size_shader_vs);
+//    _EngineSystem.GetRenderSystem()->CompilePixelShader(szPSPath.c_str(), "psmain", "ps_5_0", &shader_byte_code_ps, &size_shader_ps);
+//    PixelShader* pPixelShader = _EngineSystem.GetRenderSystem()->CreatePixelShader(shader_byte_code_ps, size_shader_ps);
+//
+//    VertexBuffer* pVertexBuffer = _EngineSystem.GetRenderSystem()->CreateVertexBuffer(&pMapMesh->GetListVertex()[0], sizeof(object), pMapMesh->GetListVertex().size(), shader_byte_code_vs, size_shader_vs);
+//    IndexBuffer* pIndexBuffer = _EngineSystem.GetRenderSystem()->CreateIndexBuffer(&pMapMesh->GetListIndex()[0], pMapMesh->GetListIndex().size());
+//
+//    _EngineSystem.GetRenderSystem()->ReleaseBlob();
+//
+//    pMapMesh->m_pVertexBuffer = pVertexBuffer;
+//    pMapMesh->m_pIndexBuffer = pIndexBuffer;
+//
+//    m_pQuadTree = new FQuadTree(m_pCamera, pMapMesh, iMaxDepth, fAlphaData);
+//    m_pQuadTree->SetConstantData(cc);
+//    m_pQuadTree->SetTransform({ mapTransform.position, mapTransform.rotation, mapTransform.scale });
+//    m_pQuadTree->SetTexture(pTexture);
+//    for (const auto& texture : m_ListTextureSplatting)
+//        m_pQuadTree->SetSplattingTexture(_EngineSystem.GetTextureSystem()->GetTexture(texture));
+//    m_pQuadTree->SetShader(szVSPath, pVertexShader, szPSPath, pPixelShader);
+//    m_pQuadTree->SetDrawMode(DRAW_MODE::MODE_SOLID);
+//
+//    for (const auto& obj : allObjectList)
+//    {
+//        if (obj->GetSpecify() != OBJECT_SPECIFY::OBJECT_SIMPLE)
+//            m_ListFbx.insert(obj->GetObjectName());
+//        m_pQuadTree->AddObject(obj);
+//    }
+//}

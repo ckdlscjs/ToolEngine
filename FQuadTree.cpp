@@ -122,10 +122,11 @@ std::ostream& operator<<(std::ostream& os, const FQuadTree* pQuadTree)
     os << "m_pAllObjectList:" << std::endl;
     for (const auto& object : pQuadTree->m_pAllObjectList)
     {
+
+        os << object;
         if (object->GetSpecify() == OBJECT_SPECIFY::OBJECT_SIMPLE)
-            os << (SimpleBox*)object << std::endl;
-        else
-            os << object << std::endl; 
+            os <<", " << "m_fLength:" << static_cast<SimpleBox*>(object)->GetLength();
+        os << std::endl;       
     }
 
     os << "m_fAlphaData:";
@@ -134,6 +135,7 @@ std::ostream& operator<<(std::ostream& os, const FQuadTree* pQuadTree)
     os << std::endl;
     return os;
 }
+
 //std::ifstream& operator>>(std::ifstream& is, FQuadTree* pQuadTree)
 //{
 //    Texture* pTexture = nullptr;
@@ -302,6 +304,7 @@ FQuadTree::FQuadTree(Camera* pCamera, MeshMap* pMap, int iMaxDepth, BYTE* fAlpha
 
 FQuadTree::~FQuadTree()
 {
+    if (m_pMap) delete m_pMap;
     if (m_fAlphaData) delete m_fAlphaData;
     if (m_pMaskAlphaTexture) m_pMaskAlphaTexture->Release();
     if (m_pMaskAlphaSrv) m_pMaskAlphaSrv->Release();
@@ -426,7 +429,7 @@ void FQuadTree::SetShader(std::wstring vsPath, VertexShader* pVertexShader, std:
 }
 
 
-void FQuadTree::SetConstantData(constant_map cc)
+void FQuadTree::SetConstantData(CBufferData_Map cc)
 {
     m_constantDataMap = cc;
 }
@@ -445,10 +448,10 @@ BOOL FQuadTree::AddObject(Object* pObj)
 {
     m_pAllObjectList.insert(pObj);
 
-    FNode* pFindNode = FindNode(m_pRootNode, pObj);
+    FNode* pFindNode = FindCollisionNode(m_pRootNode, pObj);
     if (pFindNode != nullptr)
     {
-        pFindNode->m_pDynamicObjectList.push_back(pObj);
+        pFindNode->m_pDynamicObjectList.insert(pObj);
         //pFindNode->m_pStaticObjectList.push_back(pObj);
         return TRUE;
     }
@@ -457,6 +460,8 @@ BOOL FQuadTree::AddObject(Object* pObj)
 
 BOOL FQuadTree::DeleteObject(Object* pObj)
 {
+    FNode* pNode = FindNode(m_pRootNode, pObj);
+    pNode->m_pDynamicObjectList.erase(pObj);
     return m_pAllObjectList.erase(pObj);
 }
 
@@ -486,13 +491,29 @@ BOOL FQuadTree::IsSubDivide(FNode* pNode)
 
 FNode* FQuadTree::FindNode(FNode* pNode, Object* pObj)
 {
+    if (pNode->m_pDynamicObjectList.find(pObj) != pNode->m_pDynamicObjectList.end())
+        return pNode;
+    for (int i = 0; i < 4; i++)
+    {
+        if (pNode->m_pChild[i] != nullptr)
+        {
+            FNode* nodePtr = FindNode(pNode->m_pChild[i], pObj);
+            if (nodePtr)
+                return nodePtr;
+        }
+    }
+    return nullptr;
+}
+
+FNode* FQuadTree::FindCollisionNode(FNode* pNode, Object* pObj)
+{
     for (int i = 0; i < 4; i++)
     {
         if (pNode->m_pChild[i] != nullptr)
         {
             if (TCollision::BoxToBox(pNode->m_pChild[i]->m_Box, pObj->m_Box))
             {
-                pNode = FindNode(pNode->m_pChild[i], pObj);
+                pNode = FindCollisionNode(pNode->m_pChild[i], pObj);
                 break;
             }
         }
@@ -611,6 +632,7 @@ Object* FQuadTree::ObjectPicking()
     return nullptr;
 }
 
+#include <chrono>
 void FQuadTree::Update()
 {
     m_constantDataMap.matView = _CameraSystem.GetCurrentCamera()->m_matCamera;

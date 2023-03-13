@@ -12,10 +12,10 @@ struct vertex_info
 	XMVECTOR vNormal;
 };
 
-class MeshMap : public Mesh
+class MeshMap
 {
 public:
-	std::vector<object>& GetListVertex();
+	std::vector<PNCTVertex>& GetListVertex();
 	std::vector<DWORD>& GetListIndex();
 	void	UpdateBuffer(Camera* pCamera);
 	float	GetHeightmap(int row, int col);
@@ -37,7 +37,7 @@ public:
 	DWORD m_dwFace;
 	VertexBuffer* m_pVertexBuffer;
 	IndexBuffer* m_pIndexBuffer;
-	std::vector<object> m_ListVertex;	//정점정보
+	std::vector<PNCTVertex> m_ListVertex;	//정점정보
 	std::vector<DWORD> m_ListIndex; //인덱스정보
 	std::vector<float> m_fHeightList;	//높이맵의높이정보
 	std::vector<vertex_info> m_ListVertexInfo;	//정점법선노말

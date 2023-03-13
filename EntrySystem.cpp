@@ -1,6 +1,6 @@
 #include "EntrySystem.h"
 
-constant cc;
+CBufferData cc;
 void EntrySystem::OnCreate()
 {
     std::cout << "onCreate" << std::endl;

@@ -120,7 +120,7 @@ void Object::SetShaderName(std::wstring vsName, std::wstring psName)
 }
 
 
-void Object::SetConstantData(constant cc)
+void Object::SetConstantData(CBufferData cc)
 {
 	m_ConstantData = cc;
 }

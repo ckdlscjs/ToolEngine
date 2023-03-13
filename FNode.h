@@ -15,8 +15,8 @@ public:
 	std::vector<DWORD> m_IndexList;
 	ID3D11Buffer* m_pIndexBuffer;
 	std::vector<FNode*> m_pChild;
-	std::vector<Object*> m_pStaticObjectList;
-	std::vector<Object*> m_pDynamicObjectList;
+	std::unordered_set<Object*> m_pStaticObjectList;
+	std::unordered_set<Object*> m_pDynamicObjectList;
 	//friend std::ofstream& operator<<(std::ostream& os, const FNode& pNode);
 public:
 	void		CreateChildNode(FNode* pParent, MeshMap* pMap);

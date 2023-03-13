@@ -22,7 +22,7 @@ public:
 	void	SetMaterial(Material* pMaterial);
 	void	SetTexture(Texture* pTexture);
 	void	SetShader(std::wstring vsPath, VertexShader* pVertexShader, std::wstring psPath, PixelShader* pPixelShader);
-	void	SetConstantData(constant_map cc);
+	void	SetConstantData(CBufferData_Map cc);
 	void	SetDrawMode(DRAW_MODE mode);
 	void	SetSpecify(OBJECT_SPECIFY specify);
 	UINT	SelectVertexList(T_BOX& box, std::vector<FNode*>& selectNodeList);
@@ -33,6 +33,7 @@ public:
 	void	BuildTree(FNode* pNode, MeshMap* pMap);
 	BOOL	IsSubDivide(FNode* pNode);
 	FNode*	FindNode(FNode* pNode, Object* pObj);
+	FNode*	FindCollisionNode(FNode* pNode, Object* pObj);
 	void	Reset(FNode* pNode);
 	FNode*	VisibleNode(FNode* pNode);
 	bool	GetInterSection();
@@ -49,7 +50,6 @@ public:
 
 public:
 	friend std::ostream& operator<<(std::ostream& os, const FQuadTree* pQuadTree);
-	//friend std::ifstream& operator>>(std::ifstream& is, FQuadTree* pQuadTree);
 
 	FQuadTree(Camera* pCamera, MeshMap* pMap, int iMaxDepth = 2, BYTE* fAlphaData = 0);
 	~FQuadTree();
@@ -82,7 +82,7 @@ public:
 	Texture* m_pTexture;
 	
 	Transform m_Transform;
-	constant_map m_constantDataMap;
+	CBufferData_Map m_constantDataMap;
 	ConstantBuffer* m_pConstantBuffer;
 	std::wstring m_szVSPath;
 	VertexShader* m_pVertexShader;
@@ -90,7 +90,6 @@ public:
 	PixelShader* m_pPixelShader;
 	Camera* m_pCamera = nullptr;
 	DRAW_MODE m_DrawMode = DRAW_MODE::MODE_SOLID;
-	OBJECT_SPECIFY m_Specify = OBJECT_SPECIFY::OBJECT_MAP;
 	std::unordered_set<Object*> m_pAllObjectList;
 	std::vector<FNode*> m_pLeafNodeList;
 	std::vector<FNode*> m_pDrawLeafNodeList;

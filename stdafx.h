@@ -212,6 +212,7 @@ enum class OBJECT_SPECIFY
 	OBJECT_SIMPLE,
 	OBJECT_MAP,
 	OBJECT_SPAWN,
+	OBJECT_EFFECT,
 };
 static std::ostream& operator<<(std::ostream& os, const OBJECT_SPECIFY& mode)
 {
@@ -334,22 +335,22 @@ struct Transform
 	}
 };
 
-struct object
+struct PNCTVertex
 {
 	XMFLOAT3 pos;
 	XMFLOAT2 tex;
 	XMFLOAT3 normal;
 	XMFLOAT4 color;
-	friend std::ostream& operator<<(std::ostream& os, const object& object)
+	friend std::ostream& operator<<(std::ostream& os, const PNCTVertex& pnctVertex)
 	{
-		os << "position:" << object.pos.x << " " << object.pos.y << " " << object.pos.z << ", ";
-		os << "texcoord:" << object.tex.x << " " << object.tex.y << ", ";
-		os << "normal:" << object.normal.x << " " << object.normal.y << " " << object.normal.z << ", ";
-		os << "color:" << object.color.x << " " << object.color.y << " " << object.color.z << " " << object.color.w;
+		os << "position:" << pnctVertex.pos.x << " " << pnctVertex.pos.y << " " << pnctVertex.pos.z << ", ";
+		os << "texcoord:" << pnctVertex.tex.x << " " << pnctVertex.tex.y << ", ";
+		os << "normal:" << pnctVertex.normal.x << " " << pnctVertex.normal.y << " " << pnctVertex.normal.z << ", ";
+		os << "color:" << pnctVertex.color.x << " " << pnctVertex.color.y << " " << pnctVertex.color.z << " " << pnctVertex.color.w;
 		return os;
 	}
 
-	friend std::istringstream& operator>>(std::istringstream& is, object& object)
+	friend std::istringstream& operator>>(std::istringstream& is, PNCTVertex& pnctVertex)
 	{
 		// "pos: x y z, tex: x y, normal: x y z, color: r g b a"와 같은 형태의 문자열에서 필드 값을 추출합니다.
 		std::string line;
@@ -360,27 +361,27 @@ struct object
 		size_t pos_end = line.find(",", pos_start);
 		std::string pos_str = line.substr(pos_start, pos_end - pos_start);
 		std::istringstream pos_stream(pos_str);
-		pos_stream >> object.pos.x >> object.pos.y >> object.pos.z;
+		pos_stream >> pnctVertex.pos.x >> pnctVertex.pos.y >> pnctVertex.pos.z;
 
 		// tex 값을 추출합니다.
 		size_t tex_start = line.find("texcoord:") + strlen("texcoord:");
 		size_t tex_end = line.find(",", tex_start);
 		std::string tex_str = line.substr(tex_start, tex_end - tex_start);
 		std::istringstream tex_stream(tex_str);
-		tex_stream >> object.tex.x >> object.tex.y;
+		tex_stream >> pnctVertex.tex.x >> pnctVertex.tex.y;
 
 		// normal 값을 추출합니다.
 		size_t normal_start = line.find("normal:") + strlen("normal:");
 		size_t normal_end = line.find(",", normal_start);
 		std::string normal_str = line.substr(normal_start, normal_end - normal_start);
 		std::istringstream normal_stream(normal_str);
-		normal_stream >> object.normal.x >> object.normal.y >> object.normal.z;
+		normal_stream >> pnctVertex.normal.x >> pnctVertex.normal.y >> pnctVertex.normal.z;
 
 		// color 값을 추출합니다.
 		size_t color_start = line.find("color:") + strlen("color:");
 		std::string color_str = line.substr(color_start);
 		std::istringstream color_stream(color_str);
-		color_stream >> object.color.x >> object.color.y >> object.color.z >> object.color.w;
+		color_stream >> pnctVertex.color.x >> pnctVertex.color.y >> pnctVertex.color.z >> pnctVertex.color.w;
 
 		return is;
 	}
@@ -388,7 +389,7 @@ struct object
 
 
 __declspec(align(16))
-struct constant
+struct CBufferData
 {
 	XMMATRIX matWorld;
 	XMMATRIX matView;
@@ -398,7 +399,7 @@ struct constant
 };
 
 __declspec(align(16))
-struct constant_map
+struct CBufferData_Map
 {
 	XMMATRIX matWorld;
 	XMMATRIX matView;
@@ -409,7 +410,7 @@ struct constant_map
 	float m_cell_distance;
 };
 
-struct iw_data
+struct IWData
 {
 	std::vector<int> index;
 	std::vector<float> weight;
@@ -430,7 +431,7 @@ struct iw_data
 			}
 		}
 	}
-	iw_data()
+	IWData()
 	{
 		index.resize(8);
 		weight.resize(8);
@@ -461,7 +462,7 @@ struct weight_data
 	}
 };
 
-struct iw
+struct IW
 {
 	XMFLOAT4 index;
 	XMFLOAT4 weight;

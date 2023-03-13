@@ -318,8 +318,8 @@ void ImguiSystem::Update()
             ImGui::SameLine();
             if (ImGui::Button("Delete") && pObject != nullptr)
             {
-                _ObjectSystem.DeleteObject(pObject);
                 _ToolSystemMap.GetCurrentQuadTree()->DeleteObject(pObject);
+                _ObjectSystem.DeleteObject(pObject);
                 scale[0] = 0; scale[1] = 0; scale[2] = 0;
                 rotation[0] = 0; rotation[1] = 0; rotation[2] = 0;
                 position[0] = 0; position[1] = 0; position[2] = 0;
