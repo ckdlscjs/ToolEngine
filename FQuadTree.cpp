@@ -533,6 +533,7 @@ FNode* FQuadTree::VisibleNode(FNode* pNode)
 
 bool FQuadTree::GetInterSection()
 {
+    std::map<float, XMVECTOR> chkDist;
     for (const auto& node : m_pDrawLeafNodeList)
     {
         UINT index = 0;
@@ -546,16 +547,29 @@ bool FQuadTree::GetInterSection()
             XMFLOAT3 v1 = m_pMap->GetListVertex()[i1].pos;
             XMFLOAT3 v2 = m_pMap->GetListVertex()[i2].pos;
             float fDist;
-            if (m_Select.ChkPick(XMLoadFloat3(&v0), XMLoadFloat3(&v1), XMLoadFloat3(&v2)))
+            if (m_Select.ChkPick(XMLoadFloat3(&v0), XMLoadFloat3(&v1), XMLoadFloat3(&v2), fDist))
             //if(DirectX::TriangleTests::Intersects(m_Select.m_Ray.vOrigin, m_Select.m_Ray.vDirection, XMLoadFloat3(&v0), XMLoadFloat3(&v1), XMLoadFloat3(&v2), fDist))
             {
                 //m_Select.m_vIntersection = m_Select.m_Ray.vOrigin + m_Select.m_Ray.vDirection * fDist;
-                return true;
+                chkDist.insert(std::make_pair(fDist, m_Select.m_vIntersection));
+                /*return true;*/
             }
             index += 3;
         }
     }
-    return false;
+    if(!chkDist.size())
+        return false;
+
+    float maxFloat = 99999999.9f;
+    for (const auto& vec : chkDist)
+    {
+        if (vec.first < maxFloat)
+        {
+            maxFloat = vec.first;
+            m_Select.m_vIntersection = vec.second;
+        }
+    }
+    return true;
 }
 
 Object* FQuadTree::ObjectPicking()
@@ -580,7 +594,8 @@ Object* FQuadTree::ObjectPicking()
                     XMVECTOR v_0 = XMVector3TransformCoord(XMLoadFloat3(&v0), object->m_ConstantData.matWorld);
                     XMVECTOR v_1 = XMVector3TransformCoord(XMLoadFloat3(&v1), object->m_ConstantData.matWorld);
                     XMVECTOR v_2 = XMVector3TransformCoord(XMLoadFloat3(&v2), object->m_ConstantData.matWorld);
-                    if (m_Select.ChkPick(v_0, v_1, v_2))
+                    float fDist;
+                    if (m_Select.ChkPick(v_0, v_1, v_2, fDist))
                     {
                         return object;
                     }

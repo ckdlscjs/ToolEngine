@@ -67,10 +67,10 @@ void FSelect::Update()
 		//m_Ray.vOrigin.z = m._43;
 	}
 }
-bool FSelect::ChkPick(XMVECTOR& v0, XMVECTOR& v1, XMVECTOR& v2)
+bool FSelect::ChkPick(XMVECTOR& v0, XMVECTOR& v1, XMVECTOR& v2, float & fDist)
 {
 	FLOAT fBary1, fBary2;
-	FLOAT fDist;
+	//FLOAT fDist;
 	// Check if the pick ray passes through this point
 	if (IntersectTriangle(m_Ray.vOrigin, m_Ray.vDirection, v0, v1, v2,
 		&fDist, &fBary1, &fBary2))

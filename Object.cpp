@@ -59,7 +59,8 @@ bool Object::Intersect(FSelect& select, float distance)
 			XMFLOAT3 v0 = node->GetListVertex()[i0].pos;
 			XMFLOAT3 v1 = node->GetListVertex()[i1].pos;
 			XMFLOAT3 v2 = node->GetListVertex()[i2].pos;
-			if (select.ChkPick(XMLoadFloat3(&v0), XMLoadFloat3(&v1), XMLoadFloat3(&v2)))
+			float fDist;
+			if (select.ChkPick(XMLoadFloat3(&v0), XMLoadFloat3(&v1), XMLoadFloat3(&v2), fDist))
 			{
 				return true;
 			}

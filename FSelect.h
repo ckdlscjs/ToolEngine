@@ -9,7 +9,7 @@ public:
 public:
 	void SetMatrix(XMMATRIX* pWorld, XMMATRIX* pView, XMMATRIX* pProj);
 	void Update();
-	bool FSelect::ChkPick(XMVECTOR& v0, XMVECTOR& v1, XMVECTOR& v2);
+	bool FSelect::ChkPick(XMVECTOR& v0, XMVECTOR& v1, XMVECTOR& v2, float& fDist);
 	bool FSelect::IntersectTriangle(const XMVECTOR& orig, const XMVECTOR& dir, XMVECTOR& v0, XMVECTOR& v1, XMVECTOR& v2, FLOAT* t, FLOAT* u, FLOAT* v);
 
 public:
