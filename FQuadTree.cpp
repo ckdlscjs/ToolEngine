@@ -80,7 +80,7 @@ void FQuadTree::Splatting(XMVECTOR vIntersection, std::wstring szFullPath)
             vUV = XMFLOAT2((vTexIndex.x / (float)m_pMap->m_dwNumRows) * 2.0f - 1.0f,
                 -(vTexIndex.y / (float)m_pMap->m_dwNumColumns * 2.0f - 1.0f));
             // 맵사이즈크기만큼
-            vTexPos = XMFLOAT3(vUV.x * vMaxSize.x * fCellDistance, 0.0f, vUV.y * vMaxSize.y * fCellDistance);  //x and z
+            vTexPos = XMFLOAT3(vUV.x * vMaxSize.x * fCellDistance, m_pMap->m_ListVertex[m_pMap->m_dwNumRows * y + x].pos.y, vUV.y * vMaxSize.y * fCellDistance);  //x and z
             BYTE* pixel = &m_fAlphaData[m_pMap->m_dwNumRows * y * 4 + x * 4];
             XMFLOAT3 radius =  vPickPos - vTexPos;
             float fRadius = XMVectorGetX(XMVector3Length(XMLoadFloat3(&radius)));
