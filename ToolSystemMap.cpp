@@ -286,7 +286,6 @@ FQuadTree* ToolSystemMap::CreateSimpleMap(int iWidth, int iHeight, float fDistan
     m_pQuadTree->SetTexture(_EngineSystem.GetTextureSystem()->GetTexture(szFullPath));
     m_pQuadTree->SetShader(szVSPath, pVertexShader, szPSPath, pPixelShader);
     m_pQuadTree->SetDrawMode(DRAW_MODE::MODE_SOLID);
-    m_pQuadTree->SetSpecify(OBJECT_SPECIFY::OBJECT_MAP);
 
     return m_pQuadTree;
 }
