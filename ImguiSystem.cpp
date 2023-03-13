@@ -56,7 +56,8 @@ void ImguiSystem::Update()
             }
             if (bSimpleObj)
             {
-                ImGui::InputFloat("length", &fSimpleObjLength);
+                if(ImGui::InputFloat("length", &fSimpleObjLength))
+                    _ToolSystemMap.SelectSimple(bSimpleObj, fSimpleObjLength);
             }
            
             //FbxObjPicking

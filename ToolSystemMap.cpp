@@ -1,4 +1,5 @@
 #include "ToolSystemMap.h"
+#include "SimpleBox.h"
 
 void ToolSystemMap::SetWireframe(bool bWireFrame)
 {
@@ -164,6 +165,8 @@ Object* ToolSystemMap::CreateFbxObject(std::wstring szFullPath, XMVECTOR vPos, X
 
 Object* ToolSystemMap::CreateSimpleBox(float fLength, XMVECTOR vPos, XMVECTOR vRot, XMVECTOR vScale)
 {
+    SimpleBox* pObject = new SimpleBox(L"SimpleObjectBox");
+    pObject->SetLength(fLength);
     float fboxLength = 0.5f * fLength;
     object vertex_list[] =
     {
@@ -214,8 +217,8 @@ Object* ToolSystemMap::CreateSimpleBox(float fLength, XMVECTOR vPos, XMVECTOR vR
     cc.matView = m_pCamera->m_matCamera;
     cc.matProj = m_pCamera->m_matProj;
 
-    Object* pObject = _ObjectSystem.CreateObject(L"SimpleObjectBox");
-    Mesh* pMesh = _EngineSystem.GetMeshSystem()->CreateMeshFromFile(L"SimpleObjectMesh");
+    
+    Mesh* pMesh = _EngineSystem.GetMeshSystem()->CreateMeshFromFile(std::to_wstring(fboxLength));
 
     void* shader_byte_code_vs = nullptr;
     void* shader_byte_code_ps = nullptr;
@@ -234,6 +237,7 @@ Object* ToolSystemMap::CreateSimpleBox(float fLength, XMVECTOR vPos, XMVECTOR vR
     }
     _EngineSystem.GetRenderSystem()->ReleaseBlob();
     
+    _ObjectSystem.AddObject(pObject);
     pObject->SetShader(pVertexShader, pPixelShader);
     pObject->SetConstantData(cc);
     pObject->SetTransform({ vPos , vRot, vScale });
@@ -391,9 +395,21 @@ void ToolSystemMap::OpenFile(std::wstring szFullPath)
                     Transform transform;
                     texturesStream >> transform;
 
+                    float length;
+
+                    if (specifyMode == OBJECT_SPECIFY::OBJECT_SIMPLE)
+                    {
+                        // pos 값을 추출합니다.
+                        size_t pos_start = texturesStream.str().find("m_fLength:") + strlen("m_fLength:");
+                        size_t pos_end = texturesStream.str().find(",", pos_start);
+                        std::string pos_str = texturesStream.str().substr(pos_start, pos_end - pos_start);
+                        std::istringstream pos_stream(pos_str);
+                        pos_stream >> length;
+                    }
+
                     Object* pObject = nullptr;
                     if (specifyMode == OBJECT_SPECIFY::OBJECT_SIMPLE)
-                        pObject = CreateSimpleBox(1.0f, transform.position, transform.rotation, transform.scale);
+                        pObject = CreateSimpleBox(length, transform.position, transform.rotation, transform.scale);
                     else if (specifyMode == OBJECT_SPECIFY::OBJECT_STATIC)
                         pObject = CreateFbxObject(_tomw(strName), transform.position, transform.rotation, transform.scale);
                     else if (specifyMode == OBJECT_SPECIFY::OBJECT_SKELETON)

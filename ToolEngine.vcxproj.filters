@@ -262,7 +262,12 @@
     <ClInclude Include="MeshNode.h">
       <Filter>EngineSystem\ObjectSystem\MeshSystem\MeshNode</Filter>
     </ClInclude>
-    <ClInclude Include="FileSystem.h" />
+    <ClInclude Include="FileSystem.h">
+      <Filter>FileSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="SimpleBox.h">
+      <Filter>ToolSystem\ToolSystemMap\MapObject</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WindowSystem.cpp">
@@ -404,7 +409,12 @@
     <ClCompile Include="MeshNode.cpp">
       <Filter>EngineSystem\ObjectSystem\MeshSystem\MeshNode</Filter>
     </ClCompile>
-    <ClCompile Include="FileSystem.cpp" />
+    <ClCompile Include="FileSystem.cpp">
+      <Filter>FileSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="SimpleBox.cpp">
+      <Filter>ToolSystem\ToolSystemMap\MapObject</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="imgui.ini">

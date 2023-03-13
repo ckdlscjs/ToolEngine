@@ -97,6 +97,7 @@ void FQuadTree::Splatting(XMVECTOR vIntersection, std::wstring szFullPath)
     g_pDeviceContext->UpdateSubresource(m_pMaskAlphaTexture, 0, nullptr, m_fAlphaData, RowPitch, DepthPitch);
 }
 
+#include "SimpleBox.h"
 std::ostream& operator<<(std::ostream& os, const FQuadTree* pQuadTree)
 {
     os << "m_pTexture:" << pQuadTree->m_pTexture->GetTextureName() << std::endl;
@@ -121,7 +122,10 @@ std::ostream& operator<<(std::ostream& os, const FQuadTree* pQuadTree)
     os << "m_pAllObjectList:" << std::endl;
     for (const auto& object : pQuadTree->m_pAllObjectList)
     {
-        os << object << std::endl; 
+        if (object->GetSpecify() == OBJECT_SPECIFY::OBJECT_SIMPLE)
+            os << (SimpleBox*)object << std::endl;
+        else
+            os << object << std::endl; 
     }
 
     os << "m_fAlphaData:";
