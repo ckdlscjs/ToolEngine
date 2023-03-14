@@ -97,9 +97,22 @@ HRESULT FNode::CreateIndexBuffer(MeshMap* pMap)
 	return hr;
 }
 
-//void FNode::Render()
-//{
-//}
+
+void FNode::UpdateVertexNormal(MeshMap* pMap)
+{
+	for (UINT iFace = 0; iFace < m_IndexList.size(); iFace += 3)
+	{
+		UINT i0 = m_IndexList[iFace * 3 + 0];
+		UINT i1 = m_IndexList[iFace * 3 + 1];
+		UINT i2 = m_IndexList[iFace * 3 + 2];
+		pMap->m_ListFaceNormal[iFace].vNormal = pMap->ComputeFaceNormal(i0, i1, i2);
+	}
+
+	for (UINT iVertex = 0; iVertex < pMap->m_ListVertexInfo.size(); iVertex++)
+	{
+		pMap->ComputeVertexNormal(iVertex);
+	}
+}
 
 FNode::FNode(FNode* pParent, MeshMap* pMap, DWORD dwLT, DWORD dwRT, DWORD dwLB, DWORD dwRB)
 {

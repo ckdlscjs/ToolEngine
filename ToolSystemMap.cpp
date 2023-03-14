@@ -39,7 +39,9 @@ void ToolSystemMap::Sculpting(XMVECTOR vIntersection, float fSculptRadius, float
                 float fValue = (fDistance / fSculptRadius) * 90.0f;
                 float fdot = cosf(_DegreeToRadian(fValue));
                 pMap->GetListVertex()[iVertex].pos.y += fdot * fSculptIntensity;
+                pMap->ComputeFaceNormal(i0, i1, i2)
             }
+            
         }
 
         for (const auto& node : nodelist)
@@ -58,7 +60,6 @@ void ToolSystemMap::Sculpting(XMVECTOR vIntersection, float fSculptRadius, float
         OutputDebugStringW(L"Time1: ");
         OutputDebugStringW(std::to_wstring(duration).c_str());
         OutputDebugStringW(L"\n");
-        pMap->GenerateVertexNormal();
         _EngineSystem.GetRenderSystem()->UpdateVertexBuffer(pMap->m_pVertexBuffer, &pMap->GetListVertex()[0]);
 
         auto end_time2 = std::chrono::high_resolution_clock::now();

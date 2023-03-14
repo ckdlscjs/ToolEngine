@@ -7,34 +7,6 @@ std::vector<DWORD>& MeshMap::GetListIndex()
 {
     return m_ListIndex;
 }
-void MeshMap::UpdateBuffer(Camera* pCamera)
-{
-   /* m_dwFace = 0;
-    DWORD index = 0;
-    XMVECTOR v[3];
-    for (int iFace = 0; iFace < m_ListIndex.size() / 3; iFace++)
-    {
-        UINT i0 = m_ListIndex[iFace * 3 + 0];
-        UINT i1 = m_ListIndex[iFace * 3 + 1];
-        UINT i2 = m_ListIndex[iFace * 3 + 2];
-        v[0] = XMLoadFloat3(&m_ListVertex[i0].pos);
-        v[1] = XMLoadFloat3(&m_ListVertex[i1].pos);
-        v[2] = XMLoadFloat3(&m_ListVertex[i2].pos);
-        for (int i = 0; i < 3; i++)
-        {
-            bool bRender = pCamera->m_Frustum.ClassifyPoint(v[i]);
-            if (bRender)
-            {
-                m_dwIndexList[index++] = i0;
-                m_dwIndexList[index++] = i1;
-                m_dwIndexList[index++] = i2;
-                m_dwFace++;
-                break;
-            }
-        }
-    }
-    g_pDeviceContext->UpdateSubresource(m_pIndexBuffer->m_pBuffer, 0, nullptr, &m_dwIndexList.at(0), 0, 0);*/
-}
 
 float MeshMap::GetHeightmap(int row, int col)
 {
@@ -174,11 +146,6 @@ void MeshMap::GenerateVertexNormal()
 	{
 		ComputeVertexNormal(iVertex);
 	}
-}
-
-void MeshMap::UpdateVertexNormal(FNode* pNode)
-{
-   
 }
 
 XMVECTOR MeshMap::ComputeFaceNormal(UINT i0, UINT i1, UINT i2)
