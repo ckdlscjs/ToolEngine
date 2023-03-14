@@ -8,16 +8,6 @@ class FQuadTree
 {
 
 public:
-	void	SetPickingSimple(bool bPicking, float fLength);
-	void	SetPickingFbx(std::wstring szCurrentFbx, bool bPicking);
-	void	SetPickingObject(bool bPicking);
-	void	SetPickingSculpt(bool bPicking);
-	void	SetSculptRadius(float fRadius);
-	void	SetSculptIntensity(float fIntensity);
-	void	SetSplatRadius(float fRadius);
-	void	SetSplattingTexture(Texture* pTexture);
-	void	SetSplatting(std::wstring szCurrentSplat, bool bSplatting);
-
 	void	SetTransform(Transform transform);
 	void	SetTexture(Texture* pTexture);
 	void	SetShader(std::wstring vsPath, VertexShader* pVertexShader, std::wstring psPath, PixelShader* pPixelShader);
@@ -25,58 +15,34 @@ public:
 	void	SetDrawMode(DRAW_MODE mode);
 	UINT	SelectVertexList(T_BOX& box, std::vector<FNode*>& selectNodeList);
 	void	UpdateNode(FNode* pNode);
-	Object* GetPickingObject();
 	BOOL	AddObject(Object* pObj);
 	BOOL	DeleteObject(Object* pObj);
+	void	ClearObjectList(FNode* pNode);
 	void	BuildTree(FNode* pNode, MeshMap* pMap);
 	BOOL	IsSubDivide(FNode* pNode);
 	FNode*	FindNode(FNode* pNode, Object* pObj);
 	FNode*	FindCollisionNode(FNode* pNode, Object* pObj);
-	void	ClearObjectList(FNode* pNode);
 	FNode*	VisibleNode(FNode* pNode);
-	bool	GetInterSection();
-	Object*	ObjectPicking();
+	
+	HRESULT CreateAlphaTexture(DWORD dwWidth, DWORD dwHeight, BYTE* fAlphaData);
 	void	Update();
 	void	Render();
 
 public:
-	BYTE* m_fAlphaData;
-	ID3D11Texture2D* m_pMaskAlphaTexture;
-	ID3D11ShaderResourceView* m_pMaskAlphaSrv;
-	HRESULT CreateAlphaTexture(DWORD dwWidth, DWORD dwHeight, BYTE* fAlphaData);
-	void    Splatting(XMVECTOR vIntersection, std::wstring szFullPath);
-
-public:
 	friend std::ostream& operator<<(std::ostream& os, const FQuadTree* pQuadTree);
-
-	FQuadTree(Camera* pCamera, MeshMap* pMap, int iMaxDepth = 2, BYTE* fAlphaData = 0);
+	FQuadTree(MeshMap* pMap, int iMaxDepth = 2, BYTE* fAlphaData = 0);
 	~FQuadTree();
 
-public:
-	bool m_bSclupting;
-	float m_fSculptRadius = 10.0f;
-	float m_fSculptIntensity = 10.0f;
-
-	bool m_bSimplePicking;
-	float m_fObjLength = 1.0f;
-
-	bool m_bFbxPicking;
-	std::wstring m_szCurrentImage;
-
-	bool m_bObjectPicking;
-	std::wstring m_szCurrentFbx;
-
-	bool m_bSplatting;
-	float m_fSplattingRadius = 5.0f;
-	std::wstring m_szCurrentSplat;
-	std::vector<Texture*> m_ListTextureSplatting;
-
+private:
 	int m_iMaxDepth;
 	FNode* m_pRootNode;
-	FSelect m_Select;
 
 	MeshMap* m_pMap = nullptr;
 	Texture* m_pTexture;
+	std::vector<Texture*> m_ListTextureSplatting;
+	BYTE* m_fAlphaData;
+	ID3D11Texture2D* m_pMaskAlphaTexture;
+	ID3D11ShaderResourceView* m_pMaskAlphaSrv;
 	
 	Transform m_Transform;
 	ConstantBuffer* m_pConstantBuffer;
@@ -87,7 +53,6 @@ public:
 	std::wstring m_szPSPath;
 	PixelShader* m_pPixelShader;
 
-	Camera* m_pCamera = nullptr;
 	DRAW_MODE m_DrawMode = DRAW_MODE::MODE_SOLID;
 
 	std::unordered_set<Object*> m_pAllObjectList;

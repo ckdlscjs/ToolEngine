@@ -1,6 +1,7 @@
 #pragma once
 #include "stdafx.h"
 #include "CameraSystem.h"
+#include "PhysicsSystem.h"
 #include "ObjectSystem.h"
 #include "MaterialSystem.h"
 #include "FBXSystem.h"
@@ -11,16 +12,12 @@ class ToolSystemMap : public Singleton<ToolSystemMap>
 {
 public:
 	/*SetBlock*/
+	bool GetInterSection();
 	void SetWireframe(bool bWireFrame);
-	void SelectSimple(bool bPicking, float fLength);
-	void SelectSculpt(bool bPicking);
-	void SelectFbxObject(std::wstring szSelectFbx, bool bPicking);
-	void SelectObject(bool bPicking);
 	void SetSplattingTexture(Texture* pTexture);
-	void SelectSplatting(std::wstring szSelectSplat, bool bSplatting);
-	void SetSculptRadius(float fRadius);
-	void SetSculptIntensity(float fIntensity);
-	void SetSplatRadius(float fRadius);
+	void Sculpting(XMVECTOR m_vIntersection, float fSculptRadius, float fSculptIntensity);
+	void Splatting(XMVECTOR vIntersection, float fSplattingRadius, std::wstring szFullPath);
+	Object* ObjectPicking();
 
 	/*GetBlock*/
 	std::set<std::wstring>& GetListTextureSplatting();
@@ -44,8 +41,8 @@ public:
 	ToolSystemMap();
 	~ToolSystemMap();
 private:
-	Camera* m_pCamera;
-	FQuadTree* m_pQuadTree;
+	Camera* m_pCamera = nullptr;
+	FQuadTree* m_pQuadTree = nullptr;
 	std::set<std::wstring> m_ListTextureSplatting;
 	std::set<std::wstring> m_ListTexture;
 	std::set<std::wstring> m_ListFbx;

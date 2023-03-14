@@ -232,9 +232,6 @@
     <ClInclude Include="RasterizerState.h">
       <Filter>EngineSystem\RenderySystem\RasterizerState</Filter>
     </ClInclude>
-    <ClInclude Include="FSelect.h">
-      <Filter>ToolSystem\ToolSystemMap\MapObject</Filter>
-    </ClInclude>
     <ClInclude Include="Material.h">
       <Filter>EngineSystem\ObjectSystem\MaterialSystem</Filter>
     </ClInclude>
@@ -267,6 +264,12 @@
     </ClInclude>
     <ClInclude Include="SimpleBox.h">
       <Filter>ToolSystem\ToolSystemMap\MapObject</Filter>
+    </ClInclude>
+    <ClInclude Include="PhysicsSystem.h">
+      <Filter>PhysicsSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="FSelect.h">
+      <Filter>PhysicsSystem</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -379,9 +382,6 @@
     <ClCompile Include="RasterizerState.cpp">
       <Filter>EngineSystem\RenderySystem\RasterizerState</Filter>
     </ClCompile>
-    <ClCompile Include="FSelect.cpp">
-      <Filter>ToolSystem\ToolSystemMap\MapObject</Filter>
-    </ClCompile>
     <ClCompile Include="Material.cpp">
       <Filter>EngineSystem\ObjectSystem\MaterialSystem</Filter>
     </ClCompile>
@@ -414,6 +414,12 @@
     </ClCompile>
     <ClCompile Include="SimpleBox.cpp">
       <Filter>ToolSystem\ToolSystemMap\MapObject</Filter>
+    </ClCompile>
+    <ClCompile Include="PhysicsSystem.cpp">
+      <Filter>PhysicsSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="FSelect.cpp">
+      <Filter>PhysicsSystem</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -1,64 +1,179 @@
 #include "ToolSystemMap.h"
-#include "SimpleBox.h"
+
 
 void ToolSystemMap::SetWireframe(bool bWireFrame)
 {
     _EngineSystem.GetRenderSystem()->SetWireFrame(bWireFrame ? DRAW_MODE::MODE_WIRE : DRAW_MODE::MODE_SOLID);
 }
 
-void ToolSystemMap::SelectSimple(bool bPicking, float fLength)
-{
-    if(m_pQuadTree)
-        m_pQuadTree->SetPickingSimple(bPicking, fLength);
-}
-
-void ToolSystemMap::SelectSculpt(bool bPicking)
-{
-    if (m_pQuadTree)
-        m_pQuadTree->SetPickingSculpt(bPicking);
-}
-
-void ToolSystemMap::SelectFbxObject(std::wstring szSelectFbx, bool bPicking)
-{
-    if (m_pQuadTree)
-        m_pQuadTree->SetPickingFbx(szSelectFbx, bPicking);
-}
-
-
-void ToolSystemMap::SelectObject(bool bPicking)
-{
-    if (m_pQuadTree)
-        m_pQuadTree->SetPickingObject(bPicking);
-}
-
 void ToolSystemMap::SetSplattingTexture(Texture* pTexture)
 {
     if (m_pQuadTree)
-        m_pQuadTree->SetSplattingTexture(pTexture);
+        m_pQuadTree->m_ListTextureSplatting.push_back(pTexture);
 }
 
-void ToolSystemMap::SelectSplatting(std::wstring szSelectSplat, bool bSplatting)
+void ToolSystemMap::Sculpting(XMVECTOR vIntersection, float fSculptRadius, float fSculptIntensity)
 {
-    if (m_pQuadTree)
-        m_pQuadTree->SetSplatting(szSelectSplat, bSplatting);
+    MeshMap* pMap = m_pQuadTree->m_pMap;
+    std::vector<FNode*> nodelist;
+    T_BOX box;
+    XMFLOAT3 vMin, vMax;
+    XMFLOAT3 vRange(10, 10, 10);
+    XMStoreFloat3(&vMax, vIntersection + XMLoadFloat3(&vRange));
+    XMStoreFloat3(&vMin, vIntersection - XMLoadFloat3(&vRange));
+    box.Set(vMax, vMin);
+    if (m_pQuadTree->SelectVertexList(box, nodelist) > 0)
+    {
+        int iVertex = nodelist[0]->m_IndexList[0];
+        int iVertexSize = nodelist[nodelist.size() - 1]->m_IndexList[nodelist[nodelist.size() - 1]->m_IndexList.size() - 1];
+        for (iVertex; iVertex < iVertexSize; iVertex++)
+        {
+            XMFLOAT3 v0 = pMap->GetListVertex()[iVertex].pos;
+            XMVECTOR v = XMLoadFloat3(&v0) - vIntersection;
+            float fDistance = XMVectorGetX(XMVector3Length(v));
+            if (fDistance <= fSculptRadius)
+            {
+                float fValue = (fDistance / fSculptRadius) * 90.0f;
+                float fdot = cosf(_DegreeToRadian(fValue));
+                pMap->GetListVertex()[iVertex].pos.y += fdot * fSculptIntensity;
+            }
+        }
+
+        for (const auto& node : nodelist)
+        {
+            for (const auto& object : node->m_pDynamicObjectList)
+            {
+                XMFLOAT3 pos;
+                XMStoreFloat3(&pos, object->GetPosition());
+                object->SetTransform({ {pos.x, pMap->GetHeight(pos.x, pos.z), pos.z}, object->GetRotation(), object->GetScale() });
+            }
+        }
+
+        m_pQuadTree->UpdateNode(m_pQuadTree->m_pRootNode);
+        pMap->GenerateVertexNormal();
+        _EngineSystem.GetRenderSystem()->UpdateVertexBuffer(pMap->m_pVertexBuffer, &pMap->GetListVertex()[0]);
+    }
 }
 
-void ToolSystemMap::SetSculptRadius(float fRadius)
+void ToolSystemMap::Splatting(XMVECTOR vIntersection, float fSplattingRadius, std::wstring szFullPath)
 {
-    if (m_pQuadTree)
-        m_pQuadTree->SetSculptRadius(fRadius);
+    MeshMap* pMap = m_pQuadTree->m_pMap;
+    UINT const DataSize = sizeof(BYTE) * 4;
+    UINT const RowPitch = DataSize * pMap->m_dwNumRows;
+    UINT const DepthPitch = 0;
+
+    // pick data    ->  texture data
+    // 0 ~ 64      ->   0 ~ 1
+    // - 32 ~ +32  ->   0 ~ 1024 -> 0 ~ 1
+    float fCellDistance = m_pQuadTree->m_pMap->m_fCellDistance;
+    XMFLOAT2 vTexIndex;
+    XMFLOAT2 vUV;
+    XMFLOAT2 vMaxSize = { (float)(pMap->m_dwNumRows / 2), (float)(pMap->m_dwNumColumns / 2) };
+    XMFLOAT3 vTexPos;
+    XMFLOAT3 vPickPos;
+    XMStoreFloat3(&vPickPos, vIntersection);
+
+    for (UINT y = 0; y < pMap->m_dwNumColumns; y++)
+    {
+        vTexIndex.y = y;
+        for (UINT x = 0; x < pMap->m_dwNumRows; x++)
+        {
+            vTexIndex.x = x;
+            // tex uv 0 ~ 1 to -1 ~ 1
+            vUV = XMFLOAT2((vTexIndex.x / (float)pMap->m_dwNumRows) * 2.0f - 1.0f,
+                -(vTexIndex.y / (float)pMap->m_dwNumColumns * 2.0f - 1.0f));
+            // 맵사이즈크기만큼
+            vTexPos = XMFLOAT3(vUV.x * vMaxSize.x * fCellDistance, pMap->m_ListVertex[pMap->m_dwNumRows * y + x].pos.y, vUV.y * vMaxSize.y * fCellDistance);  //x and z
+            BYTE* pixel = &m_pQuadTree->m_fAlphaData[pMap->m_dwNumRows * y * 4 + x * 4];
+            XMFLOAT3 radius = vPickPos - vTexPos;
+            float fRadius = XMVectorGetX(XMVector3Length(XMLoadFloat3(&radius)));
+
+            if (fRadius < fSplattingRadius)
+            {
+                float fDot = 1.0f - (fRadius / fSplattingRadius); //지점부터 범위까지, splattingRadius가 기준, 멀어질수록 fdot의값이 작아져 연해진다
+                for (int idx = 0; idx < m_pQuadTree->m_ListTextureSplatting.size(); idx++)
+                    if (szFullPath == m_pQuadTree->m_ListTextureSplatting[idx]->GetTextureName() && (fDot * 255) > pixel[idx])
+                        pixel[idx] = fDot * 255;//rgba -> this size rimited under 4
+            }
+        }
+    }
+    g_pDeviceContext->UpdateSubresource(m_pQuadTree->m_pMaskAlphaTexture, 0, nullptr, m_pQuadTree->m_fAlphaData, RowPitch, DepthPitch);
 }
 
-void ToolSystemMap::SetSculptIntensity(float fIntensity)
+bool ToolSystemMap::GetInterSection()
 {
-    if (m_pQuadTree)
-        m_pQuadTree->SetSculptIntensity(fIntensity);
+    std::map<float, XMVECTOR> chkDist;
+    for (const auto& node : m_pQuadTree->m_pDrawLeafNodeList)
+    {
+        UINT index = 0;
+        UINT iNumFace = node->m_IndexList.size() / 3;
+        for (UINT face = 0; face < iNumFace; face++)
+        {
+            UINT i0 = node->m_IndexList[index + 0];
+            UINT i1 = node->m_IndexList[index + 1];
+            UINT i2 = node->m_IndexList[index + 2];
+            XMFLOAT3 v0 = m_pQuadTree->m_pMap->GetListVertex()[i0].pos;
+            XMFLOAT3 v1 = m_pQuadTree->m_pMap->GetListVertex()[i1].pos;
+            XMFLOAT3 v2 = m_pQuadTree->m_pMap->GetListVertex()[i2].pos;
+            float fDist;
+            if (_PhysicsSystem.GetSelect().ChkPick(XMLoadFloat3(&v0), XMLoadFloat3(&v1), XMLoadFloat3(&v2), fDist))
+                //if(DirectX::TriangleTests::Intersects(m_Select.m_Ray.vOrigin, m_Select.m_Ray.vDirection, XMLoadFloat3(&v0), XMLoadFloat3(&v1), XMLoadFloat3(&v2), fDist))
+            {
+                //m_Select.m_vIntersection = m_Select.m_Ray.vOrigin + m_Select.m_Ray.vDirection * fDist;
+                chkDist.insert(std::make_pair(fDist, _PhysicsSystem.GetSelect().m_vIntersection));
+                /*return true;*/
+            }
+            index += 3;
+        }
+    }
+    if (!chkDist.size())
+        return false;
+
+    float maxFloat = 99999999.9f;
+    for (const auto& vec : chkDist)
+    {
+        if (vec.first < maxFloat)
+        {
+            maxFloat = vec.first;
+            _PhysicsSystem.GetSelect().m_vIntersection = vec.second;
+        }
+    }
+    return true;
 }
 
-void ToolSystemMap::SetSplatRadius(float fRadius)
+Object* ToolSystemMap::ObjectPicking()
 {
-    if (m_pQuadTree)
-        m_pQuadTree->SetSplatRadius(fRadius);
+    //교점체크
+    for (const auto& node : m_pQuadTree->m_pDrawLeafNodeList)
+    {
+        for (const auto& object : node->m_pDynamicObjectList)
+        {
+            for (const auto& meshnode : object->m_pMesh->GetMeshNodeList())
+            {
+                UINT index = 0;
+                UINT iNumFace = meshnode->GetListIndex().size() / 3;
+                for (UINT face = 0; face < iNumFace; face++)
+                {
+                    UINT i0 = meshnode->GetListIndex()[index + 0];
+                    UINT i1 = meshnode->GetListIndex()[index + 1];
+                    UINT i2 = meshnode->GetListIndex()[index + 2];
+                    XMFLOAT3 v0 = meshnode->GetListVertex()[i0].pos;
+                    XMFLOAT3 v1 = meshnode->GetListVertex()[i1].pos;
+                    XMFLOAT3 v2 = meshnode->GetListVertex()[i2].pos;
+                    XMVECTOR v_0 = XMVector3TransformCoord(XMLoadFloat3(&v0), object->m_ConstantData.matWorld);
+                    XMVECTOR v_1 = XMVector3TransformCoord(XMLoadFloat3(&v1), object->m_ConstantData.matWorld);
+                    XMVECTOR v_2 = XMVector3TransformCoord(XMLoadFloat3(&v2), object->m_ConstantData.matWorld);
+                    float fDist;
+                    if (_PhysicsSystem.GetSelect().ChkPick(v_0, v_1, v_2, fDist))
+                    {
+                        return object;
+                    }
+                    index += 3;
+                }
+            }
+        }
+    }
+    return nullptr;
 }
 
 std::set<std::wstring>& ToolSystemMap::GetListTextureSplatting()
@@ -88,6 +203,8 @@ FQuadTree* ToolSystemMap::GetCurrentQuadTree()
 
 Object* ToolSystemMap::CreateFbxObject(std::wstring szFullPath, XMVECTOR vPos, XMVECTOR vRot, XMVECTOR vScale)
 {
+    if (szFullPath.empty())
+        return nullptr;
     CBufferData cc;
     cc.matWorld = XMMatrixIdentity();
     cc.matView = m_pCamera->m_matCamera;
@@ -163,6 +280,7 @@ Object* ToolSystemMap::CreateFbxObject(std::wstring szFullPath, XMVECTOR vPos, X
     return pObject;
 }
 
+#include "SimpleBox.h"
 Object* ToolSystemMap::CreateSimpleBox(float fLength, XMVECTOR vPos, XMVECTOR vRot, XMVECTOR vScale)
 {
     SimpleBox* pObject = new SimpleBox(L"SimpleObjectBox");
@@ -253,6 +371,8 @@ Object* ToolSystemMap::CreateSimpleBox(float fLength, XMVECTOR vPos, XMVECTOR vR
 
 FQuadTree* ToolSystemMap::CreateSimpleMap(int iWidth, int iHeight, float fDistance, std::wstring szFullPath)
 {
+    if (szFullPath.empty())
+        return nullptr;
     CBufferData_Map cc;
     cc.matWorld = XMMatrixIdentity();
     cc.matView = m_pCamera->m_matCamera;
@@ -280,7 +400,7 @@ FQuadTree* ToolSystemMap::CreateSimpleMap(int iWidth, int iHeight, float fDistan
     pMapMesh->m_pVertexBuffer = pVertexBuffer;
     pMapMesh->m_pIndexBuffer = pIndexBuffer;
    
-    m_pQuadTree = new FQuadTree(m_pCamera, pMapMesh);
+    m_pQuadTree = new FQuadTree(pMapMesh);
     m_pQuadTree->SetConstantData(cc);
     m_pQuadTree->SetTransform({ {0, 0, 0} , {0, 0, 0}, {1, 1, 1} });
     m_pQuadTree->SetTexture(_EngineSystem.GetTextureSystem()->GetTexture(szFullPath));
@@ -451,12 +571,12 @@ void ToolSystemMap::OpenFile(std::wstring szFullPath)
     pMapMesh->m_pVertexBuffer = pVertexBuffer;
     pMapMesh->m_pIndexBuffer = pIndexBuffer;
 
-    m_pQuadTree = new FQuadTree(m_pCamera, pMapMesh, iMaxDepth, fAlphaData);
+    m_pQuadTree = new FQuadTree(pMapMesh, iMaxDepth, fAlphaData);
     m_pQuadTree->SetConstantData(cc);
     m_pQuadTree->SetTransform({ mapTransform.position, mapTransform.rotation, mapTransform.scale });
     m_pQuadTree->SetTexture(pTexture);
     for (const auto& texture : m_ListTextureSplatting)
-        m_pQuadTree->SetSplattingTexture(_EngineSystem.GetTextureSystem()->GetTexture(texture));
+        m_pQuadTree->m_ListTextureSplatting.push_back(_EngineSystem.GetTextureSystem()->GetTexture(texture));
     m_pQuadTree->SetShader(szVSPath, pVertexShader, szPSPath, pPixelShader);
     m_pQuadTree->SetDrawMode(DRAW_MODE::MODE_SOLID);
 

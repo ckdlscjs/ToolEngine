@@ -23,19 +23,31 @@ void ImguiSystem::Update()
     static std::wstring szCurrentSplat;
     static std::wstring szCurrentImage;
     static std::wstring szCurrentFbx;
+
     static bool bMouseMove = true;
     static int iMapSize = 4;
     static float fMapDistance = 1.0f;
+
     static bool bWireFrame = false;
-    static bool bFbxObj = false;
+
     static bool bSimpleObj = false;
     static float fSimpleObjLength = 1.0f;
-    static bool bOjbectPicking = false;
+
+    static bool bFbxObj = false;
+
     static bool bSculpt = false;
+
     static bool bSplatting = false;
     static float fSculptRadius = 10.0f;
-    static float fSculptIntensity = 10.0f;
+    static float fSculptIntensity = 0.1f;
     static float fSplatRadius = 5.0f;
+
+    static bool bOjbectPicking = false;
+    std::string objectname;
+    static float scale[3] = { 0.0f, 0.0f, 0.0f };
+    static float rotation[3] = { 0.0f, 0.0f, 0.0f };
+    static float position[3] = { 0.0f, 0.0f, 0.0f };
+    static Object* pObject;
 
     ImGui::Begin("Demo");
     {
@@ -43,63 +55,80 @@ void ImguiSystem::Update()
             bMouseMove = (bFbxObj | bSimpleObj | bOjbectPicking | bSculpt | bSplatting) != true ? true : false;
             _ToolSystemMap.GetCurrentCamera()->SetCameraMove(bMouseMove);
             //WireFrame
-            if (ImGui::Checkbox("WireFrame", &bWireFrame))
             {
-                ~bWireFrame;
-                _ToolSystemMap.SetWireframe(bWireFrame);
+                if (ImGui::Checkbox("WireFrame", &bWireFrame))
+                    ~bWireFrame;
             }
+            
             //SimpleObjPicking
-            if (ImGui::Checkbox("CreateSimpleObj", &bSimpleObj))
             {
-                ~bSimpleObj;
-                _ToolSystemMap.SelectSimple(bSimpleObj, fSimpleObjLength);
+                if (ImGui::Checkbox("CreateSimpleObj", &bSimpleObj))
+                    ~bSimpleObj;
+
+                if (bSimpleObj && _ToolSystemMap.GetCurrentQuadTree() != nullptr)
+                {
+                    ImGui::InputFloat("length", &fSimpleObjLength);
+                    if ((_InputSystem.GetKey(VK_RBUTTON) == KEY_STATE::KEY_DOWN) && _ToolSystemMap.GetInterSection())
+                        _ToolSystemMap.CreateSimpleBox(fSimpleObjLength, _PhysicsSystem.GetSelect().m_vIntersection);
+                }
             }
-            if (bSimpleObj)
+            
+            //FbxObjPicking
             {
-                if(ImGui::InputFloat("length", &fSimpleObjLength))
-                    _ToolSystemMap.SelectSimple(bSimpleObj, fSimpleObjLength);
+                if (ImGui::Checkbox("CreateFbxObj", &bFbxObj))
+                    ~bFbxObj;
+
+                if (bFbxObj && _ToolSystemMap.GetCurrentQuadTree() != nullptr)
+                {
+                    if ((_InputSystem.GetKey(VK_RBUTTON) == KEY_STATE::KEY_DOWN) && _ToolSystemMap.GetInterSection())
+                    {
+                        _ToolSystemMap.CreateFbxObject(szCurrentFbx, _PhysicsSystem.GetSelect().m_vIntersection);
+                    }
+                }
+            }
+            
+            //OjbectPicking
+            {
+                if (ImGui::Checkbox("OjbectPicking", &bOjbectPicking))
+                    ~bOjbectPicking;
+                if (bOjbectPicking && _ToolSystemMap.GetCurrentQuadTree() != nullptr)
+                {
+                    if (_InputSystem.GetKey(VK_RBUTTON) == KEY_STATE::KEY_DOWN)
+                        pObject = _ToolSystemMap.ObjectPicking();
+                }
+            }
+            
+            //SculptPicking
+            {
+                if (ImGui::Checkbox("SculptPicking", &bSculpt))
+                    ~bSculpt;
+
+                if (bSculpt && _ToolSystemMap.GetCurrentQuadTree() != nullptr)
+                {
+                    ImGui::InputFloat("SculptRadius", &fSculptRadius);
+                    ImGui::InputFloat("Intensity", &fSculptIntensity);
+                    if (_InputSystem.GetKey(VK_RBUTTON) && _ToolSystemMap.GetInterSection())
+                    {
+                        _ToolSystemMap.Sculpting(_PhysicsSystem.GetSelect().m_vIntersection, fSculptRadius, fSculptIntensity);
+                    }
+                }
             }
            
-            //FbxObjPicking
-            if (ImGui::Checkbox("CreateFbxObj", &bFbxObj))
-            {
-                ~bFbxObj;
-                _ToolSystemMap.SelectFbxObject(szCurrentFbx, bFbxObj);
-            }
-
-            //OjbectPicking
-            if (ImGui::Checkbox("OjbectPicking", &bOjbectPicking))
-            {
-                ~bOjbectPicking;
-                _ToolSystemMap.SelectObject(bOjbectPicking);
-            }
-
-            //SculptPicking
-            if (ImGui::Checkbox("SculptPicking", &bSculpt))
-            {
-                ~bSculpt;
-                _ToolSystemMap.SelectSculpt(bSculpt);
-            }
-            if (bSculpt)
-            {
-                if (ImGui::InputFloat("SculptRadius", &fSculptRadius))
-                    _ToolSystemMap.SetSculptRadius(fSculptRadius);
-
-                if (ImGui::InputFloat("Intensity", &fSculptIntensity))
-                    _ToolSystemMap.SetSculptIntensity(fSculptIntensity);
-            }
-
             //Splatting
-            if (ImGui::Checkbox("Splatting", &bSplatting))
             {
-                ~bSplatting;
-                _ToolSystemMap.SelectSplatting(szCurrentSplat, bSplatting);
+                if (ImGui::Checkbox("Splatting", &bSplatting))
+                    ~bSplatting;
+
+                if (bSplatting && _ToolSystemMap.GetCurrentQuadTree() != nullptr)
+                {
+                    ImGui::InputFloat("SplatRadius", &fSplatRadius);
+                    if (_InputSystem.GetKey(VK_RBUTTON) && _ToolSystemMap.GetInterSection())
+                    {
+                        _ToolSystemMap.Splatting(_PhysicsSystem.GetSelect().m_vIntersection, fSplatRadius ,szCurrentSplat);
+                    }
+                }
             }
-            if (bSplatting)
-            {
-                if (ImGui::InputFloat("SplatRadius", &fSplatRadius))
-                    _ToolSystemMap.SetSplatRadius(fSplatRadius);
-            }
+            
             ImGui::Dummy({ 0, 10 });
 
             if (ImGui::Button("Open SplatImage"))
@@ -114,7 +143,6 @@ void ImguiSystem::Update()
                     if (ImGui::Selectable(_towm(content).c_str(), is_selected))
                     {
                         szCurrentSplat = fullpath;
-                        _ToolSystemMap.SelectSplatting(szCurrentSplat, bSplatting);
                     }
 
                     // Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
@@ -146,10 +174,6 @@ void ImguiSystem::Update()
         
         if (ImGui::Button("Open ImgFile"))
             ifd::FileDialog::Instance().Open("ImageOpenDialog", "Open a Image", "Image file (*.png;*.jpg;*.jpeg;*.bmp;*.tga){.png,.jpg,.jpeg,.bmp,.tga},.*", true);
-        /*if (ImGui::Button("Open directory"))
-            ifd::FileDialog::Instance().Open("DirectoryOpenDialog", "Open a directory", "");
-        if (ImGui::Button("Save file"))
-            ifd::FileDialog::Instance().Save("ShaderSaveDialog", "Save a shader", "*.sprj {.sprj}");*/
 
         if (ImGui::BeginListBox("listboxImage"))
         {
@@ -242,8 +266,10 @@ void ImguiSystem::Update()
 
     }
     ImGui::Dummy({ 0, 10 });
+
     if (ImGui::Button("Open Fbxfile"))
         ifd::FileDialog::Instance().Open("FbxOpenDialog", "Open a Fbx", "Fbx file (*.fbx;*.FBX){.fbx,.FBX},.*", true);
+
     if (ImGui::BeginListBox("listboxFbx"))
     {
         for (const auto& fbx : _ToolSystemMap.GetListFbx())
@@ -266,11 +292,7 @@ void ImguiSystem::Update()
     }
     ImGui::End();
 
-    std::string objectname;
-    static float scale[3] = { 0.0f, 0.0f, 0.0f };
-    static float rotation[3] = { 0.0f, 0.0f, 0.0f };
-    static float position[3] = { 0.0f, 0.0f, 0.0f };
-    static Object* pObject;
+    
     // Simple window
     ImGui::Begin("Control Panel2");
     {
@@ -290,26 +312,22 @@ void ImguiSystem::Update()
 
             if (_ToolSystemMap.GetCurrentQuadTree() != nullptr)
             {
-                if (bOjbectPicking && _InputSystem.GetKey(VK_RBUTTON) == KEY_STATE::KEY_DOWN)
+                if (pObject)
                 {
-                    if (pObject = _ToolSystemMap.GetCurrentQuadTree()->GetPickingObject())
-                    {
-                        XMVECTOR v_scale, v_rotation, v_translation;
-                        v_scale = pObject->GetScale();
-                        v_rotation = pObject->GetRotation();
-                        v_translation = pObject->GetPosition();
-                        scale[0] = v_scale.m128_f32[0]; scale[1] = v_scale.m128_f32[1]; scale[2] = v_scale.m128_f32[2];
-                        rotation[0] = v_rotation.m128_f32[0]; rotation[1] = v_rotation.m128_f32[1]; rotation[2] = v_rotation.m128_f32[2];
-                        position[0] = v_translation.m128_f32[0]; position[1] = v_translation.m128_f32[1]; position[2] = v_translation.m128_f32[2];
-                    }
-                    else
-                    {
-                        pObject = nullptr;
-                        scale[0] = 0; scale[1] = 0; scale[2] = 0;
-                        rotation[0] = 0; rotation[1] = 0; rotation[2] = 0;
-                        position[0] = 0; position[1] = 0; position[2] = 0;
-                    }
-                }  
+                    XMVECTOR v_scale, v_rotation, v_translation;
+                    v_scale = pObject->GetScale();
+                    v_rotation = pObject->GetRotation();
+                    v_translation = pObject->GetPosition();
+                    scale[0] = v_scale.m128_f32[0]; scale[1] = v_scale.m128_f32[1]; scale[2] = v_scale.m128_f32[2];
+                    rotation[0] = v_rotation.m128_f32[0]; rotation[1] = v_rotation.m128_f32[1]; rotation[2] = v_rotation.m128_f32[2];
+                    position[0] = v_translation.m128_f32[0]; position[1] = v_translation.m128_f32[1]; position[2] = v_translation.m128_f32[2];
+                }
+                else
+                {
+                    scale[0] = 0; scale[1] = 0; scale[2] = 0;
+                    rotation[0] = 0; rotation[1] = 0; rotation[2] = 0;
+                    position[0] = 0; position[1] = 0; position[2] = 0;
+                }
             }
             if (ImGui::Button("Object") && pObject != nullptr)
             {

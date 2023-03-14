@@ -7,6 +7,7 @@
 #include "ObjectSystem.h"
 #include "MaterialSystem.h"
 #include "CameraSystem.h"
+#include "PhysicsSystem.h"
 #include "ToolSystemMap.h"
 #include "FBXSystem.h"
 
@@ -31,14 +32,5 @@ public:
 	~EntrySystem();
 	
 	///*Variable Block*/
-	//VertexBuffer* m_pVertexBuffer;
-	//IndexBuffer* m_pIndexBuffer;
-	//ConstantBuffer* m_pConstantBuffer;
-	//VertexShader* m_pVertexShader;
-	//PixelShader* m_pPixelShader;
-	//
-	//Texture* m_pTexture;
-	//Camera* m_pCamera;
-	//Object* m_pObject;
 };
 
