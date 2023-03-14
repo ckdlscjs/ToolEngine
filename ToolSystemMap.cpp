@@ -15,7 +15,7 @@ void ToolSystemMap::SetSplattingTexture(Texture* pTexture)
 #include <chrono>
 void ToolSystemMap::Sculpting(XMVECTOR vIntersection, float fSculptRadius, float fSculptIntensity)
 {
-    auto start_time = std::chrono::high_resolution_clock::now();
+    /*auto start_time = std::chrono::high_resolution_clock::now();*/
 
     MeshMap* pMap = m_pQuadTree->m_pMap;
     std::vector<FNode*> nodelist;
@@ -29,19 +29,6 @@ void ToolSystemMap::Sculpting(XMVECTOR vIntersection, float fSculptRadius, float
     {
         int iVertex = nodelist[0]->m_IndexList[0];
         int iVertexSize = nodelist[nodelist.size() - 1]->m_IndexList[nodelist[nodelist.size() - 1]->m_IndexList.size() - 1];
-        int dwFaceStart = 0;
-        int dwFaceEnd = 0;
-
-        for (int dwFaceIdx = 0; dwFaceIdx < pMap->m_dwFace; dwFaceIdx++)
-        {
-            if (pMap->m_ListFaceNormal[dwFaceIdx].vertexArray[0] == iVertex)
-                dwFaceStart = dwFaceIdx;
-            if (pMap->m_ListFaceNormal[dwFaceIdx].vertexArray[2] == iVertexSize)
-            {
-                dwFaceEnd = dwFaceIdx;
-                break;
-            }
-        }
 
         for (int iVert = iVertex; iVert < iVertexSize; iVert++)
         {
@@ -56,16 +43,16 @@ void ToolSystemMap::Sculpting(XMVECTOR vIntersection, float fSculptRadius, float
             }
         }
         
-        for (dwFaceStart; dwFaceStart <= dwFaceEnd; dwFaceStart++)
-        {
+        int dwFaceStart = pMap->m_ListVertexInfo[iVertex].faceIndexArray[0];
+        int dwFaceEnd = pMap->m_ListVertexInfo[iVertexSize].faceIndexArray[0];
+        for(dwFaceStart; dwFaceStart <= dwFaceEnd; dwFaceStart++)
             pMap->m_ListFaceNormal[dwFaceStart].vNormal = pMap->ComputeFaceNormal
             (
                 pMap->m_ListFaceNormal[dwFaceStart].vertexArray[0],
                 pMap->m_ListFaceNormal[dwFaceStart].vertexArray[1],
                 pMap->m_ListFaceNormal[dwFaceStart].vertexArray[2]
             );
-        }
-      
+        
         for (int iVert = iVertex; iVert < iVertexSize; iVert++)
         {
             pMap->ComputeVertexNormal(iVert);
@@ -82,18 +69,18 @@ void ToolSystemMap::Sculpting(XMVECTOR vIntersection, float fSculptRadius, float
             m_pQuadTree->UpdateNode(node);
         }
 
-        auto end_time = std::chrono::high_resolution_clock::now();
+    /*    auto end_time = std::chrono::high_resolution_clock::now();
         auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count();
         OutputDebugStringW(L"Time1: ");
         OutputDebugStringW(std::to_wstring(duration).c_str());
-        OutputDebugStringW(L"\n");
+        OutputDebugStringW(L"\n");*/
         _EngineSystem.GetRenderSystem()->UpdateVertexBuffer(pMap->m_pVertexBuffer, &pMap->GetListVertex()[0]);
 
-        auto end_time2 = std::chrono::high_resolution_clock::now();
+   /*     auto end_time2 = std::chrono::high_resolution_clock::now();
         auto duration2 = std::chrono::duration_cast<std::chrono::milliseconds>(end_time2 - end_time).count();
         OutputDebugStringW(L"Time2: ");
         OutputDebugStringW(std::to_wstring(duration2).c_str());
-        OutputDebugStringW(L"\n");
+        OutputDebugStringW(L"\n");*/
     }
 }
 
