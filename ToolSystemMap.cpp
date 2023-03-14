@@ -29,19 +29,46 @@ void ToolSystemMap::Sculpting(XMVECTOR vIntersection, float fSculptRadius, float
     {
         int iVertex = nodelist[0]->m_IndexList[0];
         int iVertexSize = nodelist[nodelist.size() - 1]->m_IndexList[nodelist[nodelist.size() - 1]->m_IndexList.size() - 1];
-        for (iVertex; iVertex < iVertexSize; iVertex++)
+        int dwFaceStart = 0;
+        int dwFaceEnd = 0;
+
+        for (int dwFaceIdx = 0; dwFaceIdx < pMap->m_dwFace; dwFaceIdx++)
         {
-            XMFLOAT3 v0 = pMap->GetListVertex()[iVertex].pos;
+            if (pMap->m_ListFaceNormal[dwFaceIdx].vertexArray[0] == iVertex)
+                dwFaceStart = dwFaceIdx;
+            if (pMap->m_ListFaceNormal[dwFaceIdx].vertexArray[2] == iVertexSize)
+            {
+                dwFaceEnd = dwFaceIdx;
+                break;
+            }
+        }
+
+        for (int iVert = iVertex; iVert < iVertexSize; iVert++)
+        {
+            XMFLOAT3 v0 = pMap->GetListVertex()[iVert].pos;
             XMVECTOR v = XMLoadFloat3(&v0) - vIntersection;
             float fDistance = XMVectorGetX(XMVector3Length(v));
             if (fDistance <= fSculptRadius)
             {
                 float fValue = (fDistance / fSculptRadius) * 90.0f;
                 float fdot = cosf(_DegreeToRadian(fValue));
-                pMap->GetListVertex()[iVertex].pos.y += fdot * fSculptIntensity;
-                pMap->ComputeFaceNormal(i0, i1, i2)
+                pMap->GetListVertex()[iVert].pos.y += fdot * fSculptIntensity;
             }
-            
+        }
+        
+        for (dwFaceStart; dwFaceStart <= dwFaceEnd; dwFaceStart++)
+        {
+            pMap->m_ListFaceNormal[dwFaceStart].vNormal = pMap->ComputeFaceNormal
+            (
+                pMap->m_ListFaceNormal[dwFaceStart].vertexArray[0],
+                pMap->m_ListFaceNormal[dwFaceStart].vertexArray[1],
+                pMap->m_ListFaceNormal[dwFaceStart].vertexArray[2]
+            );
+        }
+      
+        for (int iVert = iVertex; iVert < iVertexSize; iVert++)
+        {
+            pMap->ComputeVertexNormal(iVert);
         }
 
         for (const auto& node : nodelist)
