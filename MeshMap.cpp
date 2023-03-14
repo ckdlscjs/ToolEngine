@@ -1,5 +1,5 @@
 #include "MeshMap.h"
-std::vector<PNCTVertex>& MeshMap::GetListVertex()
+std::vector<PTNCVertex>& MeshMap::GetListVertex()
 {
     return m_ListVertex;
 }
@@ -176,6 +176,11 @@ void MeshMap::GenerateVertexNormal()
 	}
 }
 
+void MeshMap::UpdateVertexNormal(FNode* pNode)
+{
+   
+}
+
 XMVECTOR MeshMap::ComputeFaceNormal(UINT i0, UINT i1, UINT i2)
 {
     XMVECTOR vNormal;
@@ -307,12 +312,12 @@ std::ifstream& operator>>(std::ifstream& is, MeshMap* pMap)
             }
             else if (fieldName == "m_ListVertex")
             {
-                std::vector<PNCTVertex> vertices;
+                std::vector<PTNCVertex> vertices;
                 std::string vertexLine;
                 while (std::getline(is, vertexLine) && vertexLine != "") {
                     if (vertexLine.find("m_pAllObjectList:") != std::string::npos)
                         break;
-                    PNCTVertex vertex;
+                    PTNCVertex vertex;
                     std::istringstream vertexIss(vertexLine);
                     vertexIss >> vertex;
                     vertices.push_back(vertex);

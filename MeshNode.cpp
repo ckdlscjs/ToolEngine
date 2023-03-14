@@ -1,6 +1,6 @@
 #include "MeshNode.h"
 
-std::vector<PNCTVertex>& MeshNode::GetListVertex()
+std::vector<PTNCVertex>& MeshNode::GetListVertex()
 {
 	return m_ListVertex;
 }
@@ -29,7 +29,7 @@ void MeshNode::SetVertexList(void* vertices, int iSize)
 {
 	for (int i = 0; i < iSize; i++)
 	{
-		m_ListVertex.push_back(*((PNCTVertex*)vertices + i));
+		m_ListVertex.push_back(*((PTNCVertex*)vertices + i));
 	}
 }
 

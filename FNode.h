@@ -22,6 +22,7 @@ public:
 	void		CreateChildNode(FNode* pParent, MeshMap* pMap);
 	void		CreateIndexData(MeshMap* pMap);
 	HRESULT		CreateIndexBuffer(MeshMap* pMap);
+	//void		Render();
 public:
 	FNode(FNode* pParent, MeshMap* pMap, DWORD dwLT, DWORD dwRT, DWORD dwLB, DWORD dwRB);
 	virtual ~FNode();

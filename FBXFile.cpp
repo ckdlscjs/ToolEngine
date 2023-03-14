@@ -168,7 +168,7 @@ void FBXFile::ParseMesh(FBXNode* pNode, int nodeIdx)
 			{
 				int vertexID = iCornerIndex[idxVertFace];
 				FbxVector4 vOrigin = pControlPositions[vertexID];
-				PNCTVertex pnctVertex;
+				PTNCVertex pnctVertex;
 				IW iwVertex;
 				FbxVector4 vConvert = geom.MultT(vOrigin);
 

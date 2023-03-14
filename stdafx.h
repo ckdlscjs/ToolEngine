@@ -335,13 +335,13 @@ struct Transform
 	}
 };
 
-struct PNCTVertex
+struct PTNCVertex
 {
 	XMFLOAT3 pos;
 	XMFLOAT2 tex;
 	XMFLOAT3 normal;
 	XMFLOAT4 color;
-	friend std::ostream& operator<<(std::ostream& os, const PNCTVertex& pnctVertex)
+	friend std::ostream& operator<<(std::ostream& os, const PTNCVertex& pnctVertex)
 	{
 		os << "position:" << pnctVertex.pos.x << " " << pnctVertex.pos.y << " " << pnctVertex.pos.z << ", ";
 		os << "texcoord:" << pnctVertex.tex.x << " " << pnctVertex.tex.y << ", ";
@@ -350,7 +350,7 @@ struct PNCTVertex
 		return os;
 	}
 
-	friend std::istringstream& operator>>(std::istringstream& is, PNCTVertex& pnctVertex)
+	friend std::istringstream& operator>>(std::istringstream& is, PTNCVertex& pnctVertex)
 	{
 		// "pos: x y z, tex: x y, normal: x y z, color: r g b a"와 같은 형태의 문자열에서 필드 값을 추출합니다.
 		std::string line;

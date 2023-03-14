@@ -10,8 +10,8 @@ int main()
 {
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 	//_CrtSetBreakAlloc(519339);
-	fbxsample::FBXSample a;
-	a.sample();
+	/*fbxsample::FBXSample a;
+	a.sample();*/
 	EntrySystem entrypoint;
 	entrypoint.Initialize();
 	while (entrypoint.IsRun())

@@ -5,7 +5,7 @@
 class MeshNode
 {
 public:
-	std::vector<PNCTVertex>& GetListVertex();
+	std::vector<PTNCVertex>& GetListVertex();
 	std::vector<unsigned int>& GetListIndex();
 	VertexBuffer* GetVertexBuffer();
 	IndexBuffer* GetIndexBuffer();
@@ -21,7 +21,7 @@ public:
 	MeshNode(void* vertices, int iSizeVertices, VertexBuffer* pVertexBuffer, void* indices, int iSizeIndices, IndexBuffer* pIndexBuffer);
 	~MeshNode();
 private:
-	std::vector<PNCTVertex> m_ListVertex;
+	std::vector<PTNCVertex> m_ListVertex;
 	VertexBuffer* m_pVertexBuffer;
 	std::vector<unsigned int> m_ListIndex;
 	//Texture* m_pTexture;

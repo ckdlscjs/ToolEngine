@@ -274,11 +274,37 @@ FQuadTree::~FQuadTree()
 
 void FQuadTree::UpdateNode(FNode* pNode)
 {
-    pNode->CreateIndexData(m_pMap);
-    if (pNode->m_bLeaf)
-        return;
-    for (int iChild = 0; iChild < 4; iChild++)
-        UpdateNode(pNode->m_pChild[iChild]);
+    DWORD dwLT = pNode->m_dwCorner[0];
+    DWORD dwRT = pNode->m_dwCorner[1];
+    DWORD dwLB = pNode->m_dwCorner[2];
+    DWORD dwRB = pNode->m_dwCorner[3];
+    DWORD dwNumRowCell = (dwLB - dwLT) / m_pMap->m_dwNumColumns;
+    DWORD dwNumColCell = dwRT - dwLT;
+    DWORD dwNumCells = dwNumRowCell * dwNumColCell;
+    int iIndex = 0;
+
+    pNode->m_Box.vMin.y = 100000.0f;
+    pNode->m_Box.vMax.y = -100000.0f;
+
+    for (int dwRow = 0; dwRow < dwNumRowCell; dwRow++)
+    {
+        for (int dwCol = 0; dwCol < dwNumColCell; dwCol++)
+        {
+            for (DWORD dwVertex = 0; dwVertex < 6; dwVertex++)
+            {
+                if (pNode->m_Box.vMin.y > m_pMap->GetListVertex()[pNode->m_IndexList[iIndex + dwVertex]].pos.y)
+                {
+                    pNode->m_Box.vMin.y = m_pMap->GetListVertex()[pNode->m_IndexList[iIndex + dwVertex]].pos.y;
+                }
+                if (pNode->m_Box.vMax.y < m_pMap->GetListVertex()[pNode->m_IndexList[iIndex + dwVertex]].pos.y)
+                {
+                    pNode->m_Box.vMax.y = m_pMap->GetListVertex()[pNode->m_IndexList[iIndex + dwVertex]].pos.y;
+                }
+            }
+            iIndex += 6;
+        }
+    }
+    pNode->m_Box.Set(pNode->m_Box.vMax, pNode->m_Box.vMin);
 }
 
 UINT FQuadTree::SelectVertexList(T_BOX& box, std::vector<FNode*>& selectNodeList)

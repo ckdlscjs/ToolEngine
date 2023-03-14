@@ -1,5 +1,5 @@
 #include "ToolSystemMap.h"
-
+#include <DirectXMath.h>
 
 void ToolSystemMap::SetWireframe(bool bWireFrame)
 {
@@ -12,8 +12,11 @@ void ToolSystemMap::SetSplattingTexture(Texture* pTexture)
         m_pQuadTree->m_ListTextureSplatting.push_back(pTexture);
 }
 
+#include <chrono>
 void ToolSystemMap::Sculpting(XMVECTOR vIntersection, float fSculptRadius, float fSculptIntensity)
 {
+    auto start_time = std::chrono::high_resolution_clock::now();
+
     MeshMap* pMap = m_pQuadTree->m_pMap;
     std::vector<FNode*> nodelist;
     T_BOX box;
@@ -47,11 +50,22 @@ void ToolSystemMap::Sculpting(XMVECTOR vIntersection, float fSculptRadius, float
                 XMStoreFloat3(&pos, object->GetPosition());
                 object->SetTransform({ {pos.x, pMap->GetHeight(pos.x, pos.z), pos.z}, object->GetRotation(), object->GetScale() });
             }
+            m_pQuadTree->UpdateNode(node);
         }
 
-        m_pQuadTree->UpdateNode(m_pQuadTree->m_pRootNode);
+        auto end_time = std::chrono::high_resolution_clock::now();
+        auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count();
+        OutputDebugStringW(L"Time1: ");
+        OutputDebugStringW(std::to_wstring(duration).c_str());
+        OutputDebugStringW(L"\n");
         pMap->GenerateVertexNormal();
         _EngineSystem.GetRenderSystem()->UpdateVertexBuffer(pMap->m_pVertexBuffer, &pMap->GetListVertex()[0]);
+
+        auto end_time2 = std::chrono::high_resolution_clock::now();
+        auto duration2 = std::chrono::duration_cast<std::chrono::milliseconds>(end_time2 - end_time).count();
+        OutputDebugStringW(L"Time2: ");
+        OutputDebugStringW(std::to_wstring(duration2).c_str());
+        OutputDebugStringW(L"\n");
     }
 }
 
@@ -100,30 +114,71 @@ void ToolSystemMap::Splatting(XMVECTOR vIntersection, float fSplattingRadius, st
     g_pDeviceContext->UpdateSubresource(m_pQuadTree->m_pMaskAlphaTexture, 0, nullptr, m_pQuadTree->m_fAlphaData, RowPitch, DepthPitch);
 }
 
+bool IntersectRayBox(const XMVECTOR& rayOrigin, const XMVECTOR& rayDirection, const T_BOX& box)
+{
+    XMFLOAT3 vMin = box.vMin;
+    XMFLOAT3 vMax = box.vMax;
+
+    float tMin = (vMin.x - XMVectorGetX(rayOrigin)) / XMVectorGetX(rayDirection);
+    float tMax = (vMax.x - XMVectorGetX(rayOrigin)) / XMVectorGetX(rayDirection);
+
+    if (tMin > tMax) std::swap(tMin, tMax);
+
+    float tyMin = (vMin.y - XMVectorGetY(rayOrigin)) / XMVectorGetY(rayDirection);
+    float tyMax = (vMax.y - XMVectorGetY(rayOrigin)) / XMVectorGetY(rayDirection);
+
+    if (tyMin > tyMax) std::swap(tyMin, tyMax);
+
+    if ((tMin > tyMax) || (tyMin > tMax))
+        return false;
+
+    if (tyMin > tMin)
+        tMin = tyMin;
+
+    if (tyMax < tMax)
+        tMax = tyMax;
+
+    float tzMin = (vMin.z - XMVectorGetZ(rayOrigin)) / XMVectorGetZ(rayDirection);
+    float tzMax = (vMax.z - XMVectorGetZ(rayOrigin)) / XMVectorGetZ(rayDirection);
+
+    if (tzMin > tzMax) std::swap(tzMin, tzMax);
+
+    if ((tMin > tzMax) || (tzMin > tMax))
+        return false;
+
+    if (tzMin > tMin)
+        tMin = tzMin;
+
+   /* distance = tMin;*/
+
+    return true;
+}
+
 bool ToolSystemMap::GetInterSection()
 {
     std::map<float, XMVECTOR> chkDist;
     for (const auto& node : m_pQuadTree->m_pDrawLeafNodeList)
     {
-        UINT index = 0;
-        UINT iNumFace = node->m_IndexList.size() / 3;
-        for (UINT face = 0; face < iNumFace; face++)
+        float tmin, tmax;
+        if (IntersectRayBox(_PhysicsSystem.GetSelect().m_Ray.vOrigin, _PhysicsSystem.GetSelect().m_Ray.vDirection, node->m_Box))
         {
-            UINT i0 = node->m_IndexList[index + 0];
-            UINT i1 = node->m_IndexList[index + 1];
-            UINT i2 = node->m_IndexList[index + 2];
-            XMFLOAT3 v0 = m_pQuadTree->m_pMap->GetListVertex()[i0].pos;
-            XMFLOAT3 v1 = m_pQuadTree->m_pMap->GetListVertex()[i1].pos;
-            XMFLOAT3 v2 = m_pQuadTree->m_pMap->GetListVertex()[i2].pos;
-            float fDist;
-            if (_PhysicsSystem.GetSelect().ChkPick(XMLoadFloat3(&v0), XMLoadFloat3(&v1), XMLoadFloat3(&v2), fDist))
-                //if(DirectX::TriangleTests::Intersects(m_Select.m_Ray.vOrigin, m_Select.m_Ray.vDirection, XMLoadFloat3(&v0), XMLoadFloat3(&v1), XMLoadFloat3(&v2), fDist))
+            UINT index = 0;
+            UINT iNumFace = node->m_IndexList.size() / 3;
+            for (UINT face = 0; face < iNumFace; face++)
             {
-                //m_Select.m_vIntersection = m_Select.m_Ray.vOrigin + m_Select.m_Ray.vDirection * fDist;
-                chkDist.insert(std::make_pair(fDist, _PhysicsSystem.GetSelect().m_vIntersection));
-                /*return true;*/
+                UINT i0 = node->m_IndexList[index + 0];
+                UINT i1 = node->m_IndexList[index + 1];
+                UINT i2 = node->m_IndexList[index + 2];
+                XMFLOAT3 v0 = m_pQuadTree->m_pMap->GetListVertex()[i0].pos;
+                XMFLOAT3 v1 = m_pQuadTree->m_pMap->GetListVertex()[i1].pos;
+                XMFLOAT3 v2 = m_pQuadTree->m_pMap->GetListVertex()[i2].pos;
+                float fDist;
+                if (_PhysicsSystem.GetSelect().ChkPick(XMLoadFloat3(&v0), XMLoadFloat3(&v1), XMLoadFloat3(&v2), fDist))
+                {
+                    chkDist.insert(std::make_pair(fDist, _PhysicsSystem.GetSelect().m_vIntersection));
+                }
+                index += 3;
             }
-            index += 3;
         }
     }
     if (!chkDist.size())
@@ -237,7 +292,7 @@ Object* ToolSystemMap::CreateFbxObject(std::wstring szFullPath, XMVECTOR vPos, X
                 UINT iSizeVertices = pFBXFile->m_ListNode[nodeCount]->m_ListVertexPNCT[nodeMaterialCount].size();
                 void* indices = &pFBXFile->m_ListNode[nodeCount]->m_ListIndex[nodeMaterialCount][0];
                 UINT iSizeIndices = pFBXFile->m_ListNode[nodeCount]->m_ListIndex[nodeMaterialCount].size();
-                VertexBuffer* pVertexBuffer = _EngineSystem.GetRenderSystem()->CreateVertexBuffer(vertices, sizeof(PNCTVertex), iSizeVertices, shader_byte_code_vs, size_shader_vs);
+                VertexBuffer* pVertexBuffer = _EngineSystem.GetRenderSystem()->CreateVertexBuffer(vertices, sizeof(PTNCVertex), iSizeVertices, shader_byte_code_vs, size_shader_vs);
                 IndexBuffer* pIndexBuffer = _EngineSystem.GetRenderSystem()->CreateIndexBuffer(indices, iSizeIndices);
                 pMesh->SetMeshNode(vertices, iSizeVertices, pVertexBuffer, indices, iSizeIndices, pIndexBuffer);
             }
@@ -286,7 +341,7 @@ Object* ToolSystemMap::CreateSimpleBox(float fLength, XMVECTOR vPos, XMVECTOR vR
     SimpleBox* pObject = new SimpleBox(L"SimpleObjectBox");
     pObject->SetLength(fLength);
     float fboxLength = 0.5f * fLength;
-    PNCTVertex vertex_list[] =
+    PTNCVertex vertex_list[] =
     {
         //FrontFace
         {XMFLOAT3(-fboxLength,-fboxLength,-fboxLength),	XMFLOAT2(0,1),		XMFLOAT3(1, 0, 0),		XMFLOAT4(0, 1, 0, 1)},
@@ -349,7 +404,7 @@ Object* ToolSystemMap::CreateSimpleBox(float fLength, XMVECTOR vPos, XMVECTOR vR
     
     if (pMesh->IsEmpty())
     {
-        VertexBuffer* pVertexBuffer = _EngineSystem.GetRenderSystem()->CreateVertexBuffer(vertex_list, sizeof(PNCTVertex), size_vertex_list, shader_byte_code_vs, size_shader_vs);
+        VertexBuffer* pVertexBuffer = _EngineSystem.GetRenderSystem()->CreateVertexBuffer(vertex_list, sizeof(PTNCVertex), size_vertex_list, shader_byte_code_vs, size_shader_vs);
         IndexBuffer* pIndexBuffer = _EngineSystem.GetRenderSystem()->CreateIndexBuffer(index_list, size_index_list);
         pMesh->SetMeshNode(vertex_list, size_vertex_list, pVertexBuffer, index_list, size_index_list, pIndexBuffer);
     }
@@ -392,7 +447,7 @@ FQuadTree* ToolSystemMap::CreateSimpleMap(int iWidth, int iHeight, float fDistan
     _EngineSystem.GetRenderSystem()->CompilePixelShader(szPSPath.c_str(), "psmain", "ps_5_0", &shader_byte_code_ps, &size_shader_ps);
     PixelShader* pPixelShader = _EngineSystem.GetRenderSystem()->CreatePixelShader(shader_byte_code_ps, size_shader_ps);
 
-    VertexBuffer* pVertexBuffer = _EngineSystem.GetRenderSystem()->CreateVertexBuffer(&pMapMesh->GetListVertex()[0], sizeof(PNCTVertex), pMapMesh->GetListVertex().size(), shader_byte_code_vs, size_shader_vs);
+    VertexBuffer* pVertexBuffer = _EngineSystem.GetRenderSystem()->CreateVertexBuffer(&pMapMesh->GetListVertex()[0], sizeof(PTNCVertex), pMapMesh->GetListVertex().size(), shader_byte_code_vs, size_shader_vs);
     IndexBuffer* pIndexBuffer = _EngineSystem.GetRenderSystem()->CreateIndexBuffer(&pMapMesh->GetListIndex()[0], pMapMesh->GetListIndex().size());
    
     _EngineSystem.GetRenderSystem()->ReleaseBlob();
@@ -563,7 +618,7 @@ void ToolSystemMap::OpenFile(std::wstring szFullPath)
     _EngineSystem.GetRenderSystem()->CompilePixelShader(szPSPath.c_str(), "psmain", "ps_5_0", &shader_byte_code_ps, &size_shader_ps);
     PixelShader* pPixelShader = _EngineSystem.GetRenderSystem()->CreatePixelShader(shader_byte_code_ps, size_shader_ps);
 
-    VertexBuffer* pVertexBuffer = _EngineSystem.GetRenderSystem()->CreateVertexBuffer(&pMapMesh->GetListVertex()[0], sizeof(PNCTVertex), pMapMesh->GetListVertex().size(), shader_byte_code_vs, size_shader_vs);
+    VertexBuffer* pVertexBuffer = _EngineSystem.GetRenderSystem()->CreateVertexBuffer(&pMapMesh->GetListVertex()[0], sizeof(PTNCVertex), pMapMesh->GetListVertex().size(), shader_byte_code_vs, size_shader_vs);
     IndexBuffer* pIndexBuffer = _EngineSystem.GetRenderSystem()->CreateIndexBuffer(&pMapMesh->GetListIndex()[0], pMapMesh->GetListIndex().size());
 
     _EngineSystem.GetRenderSystem()->ReleaseBlob();

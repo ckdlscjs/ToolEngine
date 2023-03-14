@@ -100,11 +100,21 @@ struct T_BOX
     XMFLOAT3		vAxis[3];
     float			fExtent[3];
 
+    unsigned int vRectIndices[36] =
+    {
+        0, 1, 2, 2, 3, 0,
+        3, 2, 6, 6, 7, 3,
+        7, 6, 5, 5, 4, 7,
+        4, 5, 1, 1, 0, 4,
+        4, 0, 3, 3, 7, 4,
+        1, 5, 6, 6, 2, 1
+    };
+   
     T_BOX()
     {
 
     }
-    T_BOX(XMFLOAT3	max, XMFLOAT3		min)
+    T_BOX(XMFLOAT3	max, XMFLOAT3 min)
     {
         Set(max, min);
     }
@@ -119,6 +129,15 @@ struct T_BOX
         fExtent[0] = vMax.x - vCenter.x;
         fExtent[1] = vMax.y - vCenter.y;
         fExtent[2] = vMax.z - vCenter.z;
+
+        vPos[0] = XMFLOAT3(vMin.x, vMin.y, vMin.z);
+        vPos[1] = XMFLOAT3(vMin.x, vMin.y, vMax.z);
+        vPos[2] = XMFLOAT3(vMax.x, vMin.y, vMax.z);
+        vPos[3] = XMFLOAT3(vMax.x, vMin.y, vMin.z);
+        vPos[4] = XMFLOAT3(vMin.x, vMax.y, vMin.z);
+        vPos[5] = XMFLOAT3(vMin.x, vMax.y, vMax.z);
+        vPos[6] = XMFLOAT3(vMax.x, vMax.y, vMax.z);
+        vPos[7] = XMFLOAT3(vMax.x, vMax.y, vMin.z);
     }
 };
 //--------------------------------------------------------------------------------------

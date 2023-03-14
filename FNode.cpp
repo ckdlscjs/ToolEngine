@@ -73,13 +73,7 @@ void FNode::CreateIndexData(MeshMap* pMap)
 		}
 	}
 	m_dwFace = m_IndexList.size() / 3;
-	m_Box.vCenter = (m_Box.vMax + m_Box.vMin) * 0.5f;
-	m_Box.vAxis[0] = { 1,0,0 };
-	m_Box.vAxis[1] = { 0,1,0 };
-	m_Box.vAxis[2] = { 0,0,1 };
-	m_Box.fExtent[0] = m_Box.vMax.x - m_Box.vCenter.x;
-	m_Box.fExtent[1] = m_Box.vMax.y - m_Box.vCenter.y;
-	m_Box.fExtent[2] = m_Box.vMax.z - m_Box.vCenter.z;
+	m_Box.Set(m_Box.vMax, m_Box.vMin);
 }
 
 HRESULT FNode::CreateIndexBuffer(MeshMap* pMap)
@@ -103,6 +97,9 @@ HRESULT FNode::CreateIndexBuffer(MeshMap* pMap)
 	return hr;
 }
 
+//void FNode::Render()
+//{
+//}
 
 FNode::FNode(FNode* pParent, MeshMap* pMap, DWORD dwLT, DWORD dwRT, DWORD dwLB, DWORD dwRB)
 {
@@ -139,8 +136,3 @@ FNode::~FNode()
 	m_pChild[2] = nullptr;
 	m_pChild[3] = nullptr;
 }
-
-//std::ofstream& operator<<(std::ostream& os, const FNode& pNode)
-//{
-//	os<<
-//}
