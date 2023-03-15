@@ -178,7 +178,7 @@ void Object::Update()
 
 void Object::Render()
 {
-	_EngineSystem.GetRenderSystem()->SetWireFrame(m_DrawMode);
+	_EngineSystem.GetRenderSystem()->SetWireFrame(m_Specify == OBJECT_SPECIFY::OBJECT_SIMPLE ? DRAW_MODE::MODE_WIRE :(m_DrawMode = g_bWireFrame ? DRAW_MODE::MODE_WIRE : DRAW_MODE::MODE_SOLID));
 	_EngineSystem.GetRenderSystem()->SetConstantBuffer(m_pVertexShader, m_pConstantBuffer);
 	_EngineSystem.GetRenderSystem()->SetConstantBuffer(m_pPixelShader, m_pConstantBuffer);
 	_EngineSystem.GetRenderSystem()->SetVertexShader(m_pVertexShader);

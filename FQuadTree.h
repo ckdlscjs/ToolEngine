@@ -12,7 +12,6 @@ public:
 	void	SetTexture(Texture* pTexture);
 	void	SetShader(std::wstring vsPath, VertexShader* pVertexShader, std::wstring psPath, PixelShader* pPixelShader);
 	void	SetConstantData(CBufferData_Map cc);
-	void	SetDrawMode(DRAW_MODE mode);
 	UINT	SelectVertexList(T_BOX& box, std::vector<FNode*>& selectNodeList);
 	void	UpdateNode(FNode* pNode);
 	BOOL	AddObject(Object* pObj);
@@ -52,8 +51,6 @@ private:
 	VertexShader* m_pVertexShader;
 	std::wstring m_szPSPath;
 	PixelShader* m_pPixelShader;
-
-	DRAW_MODE m_DrawMode = DRAW_MODE::MODE_SOLID;
 
 	std::unordered_set<Object*> m_pAllObjectList;
 	std::vector<FNode*> m_pLeafNodeList;

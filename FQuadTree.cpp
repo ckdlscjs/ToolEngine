@@ -358,11 +358,6 @@ void FQuadTree::SetConstantData(CBufferData_Map cc)
     m_constantDataMap = cc;
 }
 
-void FQuadTree::SetDrawMode(DRAW_MODE mode)
-{
-    m_DrawMode = mode;
-}
-
 BOOL FQuadTree::AddObject(Object* pObj)
 {
     m_pAllObjectList.insert(pObj);
@@ -497,7 +492,7 @@ void FQuadTree::Update()
 
 void FQuadTree::Render()
 {
-    _EngineSystem.GetRenderSystem()->SetWireFrame(m_DrawMode);
+    _EngineSystem.GetRenderSystem()->SetWireFrame(g_bWireFrame ? DRAW_MODE::MODE_WIRE : DRAW_MODE::MODE_SOLID);
     _EngineSystem.GetRenderSystem()->SetConstantBuffer(m_pVertexShader, m_pConstantBuffer);
     _EngineSystem.GetRenderSystem()->SetConstantBuffer(m_pPixelShader, m_pConstantBuffer);
     _EngineSystem.GetRenderSystem()->SetVertexShader(m_pVertexShader);

@@ -13,7 +13,6 @@ class ToolSystemMap : public Singleton<ToolSystemMap>
 public:
 	/*SetBlock*/
 	bool GetInterSection();
-	void SetWireframe(bool bWireFrame);
 	void SetSplattingTexture(Texture* pTexture);
 	void Sculpting(XMVECTOR m_vIntersection, float fSculptRadius, float fSculptIntensity);
 	void Splatting(XMVECTOR vIntersection, float fSplattingRadius, std::wstring szFullPath);

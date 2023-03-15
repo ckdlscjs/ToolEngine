@@ -1,11 +1,5 @@
 #include "ToolSystemMap.h"
 #include <DirectXMath.h>
-
-void ToolSystemMap::SetWireframe(bool bWireFrame)
-{
-    _EngineSystem.GetRenderSystem()->SetWireFrame(bWireFrame ? DRAW_MODE::MODE_WIRE : DRAW_MODE::MODE_SOLID);
-}
-
 void ToolSystemMap::SetSplattingTexture(Texture* pTexture)
 {
     if (m_pQuadTree)
@@ -475,7 +469,6 @@ FQuadTree* ToolSystemMap::CreateSimpleMap(int iWidth, int iHeight, float fDistan
     m_pQuadTree->SetTransform({ {0, 0, 0} , {0, 0, 0}, {1, 1, 1} });
     m_pQuadTree->SetTexture(_EngineSystem.GetTextureSystem()->GetTexture(szFullPath));
     m_pQuadTree->SetShader(szVSPath, pVertexShader, szPSPath, pPixelShader);
-    m_pQuadTree->SetDrawMode(DRAW_MODE::MODE_SOLID);
 
     return m_pQuadTree;
 }
@@ -648,7 +641,6 @@ void ToolSystemMap::OpenFile(std::wstring szFullPath)
     for (const auto& texture : m_ListTextureSplatting)
         m_pQuadTree->m_ListTextureSplatting.push_back(_EngineSystem.GetTextureSystem()->GetTexture(texture));
     m_pQuadTree->SetShader(szVSPath, pVertexShader, szPSPath, pPixelShader);
-    m_pQuadTree->SetDrawMode(DRAW_MODE::MODE_SOLID);
 
     for (const auto& obj : allObjectList)
     {

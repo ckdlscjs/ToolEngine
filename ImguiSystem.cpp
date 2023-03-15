@@ -3,6 +3,9 @@
 #include "WindowSystem.h"
 #include "ToolSystemMap.h"
 #include "InputSystem.h"
+#include "stdafx.h"
+
+bool g_bWireFrame = false;
 
 // Forward declare message handler from imgui_impl_win32.cpp
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
@@ -81,8 +84,6 @@ void ImguiSystem::Update()
     static int iMapSize = 4;
     static float fMapDistance = 1.0f;
 
-    static bool bWireFrame = false;
-
     static bool bSimpleObj = false;
     static float fSimpleObjLength = 1.0f;
 
@@ -109,8 +110,8 @@ void ImguiSystem::Update()
             _ToolSystemMap.GetCurrentCamera()->SetCameraMove(bMouseMove);
             //WireFrame
             {
-                if (ImGui::Checkbox("WireFrame", &bWireFrame))
-                    ~bWireFrame;
+                if (ImGui::Checkbox("WireFrame", &g_bWireFrame))
+                    ~g_bWireFrame;
             }
             
             //SimpleObjPicking
