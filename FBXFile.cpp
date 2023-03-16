@@ -50,7 +50,7 @@ void FBXFile::ParseNode(FbxNode* pFbxNode)
 	pNode->m_szName = pNode->m_pNode->GetName();
 	pNode->m_iBoneIdx = m_ListNode.size();
 	m_ListNode.push_back(pNode);
-	m_SetNode.insert(pNode);
+	m_SetNode.insert(std::make_pair(pNode->m_pNode,pNode));
 
 	int iNumChild = pFbxNode->GetChildCount();
 	for (int iChild = 0; iChild < iNumChild; iChild++)
@@ -58,6 +58,7 @@ void FBXFile::ParseNode(FbxNode* pFbxNode)
 		FbxNode* pChild = pFbxNode->GetChild(iChild);
 		ParseNode(pChild);
 	}
+
 }
 
 void FBXFile::ParseMesh(FBXNode* pNode, int nodeIdx)
@@ -287,7 +288,7 @@ void FBXFile::ParseSkinning(FBXNode* pNode)
 		{
 			FbxCluster* pCluster = pSkin->GetCluster(iCluster);
 			FbxNode* pFbxNode = pCluster->GetLink();
-			int iBoneIdx = pNode->m_iBoneIdx;
+			int iBoneIdx = m_SetNode.find(pFbxNode)->second->m_iBoneIdx;
 
 			// 뼈대공간으로 변환하는 행렬이 필요하다.
 			FbxAMatrix matXBindPose;

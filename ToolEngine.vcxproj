@@ -215,7 +215,7 @@
     <LinkIncremental>true</LinkIncremental>
     <OutDir>../../Output/Debug/</OutDir>
     <IntDir>../../Output/Debug/$(ProjectName)</IntDir>
-    <IncludePath>../../Include/DXTK;../../Include/DXTEX;../../Include/tinyobjloader;$(IncludePath)</IncludePath>
+    <IncludePath>../../fbxsdk/include;../../Include/DXTK;../../Include/DXTEX;../../Include/tinyobjloader;$(IncludePath)</IncludePath>
     <LibraryPath>../../Lib;../../fbxsdk/lib/vs2019/x64/Debug;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">

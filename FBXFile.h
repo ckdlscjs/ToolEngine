@@ -26,6 +26,6 @@ public:
 	FbxScene* m_pFbxScene;
 	FbxNode* m_pRootNode;
 	std::vector<FBXNode*> m_ListNode;
-	std::unordered_set<FBXNode*> m_SetNode;
+	std::unordered_map<FbxNode*, FBXNode*> m_SetNode;
 };
 

@@ -301,13 +301,17 @@ Object* ToolSystemMap::CreateFbxObject(std::wstring szFullPath, XMVECTOR vPos, X
                 UINT iSizeVertices = pFBXFile->m_ListNode[nodeCount]->m_ListVertexPNCT[nodeMaterialCount].size();
                 void* indices = &pFBXFile->m_ListNode[nodeCount]->m_ListIndex[nodeMaterialCount][0];
                 UINT iSizeIndices = pFBXFile->m_ListNode[nodeCount]->m_ListIndex[nodeMaterialCount].size();
+       
+                void* IW = &pFBXFile->m_ListNode[nodeCount]->m_ListVertexIW[nodeMaterialCount][0];
+                UINT iSizeIW = pFBXFile->m_ListNode[nodeCount]->m_ListVertexIW[nodeMaterialCount].size();
+
                 VertexBuffer* pVertexBuffer = _EngineSystem.GetRenderSystem()->CreateVertexBuffer(vertices, sizeof(PNCTVertex), iSizeVertices, shader_byte_code_vs, size_shader_vs);
                 IndexBuffer* pIndexBuffer = _EngineSystem.GetRenderSystem()->CreateIndexBuffer(indices, iSizeIndices);
                 pMesh->SetMeshNode(vertices, iSizeVertices, pVertexBuffer, indices, iSizeIndices, pIndexBuffer);
             }
         }
     }
-
+    
     if (pMaterial->IsEmpty())
     {
         for (int nodeCount = 0; nodeCount < pFBXFile->m_ListNode.size(); nodeCount++)
