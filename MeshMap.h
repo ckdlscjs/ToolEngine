@@ -2,6 +2,7 @@
 #include "stdafx.h"
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
+#include "InputLayout.h"
 
 struct face_info
 {
@@ -38,6 +39,7 @@ public:
 	DWORD m_dwFace;
 	VertexBuffer* m_pVertexBuffer;
 	IndexBuffer* m_pIndexBuffer;
+	InputLayout* m_pInputLayout;
 	std::vector<PNCTVertex> m_ListVertex;	//정점정보
 	std::vector<DWORD> m_ListIndex; //인덱스정보
 	std::vector<float> m_fHeightList;	//높이맵의높이정보

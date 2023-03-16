@@ -497,6 +497,7 @@ void FQuadTree::Render()
     _EngineSystem.GetRenderSystem()->SetConstantBuffer(m_pPixelShader, m_pConstantBuffer);
     _EngineSystem.GetRenderSystem()->SetVertexShader(m_pVertexShader);
     _EngineSystem.GetRenderSystem()->SetPixelShader(m_pPixelShader);
+    _EngineSystem.GetRenderSystem()->SetInputLayout(m_pMap->m_pInputLayout);
     _EngineSystem.GetRenderSystem()->SetVertexBuffer(m_pMap->m_pVertexBuffer);
     _EngineSystem.GetRenderSystem()->setTexture(m_pVertexShader, m_pTexture);
     _EngineSystem.GetRenderSystem()->setTexture(m_pPixelShader, m_pTexture);

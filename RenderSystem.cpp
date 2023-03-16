@@ -61,9 +61,19 @@ void RenderSystem::CreateRasterizeState(ID3D11Device* pDevice)
 	m_pCRasterizerState = new RasterizerState(pDevice);
 }
 
-VertexBuffer* RenderSystem::CreateVertexBuffer(void* pVertices, UINT iSizeVertex, UINT iSizeList, void* pCodeShader, UINT iSizeShader)
+//VertexBuffer* RenderSystem::CreateVertexBuffer(void* pVertices, UINT iSizeVertex, UINT iSizeList, void* pCodeShader, UINT iSizeShader)
+//{
+//	return new VertexBuffer(m_pCDevice->m_pDevice, pVertices, iSizeVertex, iSizeList, pCodeShader, iSizeShader);
+//}
+
+VertexBuffer* RenderSystem::CreateVertexBuffer(void* pVertices, UINT iSizeVertex, UINT iSizeList)
 {
-	return new VertexBuffer(m_pCDevice->m_pDevice, pVertices, iSizeVertex, iSizeList, pCodeShader, iSizeShader);
+	return new VertexBuffer(m_pCDevice->m_pDevice, pVertices, iSizeVertex, iSizeList);
+}
+
+InputLayout* RenderSystem::CreateInputLayout(void* pCodeShader, UINT iSizeShader, INPUT_LAYOUT layout)
+{
+	return new InputLayout(m_pCDevice->m_pDevice, pCodeShader, iSizeShader, layout);
 }
 
 IndexBuffer* RenderSystem::CreateIndexBuffer(void* pIndices, UINT iSizeList)
@@ -164,12 +174,11 @@ void RenderSystem::SetViewport(UINT iWidth, UINT iHeight)
 	m_pCDevice->m_pImmediateContext->RSSetViewports(1, &vp);
 }
 
-void RenderSystem::SetVertexBuffer(VertexBuffer* pVertexBuffer)
+void RenderSystem::SetVertexBuffer(VertexBuffer* pVertexBuffer, int iStartSlot)
 {
 	UINT stride = pVertexBuffer->m_iSizeVertex; //정점의크기
 	UINT offset = 0;                            //정점의오프셋
-	m_pCDevice->m_pImmediateContext->IASetVertexBuffers(0, 1, &pVertexBuffer->m_pBuffer, &stride, &offset);	// VertexBuffer를 세팅, 1은 버퍼의갯수
-	m_pCDevice->m_pImmediateContext->IASetInputLayout(pVertexBuffer->m_pInputLayout);
+	m_pCDevice->m_pImmediateContext->IASetVertexBuffers(iStartSlot, 1, &pVertexBuffer->m_pBuffer, &stride, &offset);	// VertexBuffer를 세팅, 1은 버퍼의갯수
 }
 
 void RenderSystem::SetIndexBuffer(IndexBuffer* pIndexBuffer)
@@ -180,6 +189,11 @@ void RenderSystem::SetIndexBuffer(IndexBuffer* pIndexBuffer)
 void RenderSystem::SetConstantBuffer(VertexShader* pVertexShader, ConstantBuffer* pConstantBuffer)
 {
 	m_pCDevice->m_pImmediateContext->VSSetConstantBuffers(0, 1, &pConstantBuffer->m_pBuffer);
+}
+
+void RenderSystem::SetInputLayout(InputLayout* pInputLayout)
+{
+	m_pCDevice->m_pImmediateContext->IASetInputLayout(pInputLayout->m_pInputLayout);
 }
 
 void RenderSystem::SetConstantBuffer(PixelShader* pPixelShader, ConstantBuffer* pConstantBuffer)

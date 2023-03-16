@@ -5,9 +5,14 @@ bool Mesh::IsEmpty()
 	return m_ListMeshNode.empty();
 }
 
-void Mesh::SetMeshNode(void* vertices, int iSizeVertices, VertexBuffer* pVertexBuffer, void* indices, int iSizeIndices, IndexBuffer* pIndexBuffer)
+//void Mesh::SetMeshNode(void* vertices, int iSizeVertices, VertexBuffer* pVertexBuffer, void* indices, int iSizeIndices, IndexBuffer* pIndexBuffer)
+//{
+//	m_ListMeshNode.push_back(new MeshNode());
+//}
+
+void Mesh::SetMeshNode(MeshNode* pMeshNode)
 {
-	m_ListMeshNode.push_back(new MeshNode(vertices, iSizeVertices, pVertexBuffer, indices, iSizeIndices, pIndexBuffer));
+	m_ListMeshNode.push_back(pMeshNode);
 }
 
 std::vector<MeshNode*>& Mesh::GetMeshNodeList()

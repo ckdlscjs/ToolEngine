@@ -4,6 +4,7 @@
 #include "RasterizerState.h"
 #include "SwapChain.h"
 #include "VertexBuffer.h"
+#include "InputLayout.h"
 #include "IndexBuffer.h"
 #include "ConstantBuffer.h"
 #include "VertexShader.h"
@@ -26,7 +27,9 @@ public:
 	PixelShader* CreatePixelShader(const void* pCodeShader, size_t iSizeShader);
 
 	/*Buffer Block*/
-	VertexBuffer* CreateVertexBuffer(void* pVertices, UINT iSizeVertex, UINT iSizeList, void* pCodeShader, UINT iSizeShader);
+	//VertexBuffer* CreateVertexBuffer(void* pVertices, UINT iSizeVertex, UINT iSizeList, void* pCodeShader, UINT iSizeShader);
+	VertexBuffer* CreateVertexBuffer(void* pVertices, UINT iSizeVertex, UINT iSizeList);
+	InputLayout* CreateInputLayout(void* pCodeShader, UINT iSizeShader, INPUT_LAYOUT layout = INPUT_LAYOUT::PNCT);
 	IndexBuffer* CreateIndexBuffer(void* pIndices, UINT iSizeList);
 	ConstantBuffer* CreateConstantBuffer(void* pBuffer, UINT iSizeBuffer);
 
@@ -38,7 +41,8 @@ public:
 	void SetFullScreen(bool bFullscreen, unsigned int iWidth, unsigned int iHeight);
 	void Resize(unsigned int iWidth, unsigned int iHeight);
 	void ReloadBuffer(unsigned int iWidth, unsigned int iHeight);
-	void SetVertexBuffer(VertexBuffer* pVertexBuffer);
+	void SetInputLayout(InputLayout* pInputLayout);
+	void SetVertexBuffer(VertexBuffer* pVertexBuffer, int iStartSlot = 0);
 	void SetIndexBuffer(IndexBuffer* pIndexBuffer);
 	void SetConstantBuffer(VertexShader* pVertexShader, ConstantBuffer* pConstantBuffer);
 	void SetConstantBuffer(PixelShader* pPixelShader, ConstantBuffer* pConstantBuffer);

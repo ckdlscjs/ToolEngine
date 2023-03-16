@@ -21,7 +21,7 @@ T_BOX Object::CreateBoundingBox()
 
 	for (const auto& node : m_pMesh->GetMeshNodeList())
 	{
-		for (const auto& vertex : node->GetListVertex())
+		for (const auto& vertex : node->GetListPNCT())
 		{
 			XMVECTOR v = XMLoadFloat3(&vertex.pos);
 
@@ -56,9 +56,9 @@ bool Object::Intersect(FSelect& select, float distance)
 			UINT i0 = node->GetListIndex()[index + 0];
 			UINT i1 = node->GetListIndex()[index + 1];
 			UINT i2 = node->GetListIndex()[index + 2];
-			XMFLOAT3 v0 = node->GetListVertex()[i0].pos;
-			XMFLOAT3 v1 = node->GetListVertex()[i1].pos;
-			XMFLOAT3 v2 = node->GetListVertex()[i2].pos;
+			XMFLOAT3 v0 = node->GetListPNCT()[i0].pos;
+			XMFLOAT3 v1 = node->GetListPNCT()[i1].pos;
+			XMFLOAT3 v2 = node->GetListPNCT()[i2].pos;
 			float fDist;
 			if (select.ChkPick(XMLoadFloat3(&v0), XMLoadFloat3(&v1), XMLoadFloat3(&v2), fDist))
 			{
@@ -185,7 +185,9 @@ void Object::Render()
 	_EngineSystem.GetRenderSystem()->SetPixelShader(m_pPixelShader);
 	for (int idxNode = 0; idxNode < m_pMesh->GetMeshNodeList().size(); idxNode++)
 	{
-		_EngineSystem.GetRenderSystem()->SetVertexBuffer(m_pMesh->GetMeshNodeList()[idxNode]->GetVertexBuffer());
+		_EngineSystem.GetRenderSystem()->SetInputLayout(m_pMesh->GetMeshNodeList()[idxNode]->GetInputLayout());
+		_EngineSystem.GetRenderSystem()->SetVertexBuffer(m_pMesh->GetMeshNodeList()[idxNode]->GetVertexBufferPNCT());
+		_EngineSystem.GetRenderSystem()->SetVertexBuffer(m_pMesh->GetMeshNodeList()[idxNode]->GetVertexBufferIW(), 1);
 		_EngineSystem.GetRenderSystem()->SetIndexBuffer(m_pMesh->GetMeshNodeList()[idxNode]->GetIndexBuffer());
 		if (m_pMaterial)
 		{

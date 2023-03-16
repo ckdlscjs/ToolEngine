@@ -1,8 +1,13 @@
 #include "MeshNode.h"
 
-std::vector<PNCTVertex>& MeshNode::GetListVertex()
+std::vector<PNCTVertex>& MeshNode::GetListPNCT()
 {
-	return m_ListVertex;
+	return m_ListPNCT;
+}
+
+std::vector<IW>& MeshNode::GetListIW()
+{
+	return m_ListIW;
 }
 
 std::vector<unsigned int>& MeshNode::GetListIndex()
@@ -10,9 +15,14 @@ std::vector<unsigned int>& MeshNode::GetListIndex()
 	return m_ListIndex;
 }
 
-VertexBuffer* MeshNode::GetVertexBuffer()
+VertexBuffer* MeshNode::GetVertexBufferPNCT()
 {
-	return m_pVertexBuffer;
+	return m_pVertexBufferPNCT;
+}
+
+VertexBuffer* MeshNode::GetVertexBufferIW()
+{
+	return m_pVertexBufferIW;
 }
 
 IndexBuffer* MeshNode::GetIndexBuffer()
@@ -20,30 +30,42 @@ IndexBuffer* MeshNode::GetIndexBuffer()
 	return m_pIndexBuffer;
 }
 
-//void MeshNode::SetTexture(Texture* pTexture)
-//{
-//	m_pTexture = pTexture;
-//}
+InputLayout* MeshNode::GetInputLayout()
+{
+	return m_pInputLayout;
+}
 
-void MeshNode::SetVertexList(void* vertices, int iSize)
+void MeshNode::SetListPNCT(void* vertices, int iSize)
 {
 	for (int i = 0; i < iSize; i++)
 	{
-		m_ListVertex.push_back(*((PNCTVertex*)vertices + i));
+		m_ListPNCT.push_back(*((PNCTVertex*)vertices + i));
 	}
 }
 
-
-void MeshNode::SetIndexList(void* indices, int iSize)
+void MeshNode::SetListIndex(void* indices, int iSize)
 {
 	for (int i = 0; i < iSize; i++)
 	{
 		m_ListIndex.push_back(*((unsigned int*)indices + i));
 	}
 }
-void MeshNode::SetVertexBuffer(VertexBuffer* pVertexBuffer)
+
+void MeshNode::SetListIW(void* iw, int iSize)
 {
-	m_pVertexBuffer = pVertexBuffer;
+	for (int i = 0; i < iSize; i++)
+	{
+		m_ListIW.push_back(*((IW*)iw + i));
+	}
+}
+void MeshNode::SetVertexBufferPNCT(VertexBuffer* pVertexBuffer)
+{
+	m_pVertexBufferPNCT = pVertexBuffer;
+}
+
+void MeshNode::SetVertexBufferIW(VertexBuffer* pVertexBuffer)
+{
+	m_pVertexBufferIW = pVertexBuffer;
 }
 
 void MeshNode::SetIndexBuffer(IndexBuffer* pIndexBuffer)
@@ -51,24 +73,35 @@ void MeshNode::SetIndexBuffer(IndexBuffer* pIndexBuffer)
 	m_pIndexBuffer = pIndexBuffer;
 }
 
-MeshNode::MeshNode(void* vertices, int iSizeVertices, VertexBuffer* pVertexBuffer, void* indices, int iSizeIndices, IndexBuffer* pIndexBuffer)
+void MeshNode::SetInputLayout(InputLayout* pInputLayout)
 {
-	SetVertexList(vertices, iSizeVertices);
-	SetVertexBuffer(pVertexBuffer);
-	SetIndexList(indices, iSizeIndices);
-	SetIndexBuffer(pIndexBuffer);
+	m_pInputLayout = pInputLayout;
+}
+
+//MeshNode::MeshNode(void* vertices, int iSizeVertices, VertexBuffer* pVertexBuffer, void* indices, int iSizeIndices, IndexBuffer* pIndexBuffer)
+//{
+//	SetListVertex(vertices, iSizeVertices);
+//	SetVertexBuffer(pVertexBuffer);
+//	SetListIndex(indices, iSizeIndices);
+//	SetIndexBuffer(pIndexBuffer);
+//}
+
+MeshNode::MeshNode()
+{
 }
 
 MeshNode::~MeshNode()
 {
-	if (m_pVertexBuffer) delete m_pVertexBuffer;
+	if (m_pVertexBufferPNCT) delete m_pVertexBufferPNCT;
+	if (m_pVertexBufferIW) delete m_pVertexBufferIW;
 	if (m_pIndexBuffer) delete m_pIndexBuffer;
+	if (m_pInputLayout) delete m_pInputLayout;
 }
 
 std::ostream& operator<<(std::ostream& os, const MeshNode* pMeshNode)
 {
 	os << "m_ListVertex:" << std::endl;
-	for (const auto& vertex : pMeshNode->m_ListVertex)
+	for (const auto& vertex : pMeshNode->m_ListPNCT)
 	{
 		os << "vertex:" << vertex << std::endl;
 	}

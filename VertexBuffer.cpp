@@ -5,7 +5,7 @@ UINT VertexBuffer::GetSizeList()
 	return 	m_iSizeList;
 }
 
-VertexBuffer::VertexBuffer(ID3D11Device* pDevice, void* pVertices, UINT iSizeVertex, UINT iSizeList, void* pCodeShader, UINT iSizeShader, INPUT_LAYOUT layout) : m_pBuffer(nullptr), m_pInputLayout(nullptr), m_Layout(layout)
+VertexBuffer::VertexBuffer(ID3D11Device* pDevice, void* pVertices, UINT iSizeVertex, UINT iSizeList, /*void* pCodeShader, UINT iSizeShader, */INPUT_LAYOUT layout) : m_pBuffer(nullptr)/*, m_pInputLayout(nullptr), m_Layout(layout)*/
 {
 	//BufferDescriptor
 	D3D11_BUFFER_DESC bufferDesc = {};
@@ -25,7 +25,7 @@ VertexBuffer::VertexBuffer(ID3D11Device* pDevice, void* pVertices, UINT iSizeVer
 	if (FAILED(pDevice->CreateBuffer(&bufferDesc, &resourceData, &m_pBuffer)))
 		throw std::exception("VertexBuffer not create successfully");
 
-	D3D11_INPUT_ELEMENT_DESC* layout_desc = nullptr;
+	/*D3D11_INPUT_ELEMENT_DESC* layout_desc = nullptr;
 	UINT iSizeLayout;
 	switch (m_Layout)
 	{
@@ -43,12 +43,12 @@ VertexBuffer::VertexBuffer(ID3D11Device* pDevice, void* pVertices, UINT iSizeVer
 	}
 
 	if (FAILED(pDevice->CreateInputLayout(layout_desc, iSizeLayout, pCodeShader, iSizeShader, &m_pInputLayout)))
-		throw std::exception("InputLayout not create successfully");
+		throw std::exception("InputLayout not create successfully");*/
 }
 
 VertexBuffer::~VertexBuffer()
 {
 	if(m_pBuffer) m_pBuffer->Release();
-	if(m_pInputLayout) m_pInputLayout->Release();
+	//if(m_pInputLayout) m_pInputLayout->Release();
 }
  

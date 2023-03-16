@@ -115,6 +115,9 @@
     <Filter Include="Shaders\SimpleObj">
       <UniqueIdentifier>{057b667d-e656-4eac-b287-db15ca7fb3b7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="EngineSystem\RenderySystem\InputLayout">
+      <UniqueIdentifier>{ed1bbf7c-21a8-4105-a539-10d60270419d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="WindowSystem.h">
@@ -271,6 +274,9 @@
     <ClInclude Include="FSelect.h">
       <Filter>PhysicsSystem</Filter>
     </ClInclude>
+    <ClInclude Include="InputLayout.h">
+      <Filter>EngineSystem\RenderySystem\InputLayout</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WindowSystem.cpp">
@@ -420,6 +426,9 @@
     </ClCompile>
     <ClCompile Include="FSelect.cpp">
       <Filter>PhysicsSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="InputLayout.cpp">
+      <Filter>EngineSystem\RenderySystem\InputLayout</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -237,8 +237,9 @@ MeshMap::MeshMap()
 
 MeshMap::~MeshMap()
 {
-    if(m_pVertexBuffer) delete m_pVertexBuffer;
-    if(m_pIndexBuffer) delete m_pIndexBuffer;
+    if (m_pVertexBuffer) delete m_pVertexBuffer;
+    if (m_pIndexBuffer) delete m_pIndexBuffer;
+    if (m_pInputLayout) delete m_pInputLayout;
 }
 
 std::ostream& operator<<(std::ostream& os, const MeshMap* pMap)

@@ -129,8 +129,9 @@ void FBXFile::ParseMesh(FBXNode* pNode, int nodeIdx)
 	}
 
 	pNode->m_ListVertexPNCT.resize(iNumMtrl);
-	pNode->m_ListVertexIW.resize(iNumMtrl);
 	pNode->m_ListIndex.resize(iNumMtrl);
+	if (pNode->m_bSkinning)
+		pNode->m_ListVertexIW.resize(iNumMtrl);
 	if (iNumMtrl == 1)
 	{
 		//pNode->m_ListTexture[0] = GetSplitName(szFileName);
@@ -163,7 +164,8 @@ void FBXFile::ParseMesh(FBXNode* pNode, int nodeIdx)
 			iSubMtrl = GetSubMaterialIndex(idxPolygon, MaterialSet);
 
 		pNode->m_ListVertexPNCT[iSubMtrl].resize(iNumVertexCount);
-		pNode->m_ListVertexIW[iSubMtrl].resize(iNumVertexCount);
+		if (pNode->m_bSkinning)
+			pNode->m_ListVertexIW[iSubMtrl].resize(iNumVertexCount);
 
 		for (int iFace = 0; iFace < iNumFace; iFace++)
 		{
@@ -254,7 +256,8 @@ void FBXFile::ParseMesh(FBXNode* pNode, int nodeIdx)
 					iwVertex.weight.w = pIW->weight[3];
 				}
 				pNode->m_ListVertexPNCT[iSubMtrl][vertexID] = pnctVertex;
-				pNode->m_ListVertexIW[iSubMtrl][vertexID] = iwVertex;
+				if (pNode->m_bSkinning)
+					pNode->m_ListVertexIW[iSubMtrl][vertexID] = iwVertex;
 				pNode->m_ListIndex[iSubMtrl].push_back(vertexID);
 			}
 		}
