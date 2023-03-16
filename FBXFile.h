@@ -1,28 +1,11 @@
 #pragma once
 #include "stdafx.h"
 #include "FBXNode.h"
-struct AnimTrack
-{
-	//UINT      iFrame; //fTime;
-	//TBASIS_EX::TMatrix   matAnim;  // self * parent;
-	//TBASIS_EX::TMatrix   matSelfAnim; // matAnim * inv(parent)
-	//TBASIS_EX::TVector3     t; // self
-	//TBASIS_EX::TQuaternion  r; // self
-	//TBASIS_EX::TVector3     s; // self
-};
-
-struct AnimScene
-{
-	FbxTime::EMode TimeMode;
-	UINT iStartFrame;
-	UINT iEndFrame;
-	float fTickPerFrame; // 160
-	float fFrameSpeed; // 30
-};
 
 class FBXFile
 {
-	void ParseAnim();
+	void InitAnim();
+	void ParseAnim(FbxLongLong t, FbxTime time);
 	void ParseNode(FbxNode* pFbxNode);
 	void ParseMesh(FBXNode* pNode, int nodeIdx);
 	void ParseSkinning(FBXNode* pNode);
@@ -43,6 +26,6 @@ public:
 	FbxScene* m_pFbxScene;
 	FbxNode* m_pRootNode;
 	std::vector<FBXNode*> m_ListNode;
-	std::unordered_map<FBXNode*, unsigned int> m_mapNode;
+	std::unordered_set<FBXNode*> m_SetNode;
 };
 

@@ -1,5 +1,5 @@
 #include "MeshMap.h"
-std::vector<PTNCVertex>& MeshMap::GetListVertex()
+std::vector<PNCTVertex>& MeshMap::GetListVertex()
 {
     return m_ListVertex;
 }
@@ -279,12 +279,12 @@ std::ifstream& operator>>(std::ifstream& is, MeshMap* pMap)
             }
             else if (fieldName == "m_ListVertex")
             {
-                std::vector<PTNCVertex> vertices;
+                std::vector<PNCTVertex> vertices;
                 std::string vertexLine;
                 while (std::getline(is, vertexLine) && vertexLine != "") {
                     if (vertexLine.find("m_pAllObjectList:") != std::string::npos)
                         break;
-                    PTNCVertex vertex;
+                    PNCTVertex vertex;
                     std::istringstream vertexIss(vertexLine);
                     vertexIss >> vertex;
                     vertices.push_back(vertex);

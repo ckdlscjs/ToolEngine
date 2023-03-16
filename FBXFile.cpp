@@ -1,7 +1,7 @@
 #include "FBXFile.h"
 
 
-void FBXFile::ParseAnim()
+void FBXFile::InitAnim()
 {
 	FbxAnimStack* pStackAnim = m_pFbxScene->GetSrcObject<FbxAnimStack>(0);
 	FbxLongLong s = 0;
@@ -27,6 +27,20 @@ void FBXFile::ParseAnim()
 	m_AnimScene.TimeMode = TimeMode;
 }
 
+void FBXFile::ParseAnim(FbxLongLong t, FbxTime time)
+{
+	for (auto& tNode : m_ListNode)
+	{
+		FbxNode* pNode = tNode->m_pNode;
+		AnimTrack track;
+		track.iFrame = t;
+		FbxAMatrix fbxMatrix = pNode->EvaluateGlobalTransform(time);
+		track.matAnim = DxConvertMatrix(fbxMatrix);
+		XMMatrixDecompose(&track.scale, &track.rotation, &track.translation, track.matAnim);
+		tNode->m_AnimTracks.push_back(track);
+	}
+}
+
 void FBXFile::ParseNode(FbxNode* pFbxNode)
 {
 	if (!pFbxNode)
@@ -34,8 +48,9 @@ void FBXFile::ParseNode(FbxNode* pFbxNode)
 	FBXNode* pNode = new FBXNode();
 	pNode->m_pNode = pFbxNode;
 	pNode->m_szName = pNode->m_pNode->GetName();
-	//m_mapNode.insert(std::make_pair(pNode, m_mapNode.size()));
+	pNode->m_iBoneIdx = m_ListNode.size();
 	m_ListNode.push_back(pNode);
+	m_SetNode.insert(pNode);
 
 	int iNumChild = pFbxNode->GetChildCount();
 	for (int iChild = 0; iChild < iNumChild; iChild++)
@@ -168,7 +183,7 @@ void FBXFile::ParseMesh(FBXNode* pNode, int nodeIdx)
 			{
 				int vertexID = iCornerIndex[idxVertFace];
 				FbxVector4 vOrigin = pControlPositions[vertexID];
-				PTNCVertex pnctVertex;
+				PNCTVertex pnctVertex;
 				IW iwVertex;
 				FbxVector4 vConvert = geom.MultT(vOrigin);
 
@@ -280,7 +295,6 @@ void FBXFile::ParseSkinning(FBXNode* pNode)
 			pCluster->GetTransformLinkMatrix(matXBindPose);
 			pCluster->GetTransformMatrix(matReferenceGlobalInitPostion);
 			FbxAMatrix matBindPos = matReferenceGlobalInitPostion.Inverse() * matXBindPose;
-
 
 			XMMATRIX matInvBindPos = DxConvertMatrix(matBindPos);
 			matInvBindPos = XMMatrixInverse(NULL, matInvBindPos);
@@ -499,11 +513,19 @@ XMMATRIX FBXFile::DxConvertMatrix(FbxAMatrix& fbxMatrix)
 FBXFile::FBXFile(FbxScene* pFbxScene)
 {
 	m_pFbxScene = pFbxScene;
+	InitAnim();
 	ParseNode(m_pFbxScene->GetRootNode());
-
+	// mesh
 	for(int iNodeIdx = 0; iNodeIdx < m_ListNode.size(); iNodeIdx++)
 	{
 		ParseMesh(m_ListNode[iNodeIdx], iNodeIdx);
+	}
+	// animation
+	FbxTime time;
+	for (FbxLongLong t = m_AnimScene.iStartFrame; t <= m_AnimScene.iEndFrame; t++)
+	{
+		time.SetFrame(t, m_AnimScene.TimeMode);
+		ParseAnim(t, time);
 	}
 }
 
@@ -517,12 +539,12 @@ FBXFile::~FBXFile()
 	}
 	m_ListNode.clear();
 
-	for (auto iter = m_mapNode.begin(); iter != m_mapNode.end(); )
+	/*for (auto iter = m_SetNode.begin(); iter != m_SetNode.end(); )
 	{
-		delete (*iter).first;
-		iter = m_mapNode.erase(iter);
+		delete *iter;
+		iter = m_SetNode.erase(iter);
 	}
-	m_mapNode.clear();
+	m_SetNode.clear();*/
 
 	if (m_pFbxScene) m_pFbxScene->Destroy();
 }

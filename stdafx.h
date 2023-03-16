@@ -110,8 +110,8 @@ static std::wstring GetSplitFile(std::wstring szFullPath)
 	else
 		return szFullPath.substr(pos + 1);
 }
-//상호작용을 위한 열거
 
+//상호작용을 위한 열거
 
 enum class CULL_MODE
 {
@@ -250,6 +250,34 @@ static std::stringstream& operator>>(std::stringstream& is, OBJECT_SPECIFY& mode
 
 	return is;
 }
+enum class INPUT_LAYOUT
+{
+	PNCT = 0,
+	PNCTIW,
+};
+
+static D3D11_INPUT_ELEMENT_DESC layoutPNCT[] =
+{
+	//SEMANTIC NAME, SEMANTIC INDEX, FORMAT, INPUT SLOT, ALIGNED BYTE OFFSET, INPUT SLOT CLASS, INSTANCE DATA STEP RATE, 
+	{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},		//POSITION0을 의미
+	{"NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0},
+	{"COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 24, D3D11_INPUT_PER_VERTEX_DATA, 0},
+	{"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 40, D3D11_INPUT_PER_VERTEX_DATA, 0},
+};
+static UINT size_layoutPNCT = ARRAYSIZE(layoutPNCT);
+
+static D3D11_INPUT_ELEMENT_DESC layoutPNCTIW[] =
+{
+	//SEMANTIC NAME, SEMANTIC INDEX, FORMAT, INPUT SLOT, ALIGNED BYTE OFFSET, INPUT SLOT CLASS, INSTANCE DATA STEP RATE, 
+	{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},		//POSITION0을 의미
+	{"NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0},
+	{"COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 24, D3D11_INPUT_PER_VERTEX_DATA, 0},
+	{"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 40, D3D11_INPUT_PER_VERTEX_DATA, 0},
+	/*{"INDEX", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1,0,D3D11_INPUT_PER_VERTEX_DATA, 0},
+	{"WEIGHT", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 1,16,D3D11_INPUT_PER_VERTEX_DATA, 0},*/
+};
+static UINT size_layoutPNCTIW = ARRAYSIZE(layoutPNCTIW);
+
 
 struct Transform
 {
@@ -336,22 +364,22 @@ struct Transform
 	}
 };
 
-struct PTNCVertex
+struct PNCTVertex
 {
 	XMFLOAT3 pos;
-	XMFLOAT2 tex;
 	XMFLOAT3 normal;
 	XMFLOAT4 color;
-	friend std::ostream& operator<<(std::ostream& os, const PTNCVertex& pnctVertex)
+	XMFLOAT2 tex;
+	friend std::ostream& operator<<(std::ostream& os, const PNCTVertex& pnctVertex)
 	{
 		os << "position:" << pnctVertex.pos.x << " " << pnctVertex.pos.y << " " << pnctVertex.pos.z << ", ";
-		os << "texcoord:" << pnctVertex.tex.x << " " << pnctVertex.tex.y << ", ";
 		os << "normal:" << pnctVertex.normal.x << " " << pnctVertex.normal.y << " " << pnctVertex.normal.z << ", ";
-		os << "color:" << pnctVertex.color.x << " " << pnctVertex.color.y << " " << pnctVertex.color.z << " " << pnctVertex.color.w;
+		os << "color:" << pnctVertex.color.x << " " << pnctVertex.color.y << " " << pnctVertex.color.z << " " << pnctVertex.color.w << ", ";
+		os << "texcoord:" << pnctVertex.tex.x << " " << pnctVertex.tex.y;
 		return os;
 	}
 
-	friend std::istringstream& operator>>(std::istringstream& is, PTNCVertex& pnctVertex)
+	friend std::istringstream& operator>>(std::istringstream& is, PNCTVertex& pnctVertex)
 	{
 		// "pos: x y z, tex: x y, normal: x y z, color: r g b a"와 같은 형태의 문자열에서 필드 값을 추출합니다.
 		std::string line;
@@ -363,13 +391,6 @@ struct PTNCVertex
 		std::string pos_str = line.substr(pos_start, pos_end - pos_start);
 		std::istringstream pos_stream(pos_str);
 		pos_stream >> pnctVertex.pos.x >> pnctVertex.pos.y >> pnctVertex.pos.z;
-
-		// tex 값을 추출합니다.
-		size_t tex_start = line.find("texcoord:") + strlen("texcoord:");
-		size_t tex_end = line.find(",", tex_start);
-		std::string tex_str = line.substr(tex_start, tex_end - tex_start);
-		std::istringstream tex_stream(tex_str);
-		tex_stream >> pnctVertex.tex.x >> pnctVertex.tex.y;
 
 		// normal 값을 추출합니다.
 		size_t normal_start = line.find("normal:") + strlen("normal:");
@@ -383,6 +404,13 @@ struct PTNCVertex
 		std::string color_str = line.substr(color_start);
 		std::istringstream color_stream(color_str);
 		color_stream >> pnctVertex.color.x >> pnctVertex.color.y >> pnctVertex.color.z >> pnctVertex.color.w;
+
+		// tex 값을 추출합니다.
+		size_t tex_start = line.find("texcoord:") + strlen("texcoord:");
+		size_t tex_end = line.find(",", tex_start);
+		std::string tex_str = line.substr(tex_start, tex_end - tex_start);
+		std::istringstream tex_stream(tex_str);
+		tex_stream >> pnctVertex.tex.x >> pnctVertex.tex.y;
 
 		return is;
 	}

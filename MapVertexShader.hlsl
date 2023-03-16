@@ -1,17 +1,17 @@
 struct VS_INPUT
 {
 	float4 position : POSITION0;
-	float2 tex : TEXCOORD0;
 	float3 normal : NORMAL0;
 	float4 color : COLOR0;
+	float2 tex : TEXCOORD0;
 };
 
 struct VS_OUTPUT
 {
 	float4 position : SV_POSITION;
-	float2 tex : TEXCOORD0;
 	float3 normal : NORMAL0;
 	float4 color : COLOR0;
+	float2 tex : TEXCOORD0;
 	float3 direction_to_camera : TEXCOORD1;
 	float4 m_light_direction : TEXCOORD2;
 	float3 world : TEXCOORD3;

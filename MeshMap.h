@@ -17,7 +17,7 @@ struct vertex_info
 class MeshMap
 {
 public:
-	std::vector<PTNCVertex>& GetListVertex();
+	std::vector<PNCTVertex>& GetListVertex();
 	std::vector<DWORD>& GetListIndex();
 	float	GetHeightmap(int row, int col);
 	float	GetHeight(float fPosX, float fPosZ);
@@ -38,7 +38,7 @@ public:
 	DWORD m_dwFace;
 	VertexBuffer* m_pVertexBuffer;
 	IndexBuffer* m_pIndexBuffer;
-	std::vector<PTNCVertex> m_ListVertex;	//정점정보
+	std::vector<PNCTVertex> m_ListVertex;	//정점정보
 	std::vector<DWORD> m_ListIndex; //인덱스정보
 	std::vector<float> m_fHeightList;	//높이맵의높이정보
 	std::vector<vertex_info> m_ListVertexInfo;	//정점법선노말

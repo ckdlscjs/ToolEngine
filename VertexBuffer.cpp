@@ -5,7 +5,7 @@ UINT VertexBuffer::GetSizeList()
 	return 	m_iSizeList;
 }
 
-VertexBuffer::VertexBuffer(ID3D11Device* pDevice, void* pVertices, UINT iSizeVertex, UINT iSizeList, void* pCodeShader, UINT iSizeShader) : m_pBuffer(nullptr), m_pInputLayout(nullptr)
+VertexBuffer::VertexBuffer(ID3D11Device* pDevice, void* pVertices, UINT iSizeVertex, UINT iSizeList, void* pCodeShader, UINT iSizeShader, INPUT_LAYOUT layout) : m_pBuffer(nullptr), m_pInputLayout(nullptr), m_Layout(layout)
 {
 	//BufferDescriptor
 	D3D11_BUFFER_DESC bufferDesc = {};
@@ -25,17 +25,24 @@ VertexBuffer::VertexBuffer(ID3D11Device* pDevice, void* pVertices, UINT iSizeVer
 	if (FAILED(pDevice->CreateBuffer(&bufferDesc, &resourceData, &m_pBuffer)))
 		throw std::exception("VertexBuffer not create successfully");
 
-	D3D11_INPUT_ELEMENT_DESC layout[] =
+	D3D11_INPUT_ELEMENT_DESC* layout_desc = nullptr;
+	UINT iSizeLayout;
+	switch (m_Layout)
 	{
-		//SEMANTIC NAME, SEMANTIC INDEX, FORMAT, INPUT SLOT, ALIGNED BYTE OFFSET, INPUT SLOT CLASS, INSTANCE DATA STEP RATE, 
-		{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},		//POSITION0À» ÀÇ¹Ì
-		{"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0},
-		{"NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 20, D3D11_INPUT_PER_VERTEX_DATA, 0},
-		{"COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 32, D3D11_INPUT_PER_VERTEX_DATA, 0},
-	};
+		case INPUT_LAYOUT::PNCT:
+		{
+			layout_desc = layoutPNCT;
+			iSizeLayout = size_layoutPNCT;
+		}break;
 
-	UINT iSizeLayout = ARRAYSIZE(layout);
-	if (FAILED(pDevice->CreateInputLayout(layout, iSizeLayout, pCodeShader, iSizeShader, &m_pInputLayout)))
+		case INPUT_LAYOUT::PNCTIW:
+		{
+			layout_desc = layoutPNCTIW;
+			iSizeLayout = size_layoutPNCTIW;
+		}break;
+	}
+
+	if (FAILED(pDevice->CreateInputLayout(layout_desc, iSizeLayout, pCodeShader, iSizeShader, &m_pInputLayout)))
 		throw std::exception("InputLayout not create successfully");
 }
 
