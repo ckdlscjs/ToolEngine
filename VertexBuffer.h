@@ -8,6 +8,7 @@ public:
 	~VertexBuffer();
 private:
 	ID3D11Buffer* m_pBuffer;
+	ID3D11Buffer* m_pBufferIW;
 	ID3D11InputLayout* m_pInputLayout;
 private:
 	UINT m_iSizeVertex;
