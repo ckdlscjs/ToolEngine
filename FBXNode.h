@@ -1,23 +1,5 @@
 #pragma once
 #include "stdafx.h"
-struct AnimTrack
-{
-	UINT      iFrame; //fTime;
-	XMMATRIX  matAnim;  // self * parent;
-	XMMATRIX  matSelfAnim; // matAnim * inv(parent)
-	XMVECTOR  scale; // self
-	XMVECTOR  rotation; // self
-	XMVECTOR  translation; // self
-};
-
-struct AnimScene
-{
-	FbxTime::EMode TimeMode;
-	UINT iStartFrame;
-	UINT iEndFrame;
-	float fTickPerFrame; // 160
-	float fFrameSpeed; // 30
-};
 class FBXNode
 {
 public:

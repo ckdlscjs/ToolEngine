@@ -277,6 +277,9 @@
     <ClInclude Include="InputLayout.h">
       <Filter>EngineSystem\RenderySystem\InputLayout</Filter>
     </ClInclude>
+    <ClInclude Include="FBXObject.h">
+      <Filter>EngineSystem\ObjectSystem</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WindowSystem.cpp">
@@ -429,6 +432,9 @@
     </ClCompile>
     <ClCompile Include="InputLayout.cpp">
       <Filter>EngineSystem\RenderySystem\InputLayout</Filter>
+    </ClCompile>
+    <ClCompile Include="FBXObject.cpp">
+      <Filter>EngineSystem\ObjectSystem</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

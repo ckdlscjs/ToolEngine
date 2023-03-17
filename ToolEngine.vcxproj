@@ -27,6 +27,7 @@
     <ClInclude Include="EntrySystem.h" />
     <ClInclude Include="FBXFile.h" />
     <ClInclude Include="FBXNode.h" />
+    <ClInclude Include="FBXObject.h" />
     <ClInclude Include="FBXSample.h" />
     <ClInclude Include="FBXSystem.h" />
     <ClInclude Include="FileSystem.h" />
@@ -82,6 +83,7 @@
     <ClCompile Include="EntrySystem.cpp" />
     <ClCompile Include="FBXFile.cpp" />
     <ClCompile Include="FBXNode.cpp" />
+    <ClCompile Include="FBXObject.cpp" />
     <ClCompile Include="FBXSample.cpp" />
     <ClCompile Include="FBXSystem.cpp" />
     <ClCompile Include="FileSystem.cpp" />

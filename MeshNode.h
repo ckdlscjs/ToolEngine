@@ -2,8 +2,8 @@
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
 #include "InputLayout.h"
-
 //#include "Texture.h"
+
 class MeshNode
 {
 public:
@@ -13,8 +13,8 @@ public:
 	VertexBuffer* GetVertexBufferPNCT();
 	VertexBuffer* GetVertexBufferIW();
 	IndexBuffer* GetIndexBuffer();
+
 	InputLayout* GetInputLayout();
-	//void SetTexture(Texture* pTexture);
 	void SetListPNCT(void* vertices, int iSize);
 	void SetListIndex(void* indices, int iSize);
 	void SetListIW(void* iw, int iSize);
@@ -35,5 +35,4 @@ private:
 	std::vector<IW> m_ListIW;
 	VertexBuffer* m_pVertexBufferIW;
 	InputLayout* m_pInputLayout;
-	//Texture* m_pTexture;
 };

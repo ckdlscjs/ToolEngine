@@ -93,6 +93,15 @@ static std::string GetSplitFile(std::string szFullPath)
 		return szFullPath.substr(pos + 1);
 }
 
+static std::string GetSplitExtension(std::string szFullPath)
+{
+	size_t pos = szFullPath.find_last_of("/.");
+	if (pos == std::string::npos)
+		return szFullPath;
+	else
+		return szFullPath.substr(0, pos);
+}
+
 static std::wstring GetSplitName(std::wstring szFullPath)
 {
 	size_t pos = szFullPath.find_last_of(L"/\\");
@@ -109,6 +118,14 @@ static std::wstring GetSplitFile(std::wstring szFullPath)
 		return szFullPath;
 	else
 		return szFullPath.substr(pos + 1);
+}
+static std::wstring GetSplitExtension(std::wstring szFullPath)
+{
+	size_t pos = szFullPath.find_last_of(L"/.");
+	if (pos == std::wstring::npos)
+		return szFullPath;
+	else
+		return szFullPath.substr(0, pos);
 }
 
 //상호작용을 위한 열거
@@ -416,6 +433,24 @@ struct PNCTVertex
 	}
 };
 
+struct AnimTrack
+{
+	UINT      iFrame; //fTime;
+	XMMATRIX  matAnim;  // self * parent;
+	XMMATRIX  matSelfAnim; // matAnim * inv(parent)
+	XMVECTOR  scale; // self
+	XMVECTOR  rotation; // self
+	XMVECTOR  translation; // self
+};
+
+struct AnimScene
+{
+	FbxTime::EMode TimeMode;
+	UINT iStartFrame;
+	UINT iEndFrame;
+	float fTickPerFrame; // 160
+	float fFrameSpeed; // 30
+};
 
 __declspec(align(16))
 struct CBufferData
@@ -437,6 +472,12 @@ struct CBufferData_Map
 	XMFLOAT4 m_camera_position;
 	XMFLOAT2 m_world_size;
 	float m_cell_distance;
+};
+
+__declspec(align(16))
+struct CBufferData_Bone
+{
+	XMMATRIX matBone[255];
 };
 
 struct IWData

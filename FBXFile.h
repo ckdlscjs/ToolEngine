@@ -5,7 +5,7 @@
 class FBXFile
 {
 	void InitAnim();
-	void ParseAnim(FbxLongLong t, FbxTime time);
+	void ParseAnim(FbxLongLong t);
 	void ParseNode(FbxNode* pFbxNode);
 	void ParseMesh(FBXNode* pNode, int nodeIdx);
 	void ParseSkinning(FBXNode* pNode);

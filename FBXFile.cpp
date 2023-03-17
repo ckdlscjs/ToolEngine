@@ -1,6 +1,5 @@
 #include "FBXFile.h"
 
-
 void FBXFile::InitAnim()
 {
 	FbxAnimStack* pStackAnim = m_pFbxScene->GetSrcObject<FbxAnimStack>(0);
@@ -27,12 +26,14 @@ void FBXFile::InitAnim()
 	m_AnimScene.TimeMode = TimeMode;
 }
 
-void FBXFile::ParseAnim(FbxLongLong t, FbxTime time)
+void FBXFile::ParseAnim(FbxLongLong t)
 {
 	for (auto& tNode : m_ListNode)
 	{
+		FbxTime time;
+		time.SetFrame(t, m_AnimScene.TimeMode);
 		FbxNode* pNode = tNode->m_pNode;
-		AnimTrack track;
+		AnimTrack track;						//특정노드의 특정시간에 해당하는 애니메이션행렬값(트랙)
 		track.iFrame = t;
 		FbxAMatrix fbxMatrix = pNode->EvaluateGlobalTransform(time);
 		track.matAnim = DxConvertMatrix(fbxMatrix);
@@ -528,8 +529,7 @@ FBXFile::FBXFile(FbxScene* pFbxScene)
 	FbxTime time;
 	for (FbxLongLong t = m_AnimScene.iStartFrame; t <= m_AnimScene.iEndFrame; t++)
 	{
-		time.SetFrame(t, m_AnimScene.TimeMode);
-		ParseAnim(t, time);
+		ParseAnim(t);
 	}
 }
 

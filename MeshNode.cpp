@@ -58,6 +58,7 @@ void MeshNode::SetListIW(void* iw, int iSize)
 		m_ListIW.push_back(*((IW*)iw + i));
 	}
 }
+
 void MeshNode::SetVertexBufferPNCT(VertexBuffer* pVertexBuffer)
 {
 	m_pVertexBufferPNCT = pVertexBuffer;
@@ -77,14 +78,6 @@ void MeshNode::SetInputLayout(InputLayout* pInputLayout)
 {
 	m_pInputLayout = pInputLayout;
 }
-
-//MeshNode::MeshNode(void* vertices, int iSizeVertices, VertexBuffer* pVertexBuffer, void* indices, int iSizeIndices, IndexBuffer* pIndexBuffer)
-//{
-//	SetListVertex(vertices, iSizeVertices);
-//	SetVertexBuffer(pVertexBuffer);
-//	SetListIndex(indices, iSizeIndices);
-//	SetIndexBuffer(pIndexBuffer);
-//}
 
 MeshNode::MeshNode()
 {

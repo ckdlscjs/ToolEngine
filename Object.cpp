@@ -187,7 +187,7 @@ void Object::Render()
 	{
 		_EngineSystem.GetRenderSystem()->SetInputLayout(m_pMesh->GetMeshNodeList()[idxNode]->GetInputLayout());
 		_EngineSystem.GetRenderSystem()->SetVertexBuffer(m_pMesh->GetMeshNodeList()[idxNode]->GetVertexBufferPNCT());
-		_EngineSystem.GetRenderSystem()->SetVertexBuffer(m_pMesh->GetMeshNodeList()[idxNode]->GetVertexBufferIW(), 1);
+		//_EngineSystem.GetRenderSystem()->SetVertexBuffer(m_pMesh->GetMeshNodeList()[idxNode]->GetVertexBufferIW(), 1);
 		_EngineSystem.GetRenderSystem()->SetIndexBuffer(m_pMesh->GetMeshNodeList()[idxNode]->GetIndexBuffer());
 		if (m_pMaterial)
 		{
@@ -238,7 +238,15 @@ Object::~Object()
 
 std::ostream& operator<<(std::ostream& os, const Object* pObject)
 {
-	os << pObject->m_szFullPath << ", ";
+	//os << pObject->m_szFullPath << ", ";
+	os << GetSplitExtension(pObject->m_szFullPath);
+	if (pObject->m_Specify != OBJECT_SPECIFY::OBJECT_SIMPLE)
+	{
+		std::wstring scriptExtension = L".Script";
+		os << scriptExtension;
+	}
+		
+	os<< ", ";
 	os << "m_CullMode:" << pObject->m_CullMode << ", ";
 	os << "m_DrawMode:" << pObject->m_DrawMode << ", ";
 	os << "m_InteractiveMode:" << pObject->m_InteractiveMode << ", ";
