@@ -176,6 +176,8 @@ void RenderSystem::SetViewport(UINT iWidth, UINT iHeight)
 
 void RenderSystem::SetVertexBuffer(VertexBuffer* pVertexBuffer, int iStartSlot)
 {
+	if (!pVertexBuffer)
+		return;
 	UINT stride = pVertexBuffer->m_iSizeVertex; //정점의크기
 	UINT offset = 0;                            //정점의오프셋
 	m_pCDevice->m_pImmediateContext->IASetVertexBuffers(iStartSlot, 1, &pVertexBuffer->m_pBuffer, &stride, &offset);	// VertexBuffer를 세팅, 1은 버퍼의갯수
