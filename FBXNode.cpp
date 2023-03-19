@@ -1,9 +1,10 @@
 #include "FBXNode.h"
 
-FBXNode::FBXNode()
+FBXNode::FBXNode(std::wstring szName) : Mesh(szName)
 {
 }
 
 FBXNode::~FBXNode()
 {
+
 }

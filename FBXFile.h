@@ -20,9 +20,6 @@ public:
 	~FBXFile();
 public:
 	AnimScene m_AnimScene;
-	float m_fAnimFrame = 0;
-	float m_fAnimInverse = 1.0f;
-	float m_fAnimSpeed = 1.0f;
 	FbxScene* m_pFbxScene;
 	FbxNode* m_pRootNode;
 	std::vector<FBXNode*> m_ListNode;

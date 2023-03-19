@@ -450,6 +450,9 @@ struct AnimScene
 	UINT iEndFrame;
 	float fTickPerFrame; // 160
 	float fFrameSpeed; // 30
+	float fAnimFrame = 0;
+	float fAnimInverse = 1.0f;
+	float fAnimSpeed = 1.0f;
 };
 
 __declspec(align(16))

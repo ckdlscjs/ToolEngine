@@ -2,12 +2,12 @@
 
 std::vector<PNCTVertex>& MeshNode::GetListPNCT()
 {
-	return m_ListPNCT;
+	return m_ListVertexPNCT;
 }
 
 std::vector<IW>& MeshNode::GetListIW()
 {
-	return m_ListIW;
+	return m_ListVertexIW;
 }
 
 std::vector<unsigned int>& MeshNode::GetListIndex()
@@ -39,7 +39,7 @@ void MeshNode::SetListPNCT(void* vertices, int iSize)
 {
 	for (int i = 0; i < iSize; i++)
 	{
-		m_ListPNCT.push_back(*((PNCTVertex*)vertices + i));
+		m_ListVertexPNCT.push_back(*((PNCTVertex*)vertices + i));
 	}
 }
 
@@ -55,7 +55,7 @@ void MeshNode::SetListIW(void* iw, int iSize)
 {
 	for (int i = 0; i < iSize; i++)
 	{
-		m_ListIW.push_back(*((IW*)iw + i));
+		m_ListVertexIW.push_back(*((IW*)iw + i));
 	}
 }
 
@@ -94,7 +94,7 @@ MeshNode::~MeshNode()
 std::ostream& operator<<(std::ostream& os, const MeshNode* pMeshNode)
 {
 	os << "m_ListVertex:" << std::endl;
-	for (const auto& vertex : pMeshNode->m_ListPNCT)
+	for (const auto& vertex : pMeshNode->m_ListVertexPNCT)
 	{
 		os << "vertex:" << vertex << std::endl;
 	}

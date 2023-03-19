@@ -46,9 +46,9 @@ void FBXFile::ParseNode(FbxNode* pFbxNode)
 {
 	if (!pFbxNode)
 		return;
-	FBXNode* pNode = new FBXNode();
+	FBXNode* pNode = new FBXNode(_tomw(pFbxNode->GetName()));
 	pNode->m_pNode = pFbxNode;
-	pNode->m_szName = pNode->m_pNode->GetName();
+	//pNode->m_szName = pNode->m_pNode->GetName();
 	pNode->m_iBoneIdx = m_ListNode.size();
 	m_ListNode.push_back(pNode);
 	m_SetNode.insert(std::make_pair(pNode->m_pNode,pNode));
@@ -59,7 +59,6 @@ void FBXFile::ParseNode(FbxNode* pFbxNode)
 		FbxNode* pChild = pFbxNode->GetChild(iChild);
 		ParseNode(pChild);
 	}
-
 }
 
 void FBXFile::ParseMesh(FBXNode* pNode, int nodeIdx)
@@ -104,7 +103,7 @@ void FBXFile::ParseMesh(FBXNode* pNode, int nodeIdx)
 
 	std::wstring szFileName;
 	int iNumMtrl = pFbxNode->GetMaterialCount();
-	std::vector<std::wstring>   texFullNameList;
+	std::vector<std::wstring> texFullNameList;
 	texFullNameList.resize(iNumMtrl);
 	pNode->m_ListTexture.resize(iNumMtrl);
 	for (int iMtrl = 0; iMtrl < iNumMtrl; iMtrl++)
@@ -128,22 +127,21 @@ void FBXFile::ParseMesh(FBXNode* pNode, int nodeIdx)
 			}
 		}
 	}
-
-	pNode->m_ListVertexPNCT.resize(iNumMtrl);
+	/*pNode->m_ListVertexPNCT.resize(iNumMtrl);
 	pNode->m_ListIndex.resize(iNumMtrl);
 	if (pNode->m_bSkinning)
-		pNode->m_ListVertexIW.resize(iNumMtrl);
+		pNode->m_ListVertexIW.resize(iNumMtrl);*/
 	if (iNumMtrl == 1)
 	{
-		//pNode->m_ListTexture[0] = GetSplitName(szFileName);
 		pNode->m_ListTexture[0] = szFileName;
+		pNode->SetMeshNode(new MeshNode());
 	}
 	if (iNumMtrl > 1)
 	{
 		for (int iTex = 0; iTex < iNumMtrl; iTex++)
 		{
-			//pNode->m_ListTexture[iTex] = GetSplitName(texFullNameList[iTex]);
 			pNode->m_ListTexture[iTex] = texFullNameList[iTex];
+			pNode->SetMeshNode(new MeshNode());
 		}
 	}
 	
@@ -164,9 +162,9 @@ void FBXFile::ParseMesh(FBXNode* pNode, int nodeIdx)
 		if (MaterialSet)
 			iSubMtrl = GetSubMaterialIndex(idxPolygon, MaterialSet);
 
-		pNode->m_ListVertexPNCT[iSubMtrl].resize(iNumVertexCount);
+		pNode->GetMeshNodeList()[iSubMtrl]->GetListPNCT().resize(iNumVertexCount);
 		if (pNode->m_bSkinning)
-			pNode->m_ListVertexIW[iSubMtrl].resize(iNumVertexCount);
+			pNode->GetMeshNodeList()[iSubMtrl]->GetListIW().resize(iNumVertexCount);
 
 		for (int iFace = 0; iFace < iNumFace; iFace++)
 		{
@@ -256,10 +254,10 @@ void FBXFile::ParseMesh(FBXNode* pNode, int nodeIdx)
 					iwVertex.weight.z = pIW->weight[2];
 					iwVertex.weight.w = pIW->weight[3];
 				}
-				pNode->m_ListVertexPNCT[iSubMtrl][vertexID] = pnctVertex;
+				pNode->GetMeshNodeList()[iSubMtrl]->GetListPNCT()[vertexID] = pnctVertex;
 				if (pNode->m_bSkinning)
-					pNode->m_ListVertexIW[iSubMtrl][vertexID] = iwVertex;
-				pNode->m_ListIndex[iSubMtrl].push_back(vertexID);
+					pNode->GetMeshNodeList()[iSubMtrl]->GetListIW()[vertexID] = iwVertex;
+				pNode->GetMeshNodeList()[iSubMtrl]->GetListIndex().push_back(vertexID);
 			}
 		}
 	}
@@ -303,7 +301,7 @@ void FBXFile::ParseSkinning(FBXNode* pNode)
 
 			XMMATRIX matInvBindPos = DxConvertMatrix(matBindPos);
 			matInvBindPos = XMMatrixInverse(NULL, matInvBindPos);
-			pNode->m_mapBindPoseMatrix.insert(std::make_pair(pNode->m_szName, matInvBindPos));
+			pNode->m_mapBindPoseMatrix.insert(std::make_pair(pNode->m_szFullPath, matInvBindPos));
 
 			// 임의의 1개 정점에 영향을 미치는 뼈대의 개수
 			int iNumWeightCounter = pCluster->GetControlPointIndicesCount();
@@ -518,14 +516,16 @@ XMMATRIX FBXFile::DxConvertMatrix(FbxAMatrix& fbxMatrix)
 FBXFile::FBXFile(FbxScene* pFbxScene)
 {
 	m_pFbxScene = pFbxScene;
-	InitAnim();
-	ParseNode(m_pFbxScene->GetRootNode());
+	InitAnim();												//InitAnimation
+	ParseNode(m_pFbxScene->GetRootNode());					//ParsingNodeStruct
+
 	// mesh
 	for(int iNodeIdx = 0; iNodeIdx < m_ListNode.size(); iNodeIdx++)
 	{
 		ParseMesh(m_ListNode[iNodeIdx], iNodeIdx);
 	}
-	// animation
+
+	// animation					
 	FbxTime time;
 	for (FbxLongLong t = m_AnimScene.iStartFrame; t <= m_AnimScene.iEndFrame; t++)
 	{
@@ -535,7 +535,6 @@ FBXFile::FBXFile(FbxScene* pFbxScene)
 
 FBXFile::~FBXFile()
 {
-
 	for (auto iter = m_ListNode.begin(); iter != m_ListNode.end(); )
 	{
 		delete (*iter);

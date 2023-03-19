@@ -2,7 +2,6 @@
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
 #include "InputLayout.h"
-//#include "Texture.h"
 
 class MeshNode
 {
@@ -26,13 +25,13 @@ public:
 	friend std::ifstream& operator>>(std::ifstream& is, MeshNode* pMeshNode);
 public:
 	MeshNode();
-	~MeshNode();
+	virtual ~MeshNode();
 private:
-	std::vector<PNCTVertex> m_ListPNCT;
+	std::vector<PNCTVertex> m_ListVertexPNCT;
 	VertexBuffer* m_pVertexBufferPNCT;
 	std::vector<unsigned int> m_ListIndex;
 	IndexBuffer* m_pIndexBuffer;
-	std::vector<IW> m_ListIW;
+	std::vector<IW> m_ListVertexIW;
 	VertexBuffer* m_pVertexBufferIW;
 	InputLayout* m_pInputLayout;
 };
