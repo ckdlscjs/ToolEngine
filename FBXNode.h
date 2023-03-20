@@ -1,17 +1,17 @@
 #pragma once
 #include "stdafx.h"
-#include "MeshNode.h"
-class FBXNode : public Mesh
+class FBXNode
 {
 public:
 	FBXNode(std::wstring szName);
 	~FBXNode();
 private:
 	FbxNode* m_pNode;
+	std::wstring m_szName;
 	unsigned int m_iBoneIdx;
-	/*std::vector<std::vector<PNCTVertex>> m_ListVertexPNCT;
+	std::vector<std::vector<PNCTVertex>> m_ListVertexPNCT;
 	std::vector<std::vector<IW>> m_ListVertexIW;
-	std::vector<std::vector<int>> m_ListIndex;*/
+	std::vector<std::vector<unsigned int>> m_ListIndex;
 	std::vector<std::wstring> m_ListTexture;
 	std::vector<AnimTrack> m_AnimTracks;
 	std::vector<IWData> m_ListIW;

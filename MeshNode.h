@@ -12,8 +12,8 @@ public:
 	VertexBuffer* GetVertexBufferPNCT();
 	VertexBuffer* GetVertexBufferIW();
 	IndexBuffer* GetIndexBuffer();
-
 	InputLayout* GetInputLayout();
+
 	void SetListPNCT(void* vertices, int iSize);
 	void SetListIndex(void* indices, int iSize);
 	void SetListIW(void* iw, int iSize);
@@ -28,10 +28,10 @@ public:
 	virtual ~MeshNode();
 private:
 	std::vector<PNCTVertex> m_ListVertexPNCT;
-	VertexBuffer* m_pVertexBufferPNCT;
-	std::vector<unsigned int> m_ListIndex;
-	IndexBuffer* m_pIndexBuffer;
 	std::vector<IW> m_ListVertexIW;
+	std::vector<unsigned int> m_ListIndex;
+	VertexBuffer* m_pVertexBufferPNCT;
 	VertexBuffer* m_pVertexBufferIW;
+	IndexBuffer* m_pIndexBuffer;
 	InputLayout* m_pInputLayout;
 };

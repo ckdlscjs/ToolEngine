@@ -48,7 +48,6 @@ void FBXFile::ParseNode(FbxNode* pFbxNode)
 		return;
 	FBXNode* pNode = new FBXNode(_tomw(pFbxNode->GetName()));
 	pNode->m_pNode = pFbxNode;
-	//pNode->m_szName = pNode->m_pNode->GetName();
 	pNode->m_iBoneIdx = m_ListNode.size();
 	m_ListNode.push_back(pNode);
 	m_SetNode.insert(std::make_pair(pNode->m_pNode,pNode));
@@ -99,8 +98,16 @@ void FBXFile::ParseMesh(FBXNode* pNode, int nodeIdx)
 	if (pFbxLayer->GetMaterials() != nullptr)
 		MaterialSet = pFbxLayer->GetMaterials();
 	
-	bool bChinese = false;
+	FbxVector4* pControlPositions = pFbxMesh->GetControlPoints();
+	int iNumPolygonCount = pFbxMesh->GetPolygonCount();
+	int iNumFace = 0;
+	int iBasePolygonIndex = 0;
+	int iSubMtrl = 0;
+	// 3 Á¤Á¡ -> 1Æú¸®°ï( »ï°¢Çü)
+	// 4 Á¤Á¡ -> 1Æú¸®°ï( Äõµå )
+	int iNumVertexCount = pFbxMesh->GetControlPointsCount();
 
+	//MaterialCounting
 	std::wstring szFileName;
 	int iNumMtrl = pFbxNode->GetMaterialCount();
 	std::vector<std::wstring> texFullNameList;
@@ -127,33 +134,32 @@ void FBXFile::ParseMesh(FBXNode* pNode, int nodeIdx)
 			}
 		}
 	}
-	/*pNode->m_ListVertexPNCT.resize(iNumMtrl);
-	pNode->m_ListIndex.resize(iNumMtrl);
+	pNode->m_ListVertexPNCT.resize(iNumMtrl);
 	if (pNode->m_bSkinning)
-		pNode->m_ListVertexIW.resize(iNumMtrl);*/
+		pNode->m_ListVertexIW.resize(iNumMtrl);
+	pNode->m_ListIndex.resize(iNumMtrl);
 	if (iNumMtrl == 1)
 	{
 		pNode->m_ListTexture[0] = szFileName;
-		pNode->SetMeshNode(new MeshNode());
+		pNode->m_ListVertexPNCT[0].resize(iNumVertexCount);
+		if (pNode->m_bSkinning)
+			pNode->m_ListVertexIW[0].resize(iNumVertexCount);
+		pNode->m_ListIndex[0].resize(iNumMtrl);
 	}
 	if (iNumMtrl > 1)
 	{
 		for (int iTex = 0; iTex < iNumMtrl; iTex++)
 		{
 			pNode->m_ListTexture[iTex] = texFullNameList[iTex];
-			pNode->SetMeshNode(new MeshNode());
+			pNode->m_ListTexture[iTex] = szFileName;
+			pNode->m_ListVertexPNCT[iTex].resize(iNumVertexCount);
+			if (pNode->m_bSkinning)
+				pNode->m_ListVertexIW[iTex].resize(iNumVertexCount);
+			pNode->m_ListIndex[iTex].resize(iNumMtrl);
 		}
 	}
 	
-	FbxVector4* pControlPositions = pFbxMesh->GetControlPoints();
-	int iNumPolygonCount = pFbxMesh->GetPolygonCount();
-	int iNumFace = 0;
-	int iBasePolygonIndex = 0;
-	int iSubMtrl = 0;
-	// 3 Á¤Á¡ -> 1Æú¸®°ï( »ï°¢Çü)
-	// 4 Á¤Á¡ -> 1Æú¸®°ï( Äõµå )
-	int iNumVertexCount = pFbxMesh->GetControlPointsCount();
-
+	
 	for (int idxPolygon = 0; idxPolygon < iNumPolygonCount; idxPolygon++)
 	{
 		int iPolygonSize = pFbxMesh->GetPolygonSize(idxPolygon);
@@ -161,10 +167,6 @@ void FBXFile::ParseMesh(FBXNode* pNode, int nodeIdx)
 
 		if (MaterialSet)
 			iSubMtrl = GetSubMaterialIndex(idxPolygon, MaterialSet);
-
-		pNode->GetMeshNodeList()[iSubMtrl]->GetListPNCT().resize(iNumVertexCount);
-		if (pNode->m_bSkinning)
-			pNode->GetMeshNodeList()[iSubMtrl]->GetListIW().resize(iNumVertexCount);
 
 		for (int iFace = 0; iFace < iNumFace; iFace++)
 		{
@@ -254,10 +256,10 @@ void FBXFile::ParseMesh(FBXNode* pNode, int nodeIdx)
 					iwVertex.weight.z = pIW->weight[2];
 					iwVertex.weight.w = pIW->weight[3];
 				}
-				pNode->GetMeshNodeList()[iSubMtrl]->GetListPNCT()[vertexID] = pnctVertex;
+				pNode->m_ListVertexPNCT[iSubMtrl][vertexID] = pnctVertex;
 				if (pNode->m_bSkinning)
-					pNode->GetMeshNodeList()[iSubMtrl]->GetListIW()[vertexID] = iwVertex;
-				pNode->GetMeshNodeList()[iSubMtrl]->GetListIndex().push_back(vertexID);
+					pNode->m_ListVertexIW[iSubMtrl][vertexID] = iwVertex;
+				pNode->m_ListIndex[iSubMtrl].push_back(vertexID);
 			}
 		}
 	}
@@ -301,7 +303,7 @@ void FBXFile::ParseSkinning(FBXNode* pNode)
 
 			XMMATRIX matInvBindPos = DxConvertMatrix(matBindPos);
 			matInvBindPos = XMMatrixInverse(NULL, matInvBindPos);
-			pNode->m_mapBindPoseMatrix.insert(std::make_pair(pNode->m_szFullPath, matInvBindPos));
+			pNode->m_mapBindPoseMatrix.insert(std::make_pair(pNode->m_szName, matInvBindPos));
 
 			// ÀÓÀÇÀÇ 1°³ Á¤Á¡¿¡ ¿µÇâÀ» ¹ÌÄ¡´Â »À´ëÀÇ °³¼ö
 			int iNumWeightCounter = pCluster->GetControlPointIndicesCount();
