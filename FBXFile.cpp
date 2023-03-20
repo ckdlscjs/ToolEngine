@@ -120,42 +120,76 @@ void FBXFile::ParseMesh(FBXNode* pNode, int nodeIdx)
 		if (pSurface)
 		{
 			auto property = pSurface->FindProperty(FbxSurfaceMaterial::sDiffuse);
+			if(property == NULL)
+				property = pSurface->FindProperty(FbxSurfaceMaterial::sAmbient);
+			if (property == NULL)
+				property = pSurface->FindProperty(FbxSurfaceMaterial::sBump);
+			if (property == NULL)
+				property = pSurface->FindProperty(FbxSurfaceMaterial::sEmissive);
+			if (property == NULL)
+				property = pSurface->FindProperty(FbxSurfaceMaterial::sNormalMap);
+			if (property == NULL)
+				property = pSurface->FindProperty(FbxSurfaceMaterial::sReflection);
+			if (property == NULL)
+				property = pSurface->FindProperty(FbxSurfaceMaterial::sSpecular);
+			if (property == NULL)
+				property = pSurface->FindProperty(FbxSurfaceMaterial::sShininess);
+			if (property == NULL)
+				property = pSurface->FindProperty(FbxSurfaceMaterial::sShadingModel);
+			if (property == NULL)
+				property = pSurface->FindProperty(FbxSurfaceMaterial::sDisplacementColor);
 			if (property.IsValid())
 			{
-				
-				const FbxFileTexture* tex = property.GetSrcObject<FbxFileTexture>(0);
-				if (tex)
+				int size = property.GetSrcObjectCount();
+				if (!size)
 				{
-					std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
-					std::wstring strW = converter.from_bytes(tex->GetFileName());
-					szFileName = strW;
-					texFullNameList[iMtrl] = szFileName;
+					pNode->m_ListTexture.resize(0);
+					pNode->m_ListTexture.clear();
+					return;
+				}
+				for (int idx = 0; idx < size; idx++)
+				{
+					const FbxFileTexture* tex = property.GetSrcObject<FbxFileTexture>(idx);
+					if (tex)
+					{
+						std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
+						std::wstring strW = converter.from_bytes(tex->GetFileName());
+						szFileName = strW;
+						texFullNameList[iMtrl] = szFileName;
+					}
 				}
 			}
+			//else
+			//{
+			//	pNode->m_ListTexture.resize(0);
+			//	pNode->m_ListTexture.clear();
+			//	return;
+			//}
 		}
 	}
+	pNode->m_MapVertexPNCT.resize(iNumMtrl);
 	pNode->m_ListVertexPNCT.resize(iNumMtrl);
 	if (pNode->m_bSkinning)
 		pNode->m_ListVertexIW.resize(iNumMtrl);
-	pNode->m_ListIndex.resize(iNumMtrl);
+	pNode->m_ListOriginIdx.resize(iNumMtrl);
+
 	if (iNumMtrl == 1)
 	{
 		pNode->m_ListTexture[0] = szFileName;
-		pNode->m_ListVertexPNCT[0].resize(iNumVertexCount);
+		/*pNode->m_ListVertexPNCT[0].resize(iNumVertexCount);
 		if (pNode->m_bSkinning)
 			pNode->m_ListVertexIW[0].resize(iNumVertexCount);
-		pNode->m_ListIndex[0].resize(iNumMtrl);
+		pNode->m_ListIndex[0].resize(iNumMtrl);*/
 	}
 	if (iNumMtrl > 1)
 	{
 		for (int iTex = 0; iTex < iNumMtrl; iTex++)
 		{
 			pNode->m_ListTexture[iTex] = texFullNameList[iTex];
-			pNode->m_ListTexture[iTex] = szFileName;
-			pNode->m_ListVertexPNCT[iTex].resize(iNumVertexCount);
+			/*pNode->m_ListVertexPNCT[iTex].resize(iNumVertexCount);
 			if (pNode->m_bSkinning)
 				pNode->m_ListVertexIW[iTex].resize(iNumVertexCount);
-			pNode->m_ListIndex[iTex].resize(iNumMtrl);
+			pNode->m_ListIndex[iTex].resize(iNumMtrl);*/
 		}
 	}
 	
@@ -256,11 +290,29 @@ void FBXFile::ParseMesh(FBXNode* pNode, int nodeIdx)
 					iwVertex.weight.z = pIW->weight[2];
 					iwVertex.weight.w = pIW->weight[3];
 				}
-				pNode->m_ListVertexPNCT[iSubMtrl][vertexID] = pnctVertex;
+				pNode->m_MapVertexPNCT[iSubMtrl].insert(std::make_pair(vertexID, pnctVertex));
+				/*pNode->m_ListVertexPNCT[iSubMtrl][vertexID] = pnctVertex;
 				if (pNode->m_bSkinning)
-					pNode->m_ListVertexIW[iSubMtrl][vertexID] = iwVertex;
-				pNode->m_ListIndex[iSubMtrl].push_back(vertexID);
+					pNode->m_ListVertexIW[iSubMtrl][vertexID] = iwVertex;*/
+				pNode->m_ListOriginIdx[iSubMtrl].push_back(vertexID);
 			}
+		}
+	}
+	pNode->m_ListIndex.resize(iNumMtrl);
+	for (int MtrlIdx = 0; MtrlIdx < iNumMtrl; MtrlIdx++)
+	{
+		std::vector<unsigned int> pnctIdx;
+		pnctIdx.resize(100000);
+		pNode->m_ListIndex[MtrlIdx].resize(pNode->m_ListOriginIdx[MtrlIdx].size());
+		for (const auto& pnct : pNode->m_MapVertexPNCT[MtrlIdx])
+		{
+			pNode->m_ListVertexPNCT[MtrlIdx].push_back(pnct.second);
+			pnctIdx[pnct.first] = pNode->m_ListVertexPNCT[MtrlIdx].size() - 1;
+		}
+
+		for (int idx = 0; idx < pNode->m_ListOriginIdx[MtrlIdx].size(); idx++)
+		{
+			pNode->m_ListIndex[MtrlIdx][idx] = pnctIdx[pNode->m_ListOriginIdx[MtrlIdx][idx]];
 		}
 	}
 }

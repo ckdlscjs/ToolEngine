@@ -214,26 +214,29 @@ Object* ToolSystemMap::ObjectPicking()
         {
             for (const auto& meshnode : object->m_pMesh->GetMeshNodeList())
             {
-                UINT index = 0;
-                UINT iNumFace = meshnode->GetListIndex().size() / 3;
-                for (UINT face = 0; face < iNumFace; face++)
+                for (const auto& attribute : meshnode->GetAttributeList())
                 {
-                    UINT i0 = meshnode->GetListIndex()[index + 0];
-                    UINT i1 = meshnode->GetListIndex()[index + 1];
-                    UINT i2 = meshnode->GetListIndex()[index + 2];
-                    XMFLOAT3 v0 = meshnode->GetListPNCT()[i0].pos;
-                    XMFLOAT3 v1 = meshnode->GetListPNCT()[i1].pos;
-                    XMFLOAT3 v2 = meshnode->GetListPNCT()[i2].pos;
-                    XMVECTOR v_0 = XMVector3TransformCoord(XMLoadFloat3(&v0), object->m_ConstantData.matWorld);
-                    XMVECTOR v_1 = XMVector3TransformCoord(XMLoadFloat3(&v1), object->m_ConstantData.matWorld);
-                    XMVECTOR v_2 = XMVector3TransformCoord(XMLoadFloat3(&v2), object->m_ConstantData.matWorld);
-                    float fDist;
-                    if (_PhysicsSystem.GetSelect().ChkPick(v_0, v_1, v_2, fDist))
+                    UINT index = 0;
+                    UINT iNumFace = attribute->GetListIndex().size() / 3;
+                    for (UINT face = 0; face < iNumFace; face++)
                     {
-                        return object;
+                        UINT i0 = attribute->GetListIndex()[index + 0];
+                        UINT i1 = attribute->GetListIndex()[index + 1];
+                        UINT i2 = attribute->GetListIndex()[index + 2];
+                        XMFLOAT3 v0 = attribute->GetListPNCT()[i0].pos;
+                        XMFLOAT3 v1 = attribute->GetListPNCT()[i1].pos;
+                        XMFLOAT3 v2 = attribute->GetListPNCT()[i2].pos;
+                        XMVECTOR v_0 = XMVector3TransformCoord(XMLoadFloat3(&v0), object->m_ConstantData.matWorld);
+                        XMVECTOR v_1 = XMVector3TransformCoord(XMLoadFloat3(&v1), object->m_ConstantData.matWorld);
+                        XMVECTOR v_2 = XMVector3TransformCoord(XMLoadFloat3(&v2), object->m_ConstantData.matWorld);
+                        float fDist;
+                        if (_PhysicsSystem.GetSelect().ChkPick(v_0, v_1, v_2, fDist))
+                        {
+                            return object;
+                        }
+                        index += 3;
                     }
-                    index += 3;
-                }
+                } 
             }
         }
     }
@@ -276,9 +279,9 @@ Object* ToolSystemMap::CreateFbxObject(std::wstring szFullPath, XMVECTOR vPos, X
     cc.matProj = m_pCamera->m_matProj;
 
     FBXFile* pFBXFile = _FBXSystem.LoadFile(_towm(szFullPath).c_str());
-    //Object* pObject = _ObjectSystem.CreateObject(szFullPath);
-    Object* pObject = new FBXObject(szFullPath);
-    _ObjectSystem.AddObject(pObject);
+    Object* pObject = _ObjectSystem.CreateObject(szFullPath);
+    //Object* pObject = new FBXObject(szFullPath);
+    //_ObjectSystem.AddObject(pObject);
     Mesh* pMesh = _EngineSystem.GetMeshSystem()->CreateMeshFromFile(szFullPath);
     Material* pMaterial = _MaterialSystem.CreateMaterial(szFullPath);
 
@@ -296,57 +299,56 @@ Object* ToolSystemMap::CreateFbxObject(std::wstring szFullPath, XMVECTOR vPos, X
     {
         for (int nodeCount = 0; nodeCount < pFBXFile->m_ListNode.size(); nodeCount++)
         {
+            FBXNode* pFbxNode = pFBXFile->m_ListNode[nodeCount];
+            MeshNode* pMeshNode = new MeshNode();
+            pMesh->SetMeshNode(pMeshNode);
             for (int nodeMaterialCount = 0; nodeMaterialCount < pFBXFile->m_ListNode[nodeCount]->m_ListVertexPNCT.size(); nodeMaterialCount++)
             {
-                MeshNode* pMeshNode = new MeshNode();
-                if (!pFBXFile->m_ListNode[nodeCount]->m_ListVertexPNCT.size())
-                    continue;
-                pMesh->SetMeshNode(pMeshNode);
-                void* listVertexTexture = &pFBXFile->m_ListNode[nodeCount]->m_ListVertexTexture[0];
-                UINT iSizeVertexTexture = pFBXFile->m_ListNode[nodeCount]->m_ListVertexTexture.size();
-                pMeshNode->SetListVertexTexture(listVertexTexture, iSizeVertexTexture);
-
+                NodeAttribute* pAttribute = new NodeAttribute();
+                pMeshNode->SetAttribute(pAttribute);
                 //SetVB
-                void* listVertex = &pFBXFile->m_ListNode[nodeCount]->m_ListVertexPNCT[0];
-                UINT iSizeVertices = pFBXFile->m_ListNode[nodeCount]->m_ListVertexPNCT.size();
-                pMeshNode->SetListPNCT(listVertex, iSizeVertices);
-                VertexBuffer* pVertexBufferPNCT = _EngineSystem.GetRenderSystem()->CreateVertexBuffer(&pMeshNode->GetListPNCT()[0], sizeof(PNCTVertex), pMeshNode->GetListPNCT().size());
-                pMeshNode->SetVertexBufferPNCT(pVertexBufferPNCT);
+                void* listVertex = &pFbxNode->m_ListVertexPNCT[nodeMaterialCount][0];
+                UINT iSizeVertices = pFbxNode->m_ListVertexPNCT[nodeMaterialCount].size();
+                pAttribute->SetListPNCT(listVertex, iSizeVertices);
+                VertexBuffer* pVertexBufferPNCT = _EngineSystem.GetRenderSystem()->CreateVertexBuffer(&pAttribute->GetListPNCT()[0], sizeof(PNCTVertex), pAttribute->GetListPNCT().size());
+                pAttribute->SetVertexBufferPNCT(pVertexBufferPNCT);
 
                 //SetIB
-                void* listIndex = &pFBXFile->m_ListNode[nodeCount]->m_ListIndex[0];
-                UINT iSizeIndices = pFBXFile->m_ListNode[nodeCount]->m_ListIndex.size();
-                pMeshNode->SetListIndex(listIndex, iSizeIndices);
-                IndexBuffer* pIndexBuffer = _EngineSystem.GetRenderSystem()->CreateIndexBuffer(&pMeshNode->GetListIndex()[0], pMeshNode->GetListIndex().size());
-                pMeshNode->SetIndexBuffer(pIndexBuffer);
+                void* listIndex = &pFbxNode->m_ListIndex[nodeMaterialCount][0];
+                UINT iSizeIndices = pFbxNode->m_ListIndex[nodeMaterialCount].size();
+                pAttribute->SetListIndex(listIndex, iSizeIndices);
+                IndexBuffer* pIndexBuffer = _EngineSystem.GetRenderSystem()->CreateIndexBuffer(&pAttribute->GetListIndex()[0], pAttribute->GetListIndex().size());
+                pAttribute->SetIndexBuffer(pIndexBuffer);
 
                 //SetInputLayout
                 InputLayout* pInputLayout = _EngineSystem.GetRenderSystem()->CreateInputLayout(shader_byte_code_vs, size_shader_vs, INPUT_LAYOUT::PNCT);
-                pMeshNode->SetInputLayout(pInputLayout);
+                pAttribute->SetInputLayout(pInputLayout);
 
-                if (!pFBXFile->m_ListNode[nodeCount]->m_ListVertexIW.size())
-                    continue;
-                delete pInputLayout;
-                pInputLayout = _EngineSystem.GetRenderSystem()->CreateInputLayout(shader_byte_code_vs, size_shader_vs, INPUT_LAYOUT::PNCTIW);
-                pMeshNode->SetInputLayout(pInputLayout);
+                //if (!pFBXFile->m_ListNode[nodeCount]->m_ListVertexIW.size())
+                //    continue;
+                //delete pInputLayout;
+                //pInputLayout = _EngineSystem.GetRenderSystem()->CreateInputLayout(shader_byte_code_vs, size_shader_vs, INPUT_LAYOUT::PNCTIW);
+                //pAttribute->SetInputLayout(pInputLayout);
 
-                //SetVBIW
-                void* listIW = &pFBXFile->m_ListNode[nodeCount]->m_ListVertexIW[0];
-                UINT iSizelistIW = pFBXFile->m_ListNode[nodeCount]->m_ListVertexIW.size();
-                pMeshNode->SetListIW(listIW, iSizelistIW);
-                VertexBuffer* pVertexBufferIW = _EngineSystem.GetRenderSystem()->CreateVertexBuffer(&pMeshNode->GetListIW()[0], sizeof(IW), pMeshNode->GetListIW().size());
-                pMeshNode->SetVertexBufferIW(pVertexBufferIW);
+                ////SetVBIW
+                //void* listIW = &pFbxNode->m_ListVertexIW[nodeMaterialCount][0];
+                //UINT iSizelistIW = pFbxNode->m_ListVertexIW[nodeMaterialCount].size();
+                //pAttribute->SetListIW(listIW, iSizelistIW);
+                //VertexBuffer* pVertexBufferIW = _EngineSystem.GetRenderSystem()->CreateVertexBuffer(&pAttribute->GetListIW()[0], sizeof(IW), pAttribute->GetListIW().size());
+                //pAttribute->SetVertexBufferIW(pVertexBufferIW);
             }
         }
     }
 
     if (pMaterial->IsEmpty())
     {
+        pMaterial->GetListTextures().resize(pFBXFile->m_ListNode.size());
         for (int nodeCount = 0; nodeCount < pFBXFile->m_ListNode.size(); nodeCount++)
         {
-            for (int nodeMaterialCount = 0; nodeMaterialCount < pFBXFile->m_ListNode[nodeCount]->m_ListVertexPNCT.size(); nodeMaterialCount++)
+            pMaterial->GetListTextures()[nodeCount].resize(pFBXFile->m_ListNode[nodeCount]->m_ListTexture.size());
+            std::vector<Texture*> listTex;
+            for (int nodeMaterialCount = 0; nodeMaterialCount < pFBXFile->m_ListNode[nodeCount]->m_ListTexture.size(); nodeMaterialCount++)
             {
-                std::vector<Texture*> listTex;
                 if (pFBXFile->m_ListNode[nodeCount]->m_ListTexture[nodeMaterialCount].empty())
                 {
                     listTex.push_back(nullptr);
@@ -355,9 +357,10 @@ Object* ToolSystemMap::CreateFbxObject(std::wstring szFullPath, XMVECTOR vPos, X
                 {
                     std::wstring szFullPath = pFBXFile->m_ListNode[nodeCount]->m_ListTexture[nodeMaterialCount];
                     listTex.push_back(_EngineSystem.GetTextureSystem()->CreateTextureFromFile(szFullPath.c_str()));
-                }
-                pMaterial->SetList(listTex);
+                } 
             }
+            for(int idx = 0; idx < listTex.size(); idx++)
+                pMaterial->GetListTextures()[nodeCount][idx] = listTex[idx];
         }
     }
     _EngineSystem.GetRenderSystem()->ReleaseBlob();
@@ -451,11 +454,13 @@ Object* ToolSystemMap::CreateSimpleBox(float fLength, XMVECTOR vPos, XMVECTOR vR
         InputLayout* pInputLayout = _EngineSystem.GetRenderSystem()->CreateInputLayout(shader_byte_code_vs, size_shader_vs, INPUT_LAYOUT::PNCT);
 
         MeshNode* pMeshNode = new MeshNode();
-        pMeshNode->SetInputLayout(pInputLayout);
-        pMeshNode->SetListPNCT(vertex_list, size_vertex_list);
-        pMeshNode->SetVertexBufferPNCT(pVertexBufferPNCT);
-        pMeshNode->SetListIndex(index_list, size_index_list);
-        pMeshNode->SetIndexBuffer(pIndexBuffer);
+        NodeAttribute* pAttribute = new NodeAttribute();
+        pAttribute->SetInputLayout(pInputLayout);
+        pAttribute->SetListPNCT(vertex_list, size_vertex_list);
+        pAttribute->SetVertexBufferPNCT(pVertexBufferPNCT);
+        pAttribute->SetListIndex(index_list, size_index_list);
+        pAttribute->SetIndexBuffer(pIndexBuffer);
+        pMeshNode->SetAttribute(pAttribute);
         pMesh->SetMeshNode(pMeshNode);
     }
     _EngineSystem.GetRenderSystem()->ReleaseBlob();

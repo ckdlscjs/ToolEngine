@@ -267,6 +267,52 @@ static std::stringstream& operator>>(std::stringstream& is, OBJECT_SPECIFY& mode
 
 	return is;
 }
+
+namespace std
+{
+	template <>
+	struct hash<DirectX::XMFLOAT2>
+	{
+		size_t operator()(const DirectX::XMFLOAT2& v) const
+		{
+			std::hash<float> hasher;
+			size_t seed = 0;
+			seed ^= hasher(v.x) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+			seed ^= hasher(v.y) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+			return seed;
+		}
+	};
+
+	template <>
+	struct hash<DirectX::XMFLOAT3>
+	{
+		size_t operator()(const DirectX::XMFLOAT3& v) const
+		{
+			std::hash<float> hasher;
+			size_t seed = 0;
+			seed ^= hasher(v.x) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+			seed ^= hasher(v.y) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+			seed ^= hasher(v.z) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+			return seed;
+		}
+	};
+
+	template <>
+	struct hash<DirectX::XMFLOAT4>
+	{
+		size_t operator()(const DirectX::XMFLOAT4& v) const
+		{
+			std::hash<float> hasher;
+			size_t seed = 0;
+			seed ^= hasher(v.x) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+			seed ^= hasher(v.y) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+			seed ^= hasher(v.z) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+			seed ^= hasher(v.w) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+			return seed;
+		}
+	};
+}
+
 enum class INPUT_LAYOUT
 {
 	PNCT = 0,
@@ -387,6 +433,13 @@ struct PNCTVertex
 	XMFLOAT3 normal;
 	XMFLOAT4 color;
 	XMFLOAT2 tex;
+	bool operator==(const PNCTVertex& other) const
+	{
+		return  ((abs(pos.x - other.pos.x) <= _Epsilon) && (abs(pos.y - other.pos.y) <= _Epsilon) && (abs(pos.z - other.pos.z) <= _Epsilon)) &&
+			((abs(normal.x - other.normal.x) <= _Epsilon) && (abs(normal.y - other.normal.y) <= _Epsilon) && (abs(normal.z - other.normal.z) <= _Epsilon)) &&
+			((abs(color.x - other.color.x) <= _Epsilon) && (abs(color.y - other.color.y) <= _Epsilon) && (abs(color.z - other.color.z) <= _Epsilon) && (abs(color.w - other.color.w) <= _Epsilon)) &&
+			((abs(tex.x - other.tex.x) <= _Epsilon) && (abs(tex.y - other.tex.y) <= _Epsilon));
+	}
 	friend std::ostream& operator<<(std::ostream& os, const PNCTVertex& pnctVertex)
 	{
 		os << "position:" << pnctVertex.pos.x << " " << pnctVertex.pos.y << " " << pnctVertex.pos.z << ", ";
@@ -433,6 +486,18 @@ struct PNCTVertex
 	}
 };
 
+struct PNCTVertexHash
+{
+	size_t operator()(const PNCTVertex& vertex) const
+	{
+		size_t h1 = std::hash<XMFLOAT3>()(vertex.pos);
+		size_t h2 = std::hash<XMFLOAT3>()(vertex.normal);
+		size_t h3 = std::hash<XMFLOAT4>()(vertex.color);
+		size_t h4 = std::hash<XMFLOAT2>()(vertex.tex);
+
+		return h1 ^ (h2 << 1) ^ (h3 << 2) ^ (h4 << 3);
+	}
+};
 struct AnimTrack
 {
 	UINT      iFrame; //fTime;

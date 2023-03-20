@@ -280,6 +280,9 @@
     <ClInclude Include="FBXObject.h">
       <Filter>EngineSystem\ObjectSystem</Filter>
     </ClInclude>
+    <ClInclude Include="NodeAttribute.h">
+      <Filter>EngineSystem\ObjectSystem\MeshSystem\MeshNode</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WindowSystem.cpp">
@@ -435,6 +438,9 @@
     </ClCompile>
     <ClCompile Include="FBXObject.cpp">
       <Filter>EngineSystem\ObjectSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="NodeAttribute.cpp">
+      <Filter>EngineSystem\ObjectSystem\MeshSystem\MeshNode</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

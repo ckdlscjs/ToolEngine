@@ -7,6 +7,10 @@ bool Material::IsEmpty()
 {
 	return m_ListTextures.empty();
 }
+std::vector<std::vector<Texture*>>& Material::GetListTextures()
+{
+	return m_ListTextures;
+}
 std::vector<Texture*>& Material::GetListTexture(int iNodeIdx)
 {
 	return m_ListTextures[iNodeIdx];

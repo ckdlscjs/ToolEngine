@@ -6,6 +6,7 @@ class Material
 public:
 	void SetList(std::vector<Texture*> listTex);
 	bool IsEmpty();
+	std::vector<std::vector<Texture*>>& GetListTextures();
 	std::vector<Texture*>& GetListTexture(int iNodeIdx);
 	void SetTexture(Texture* pTexture, unsigned int iNodeIdx);
 	friend std::ostream& operator<<(std::ostream& os, const Material* pMaterial);
