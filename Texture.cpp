@@ -24,6 +24,8 @@ Texture::Texture(std::wstring szFullPath) : Resource(szFullPath), m_szFullPath(s
 		defaultDir += GetSplitName(szFullPath);
 		if (GetSplitFile(_towm(szFullPath)) == "tga")
 			result = DirectX::LoadFromTGAFile(defaultDir.c_str(), nullptr, image_data);
+		else if(GetSplitFile(_towm(szFullPath)) == "dds")
+			result = DirectX::LoadFromDDSFile(defaultDir.c_str(), DDS_FLAGS_NONE, nullptr, image_data);
 		else
 			result = DirectX::LoadFromWICFile(defaultDir.c_str(), DirectX::WIC_FLAGS_IGNORE_SRGB, nullptr, image_data);
 

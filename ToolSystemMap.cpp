@@ -277,8 +277,9 @@ Object* ToolSystemMap::CreateFbxObject(std::wstring szFullPath, XMVECTOR vPos, X
     cc.matWorld = XMMatrixIdentity();
     cc.matView = m_pCamera->m_matCamera;
     cc.matProj = m_pCamera->m_matProj;
-
-    FBXFile* pFBXFile = _FBXSystem.LoadFile(_towm(szFullPath).c_str());
+    std::wstring fbxFullPath = GetSplitExtension(szFullPath);
+    fbxFullPath += L".fbx";
+    FBXFile* pFBXFile = _FBXSystem.LoadFile(_towm(fbxFullPath).c_str());
     Object* pObject = _ObjectSystem.CreateObject(szFullPath);
     //Object* pObject = new FBXObject(szFullPath);
     //_ObjectSystem.AddObject(pObject);
