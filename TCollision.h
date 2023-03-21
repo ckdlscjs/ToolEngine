@@ -118,7 +118,7 @@ struct T_BOX
     {
         Set(max, min);
     }
-    void Set(XMFLOAT3	max, XMFLOAT3	min)
+    void Set(XMFLOAT3 max, XMFLOAT3	min)
     {
         vMax = max;
         vMin = min;
@@ -138,6 +138,38 @@ struct T_BOX
         vPos[5] = XMFLOAT3(vMin.x, vMax.y, vMax.z);
         vPos[6] = XMFLOAT3(vMax.x, vMax.y, vMax.z);
         vPos[7] = XMFLOAT3(vMax.x, vMax.y, vMin.z);
+    }
+    void Set(XMMATRIX matWorld)
+    {
+        // 중심점을 월드 변환 행렬로 변환
+        XMVECTOR center = XMLoadFloat3(&vCenter);
+        center = XMVector3Transform(center, matWorld);
+        XMStoreFloat3(&vCenter, center);
+
+        // 각 포인트를 월드 변환 행렬로 변환
+        for (int i = 0; i < 8; ++i)
+        {
+            XMVECTOR point = XMLoadFloat3(&vPos[i]);
+            point = XMVector3Transform(point, matWorld);
+            XMStoreFloat3(&vPos[i], point);
+        }
+
+        // AABB의 최소, 최대 점을 월드 변환 행렬로 변환
+        XMVECTOR minPoint = XMLoadFloat3(&vMin);
+        minPoint = XMVector3Transform(minPoint, matWorld);
+        XMStoreFloat3(&vMin, minPoint);
+
+        XMVECTOR maxPoint = XMLoadFloat3(&vMax);
+        maxPoint = XMVector3Transform(maxPoint, matWorld);
+        XMStoreFloat3(&vMax, maxPoint);
+
+        // OBB의 축 벡터를 월드 변환 행렬로 변환
+        for (int i = 0; i < 3; ++i)
+        {
+            XMVECTOR axis = XMLoadFloat3(&vAxis[i]);
+            axis = XMVector3TransformNormal(axis, matWorld);
+            XMStoreFloat3(&vAxis[i], axis);
+        }
     }
 };
 //--------------------------------------------------------------------------------------
@@ -184,6 +216,7 @@ public:
     static bool             RectToPoint(TRect& a, POINT& p);
     static bool             CircleToCircle(TCircle& a, TCircle& b);
 public:
+    static TCollisionType   OBBtoOBB(const T_BOX& obb1, const T_BOX& obb2);
     static TCollisionType   BoxToBox(T_BOX& a, T_BOX& b);
     static bool             BoxToInBox(T_BOX& a, T_BOX& b);
     static bool             BoxToPosition(T_BOX& a, XMFLOAT3& p);

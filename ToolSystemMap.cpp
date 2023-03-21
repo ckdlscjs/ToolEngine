@@ -368,8 +368,8 @@ Object* ToolSystemMap::CreateFbxObject(std::wstring szFullPath, XMVECTOR vPos, X
 
     pObject->SetShader(pVertexShader, pPixelShader);
     pObject->SetConstantData(cc);
-    pObject->SetTransform({ vPos , vRot, vScale });
     pObject->SetMesh(pMesh);
+    pObject->SetTransform({ vPos , vRot, vScale });
     pObject->SetMaterial(pMaterial);
     pObject->SetDrawMode(DRAW_MODE::MODE_SOLID);
     pObject->SetSpecify(OBJECT_SPECIFY::OBJECT_STATIC);
@@ -469,8 +469,8 @@ Object* ToolSystemMap::CreateSimpleBox(float fLength, XMVECTOR vPos, XMVECTOR vR
     _ObjectSystem.AddObject(pObject);
     pObject->SetShader(pVertexShader, pPixelShader);
     pObject->SetConstantData(cc);
-    pObject->SetTransform({ vPos , vRot, vScale });
     pObject->SetMesh(pMesh);
+    pObject->SetTransform({ vPos , vRot, vScale });
     pObject->SetDrawMode(DRAW_MODE::MODE_WIRE);
     pObject->SetSpecify(OBJECT_SPECIFY::OBJECT_SIMPLE);
 

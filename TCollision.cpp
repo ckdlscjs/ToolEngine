@@ -77,8 +77,55 @@ bool   TCollision::CircleToCircle(TCircle& a, TCircle& b)
     }
     return false;
 }
+TCollisionType  TCollision::OBBtoOBB(const T_BOX& obb1, const T_BOX& obb2)
+{
+    // Separating Axis Theorem (SAT) method
 
-TCollisionType   TCollision::BoxToBox(T_BOX& a, T_BOX& b)
+         // Compute the axes of the two OBBs
+    XMFLOAT3 axes[] = {
+        obb1.vAxis[0], obb1.vAxis[1], obb1.vAxis[2],
+        obb2.vAxis[0], obb2.vAxis[1], obb2.vAxis[2]
+    };
+
+    // Compute the centers of the two OBBs
+    XMFLOAT3 center1 = obb1.vCenter;
+    XMFLOAT3 center2 = obb2.vCenter;
+
+    // Compute the half extents of the two OBBs
+    XMFLOAT3 extent1 = { obb1.fExtent[0], obb1.fExtent[1], obb1.fExtent[2] };
+    XMFLOAT3 extent2 = { obb2.fExtent[0], obb2.fExtent[1], obb2.fExtent[2] };
+
+    // Test each axis for overlap
+    for (int i = 0; i < 6; i++) {
+        // Project the vertices of the first OBB onto the current axis
+        float min1 = FLT_MAX, max1 = -FLT_MAX;
+        for (int j = 0; j < 8; j++) {
+            XMFLOAT3 v1 = obb1.vPos[j];
+            float d = XMVectorGetX(XMVector3Dot(XMLoadFloat3(&v1), XMLoadFloat3(&axes[i])));
+            min1 = min(min1, d);
+            max1 = max(max1, d);
+        }
+
+        // Project the vertices of the second OBB onto the current axis
+        float min2 = FLT_MAX, max2 = -FLT_MAX;
+        for (int j = 0; j < 8; j++) {
+            XMFLOAT3 v2 = obb2.vPos[j];
+            float d = XMVectorGetX(XMVector3Dot(XMLoadFloat3(&v2), XMLoadFloat3(&axes[i])));
+            min2 = min(min2, d);
+            max2 = max(max2, d);
+        }
+
+        // Test for overlap
+        if (max1 < min2 || max2 < min1) {
+            // The two OBBs do not overlap on this axis, so they cannot be colliding
+            return TCollisionType::RECT_OUT;
+        }
+    }
+
+    // The two OBBs overlap on all axes, so they must be colliding
+    return TCollisionType::RECT_OVERLAP;
+}
+TCollisionType  TCollision::BoxToBox(T_BOX& a, T_BOX& b)
 {
     // 0 : 완전제외(0)
     // 1 : 완전포함(1) -> 걸쳐져 있는 상태(2)

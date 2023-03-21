@@ -40,10 +40,10 @@ T_BOX Object::CreateBoundingBox()
 	XMStoreFloat3(&min, minVertex);
 	if (max.y < _Epsilon)
 		max.y = 0;
-	XMFLOAT3 pos;
+	/*XMFLOAT3 pos;
 	XMStoreFloat3(&pos, m_Transform.position);
 	max += pos;
-	min += pos;
+	min += pos;*/
 	box.Set(max, min);
 	return box;
 }
@@ -90,7 +90,6 @@ XMVECTOR Object::GetScale()
 void Object::SetTransform(Transform transform)
 {
 	m_Transform = transform;
-	
 	XMVECTOR scale = m_Transform.scale;
 	XMVECTOR rotation = m_Transform.rotation;
 	XMFLOAT3 rotateAngle;
@@ -100,6 +99,7 @@ void Object::SetTransform(Transform transform)
 		_DegreeToRadian(rotateAngle.x),
 		_DegreeToRadian(rotateAngle.y),
 		_DegreeToRadian(rotateAngle.z)), translation);
+	m_Box.Set(m_ConstantData.matWorld);
 }
 
 void Object::SetMesh(Mesh* pMesh)
@@ -205,6 +205,7 @@ void Object::Render()
 				_EngineSystem.GetRenderSystem()->setTexture(m_pPixelShader, m_pMaterial->GetListTexture(idxNode)[idxSub]);
 			}
 			_EngineSystem.GetRenderSystem()->drawIndexedTriangleList(pAttribute->GetIndexBuffer()->getSizeIndexList(), 0, 0);
+			//_EngineSystem.GetRenderSystem()->drawTriangleList(pAttribute->GetListPNCT().size(), 0);
 		}
 	}
 }

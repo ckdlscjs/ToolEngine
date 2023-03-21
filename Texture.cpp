@@ -18,6 +18,7 @@ Texture::Texture(std::wstring szFullPath) : Resource(szFullPath), m_szFullPath(s
 		result = DirectX::LoadFromTGAFile(szFullPath.c_str(), nullptr, image_data);
 	else
 		result = DirectX::LoadFromWICFile(szFullPath.c_str(), DirectX::WIC_FLAGS_IGNORE_SRGB, nullptr, image_data);
+
 	if (FAILED(result))
 	{
 		std::wstring defaultDir = L"../../data/fbx/";

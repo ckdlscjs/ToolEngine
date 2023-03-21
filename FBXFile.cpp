@@ -140,23 +140,13 @@ void FBXFile::ParseMesh(FBXNode* pNode, int nodeIdx)
 				property = pSurface->FindProperty(FbxSurfaceMaterial::sDisplacementColor);
 			if (property.IsValid())
 			{
-				int size = property.GetSrcObjectCount();
-				if (!size)
+				const FbxFileTexture* tex = property.GetSrcObject<FbxFileTexture>(0);
+				if (tex)
 				{
-					pNode->m_ListTexture.resize(0);
-					pNode->m_ListTexture.clear();
-					return;
-				}
-				for (int idx = 0; idx < size; idx++)
-				{
-					const FbxFileTexture* tex = property.GetSrcObject<FbxFileTexture>(idx);
-					if (tex)
-					{
-						std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
-						std::wstring strW = converter.from_bytes(tex->GetFileName());
-						szFileName = strW;
-						texFullNameList[iMtrl] = szFileName;
-					}
+					std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
+					std::wstring strW = converter.from_bytes(tex->GetFileName());
+					szFileName = strW;
+					texFullNameList[iMtrl] = szFileName;
 				}
 			}
 			//else
@@ -192,7 +182,6 @@ void FBXFile::ParseMesh(FBXNode* pNode, int nodeIdx)
 			pNode->m_ListIndex[iTex].resize(iNumMtrl);*/
 		}
 	}
-	
 	
 	for (int idxPolygon = 0; idxPolygon < iNumPolygonCount; idxPolygon++)
 	{
@@ -295,6 +284,7 @@ void FBXFile::ParseMesh(FBXNode* pNode, int nodeIdx)
 				if (pNode->m_bSkinning)
 					pNode->m_ListVertexIW[iSubMtrl][vertexID] = iwVertex;*/
 				pNode->m_ListOriginIdx[iSubMtrl].push_back(vertexID);
+				//pNode->m_ListVertexPNCT[iSubMtrl].push_back(pnctVertex);
 			}
 		}
 	}

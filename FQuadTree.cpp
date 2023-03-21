@@ -425,7 +425,7 @@ FNode* FQuadTree::FindCollisionNode(FNode* pNode, Object* pObj)
     {
         if (pNode->m_pChild[i] != nullptr)
         {
-            if (TCollision::BoxToBox(pNode->m_pChild[i]->m_Box, pObj->m_Box))
+            if (TCollision::OBBtoOBB(pNode->m_pChild[i]->m_Box, pObj->m_Box))
             {
                 pNode = FindCollisionNode(pNode->m_pChild[i], pObj);
                 break;
