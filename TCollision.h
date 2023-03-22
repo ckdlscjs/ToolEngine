@@ -98,7 +98,7 @@ struct T_BOX
     XMFLOAT3		vMin;
     // OBB
     XMFLOAT3		vAxis[3];
-    float			fExtent[3];
+    float		    fExtent[3];
 
     unsigned int vRectIndices[36] =
     {
@@ -141,6 +141,7 @@ struct T_BOX
     }
     void Set(XMMATRIX matWorld)
     {
+        
         // 중심점을 월드 변환 행렬로 변환
         XMVECTOR center = XMLoadFloat3(&vCenter);
         center = XMVector3Transform(center, matWorld);
@@ -167,9 +168,49 @@ struct T_BOX
         for (int i = 0; i < 3; ++i)
         {
             XMVECTOR axis = XMLoadFloat3(&vAxis[i]);
-            axis = XMVector3TransformNormal(axis, matWorld);
+            axis = XMVector3Transform(axis, matWorld);
+            axis = XMVector3Normalize(axis);
             XMStoreFloat3(&vAxis[i], axis);
         }
+    }
+
+    friend std::ostream& operator<<(std::ostream& os, const T_BOX& tBox)
+    {
+        os << "vAxis:" << tBox.vAxis[0].x << " " << tBox.vAxis[0].y << " " << tBox.vAxis[0].z << " " 
+            << tBox.vAxis[1].x << " " << tBox.vAxis[1].y << " " << tBox.vAxis[1].z << " " 
+            << tBox.vAxis[2].x << " " << tBox.vAxis[2].y << " " << tBox.vAxis[2].z << ", ";
+        os << "fExtent:" << tBox.fExtent[0] << " " << tBox.fExtent[1] << " " << tBox.fExtent[2];
+        return os;
+    }
+
+    friend std::stringstream& operator>>(std::stringstream& is, T_BOX& tBox)
+    {
+        /*std::string line;
+        std::getline(is, line);*/
+
+        // axis 값을 추출합니다.
+        size_t axis_start = is.str().find("vAxis:") + strlen("vAxis:");
+        size_t axis_end = is.str().find(",", axis_start);
+        std::string axis_str = is.str().substr(axis_start, axis_end - axis_start);
+        std::istringstream axis_stream(axis_str);
+        XMFLOAT3 axis[3];
+        axis_stream >> axis[0].x >> axis[0].y >> axis[0].z >> axis[1].x >> axis[1].y >> axis[1].z >> axis[2].x >> axis[2].y >> axis[2].z;
+        tBox.vAxis[0] = axis[0];
+        tBox.vAxis[1] = axis[1];
+        tBox.vAxis[2] = axis[2];
+
+        // extent 값을 추출합니다.
+        size_t extent_start = is.str().find("fExtent:") + strlen("fExtent:");
+        size_t extent_end = is.str().find(",", extent_start);
+        std::string extent_str = is.str().substr(extent_start, extent_end - extent_start);
+        std::istringstream extent_stream(extent_str);
+        float extent[3];
+        extent_stream >> extent[0] >> extent[1] >> extent[2];
+        tBox.fExtent[0] = extent[0];
+        tBox.fExtent[1] = extent[1];
+        tBox.fExtent[2] = extent[2];
+
+        return is;
     }
 };
 //--------------------------------------------------------------------------------------

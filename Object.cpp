@@ -263,7 +263,8 @@ std::ostream& operator<<(std::ostream& os, const Object* pObject)
 	os << "m_DrawMode:" << pObject->m_DrawMode << ", ";
 	os << "m_InteractiveMode:" << pObject->m_InteractiveMode << ", ";
 	os << "m_Specify:" << pObject->m_Specify << ", ";
-	os << pObject->m_Transform;
+	os << pObject->m_Transform << ", ";
+	os << pObject->m_Box;
 	return os;
 }
 

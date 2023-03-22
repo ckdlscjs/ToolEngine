@@ -123,6 +123,110 @@ void ToolSystemMap::Splatting(XMVECTOR vIntersection, float fSplattingRadius, st
     g_pDeviceContext->UpdateSubresource(m_pQuadTree->m_pMaskAlphaTexture, 0, nullptr, m_pQuadTree->m_fAlphaData, RowPitch, DepthPitch);
 }
 
+bool RayOBBIntersect(const XMVECTOR& rayOrigin, const XMVECTOR& rayDirection, const T_BOX& obb)
+{
+    // OBB의 로컬-월드 변환 행렬을 구합니다.
+    XMMATRIX obbWorldMatrix = XMMatrixIdentity();
+    obbWorldMatrix.r[0] = XMVectorSet(obb.vAxis[0].x, obb.vAxis[0].y, obb.vAxis[0].z, 0.0f);
+    obbWorldMatrix.r[1] = XMVectorSet(obb.vAxis[1].x, obb.vAxis[1].y, obb.vAxis[1].z, 0.0f);
+    obbWorldMatrix.r[2] = XMVectorSet(obb.vAxis[2].x, obb.vAxis[2].y, obb.vAxis[2].z, 0.0f);
+    obbWorldMatrix.r[3] = XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);
+    XMMATRIX obbWorldMatrixInverse = XMMatrixInverse(nullptr, obbWorldMatrix);
+
+    // 레이의 원점을 OBB의 로컬 좌표계로 변환합니다.
+    XMVECTOR rayLocalOrigin = XMVectorSubtract(rayOrigin, XMLoadFloat3(&obb.vCenter));
+    rayLocalOrigin = XMVector3Transform(rayLocalOrigin, obbWorldMatrixInverse);
+
+    // 레이의 방향 벡터를 OBB의 로컬 좌표계로 변환합니다.
+    XMVECTOR rayLocalDirection = XMVector3TransformNormal(rayDirection, obbWorldMatrixInverse);
+
+    // OBB의 AABB와 레이의 교차 여부를 검사합니다.
+    float tMin = -9999999.9f;
+    float tMax = 999999.9f;
+    for (int i = 0; i < 3; ++i)
+    {
+        float e = XMVectorGetX(XMVector3Dot(XMLoadFloat3(&obb.vAxis[i]), rayLocalDirection));
+        float f = XMVectorGetX(XMVector3Dot(XMLoadFloat3(&obb.vAxis[i]), rayLocalOrigin));
+        if (fabsf(e) > 0.001f) // Avoid division by zero
+        {
+            float t1 = (f + obb.fExtent[i]) / e;
+            float t2 = (f - obb.fExtent[i]) / e;
+
+            if (t1 > t2)  std::swap(t1, t2);     
+            if (t1 > tMin) tMin = t1;
+            if (t2 < tMax) tMax = t2;
+            if (tMin > tMax) return false;
+            if (tMax < 0.0f) return false;
+        }
+    }
+
+    return true;
+}
+//bool RayOBBIntersection(XMVECTOR& rayOrigin, XMVECTOR& rayDirection, T_BOX& obb, float& dist)
+//{
+//    // Step 1: Define the ray
+//    XMVECTOR rayLocalOrigin, rayLocalDirection;
+//    rayLocalOrigin = rayOrigin - XMLoadFloat3(&obb.vCenter);
+//
+//    rayLocalDirection = XMVector3Normalize(rayDirection);
+//
+//    // Step 2: Calculate the inverse transformation matrix
+//    XMMATRIX inverseTransform = XMMatrixInverse(nullptr, XMMatrixSet(
+//        obb.vAxis[0].x, obb.vAxis[0].y, obb.vAxis[0].z, 0.0f,
+//        obb.vAxis[1].x, obb.vAxis[1].y, obb.vAxis[1].z, 0.0f,
+//        obb.vAxis[2].x, obb.vAxis[2].y, obb.vAxis[2].z, 0.0f,
+//        0.0f, 0.0f, 0.0f, 1.0f
+//    ));
+//
+//    // Step 3: Transform the ray into the OBB's local space
+//    XMVECTOR localOrigin = XMVector3TransformCoord(rayLocalOrigin, inverseTransform);
+//    XMVECTOR localDirection = XMVector3TransformNormal(rayLocalDirection, inverseTransform);
+//    rayLocalOrigin = localOrigin;
+//    rayLocalDirection = localDirection;
+//
+//    // Steps 4-6: Calculate the OBB's axes and extents
+//    XMFLOAT3 axis[3] = { obb.vAxis[0], obb.vAxis[1], obb.vAxis[2] };
+//    float extents[3] = { obb.fExtent[0], obb.fExtent[1], obb.fExtent[2] };
+//    XMFLOAT3 minPoint = obb.vMin;
+//    XMFLOAT3 maxPoint = obb.vMax;
+//
+//    // Step 7: Calculate the intersection distances
+//    float tMin = -FLT_MAX, tMax = FLT_MAX;
+//    for (int i = 0; i < 3; ++i)
+//    {
+//        float e = XMVectorGetX(XMVector3Dot(XMLoadFloat3(&axis[i]), localDirection));
+//        float f = XMVectorGetX(XMVector3Dot(XMLoadFloat3(&axis[i]), localOrigin));
+//        if (fabsf(e) > 0.001f) // Avoid division by zero
+//        {
+//            float t1 = (f + extents[i]) / e;
+//            float t2 = (f - extents[i]) / e;
+//            if (t1 > t2) std::swap(t1, t2);
+//            if (t1 > tMin) tMin = t1;
+//            if (t2 < tMax) tMax = t2;
+//            if (tMin > tMax) return false;
+//            if (tMax < 0.0f) return false;
+//        }
+//        else if ((-f - extents[i]) > 0.0f || (-f + extents[i]) < 0.0f)
+//        {
+//            return false;
+//        }
+//    }
+//
+//    // Step 8: Check if there is an intersection
+//    if (tMin > 0.0f)
+//    {
+//        dist = tMin;
+//    }
+//    else
+//    {
+//        dist = tMax;
+//    }
+//
+//    // Step 9: Calculate the intersection point
+//    //XMFLOAT3 intersectionPoint = rayOrigin + rayDirection * t;
+//    return true;
+//}
+
 bool IntersectRayBox(const XMVECTOR& rayOrigin, const XMVECTOR& rayDirection, const T_BOX& box)
 {
     XMFLOAT3 vMin = box.vMin;
@@ -168,7 +272,7 @@ bool ToolSystemMap::GetInterSection()
     std::map<float, XMVECTOR> chkDist;
     for (const auto& node : m_pQuadTree->m_pDrawLeafNodeList)
     {
-        float tmin, tmax;
+        float fDist;
         if (IntersectRayBox(_PhysicsSystem.GetSelect().m_Ray.vOrigin, _PhysicsSystem.GetSelect().m_Ray.vDirection, node->m_Box))
         {
             UINT index = 0;
@@ -624,6 +728,9 @@ void ToolSystemMap::OpenFile(std::wstring szFullPath)
 
                     Transform transform;
                     texturesStream >> transform;
+
+                    T_BOX box;
+                    texturesStream >> box;
 
                     float length;
 
