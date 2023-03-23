@@ -57,6 +57,7 @@ HRESULT FQuadTree::CreateAlphaTexture(DWORD dwWidth, DWORD dwHeight, BYTE* fAlph
 }
 
 #include "SimpleBox.h"
+#include "SimpleSphere.h"
 std::ostream& operator<<(std::ostream& os, const FQuadTree* pQuadTree)
 {
     os << "m_pTexture:" << pQuadTree->m_pTexture->GetTextureName() << std::endl;
@@ -81,10 +82,15 @@ std::ostream& operator<<(std::ostream& os, const FQuadTree* pQuadTree)
     os << "m_pAllObjectList:" << std::endl;
     for (const auto& object : pQuadTree->m_pAllObjectList)
     {
-
         os << object;
         if (object->GetSpecify() == OBJECT_SPECIFY::OBJECT_SIMPLE || object->GetSpecify() == OBJECT_SPECIFY::OBJECT_COLLIDER)
             os <<", " << "m_fLength:" << static_cast<SimpleBox*>(object)->GetLength();
+        else if (object->GetSpecify() == OBJECT_SPECIFY::OBJECT_SKYDOME)
+        {
+            os << ", " << "m_fRadius:" << static_cast<SimpleSphere*>(object)->GetRadius();
+            os << ", " << "m_iSliceCount:" << static_cast<SimpleSphere*>(object)->GetSliceCount();
+            os << ", " << "m_iStackCount:" << static_cast<SimpleSphere*>(object)->GetStackCount();
+        }
         os << std::endl;       
     }
 

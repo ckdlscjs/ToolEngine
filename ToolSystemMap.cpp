@@ -446,7 +446,7 @@ Object* ToolSystemMap::CreateSimpleSphere(float radius, UINT sliceCount, UINT st
 {
     std::wstring szName;
     if (specify == OBJECT_SPECIFY::OBJECT_SKYDOME)
-        szName = L"SkyDome";
+        szName = szCurrentImage;
     else
         szName = L"SimpleSphere";
     SimpleSphere* pObject = new SimpleSphere(szName);
@@ -580,8 +580,8 @@ Object* ToolSystemMap::CreateSimpleSphere(float radius, UINT sliceCount, UINT st
     pObject->SetSpecify(specify);
 
 
-    //if (m_pQuadTree)
-    //    m_pQuadTree->AddObject(pObject);
+    if (m_pQuadTree)
+        m_pQuadTree->AddObject(pObject);
 
     return pObject;
 }
@@ -734,25 +734,52 @@ void ToolSystemMap::OpenFile(std::wstring szFullPath)
                     T_BOX box;
                     texturesStream >> box;
 
-                    float length;
-
+                    float fLength;
+                    float fRadius;
+                    UINT iSliceCount;
+                    UINT iStackCount;
                     if (specifyMode == OBJECT_SPECIFY::OBJECT_COLLIDER || specifyMode == OBJECT_SPECIFY::OBJECT_SIMPLE)
                     {
-                        // pos 값을 추출합니다.
-                        size_t pos_start = texturesStream.str().find("m_fLength:") + strlen("m_fLength:");
-                        size_t pos_end = texturesStream.str().find(",", pos_start);
-                        std::string pos_str = texturesStream.str().substr(pos_start, pos_end - pos_start);
-                        std::istringstream pos_stream(pos_str);
-                        pos_stream >> length;
+                        // Length 값을 추출합니다.
+                        size_t length_start = texturesStream.str().find("m_fLength:") + strlen("m_fLength:");
+                        size_t length_end = texturesStream.str().find(",", length_start);
+                        std::string length_str = texturesStream.str().substr(length_start, length_end - length_start);
+                        std::istringstream length_stream(length_str);
+                        length_stream >> fLength;
+                    }
+                    else if (specifyMode == OBJECT_SPECIFY::OBJECT_SKYDOME)
+                    {
+                        // radius 값을 추출합니다.
+                        size_t radius_start = texturesStream.str().find("m_fRadius:") + strlen("m_fRadius:");
+                        size_t radius_end = texturesStream.str().find(",", radius_start);
+                        std::string radius_str = texturesStream.str().substr(radius_start, radius_end - radius_start);
+                        std::istringstream radius_stream(radius_str);
+                        radius_stream >> fRadius;
+
+                        // slice 값을 추출합니다.
+                        size_t slice_start = texturesStream.str().find("m_iSliceCount:") + strlen("m_iSliceCount:");
+                        size_t slice_end = texturesStream.str().find(",", slice_start);
+                        std::string slice_str = texturesStream.str().substr(slice_start, slice_end - slice_start);
+                        std::istringstream slice_stream(slice_str);
+                        slice_stream >> iSliceCount;
+
+                        // stack 값을 추출합니다.
+                        size_t stack_start = texturesStream.str().find("m_iStackCount:") + strlen("m_iStackCount:");
+                        size_t stack_end = texturesStream.str().find(",", stack_start);
+                        std::string stack_str = texturesStream.str().substr(stack_start, stack_end - stack_start);
+                        std::istringstream stack_stream(stack_str);
+                        stack_stream >> iStackCount;
                     }
 
                     Object* pObject = nullptr;
                     if (specifyMode == OBJECT_SPECIFY::OBJECT_COLLIDER || specifyMode == OBJECT_SPECIFY::OBJECT_SIMPLE)
-                        pObject = CreateSimpleBox(length, specifyMode, transform.position, transform.rotation, transform.scale);
+                        pObject = CreateSimpleBox(fLength, specifyMode, transform.position, transform.rotation, transform.scale);
                     else if (specifyMode == OBJECT_SPECIFY::OBJECT_STATIC)
                         pObject = CreateFbxObject(_tomw(strName), transform.position, transform.rotation, transform.scale);
-                    else if (specifyMode == OBJECT_SPECIFY::OBJECT_SKELETON)
-                        pObject = CreateFbxObject(_tomw(str), transform.position, transform.rotation, transform.scale);
+                   /* else if (specifyMode == OBJECT_SPECIFY::OBJECT_SKELETON)
+                        pObject = CreateFbxObject(_tomw(str), transform.position, transform.rotation, transform.scale);*/
+                    else if (specifyMode == OBJECT_SPECIFY::OBJECT_SKYDOME)
+                        pObject = CreateSimpleSphere(fRadius, iSliceCount, iStackCount, specifyMode, _tomw(strName), transform.position, transform.rotation, transform.scale);
 
                     allObjectList.insert(pObject);
                     prevPos = is.tellg();
