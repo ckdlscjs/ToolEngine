@@ -29,6 +29,7 @@ public:
 	/*CreateBlock*/
 	Object* CreateFbxObject(std::wstring szFullPath, XMVECTOR vPos, XMVECTOR vRot = { 0, 0, 0, 0 }, XMVECTOR vScale = { 1, 1, 1, 0 });
 	Object* CreateSimpleBox(float fLength, OBJECT_SPECIFY specify, XMVECTOR vPos, XMVECTOR vRot = { 0, 0, 0, 0 }, XMVECTOR vScale = { 1, 1, 1, 0 });
+	Object* CreateSimpleSphere(float radius, UINT sliceCount, UINT stackCount, OBJECT_SPECIFY specify, std::wstring szCurrentImage = L"", XMVECTOR vPos = { 0, 0, 0, 0 }, XMVECTOR vRot = { 0, 0, 0, 0 }, XMVECTOR vScale = { 1, 1, 1, 0 });
 	FQuadTree* CreateSimpleMap(int iWidth, int iHeight,float fDistance, std::wstring szFullPath);
 	void DeleteSimpleMap();
 

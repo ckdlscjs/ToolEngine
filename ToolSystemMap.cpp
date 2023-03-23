@@ -441,6 +441,151 @@ Object* ToolSystemMap::CreateSimpleBox(float fLength, OBJECT_SPECIFY specify, XM
     return pObject;
 }
 
+#include "SimpleSphere.h"
+Object* ToolSystemMap::CreateSimpleSphere(float radius, UINT sliceCount, UINT stackCount, OBJECT_SPECIFY specify, std::wstring szCurrentImage, XMVECTOR vPos, XMVECTOR vRot, XMVECTOR vScale)
+{
+    std::wstring szName;
+    if (specify == OBJECT_SPECIFY::OBJECT_SKYDOME)
+        szName = L"SkyDome";
+    else
+        szName = L"SimpleSphere";
+    SimpleSphere* pObject = new SimpleSphere(szName);
+    pObject->SetRadius(radius);
+    pObject->SetSliceCount(sliceCount);
+    pObject->SetStackCount(stackCount);
+    // Calculate vertices and indices for the sphere
+    float phiStep = XM_PI / stackCount;
+    float thetaStep = 2.0f * XM_PI / sliceCount;
+    std::vector<PNCTVertex> vertices;
+    std::vector<unsigned int> indices;
+    for (UINT i = 0; i <= stackCount; i++)
+    {
+        float phi = i * phiStep;
+
+        for (UINT j = 0; j <= sliceCount; j++)
+        {
+            float theta = j * thetaStep;
+
+            PNCTVertex vertex;
+
+            vertex.pos.x = radius * sinf(phi) * cosf(theta);
+            vertex.pos.y = radius * cosf(phi);
+            vertex.pos.z = radius * sinf(phi) * sinf(theta);
+
+            vertex.normal = vertex.pos;
+            XMStoreFloat3(&vertex.normal, XMVector3Normalize(XMLoadFloat3(&vertex.normal)));
+
+            vertex.color = XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
+
+            vertex.tex.x = (float)j / (float)sliceCount;
+            vertex.tex.y = (float)i / (float)stackCount;
+
+            vertices.push_back(vertex);
+        }
+    }
+
+    for (UINT i = 0; i < stackCount; i++)
+    {
+        for (UINT j = 0; j < sliceCount; j++)
+        {
+            UINT index1 = i * (sliceCount + 1) + j;
+            UINT index2 = i * (sliceCount + 1) + j + 1;
+            UINT index3 = (i + 1) * (sliceCount + 1) + j;
+            UINT index4 = (i + 1) * (sliceCount + 1) + j + 1;
+
+            indices.push_back(index1);
+            indices.push_back(index3);
+            indices.push_back(index2);
+
+            indices.push_back(index2);
+            indices.push_back(index3);
+            indices.push_back(index4);
+        }
+    }
+
+
+    CBufferData cc;
+    cc.matWorld = XMMatrixIdentity();
+    cc.matView = m_pCamera->m_matCamera;
+    cc.matProj = m_pCamera->m_matProj;
+
+    Mesh* pMesh = _EngineSystem.GetMeshSystem()->CreateMeshFromFile(szName);
+    
+    std::wstring szVSPath = L"FbxVertexShader.hlsl";
+    std::wstring szPSPath = L"FbxPixelShader.hlsl";
+    void* shader_byte_code_vs = nullptr;
+    void* shader_byte_code_ps = nullptr;
+    size_t size_shader_vs = 0;
+    size_t size_shader_ps = 0;
+    _EngineSystem.GetRenderSystem()->CompileVertexShader(szVSPath.c_str(), "vsmain", "vs_5_0", &shader_byte_code_vs, &size_shader_vs);
+    VertexShader* pVertexShader = _EngineSystem.GetRenderSystem()->CreateVertexShader(shader_byte_code_vs, size_shader_vs);
+    _EngineSystem.GetRenderSystem()->CompilePixelShader(szCurrentImage.empty() ? L"SimpleObjectPixelShader.hlsl" : szPSPath.c_str(), "psmain", "ps_5_0", &shader_byte_code_ps, &size_shader_ps);
+    PixelShader* pPixelShader = _EngineSystem.GetRenderSystem()->CreatePixelShader(shader_byte_code_ps, size_shader_ps);
+
+    if (pMesh->IsEmpty())
+    {
+        VertexBuffer* pVertexBufferPNCT = _EngineSystem.GetRenderSystem()->CreateVertexBuffer(&vertices[0], sizeof(PNCTVertex), vertices.size());
+        IndexBuffer* pIndexBuffer = _EngineSystem.GetRenderSystem()->CreateIndexBuffer(&indices[0], indices.size());
+        InputLayout* pInputLayout = _EngineSystem.GetRenderSystem()->CreateInputLayout(shader_byte_code_vs, size_shader_vs, INPUT_LAYOUT::PNCT);
+
+        MeshNode* pMeshNode = new MeshNode();
+        NodeAttribute* pAttribute = new NodeAttribute();
+        pAttribute->SetInputLayout(pInputLayout);
+        pAttribute->SetListPNCT(&vertices[0], vertices.size());
+        pAttribute->SetVertexBufferPNCT(pVertexBufferPNCT);
+        pAttribute->SetListIndex(&indices[0], indices.size());
+        pAttribute->SetIndexBuffer(pIndexBuffer);
+        pMeshNode->SetAttribute(pAttribute);
+        pMesh->SetMeshNode(pMeshNode);
+    }
+
+    if (!szCurrentImage.empty())
+    {
+        Material* pMaterial = _MaterialSystem.CreateMaterial(szName);
+        if (pMaterial->IsEmpty())
+        {
+            pMaterial->GetListTextures().resize(pMesh->GetMeshNodeList().size());
+            for (int nodeCount = 0; nodeCount < pMesh->GetMeshNodeList().size(); nodeCount++)
+            {
+                pMaterial->GetListTextures()[nodeCount].resize(pMesh->GetMeshNodeList()[nodeCount]->GetAttributeList().size());
+                std::vector<Texture*> listTex;
+                for (int nodeMaterialCount = 0; nodeMaterialCount < pMesh->GetMeshNodeList()[nodeCount]->GetAttributeList().size(); nodeMaterialCount++)
+                {
+                    if (pMesh->GetMeshNodeList()[nodeCount]->GetAttributeList().empty())
+                    {
+                        listTex.push_back(nullptr);
+                    }
+                    else
+                    {
+                        listTex.push_back(_EngineSystem.GetTextureSystem()->CreateTextureFromFile(szCurrentImage.c_str()));
+                    }
+                }
+                for (int idx = 0; idx < listTex.size(); idx++)
+                    pMaterial->GetListTextures()[nodeCount][idx] = listTex[idx];
+            }
+        }
+        pObject->SetMaterial(pMaterial);
+    }
+   
+    _EngineSystem.GetRenderSystem()->ReleaseBlob();
+
+    
+
+    _ObjectSystem.AddObject(pObject);
+    pObject->SetShader(pVertexShader, pPixelShader);
+    pObject->SetConstantData(cc);
+    pObject->SetMesh(pMesh);
+    pObject->SetTransform({ vPos , vRot, vScale });
+    pObject->SetDrawMode(szCurrentImage.empty() ? DRAW_MODE::MODE_WIRE : DRAW_MODE::MODE_SOLID);
+    pObject->SetSpecify(specify);
+
+
+    //if (m_pQuadTree)
+    //    m_pQuadTree->AddObject(pObject);
+
+    return pObject;
+}
+
 FQuadTree* ToolSystemMap::CreateSimpleMap(int iWidth, int iHeight, float fDistance, std::wstring szFullPath)
 {
     if (szFullPath.empty())

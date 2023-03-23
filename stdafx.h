@@ -232,6 +232,7 @@ enum class OBJECT_SPECIFY
 	OBJECT_SPAWN,
 	OBJECT_EFFECT,
 	OBJECT_COLLIDER,
+	OBJECT_SKYDOME,
 };
 static std::ostream& operator<<(std::ostream& os, const OBJECT_SPECIFY& mode)
 {
@@ -249,6 +250,8 @@ static std::ostream& operator<<(std::ostream& os, const OBJECT_SPECIFY& mode)
 			os << "OBJECT_SPAWN"; break;
 		case OBJECT_SPECIFY::OBJECT_COLLIDER:
 			os << "OBJECT_COLLIDER"; break;
+		case OBJECT_SPECIFY::OBJECT_SKYDOME:
+			os << "OBJECT_SKYDOME"; break;
 	}
 	return os;
 }
@@ -269,6 +272,8 @@ static std::stringstream& operator>>(std::stringstream& is, OBJECT_SPECIFY& mode
 		mode = OBJECT_SPECIFY::OBJECT_SPAWN;
 	else if (pos_str == "OBJECT_COLLIDER")
 		mode = OBJECT_SPECIFY::OBJECT_COLLIDER;
+	else if (pos_str == "OBJECT_SKYDOME")
+		mode = OBJECT_SPECIFY::OBJECT_SKYDOME;
 
 	return is;
 }

@@ -64,6 +64,7 @@
     <ClInclude Include="ObjectSystem.h" />
     <ClInclude Include="ResourceSystem.h" />
     <ClInclude Include="SimpleBox.h" />
+    <ClInclude Include="SimpleSphere.h" />
     <ClInclude Include="stb_image.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="SwapChain.h" />
@@ -121,6 +122,7 @@
     <ClCompile Include="ObjectSystem.cpp" />
     <ClCompile Include="ResourceSystem.cpp" />
     <ClCompile Include="SimpleBox.cpp" />
+    <ClCompile Include="SimpleSphere.cpp" />
     <ClCompile Include="SwapChain.cpp" />
     <ClCompile Include="TCollision.cpp" />
     <ClCompile Include="Texture.cpp" />

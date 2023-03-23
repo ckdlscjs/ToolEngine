@@ -84,11 +84,17 @@ void ImguiSystem::Update()
     static int iMapSize = 4;
     static float fMapDistance = 1.0f;
 
+
+    static float fSkyRadius = 1.0f;
+    static int iSliceCount = 0;
+    static int iStackCount = 0;
+
+   
     static bool bSimpleObj = false;
     static bool bSimple = false;
+    static float fSimpleObjLength = 1.0f; 
     static bool bCollider = false;
     static bool bTrigger = false;
-    static float fSimpleObjLength = 1.0f;
 
     static bool bFbxObj = false;
 
@@ -253,6 +259,22 @@ void ImguiSystem::Update()
 
             ImGui::InputFloat("CellDistance", &fMapDistance);
 
+        }
+        ImGui::Dummy({ 0, 10 });
+
+        {
+            if (ImGui::Button("CreateSkyDome"))
+            {
+                _ToolSystemMap.CreateSimpleSphere(fSkyRadius, iSliceCount, iStackCount, OBJECT_SPECIFY::OBJECT_SKYDOME, szCurrentImage);
+            }
+            ImGui::SameLine();
+            if (ImGui::Button("DeleteSkyDome"))
+            {
+                /*_ToolSystemMap.DeleteSimpleMap();*/
+            }
+            ImGui::InputFloat("SkyRadius", &fSkyRadius);
+            ImGui::InputInt("SliceCount", &iSliceCount);
+            ImGui::InputInt("StackCount", &iStackCount);
         }
         ImGui::Dummy({ 0, 10 });
         
