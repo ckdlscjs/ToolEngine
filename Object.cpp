@@ -99,7 +99,6 @@ void Object::SetTransform(Transform transform)
 		_DegreeToRadian(rotateAngle.x),
 		_DegreeToRadian(rotateAngle.y),
 		_DegreeToRadian(rotateAngle.z)), translation);
-	//m_Box.Set(m_ConstantData.matWorld);
 }
 
 void Object::SetMesh(Mesh* pMesh)

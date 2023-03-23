@@ -139,6 +139,8 @@ struct T_BOX
         vPos[6] = XMFLOAT3(vMax.x, vMax.y, vMax.z);
         vPos[7] = XMFLOAT3(vMax.x, vMax.y, vMin.z);
     }
+
+    //ThisFunction ErrorOccured!
     void Set(XMMATRIX matWorld)
     {
         
@@ -172,6 +174,9 @@ struct T_BOX
             axis = XMVector3Normalize(axis);
             XMStoreFloat3(&vAxis[i], axis);
         }
+        fExtent[0] = vMax.x - vCenter.x;
+        fExtent[1] = vMax.y - vCenter.y;
+        fExtent[2] = vMax.z - vCenter.z;
     }
 
     friend std::ostream& operator<<(std::ostream& os, const T_BOX& tBox)
