@@ -123,42 +123,50 @@ void ToolSystemMap::Splatting(XMVECTOR vIntersection, float fSplattingRadius, st
     g_pDeviceContext->UpdateSubresource(m_pQuadTree->m_pMaskAlphaTexture, 0, nullptr, m_pQuadTree->m_fAlphaData, RowPitch, DepthPitch);
 }
 
-bool RayOBBIntersect(const XMVECTOR& rayOrigin, const XMVECTOR& rayDirection, const T_BOX& obb)
+bool RayOBBIntersect(const XMVECTOR& rayOrigin, const XMVECTOR& rayDirection, const T_BOX& obb, float& dist)
 {
-    // OBB의 로컬-월드 변환 행렬을 구합니다.
-    XMMATRIX obbWorldMatrix = XMMatrixIdentity();
-    obbWorldMatrix.r[0] = XMVectorSet(obb.vAxis[0].x, obb.vAxis[0].y, obb.vAxis[0].z, 0.0f);
-    obbWorldMatrix.r[1] = XMVectorSet(obb.vAxis[1].x, obb.vAxis[1].y, obb.vAxis[1].z, 0.0f);
-    obbWorldMatrix.r[2] = XMVectorSet(obb.vAxis[2].x, obb.vAxis[2].y, obb.vAxis[2].z, 0.0f);
-    obbWorldMatrix.r[3] = XMVectorSet(0.0f, 0.0f, 0.0f, 1.0f);
-    XMMATRIX obbWorldMatrixInverse = XMMatrixInverse(nullptr, obbWorldMatrix);
+    // Calculate the center and extent of the OBB
+    XMVECTOR vCenter = XMLoadFloat3(&obb.vCenter);
+    XMVECTOR vExtent = XMVectorSet(obb.fExtent[0], obb.fExtent[1], obb.fExtent[2], 0.0f);
 
-    // 레이의 원점을 OBB의 로컬 좌표계로 변환합니다.
-    XMVECTOR rayLocalOrigin = XMVectorSubtract(rayOrigin, XMLoadFloat3(&obb.vCenter));
-    rayLocalOrigin = XMVector3Transform(rayLocalOrigin, obbWorldMatrixInverse);
+    // Calculate the ray origin in local space of the OBB
+    XMVECTOR vRayOriginLocal = rayOrigin - vCenter;
 
-    // 레이의 방향 벡터를 OBB의 로컬 좌표계로 변환합니다.
-    XMVECTOR rayLocalDirection = XMVector3TransformNormal(rayDirection, obbWorldMatrixInverse);
+    // Calculate the inverse of the OBB's world matrix
+    XMMATRIX matWorld = XMMatrixIdentity();
+    matWorld.r[0] = XMLoadFloat3(&obb.vAxis[0]);
+    matWorld.r[1] = XMLoadFloat3(&obb.vAxis[1]);
+    matWorld.r[2] = XMLoadFloat3(&obb.vAxis[2]);
+    matWorld.r[3] = vCenter;
+    XMMATRIX matWorldInverse = XMMatrixInverse(nullptr, matWorld);
 
-    // OBB의 AABB와 레이의 교차 여부를 검사합니다.
-    float tMin = -9999999.9f;
-    float tMax = 999999.9f;
-    for (int i = 0; i < 3; ++i)
-    {
-        float e = XMVectorGetX(XMVector3Dot(XMLoadFloat3(&obb.vAxis[i]), rayLocalDirection));
-        float f = XMVectorGetX(XMVector3Dot(XMLoadFloat3(&obb.vAxis[i]), rayLocalOrigin));
-        if (fabsf(e) > 0.001f) // Avoid division by zero
-        {
-            float t1 = (f + obb.fExtent[i]) / e;
-            float t2 = (f - obb.fExtent[i]) / e;
+    // Transform the ray to local space of the OBB
+    XMVECTOR vRayDirectionLocal = XMVector3Normalize(XMVector3TransformNormal(rayDirection, matWorldInverse));
+    XMVECTOR vRayOriginLocalTransformed = XMVector3TransformCoord(vRayOriginLocal, matWorldInverse);
 
-            if (t1 > t2)  std::swap(t1, t2);     
-            if (t1 > tMin) tMin = t1;
-            if (t2 < tMax) tMax = t2;
-            if (tMin > tMax) return false;
-            if (tMax < 0.0f) return false;
+    // Perform ray-OBB intersection test
+    float tmin = -XMVectorGetX(vExtent);
+    float tmax = XMVectorGetX(vExtent);
+    for (int i = 0; i < 3; ++i) {
+        float e = XMVectorGetByIndex(vExtent, i);
+        float d = XMVectorGetByIndex(vRayDirectionLocal, i);
+        float o = XMVectorGetByIndex(vRayOriginLocalTransformed, i);
+
+        if (fabsf(d) > FLT_EPSILON) {
+            float t1 = (tmin - o) / d;
+            float t2 = (tmax - o) / d;
+            if (t1 > t2) std::swap(t1, t2);
+            if (t1 > -e) tmin = t1;
+            if (t2 < e) tmax = t2;
+            if (tmin > tmax) return false;
+        }
+        else if (-o > e || o > e) {
+            return false;
         }
     }
+
+    // Store the intersection distance
+    dist = tmin;
 
     return true;
 }
@@ -273,7 +281,7 @@ bool ToolSystemMap::GetInterSection()
     for (const auto& node : m_pQuadTree->m_pDrawLeafNodeList)
     {
         float fDist;
-        if (IntersectRayBox(_PhysicsSystem.GetSelect().m_Ray.vOrigin, _PhysicsSystem.GetSelect().m_Ray.vDirection, node->m_Box))
+        if (RayOBBIntersect(_PhysicsSystem.GetSelect().m_Ray.vOrigin, _PhysicsSystem.GetSelect().m_Ray.vDirection, node->m_Box, fDist))
         {
             UINT index = 0;
             UINT iNumFace = node->m_IndexList.size() / 3;

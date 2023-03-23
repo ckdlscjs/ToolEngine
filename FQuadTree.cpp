@@ -501,6 +501,7 @@ void FQuadTree::Render()
     _EngineSystem.GetRenderSystem()->SetVertexBuffer(m_pMap->m_pVertexBuffer);
     _EngineSystem.GetRenderSystem()->setTexture(m_pVertexShader, m_pTexture);
     _EngineSystem.GetRenderSystem()->setTexture(m_pPixelShader, m_pTexture);
+
     g_pDeviceContext->PSSetShaderResources(1, 1, &m_pMaskAlphaSrv);
     for (int idx = 0; idx < m_ListTextureSplatting.size(); idx++)
         g_pDeviceContext->PSSetShaderResources(2 + idx, 1, &m_ListTextureSplatting[idx]->m_pShaderResourceView);
@@ -509,5 +510,63 @@ void FQuadTree::Render()
     {
         g_pDeviceContext->IASetIndexBuffer(m_pDrawLeafNodeList[idx]->m_pIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
         _EngineSystem.GetRenderSystem()->drawIndexedTriangleList(m_pDrawLeafNodeList[idx]->m_dwFace * 3, 0, 0);
+        
+        if (_InputSystem.GetKey('V'))
+        {
+            /*NodeBoxCheck*/
+            //_EngineSystem.GetRenderSystem()->SetWireFrame(DRAW_MODE::MODE_WIRE);
+
+            void* shader_byte_code_vs = nullptr;
+            void* shader_byte_code_ps = nullptr;
+            size_t size_shader_vs = 0;
+            size_t size_shader_ps = 0;
+            _EngineSystem.GetRenderSystem()->CompileVertexShader(L"FbxVertexShader.hlsl", "vsmain", "vs_5_0", &shader_byte_code_vs, &size_shader_vs);
+            VertexShader* pVertexShader = _EngineSystem.GetRenderSystem()->CreateVertexShader(shader_byte_code_vs, size_shader_vs);
+            _EngineSystem.GetRenderSystem()->CompilePixelShader(L"SimpleObjectPixelShader.hlsl", "psmain", "ps_5_0", &shader_byte_code_ps, &size_shader_ps);
+            PixelShader* pPixelShader = _EngineSystem.GetRenderSystem()->CreatePixelShader(shader_byte_code_ps, size_shader_ps);
+            PNCTVertex vertex_list[] =
+            {
+                //FrontFace
+                {m_pDrawLeafNodeList[idx]->m_Box.vPos[0],	XMFLOAT3(1, 0, 0),      XMFLOAT4(0, 1, 0, 1),   XMFLOAT2(0,1)},
+                {m_pDrawLeafNodeList[idx]->m_Box.vPos[1], 	XMFLOAT3(0, 1, 0),      XMFLOAT4(0, 1, 0, 1),   XMFLOAT2(0,0)},
+                {m_pDrawLeafNodeList[idx]->m_Box.vPos[2], 	XMFLOAT3(0, 0, 1),      XMFLOAT4(0, 1, 0, 1),   XMFLOAT2(1,0)},
+                {m_pDrawLeafNodeList[idx]->m_Box.vPos[3],	XMFLOAT3(1, 1, 0),      XMFLOAT4(0, 1, 0, 1),   XMFLOAT2(1,1)},
+
+                //BackFace
+                {m_pDrawLeafNodeList[idx]->m_Box.vPos[4],	XMFLOAT3(1, 0, 0),      XMFLOAT4(0, 1, 0, 1),   XMFLOAT2(0,1)},
+                {m_pDrawLeafNodeList[idx]->m_Box.vPos[5],	XMFLOAT3(0, 1, 0),      XMFLOAT4(0, 1, 0, 1),   XMFLOAT2(0,0)},
+                {m_pDrawLeafNodeList[idx]->m_Box.vPos[6], 	XMFLOAT3(0, 0, 1),      XMFLOAT4(0, 1, 0, 1),   XMFLOAT2(1,0)},
+                {m_pDrawLeafNodeList[idx]->m_Box.vPos[7],	XMFLOAT3(1, 1, 0),      XMFLOAT4(0, 1, 0, 1),   XMFLOAT2(1,1)},
+            };
+            UINT size_vertex_list = ARRAYSIZE(vertex_list);
+
+            VertexBuffer* pVertexBuffer = _EngineSystem.GetRenderSystem()->CreateVertexBuffer(vertex_list, sizeof(PNCTVertex), size_vertex_list);
+            IndexBuffer* pIndexBuffer = _EngineSystem.GetRenderSystem()->CreateIndexBuffer(m_pDrawLeafNodeList[idx]->m_Box.vRectIndices, sizeof(unsigned int) * 36);
+            InputLayout* pInputLayout = _EngineSystem.GetRenderSystem()->CreateInputLayout(shader_byte_code_vs, size_shader_vs, INPUT_LAYOUT::PNCT);
+            CBufferData cbData;
+            cbData.matWorld = m_constantDataMap.matWorld;
+            cbData.matView = _CameraSystem.GetCurrentCamera()->m_matCamera;
+            cbData.matProj = _CameraSystem.GetCurrentCamera()->m_matProj;
+            ConstantBuffer* pConstantBuffer = _EngineSystem.GetRenderSystem()->CreateConstantBuffer(&cbData, sizeof(cbData));
+            _EngineSystem.GetRenderSystem()->ReleaseBlob();
+
+            _EngineSystem.GetRenderSystem()->SetConstantBuffer(pVertexShader, pConstantBuffer);
+            _EngineSystem.GetRenderSystem()->SetConstantBuffer(pPixelShader, pConstantBuffer);
+            _EngineSystem.GetRenderSystem()->SetVertexShader(pVertexShader);
+            _EngineSystem.GetRenderSystem()->SetPixelShader(pPixelShader);
+            _EngineSystem.GetRenderSystem()->SetInputLayout(pInputLayout);
+            _EngineSystem.GetRenderSystem()->SetVertexBuffer(pVertexBuffer);
+            _EngineSystem.GetRenderSystem()->SetIndexBuffer(pIndexBuffer);
+
+            _EngineSystem.GetRenderSystem()->drawIndexedTriangleList(36, 0, 0);
+
+            delete pVertexShader;
+            delete pPixelShader;
+            delete pVertexBuffer;
+            delete pIndexBuffer;
+            delete pConstantBuffer;
+            delete pInputLayout;
+            //_EngineSystem.GetRenderSystem()->SetWireFrame(DRAW_MODE::MODE_SOLID);
+        }
     }
 }
