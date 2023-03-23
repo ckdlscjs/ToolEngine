@@ -231,6 +231,7 @@ enum class OBJECT_SPECIFY
 	OBJECT_MAP,
 	OBJECT_SPAWN,
 	OBJECT_EFFECT,
+	OBJECT_COLLIDER,
 };
 static std::ostream& operator<<(std::ostream& os, const OBJECT_SPECIFY& mode)
 {
@@ -246,6 +247,8 @@ static std::ostream& operator<<(std::ostream& os, const OBJECT_SPECIFY& mode)
 			os << "OBJECT_MAP"; break;
 		case OBJECT_SPECIFY::OBJECT_SPAWN:
 			os << "OBJECT_SPAWN"; break;
+		case OBJECT_SPECIFY::OBJECT_COLLIDER:
+			os << "OBJECT_COLLIDER"; break;
 	}
 	return os;
 }
@@ -264,6 +267,8 @@ static std::stringstream& operator>>(std::stringstream& is, OBJECT_SPECIFY& mode
 		mode = OBJECT_SPECIFY::OBJECT_MAP;
 	else if (pos_str == "OBJECT_SPAWN")
 		mode = OBJECT_SPECIFY::OBJECT_SPAWN;
+	else if (pos_str == "OBJECT_COLLIDER")
+		mode = OBJECT_SPECIFY::OBJECT_COLLIDER;
 
 	return is;
 }

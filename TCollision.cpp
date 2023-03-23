@@ -77,6 +77,158 @@ bool   TCollision::CircleToCircle(TCircle& a, TCircle& b)
     }
     return false;
 }
+
+bool TCollision::IntersectRayToOBB(const XMVECTOR& rayOrigin, const XMVECTOR& rayDirection, const T_BOX& obb, float& dist)
+{
+    // Calculate the center and extent of the OBB
+    XMVECTOR vCenter = XMLoadFloat3(&obb.vCenter);
+    XMVECTOR vExtent = XMVectorSet(obb.fExtent[0], obb.fExtent[1], obb.fExtent[2], 0.0f);
+
+    // Calculate the ray origin in local space of the OBB
+    XMVECTOR vRayOriginLocal = rayOrigin - vCenter;
+
+    // Calculate the inverse of the OBB's world matrix
+    XMMATRIX matWorld = XMMatrixIdentity();
+    matWorld.r[0] = XMLoadFloat3(&obb.vAxis[0]);
+    matWorld.r[1] = XMLoadFloat3(&obb.vAxis[1]);
+    matWorld.r[2] = XMLoadFloat3(&obb.vAxis[2]);
+    matWorld.r[3] = vCenter;
+    XMMATRIX matWorldInverse = XMMatrixInverse(nullptr, matWorld);
+
+    // Transform the ray to local space of the OBB
+    XMVECTOR vRayDirectionLocal = XMVector3Normalize(XMVector3TransformNormal(rayDirection, matWorldInverse));
+    XMVECTOR vRayOriginLocalTransformed = XMVector3TransformCoord(vRayOriginLocal, matWorldInverse);
+
+    // Perform ray-OBB intersection test
+    float tmin = -XMVectorGetX(vExtent);
+    float tmax = XMVectorGetX(vExtent);
+    for (int i = 0; i < 3; ++i) {
+        float e = XMVectorGetByIndex(vExtent, i);
+        float d = XMVectorGetByIndex(vRayDirectionLocal, i);
+        float o = XMVectorGetByIndex(vRayOriginLocalTransformed, i);
+
+        if (fabsf(d) > FLT_EPSILON) {
+            float t1 = (tmin - o) / d;
+            float t2 = (tmax - o) / d;
+            if (t1 > t2) std::swap(t1, t2);
+            if (t1 > -e) tmin = t1;
+            if (t2 < e) tmax = t2;
+            if (tmin > tmax) return false;
+        }
+        else if (-o > e || o > e) {
+            return false;
+        }
+    }
+
+    // Store the intersection distance
+    dist = tmin;
+
+    return true;
+}
+//bool RayOBBIntersection(XMVECTOR& rayOrigin, XMVECTOR& rayDirection, T_BOX& obb, float& dist)
+//{
+//    // Step 1: Define the ray
+//    XMVECTOR rayLocalOrigin, rayLocalDirection;
+//    rayLocalOrigin = rayOrigin - XMLoadFloat3(&obb.vCenter);
+//
+//    rayLocalDirection = XMVector3Normalize(rayDirection);
+//
+//    // Step 2: Calculate the inverse transformation matrix
+//    XMMATRIX inverseTransform = XMMatrixInverse(nullptr, XMMatrixSet(
+//        obb.vAxis[0].x, obb.vAxis[0].y, obb.vAxis[0].z, 0.0f,
+//        obb.vAxis[1].x, obb.vAxis[1].y, obb.vAxis[1].z, 0.0f,
+//        obb.vAxis[2].x, obb.vAxis[2].y, obb.vAxis[2].z, 0.0f,
+//        0.0f, 0.0f, 0.0f, 1.0f
+//    ));
+//
+//    // Step 3: Transform the ray into the OBB's local space
+//    XMVECTOR localOrigin = XMVector3TransformCoord(rayLocalOrigin, inverseTransform);
+//    XMVECTOR localDirection = XMVector3TransformNormal(rayLocalDirection, inverseTransform);
+//    rayLocalOrigin = localOrigin;
+//    rayLocalDirection = localDirection;
+//
+//    // Steps 4-6: Calculate the OBB's axes and extents
+//    XMFLOAT3 axis[3] = { obb.vAxis[0], obb.vAxis[1], obb.vAxis[2] };
+//    float extents[3] = { obb.fExtent[0], obb.fExtent[1], obb.fExtent[2] };
+//    XMFLOAT3 minPoint = obb.vMin;
+//    XMFLOAT3 maxPoint = obb.vMax;
+//
+//    // Step 7: Calculate the intersection distances
+//    float tMin = -FLT_MAX, tMax = FLT_MAX;
+//    for (int i = 0; i < 3; ++i)
+//    {
+//        float e = XMVectorGetX(XMVector3Dot(XMLoadFloat3(&axis[i]), localDirection));
+//        float f = XMVectorGetX(XMVector3Dot(XMLoadFloat3(&axis[i]), localOrigin));
+//        if (fabsf(e) > 0.001f) // Avoid division by zero
+//        {
+//            float t1 = (f + extents[i]) / e;
+//            float t2 = (f - extents[i]) / e;
+//            if (t1 > t2) std::swap(t1, t2);
+//            if (t1 > tMin) tMin = t1;
+//            if (t2 < tMax) tMax = t2;
+//            if (tMin > tMax) return false;
+//            if (tMax < 0.0f) return false;
+//        }
+//        else if ((-f - extents[i]) > 0.0f || (-f + extents[i]) < 0.0f)
+//        {
+//            return false;
+//        }
+//    }
+//
+//    // Step 8: Check if there is an intersection
+//    if (tMin > 0.0f)
+//    {
+//        dist = tMin;
+//    }
+//    else
+//    {
+//        dist = tMax;
+//    }
+//
+//    // Step 9: Calculate the intersection point
+//    //XMFLOAT3 intersectionPoint = rayOrigin + rayDirection * t;
+//    return true;
+//}
+
+bool TCollision::IntersectRayToAABB(const XMVECTOR& rayOrigin, const XMVECTOR& rayDirection, const T_BOX& box)
+{
+    XMFLOAT3 vMin = box.vMin;
+    XMFLOAT3 vMax = box.vMax;
+
+    float tMin = (vMin.x - XMVectorGetX(rayOrigin)) / XMVectorGetX(rayDirection);
+    float tMax = (vMax.x - XMVectorGetX(rayOrigin)) / XMVectorGetX(rayDirection);
+
+    if (tMin > tMax) std::swap(tMin, tMax);
+
+    float tyMin = (vMin.y - XMVectorGetY(rayOrigin)) / XMVectorGetY(rayDirection);
+    float tyMax = (vMax.y - XMVectorGetY(rayOrigin)) / XMVectorGetY(rayDirection);
+
+    if (tyMin > tyMax) std::swap(tyMin, tyMax);
+
+    if ((tMin > tyMax) || (tyMin > tMax))
+        return false;
+
+    if (tyMin > tMin)
+        tMin = tyMin;
+
+    if (tyMax < tMax)
+        tMax = tyMax;
+
+    float tzMin = (vMin.z - XMVectorGetZ(rayOrigin)) / XMVectorGetZ(rayDirection);
+    float tzMax = (vMax.z - XMVectorGetZ(rayOrigin)) / XMVectorGetZ(rayDirection);
+
+    if (tzMin > tzMax) std::swap(tzMin, tzMax);
+
+    if ((tMin > tzMax) || (tzMin > tMax))
+        return false;
+
+    if (tzMin > tMin)
+        tMin = tzMin;
+
+    /* distance = tMin;*/
+
+    return true;
+}
 TCollisionType  TCollision::OBBtoOBB(const T_BOX& obb1, const T_BOX& obb2)
 {
     // Separating Axis Theorem (SAT) method

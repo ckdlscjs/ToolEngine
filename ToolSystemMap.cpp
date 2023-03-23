@@ -123,157 +123,6 @@ void ToolSystemMap::Splatting(XMVECTOR vIntersection, float fSplattingRadius, st
     g_pDeviceContext->UpdateSubresource(m_pQuadTree->m_pMaskAlphaTexture, 0, nullptr, m_pQuadTree->m_fAlphaData, RowPitch, DepthPitch);
 }
 
-bool RayOBBIntersect(const XMVECTOR& rayOrigin, const XMVECTOR& rayDirection, const T_BOX& obb, float& dist)
-{
-    // Calculate the center and extent of the OBB
-    XMVECTOR vCenter = XMLoadFloat3(&obb.vCenter);
-    XMVECTOR vExtent = XMVectorSet(obb.fExtent[0], obb.fExtent[1], obb.fExtent[2], 0.0f);
-
-    // Calculate the ray origin in local space of the OBB
-    XMVECTOR vRayOriginLocal = rayOrigin - vCenter;
-
-    // Calculate the inverse of the OBB's world matrix
-    XMMATRIX matWorld = XMMatrixIdentity();
-    matWorld.r[0] = XMLoadFloat3(&obb.vAxis[0]);
-    matWorld.r[1] = XMLoadFloat3(&obb.vAxis[1]);
-    matWorld.r[2] = XMLoadFloat3(&obb.vAxis[2]);
-    matWorld.r[3] = vCenter;
-    XMMATRIX matWorldInverse = XMMatrixInverse(nullptr, matWorld);
-
-    // Transform the ray to local space of the OBB
-    XMVECTOR vRayDirectionLocal = XMVector3Normalize(XMVector3TransformNormal(rayDirection, matWorldInverse));
-    XMVECTOR vRayOriginLocalTransformed = XMVector3TransformCoord(vRayOriginLocal, matWorldInverse);
-
-    // Perform ray-OBB intersection test
-    float tmin = -XMVectorGetX(vExtent);
-    float tmax = XMVectorGetX(vExtent);
-    for (int i = 0; i < 3; ++i) {
-        float e = XMVectorGetByIndex(vExtent, i);
-        float d = XMVectorGetByIndex(vRayDirectionLocal, i);
-        float o = XMVectorGetByIndex(vRayOriginLocalTransformed, i);
-
-        if (fabsf(d) > FLT_EPSILON) {
-            float t1 = (tmin - o) / d;
-            float t2 = (tmax - o) / d;
-            if (t1 > t2) std::swap(t1, t2);
-            if (t1 > -e) tmin = t1;
-            if (t2 < e) tmax = t2;
-            if (tmin > tmax) return false;
-        }
-        else if (-o > e || o > e) {
-            return false;
-        }
-    }
-
-    // Store the intersection distance
-    dist = tmin;
-
-    return true;
-}
-//bool RayOBBIntersection(XMVECTOR& rayOrigin, XMVECTOR& rayDirection, T_BOX& obb, float& dist)
-//{
-//    // Step 1: Define the ray
-//    XMVECTOR rayLocalOrigin, rayLocalDirection;
-//    rayLocalOrigin = rayOrigin - XMLoadFloat3(&obb.vCenter);
-//
-//    rayLocalDirection = XMVector3Normalize(rayDirection);
-//
-//    // Step 2: Calculate the inverse transformation matrix
-//    XMMATRIX inverseTransform = XMMatrixInverse(nullptr, XMMatrixSet(
-//        obb.vAxis[0].x, obb.vAxis[0].y, obb.vAxis[0].z, 0.0f,
-//        obb.vAxis[1].x, obb.vAxis[1].y, obb.vAxis[1].z, 0.0f,
-//        obb.vAxis[2].x, obb.vAxis[2].y, obb.vAxis[2].z, 0.0f,
-//        0.0f, 0.0f, 0.0f, 1.0f
-//    ));
-//
-//    // Step 3: Transform the ray into the OBB's local space
-//    XMVECTOR localOrigin = XMVector3TransformCoord(rayLocalOrigin, inverseTransform);
-//    XMVECTOR localDirection = XMVector3TransformNormal(rayLocalDirection, inverseTransform);
-//    rayLocalOrigin = localOrigin;
-//    rayLocalDirection = localDirection;
-//
-//    // Steps 4-6: Calculate the OBB's axes and extents
-//    XMFLOAT3 axis[3] = { obb.vAxis[0], obb.vAxis[1], obb.vAxis[2] };
-//    float extents[3] = { obb.fExtent[0], obb.fExtent[1], obb.fExtent[2] };
-//    XMFLOAT3 minPoint = obb.vMin;
-//    XMFLOAT3 maxPoint = obb.vMax;
-//
-//    // Step 7: Calculate the intersection distances
-//    float tMin = -FLT_MAX, tMax = FLT_MAX;
-//    for (int i = 0; i < 3; ++i)
-//    {
-//        float e = XMVectorGetX(XMVector3Dot(XMLoadFloat3(&axis[i]), localDirection));
-//        float f = XMVectorGetX(XMVector3Dot(XMLoadFloat3(&axis[i]), localOrigin));
-//        if (fabsf(e) > 0.001f) // Avoid division by zero
-//        {
-//            float t1 = (f + extents[i]) / e;
-//            float t2 = (f - extents[i]) / e;
-//            if (t1 > t2) std::swap(t1, t2);
-//            if (t1 > tMin) tMin = t1;
-//            if (t2 < tMax) tMax = t2;
-//            if (tMin > tMax) return false;
-//            if (tMax < 0.0f) return false;
-//        }
-//        else if ((-f - extents[i]) > 0.0f || (-f + extents[i]) < 0.0f)
-//        {
-//            return false;
-//        }
-//    }
-//
-//    // Step 8: Check if there is an intersection
-//    if (tMin > 0.0f)
-//    {
-//        dist = tMin;
-//    }
-//    else
-//    {
-//        dist = tMax;
-//    }
-//
-//    // Step 9: Calculate the intersection point
-//    //XMFLOAT3 intersectionPoint = rayOrigin + rayDirection * t;
-//    return true;
-//}
-
-bool IntersectRayBox(const XMVECTOR& rayOrigin, const XMVECTOR& rayDirection, const T_BOX& box)
-{
-    XMFLOAT3 vMin = box.vMin;
-    XMFLOAT3 vMax = box.vMax;
-
-    float tMin = (vMin.x - XMVectorGetX(rayOrigin)) / XMVectorGetX(rayDirection);
-    float tMax = (vMax.x - XMVectorGetX(rayOrigin)) / XMVectorGetX(rayDirection);
-
-    if (tMin > tMax) std::swap(tMin, tMax);
-
-    float tyMin = (vMin.y - XMVectorGetY(rayOrigin)) / XMVectorGetY(rayDirection);
-    float tyMax = (vMax.y - XMVectorGetY(rayOrigin)) / XMVectorGetY(rayDirection);
-
-    if (tyMin > tyMax) std::swap(tyMin, tyMax);
-
-    if ((tMin > tyMax) || (tyMin > tMax))
-        return false;
-
-    if (tyMin > tMin)
-        tMin = tyMin;
-
-    if (tyMax < tMax)
-        tMax = tyMax;
-
-    float tzMin = (vMin.z - XMVectorGetZ(rayOrigin)) / XMVectorGetZ(rayDirection);
-    float tzMax = (vMax.z - XMVectorGetZ(rayOrigin)) / XMVectorGetZ(rayDirection);
-
-    if (tzMin > tzMax) std::swap(tzMin, tzMax);
-
-    if ((tMin > tzMax) || (tzMin > tMax))
-        return false;
-
-    if (tzMin > tMin)
-        tMin = tzMin;
-
-   /* distance = tMin;*/
-
-    return true;
-}
 
 bool ToolSystemMap::GetInterSection()
 {
@@ -281,7 +130,7 @@ bool ToolSystemMap::GetInterSection()
     for (const auto& node : m_pQuadTree->m_pDrawLeafNodeList)
     {
         float fDist;
-        if (RayOBBIntersect(_PhysicsSystem.GetSelect().m_Ray.vOrigin, _PhysicsSystem.GetSelect().m_Ray.vDirection, node->m_Box, fDist))
+        if (TCollision::IntersectRayToOBB(_PhysicsSystem.GetSelect().m_Ray.vOrigin, _PhysicsSystem.GetSelect().m_Ray.vDirection, node->m_Box, fDist))
         {
             UINT index = 0;
             UINT iNumFace = node->m_IndexList.size() / 3;
@@ -493,7 +342,7 @@ Object* ToolSystemMap::CreateFbxObject(std::wstring szFullPath, XMVECTOR vPos, X
 }
 
 #include "SimpleBox.h"
-Object* ToolSystemMap::CreateSimpleBox(float fLength, XMVECTOR vPos, XMVECTOR vRot, XMVECTOR vScale)
+Object* ToolSystemMap::CreateSimpleBox(float fLength, OBJECT_SPECIFY specify, XMVECTOR vPos, XMVECTOR vRot, XMVECTOR vScale)
 {
     SimpleBox* pObject = new SimpleBox(L"SimpleObjectBox");
     pObject->SetLength(fLength);
@@ -584,7 +433,7 @@ Object* ToolSystemMap::CreateSimpleBox(float fLength, XMVECTOR vPos, XMVECTOR vR
     pObject->SetMesh(pMesh);
     pObject->SetTransform({ vPos , vRot, vScale });
     pObject->SetDrawMode(DRAW_MODE::MODE_WIRE);
-    pObject->SetSpecify(OBJECT_SPECIFY::OBJECT_SIMPLE);
+    pObject->SetSpecify(specify);
 
     if (m_pQuadTree)
         m_pQuadTree->AddObject(pObject);
@@ -742,7 +591,7 @@ void ToolSystemMap::OpenFile(std::wstring szFullPath)
 
                     float length;
 
-                    if (specifyMode == OBJECT_SPECIFY::OBJECT_SIMPLE)
+                    if (specifyMode == OBJECT_SPECIFY::OBJECT_COLLIDER || specifyMode == OBJECT_SPECIFY::OBJECT_SIMPLE)
                     {
                         // pos 값을 추출합니다.
                         size_t pos_start = texturesStream.str().find("m_fLength:") + strlen("m_fLength:");
@@ -753,8 +602,8 @@ void ToolSystemMap::OpenFile(std::wstring szFullPath)
                     }
 
                     Object* pObject = nullptr;
-                    if (specifyMode == OBJECT_SPECIFY::OBJECT_SIMPLE)
-                        pObject = CreateSimpleBox(length, transform.position, transform.rotation, transform.scale);
+                    if (specifyMode == OBJECT_SPECIFY::OBJECT_COLLIDER || specifyMode == OBJECT_SPECIFY::OBJECT_SIMPLE)
+                        pObject = CreateSimpleBox(length, specifyMode, transform.position, transform.rotation, transform.scale);
                     else if (specifyMode == OBJECT_SPECIFY::OBJECT_STATIC)
                         pObject = CreateFbxObject(_tomw(strName), transform.position, transform.rotation, transform.scale);
                     else if (specifyMode == OBJECT_SPECIFY::OBJECT_SKELETON)
@@ -810,7 +659,7 @@ void ToolSystemMap::OpenFile(std::wstring szFullPath)
 
     for (const auto& obj : allObjectList)
     {
-        if (obj->GetSpecify() != OBJECT_SPECIFY::OBJECT_SIMPLE)
+        if (obj->GetSpecify() != OBJECT_SPECIFY::OBJECT_SIMPLE || obj->GetSpecify() != OBJECT_SPECIFY::OBJECT_COLLIDER)
             m_ListFbx.insert(obj->GetObjectName());
         m_pQuadTree->AddObject(obj);
     }
@@ -847,4 +696,62 @@ ToolSystemMap::~ToolSystemMap()
 {
     std::cout << "Release : ToolSystemMap" << std::endl;
     if (m_pQuadTree) delete m_pQuadTree;
+}
+
+
+void ToolSystemMap::DrawBoxCollider(T_BOX tBox, XMFLOAT3 color, XMMATRIX matWorld, XMMATRIX matView, XMMATRIX matProj)
+{
+    /*NodeBoxCheck*/
+    _EngineSystem.GetRenderSystem()->SetWireFrame(DRAW_MODE::MODE_WIRE);
+    void* shader_byte_code_vs = nullptr;
+    void* shader_byte_code_ps = nullptr;
+    size_t size_shader_vs = 0;
+    size_t size_shader_ps = 0;
+    _EngineSystem.GetRenderSystem()->CompileVertexShader(L"FbxVertexShader.hlsl", "vsmain", "vs_5_0", &shader_byte_code_vs, &size_shader_vs);
+    VertexShader* pVertexShader = _EngineSystem.GetRenderSystem()->CreateVertexShader(shader_byte_code_vs, size_shader_vs);
+    _EngineSystem.GetRenderSystem()->CompilePixelShader(L"SimpleObjectPixelShader.hlsl", "psmain", "ps_5_0", &shader_byte_code_ps, &size_shader_ps);
+    PixelShader* pPixelShader = _EngineSystem.GetRenderSystem()->CreatePixelShader(shader_byte_code_ps, size_shader_ps);
+    PNCTVertex vertex_list[] =
+    {
+        //FrontFace
+        {tBox.vPos[0],	XMFLOAT3(1, 0, 0),      XMFLOAT4(color.x, color.y, color.z, 1),   XMFLOAT2(0,1)},
+        {tBox.vPos[1], 	XMFLOAT3(0, 1, 0),      XMFLOAT4(color.x, color.y, color.z, 1),   XMFLOAT2(0,0)},
+        {tBox.vPos[2], 	XMFLOAT3(0, 0, 1),      XMFLOAT4(color.x, color.y, color.z, 1),   XMFLOAT2(1,0)},
+        {tBox.vPos[3],	XMFLOAT3(1, 1, 0),      XMFLOAT4(color.x, color.y, color.z, 1),   XMFLOAT2(1,1)},
+
+        //BackFace
+        {tBox.vPos[4],	XMFLOAT3(1, 0, 0),      XMFLOAT4(color.x, color.y, color.z, 1),   XMFLOAT2(0,1)},
+        {tBox.vPos[5],	XMFLOAT3(0, 1, 0),      XMFLOAT4(color.x, color.y, color.z, 1),   XMFLOAT2(0,0)},
+        {tBox.vPos[6], 	XMFLOAT3(0, 0, 1),      XMFLOAT4(color.x, color.y, color.z, 1),   XMFLOAT2(1,0)},
+        {tBox.vPos[7],	XMFLOAT3(1, 1, 0),      XMFLOAT4(color.x, color.y, color.z, 1),   XMFLOAT2(1,1)},
+    };
+    UINT size_vertex_list = ARRAYSIZE(vertex_list);
+
+    VertexBuffer* pVertexBuffer = _EngineSystem.GetRenderSystem()->CreateVertexBuffer(vertex_list, sizeof(PNCTVertex), size_vertex_list);
+    IndexBuffer* pIndexBuffer = _EngineSystem.GetRenderSystem()->CreateIndexBuffer(tBox.vRectIndices, sizeof(unsigned int) * 36);
+    InputLayout* pInputLayout = _EngineSystem.GetRenderSystem()->CreateInputLayout(shader_byte_code_vs, size_shader_vs, INPUT_LAYOUT::PNCT);
+    CBufferData cbData;
+    cbData.matWorld = matWorld;
+    cbData.matView = matView;
+    cbData.matProj = matProj;
+    ConstantBuffer* pConstantBuffer = _EngineSystem.GetRenderSystem()->CreateConstantBuffer(&cbData, sizeof(cbData));
+    _EngineSystem.GetRenderSystem()->ReleaseBlob();
+
+    _EngineSystem.GetRenderSystem()->SetConstantBuffer(pVertexShader, pConstantBuffer);
+    _EngineSystem.GetRenderSystem()->SetConstantBuffer(pPixelShader, pConstantBuffer);
+    _EngineSystem.GetRenderSystem()->SetVertexShader(pVertexShader);
+    _EngineSystem.GetRenderSystem()->SetPixelShader(pPixelShader);
+    _EngineSystem.GetRenderSystem()->SetInputLayout(pInputLayout);
+    _EngineSystem.GetRenderSystem()->SetVertexBuffer(pVertexBuffer);
+    _EngineSystem.GetRenderSystem()->SetIndexBuffer(pIndexBuffer);
+
+    _EngineSystem.GetRenderSystem()->drawIndexedTriangleList(36, 0, 0);
+
+    delete pVertexShader;
+    delete pPixelShader;
+    delete pVertexBuffer;
+    delete pIndexBuffer;
+    delete pConstantBuffer;
+    delete pInputLayout;
+    _EngineSystem.GetRenderSystem()->SetWireFrame(DRAW_MODE::MODE_SOLID);
 }

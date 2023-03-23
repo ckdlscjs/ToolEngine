@@ -85,6 +85,9 @@ void ImguiSystem::Update()
     static float fMapDistance = 1.0f;
 
     static bool bSimpleObj = false;
+    static bool bSimple = false;
+    static bool bCollider = false;
+    static bool bTrigger = false;
     static float fSimpleObjLength = 1.0f;
 
     static bool bFbxObj = false;
@@ -122,8 +125,35 @@ void ImguiSystem::Update()
                 if (bSimpleObj && _ToolSystemMap.GetCurrentQuadTree() != nullptr)
                 {
                     ImGui::InputFloat("length", &fSimpleObjLength);
+                    if (ImGui::Checkbox("Simple", &bSimple))
+                    {
+                        ~bSimple;
+                        bCollider = bTrigger = false;
+                        
+                    }
+                    ImGui::SameLine();
+                    if (ImGui::Checkbox("Collider", &bCollider))
+                    {
+                        ~bCollider;
+                        bSimple = bTrigger = false;
+                    }
+                    ImGui::SameLine();
+                    if (ImGui::Checkbox("Trigger", &bTrigger))
+                    {
+                        ~bTrigger;
+                        bSimple = bCollider = false;
+                    }
+        
                     if ((_InputSystem.GetKey(VK_RBUTTON) == KEY_STATE::KEY_DOWN) && _ToolSystemMap.GetInterSection())
-                        _ToolSystemMap.CreateSimpleBox(fSimpleObjLength, _PhysicsSystem.GetSelect().m_vIntersection);
+                    {
+                        if(bSimple)
+                            _ToolSystemMap.CreateSimpleBox(fSimpleObjLength, OBJECT_SPECIFY::OBJECT_SIMPLE, _PhysicsSystem.GetSelect().m_vIntersection);
+                        else if (bCollider)
+                            _ToolSystemMap.CreateSimpleBox(fSimpleObjLength, OBJECT_SPECIFY::OBJECT_COLLIDER, _PhysicsSystem.GetSelect().m_vIntersection);
+                        /*else if (bTrigger)
+                            _ToolSystemMap.CreateSimpleBox(fSimpleObjLength, OBJECT_SPECIFY::tri, _PhysicsSystem.GetSelect().m_vIntersection);*/
+                    }
+                        
                 }
             }
             

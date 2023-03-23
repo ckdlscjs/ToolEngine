@@ -99,7 +99,7 @@ void Object::SetTransform(Transform transform)
 		_DegreeToRadian(rotateAngle.x),
 		_DegreeToRadian(rotateAngle.y),
 		_DegreeToRadian(rotateAngle.z)), translation);
-	m_Box.Set(m_ConstantData.matWorld);
+	//m_Box.Set(m_ConstantData.matWorld);
 }
 
 void Object::SetMesh(Mesh* pMesh)
@@ -182,9 +182,11 @@ void Object::Update()
 	_EngineSystem.GetRenderSystem()->UpdateConstantBuffer(m_pConstantBuffer, &m_ConstantData);
 }
 
+#include "InputSystem.h"
+#include "ToolSystemMap.h"
 void Object::Render()
 {
-	_EngineSystem.GetRenderSystem()->SetWireFrame(m_Specify == OBJECT_SPECIFY::OBJECT_SIMPLE ? DRAW_MODE::MODE_WIRE :(m_DrawMode = g_bWireFrame ? DRAW_MODE::MODE_WIRE : DRAW_MODE::MODE_SOLID));
+	_EngineSystem.GetRenderSystem()->SetWireFrame(g_bWireFrame ? DRAW_MODE::MODE_WIRE : m_DrawMode);
 	_EngineSystem.GetRenderSystem()->SetConstantBuffer(m_pVertexShader, m_pConstantBuffer);
 	_EngineSystem.GetRenderSystem()->SetConstantBuffer(m_pPixelShader, m_pConstantBuffer);
 	_EngineSystem.GetRenderSystem()->SetVertexShader(m_pVertexShader);
@@ -207,6 +209,10 @@ void Object::Render()
 			_EngineSystem.GetRenderSystem()->drawIndexedTriangleList(pAttribute->GetIndexBuffer()->getSizeIndexList(), 0, 0);
 			//_EngineSystem.GetRenderSystem()->drawTriangleList(pAttribute->GetListPNCT().size(), 0);
 		}
+	}
+	if (_InputSystem.GetKey('V'))
+	{
+		_ToolSystemMap.DrawBoxCollider(m_Box, { 1, 0, 0 }, m_ConstantData.matWorld, m_ConstantData.matView, m_ConstantData.matProj);
 	}
 }
 
@@ -252,7 +258,7 @@ std::ostream& operator<<(std::ostream& os, const Object* pObject)
 {
 	//os << pObject->m_szFullPath << ", ";
 	os << GetSplitExtension(pObject->m_szFullPath);
-	if (pObject->m_Specify != OBJECT_SPECIFY::OBJECT_SIMPLE)
+	if (pObject->m_Specify != OBJECT_SPECIFY::OBJECT_SIMPLE || pObject->m_Specify != OBJECT_SPECIFY::OBJECT_COLLIDER)
 	{
 		std::wstring scriptExtension = L".Script";
 		os << scriptExtension;

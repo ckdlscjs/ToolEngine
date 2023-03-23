@@ -257,6 +257,8 @@ public:
     static bool             RectToPoint(TRect& a, POINT& p);
     static bool             CircleToCircle(TCircle& a, TCircle& b);
 public:
+    static bool             IntersectRayToAABB(const XMVECTOR& rayOrigin, const XMVECTOR& rayDirection, const T_BOX& box);
+    static bool             IntersectRayToOBB(const XMVECTOR& rayOrigin, const XMVECTOR& rayDirection, const T_BOX& obb, float& dist);
     static TCollisionType   OBBtoOBB(const T_BOX& obb1, const T_BOX& obb2);
     static TCollisionType   BoxToBox(T_BOX& a, T_BOX& b);
     static bool             BoxToInBox(T_BOX& a, T_BOX& b);

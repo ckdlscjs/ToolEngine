@@ -11,6 +11,7 @@
 class ToolSystemMap : public Singleton<ToolSystemMap>
 {
 public:
+	void DrawBoxCollider(T_BOX tBox, XMFLOAT3 color, XMMATRIX matWorld, XMMATRIX matView, XMMATRIX matProj);
 	/*SetBlock*/
 	bool GetInterSection();
 	void SetSplattingTexture(Texture* pTexture);
@@ -27,7 +28,7 @@ public:
 
 	/*CreateBlock*/
 	Object* CreateFbxObject(std::wstring szFullPath, XMVECTOR vPos, XMVECTOR vRot = { 0, 0, 0, 0 }, XMVECTOR vScale = { 1, 1, 1, 0 });
-	Object* CreateSimpleBox(float fLength, XMVECTOR vPos, XMVECTOR vRot = { 0, 0, 0, 0 }, XMVECTOR vScale = { 1, 1, 1, 0 });
+	Object* CreateSimpleBox(float fLength, OBJECT_SPECIFY specify, XMVECTOR vPos, XMVECTOR vRot = { 0, 0, 0, 0 }, XMVECTOR vScale = { 1, 1, 1, 0 });
 	FQuadTree* CreateSimpleMap(int iWidth, int iHeight,float fDistance, std::wstring szFullPath);
 	void DeleteSimpleMap();
 
