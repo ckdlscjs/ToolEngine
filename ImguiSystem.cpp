@@ -439,9 +439,12 @@ void ImguiSystem::Update()
             const std::vector<std::filesystem::path>& res = ifd::FileDialog::Instance().GetResults();
             for (int idx = 0; idx < res.size(); idx++)
             {
-                _EngineSystem.GetTextureSystem()->CreateTextureFromFile(res[idx].wstring().c_str());
+                std::wstring delim = L"Assets";
+                std::wstring cutString = L"../../";
+                cutString += CutStringDelim(res[idx].wstring(), delim);
+                auto texture = _EngineSystem.GetTextureSystem()->CreateTextureFromFile(cutString.c_str());
                 _ToolSystemMap.GetListTexture().insert(res[idx].wstring());
-                szCurrentImage = res[idx].wstring();
+                szCurrentImage = cutString;
             }
         }
         ifd::FileDialog::Instance().Close();

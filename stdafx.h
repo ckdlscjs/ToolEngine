@@ -128,6 +128,25 @@ static std::wstring GetSplitExtension(std::wstring szFullPath)
 		return szFullPath.substr(0, pos);
 }
 
+static std::string CutStringDelim(std::string path, std::string delim)
+{
+	int pos = path.find(delim);
+	if (pos != std::string::npos) {
+		return path.substr(pos);
+	}
+	return path;
+}
+
+static std::wstring CutStringDelim(std::wstring path, std::wstring delim)
+{
+	int pos = path.find(delim);
+	if (pos != std::wstring::npos) {
+		return path.substr(pos);
+	}
+	return path;
+}
+
+
 //상호작용을 위한 열거
 
 enum class CULL_MODE
