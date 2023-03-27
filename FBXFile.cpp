@@ -158,39 +158,27 @@ void FBXFile::ParseMesh(FBXNode* pNode, int nodeIdx)
 		}
 	}
 
-	//std::vector<std::map<unsigned int, PNCTVertex>> m_MapVertexPNCT;
-	std::vector<std::vector<PNCTVertex>> m_ListVertexPNCT;
-	std::vector<std::vector<IW>> m_ListVertexIW;
-	//std::vector<std::vector<unsigned int>> m_ListOriginIdx;
-
 	std::vector<std::map<unsigned int, PNCTVertex>> mapVertexPNCT;
+	std::vector<std::map<unsigned int, IW>> mapVertexIW; 
 	std::vector<std::vector<unsigned int>> listIndexOrigin;
-	mapVertexPNCT.resize(iNumMtrl);
-	pNode->m_ListVertexPNCT.resize(iNumMtrl);
-	if (pNode->m_bSkinning)
-		pNode->m_ListVertexIW.resize(iNumMtrl);
-	listIndexOrigin.resize(iNumMtrl);
 
 	if (iNumMtrl == 1)
 	{
 		pNode->m_ListTexture[0] = szFileName;
-		/*pNode->m_ListVertexPNCT[0].resize(iNumVertexCount);
-		if (pNode->m_bSkinning)
-			pNode->m_ListVertexIW[0].resize(iNumVertexCount);
-		pNode->m_ListIndex[0].resize(iNumMtrl);*/
 	}
 	if (iNumMtrl > 1)
 	{
 		for (int iTex = 0; iTex < iNumMtrl; iTex++)
 		{
 			pNode->m_ListTexture[iTex] = texFullNameList[iTex];
-			/*pNode->m_ListVertexPNCT[iTex].resize(iNumVertexCount);
-			if (pNode->m_bSkinning)
-				pNode->m_ListVertexIW[iTex].resize(iNumVertexCount);
-			pNode->m_ListIndex[iTex].resize(iNumMtrl);*/
 		}
 	}
-	
+	mapVertexPNCT.resize(iNumMtrl);
+	pNode->m_ListVertexPNCT.resize(iNumMtrl);
+	if (pNode->m_bSkinning)
+		pNode->m_ListVertexIW.resize(iNumMtrl);
+	listIndexOrigin.resize(iNumMtrl);
+
 	for (int idxPolygon = 0; idxPolygon < iNumPolygonCount; idxPolygon++)
 	{
 		int iPolygonSize = pFbxMesh->GetPolygonSize(idxPolygon);
@@ -288,11 +276,9 @@ void FBXFile::ParseMesh(FBXNode* pNode, int nodeIdx)
 					iwVertex.weight.w = pIW->weight[3];
 				}
 				mapVertexPNCT[iSubMtrl].insert(std::make_pair(vertexID, pnctVertex));
-				/*pNode->m_ListVertexPNCT[iSubMtrl][vertexID] = pnctVertex;
 				if (pNode->m_bSkinning)
-					pNode->m_ListVertexIW[iSubMtrl][vertexID] = iwVertex;*/
+					mapVertexIW[iSubMtrl].insert(std::make_pair(vertexID, iwVertex));
 				listIndexOrigin[iSubMtrl].push_back(vertexID);
-				//pNode->m_ListVertexPNCT[iSubMtrl].push_back(pnctVertex);
 			}
 		}
 	}
@@ -303,7 +289,8 @@ void FBXFile::ParseMesh(FBXNode* pNode, int nodeIdx)
 		pNode->m_ListIndex[MtrlIdx].resize(listIndexOrigin[MtrlIdx].size());
 		for (const auto& pnct : mapVertexPNCT[MtrlIdx])
 		{
-			pNode->m_ListVertexPNCT[MtrlIdx].push_back(pnct.second);
+			pNode->m_ListVertexPNCT[MtrlIdx].push_back(mapVertexPNCT[MtrlIdx].find(pnct.first)->second);
+			pNode->m_ListVertexIW[MtrlIdx].push_back(mapVertexIW[MtrlIdx].find(pnct.first)->second);
 			pnctIdx[pnct.first] = pNode->m_ListVertexPNCT[MtrlIdx].size() - 1;
 		}
 

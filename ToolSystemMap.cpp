@@ -302,32 +302,30 @@ Object* ToolSystemMap::CreateFbxObject(std::wstring szFullPath, XMVECTOR vPos, X
                 void* listVertex = &pFbxNode->m_ListVertexPNCT[nodeMaterialCount][0];
                 UINT iSizeVertices = pFbxNode->m_ListVertexPNCT[nodeMaterialCount].size();
                 pMeshNode->SetListPNCT(listVertex, iSizeVertices);
-                VertexBuffer* pVertexBufferPNCT = _EngineSystem.GetRenderSystem()->CreateVertexBuffer(&pMeshNode->GetListPNCT()[0], sizeof(PNCTVertex), pMeshNode->GetListPNCT().size());
-                pMeshNode->SetVertexBufferPNCT(pVertexBufferPNCT);
+                pMeshNode->SetVertexBufferPNCT(_EngineSystem.GetRenderSystem()->CreateVertexBuffer(&pMeshNode->GetListPNCT()[0], sizeof(PNCTVertex), pMeshNode->GetListPNCT().size()));
 
                 //SetIB
                 void* listIndex = &pFbxNode->m_ListIndex[nodeMaterialCount][0];
                 UINT iSizeIndices = pFbxNode->m_ListIndex[nodeMaterialCount].size();
                 pMeshNode->SetListIndex(listIndex, iSizeIndices);
-                IndexBuffer* pIndexBuffer = _EngineSystem.GetRenderSystem()->CreateIndexBuffer(&pMeshNode->GetListIndex()[0], pMeshNode->GetListIndex().size());
-                pMeshNode->SetIndexBuffer(pIndexBuffer);
+                pMeshNode->SetIndexBuffer(_EngineSystem.GetRenderSystem()->CreateIndexBuffer(&pMeshNode->GetListIndex()[0], pMeshNode->GetListIndex().size()));
 
                 //SetInputLayout
                 InputLayout* pInputLayout = _EngineSystem.GetRenderSystem()->CreateInputLayout(shader_byte_code_vs, size_shader_vs, INPUT_LAYOUT::PNCT);
                 pMeshNode->SetInputLayout(pInputLayout);
 
-                //if (!pFBXFile->m_ListNode[nodeCount]->m_ListVertexIW.size())
-                //    continue;
-                //delete pInputLayout;
-                //pInputLayout = _EngineSystem.GetRenderSystem()->CreateInputLayout(shader_byte_code_vs, size_shader_vs, INPUT_LAYOUT::PNCTIW);
-                //pAttribute->SetInputLayout(pInputLayout);
+                if (!pFBXFile->m_ListNode[nodeCount]->m_ListVertexIW.size())
+                    continue;
+                delete pInputLayout;
 
-                ////SetVBIW
-                //void* listIW = &pFbxNode->m_ListVertexIW[nodeMaterialCount][0];
-                //UINT iSizelistIW = pFbxNode->m_ListVertexIW[nodeMaterialCount].size();
-                //pAttribute->SetListIW(listIW, iSizelistIW);
-                //VertexBuffer* pVertexBufferIW = _EngineSystem.GetRenderSystem()->CreateVertexBuffer(&pAttribute->GetListIW()[0], sizeof(IW), pAttribute->GetListIW().size());
-                //pAttribute->SetVertexBufferIW(pVertexBufferIW);
+                pInputLayout = _EngineSystem.GetRenderSystem()->CreateInputLayout(shader_byte_code_vs, size_shader_vs, INPUT_LAYOUT::PNCTIW);
+                pMeshNode->SetInputLayout(pInputLayout);
+
+                //SetVBIW
+                void* listIW = &pFbxNode->m_ListVertexIW[nodeMaterialCount][0];
+                UINT iSizelistIW = pFbxNode->m_ListVertexIW[nodeMaterialCount].size();
+                pMeshNode->SetListIW(listIW, iSizelistIW);
+                pMeshNode->SetVertexBufferIW(_EngineSystem.GetRenderSystem()->CreateVertexBuffer(&pMeshNode->GetListIW()[0], sizeof(IW), pMeshNode->GetListIW().size()));
             }
         }
     }

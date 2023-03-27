@@ -566,9 +566,9 @@ struct CBufferData
 __declspec(align(16))
 struct CBufferData_Map
 {
-	XMMATRIX matWorld;
-	XMMATRIX matView;
-	XMMATRIX matProj;
+	//XMMATRIX matWorld;
+	//XMMATRIX matView;
+	//XMMATRIX matProj;
 	XMFLOAT4 m_light_direction;
 	XMFLOAT4 m_camera_position;
 	XMFLOAT2 m_world_size;
