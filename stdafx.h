@@ -252,6 +252,7 @@ enum class OBJECT_SPECIFY
 	OBJECT_EFFECT,
 	OBJECT_COLLIDER,
 	OBJECT_SKYDOME,
+	OBJECT_TRIGGER
 };
 static std::ostream& operator<<(std::ostream& os, const OBJECT_SPECIFY& mode)
 {
@@ -271,6 +272,8 @@ static std::ostream& operator<<(std::ostream& os, const OBJECT_SPECIFY& mode)
 			os << "OBJECT_COLLIDER"; break;
 		case OBJECT_SPECIFY::OBJECT_SKYDOME:
 			os << "OBJECT_SKYDOME"; break;
+		case OBJECT_SPECIFY::OBJECT_TRIGGER:
+			os << "OBJECT_TRIGGER"; break;
 	}
 	return os;
 }
@@ -293,54 +296,55 @@ static std::stringstream& operator>>(std::stringstream& is, OBJECT_SPECIFY& mode
 		mode = OBJECT_SPECIFY::OBJECT_COLLIDER;
 	else if (pos_str == "OBJECT_SKYDOME")
 		mode = OBJECT_SPECIFY::OBJECT_SKYDOME;
-
+	else if (pos_str == "OBJECT_TRIGGER")
+		mode = OBJECT_SPECIFY::OBJECT_TRIGGER;
 	return is;
 }
 
-namespace std
-{
-	template <>
-	struct hash<DirectX::XMFLOAT2>
-	{
-		size_t operator()(const DirectX::XMFLOAT2& v) const
-		{
-			std::hash<float> hasher;
-			size_t seed = 0;
-			seed ^= hasher(v.x) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
-			seed ^= hasher(v.y) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
-			return seed;
-		}
-	};
-
-	template <>
-	struct hash<DirectX::XMFLOAT3>
-	{
-		size_t operator()(const DirectX::XMFLOAT3& v) const
-		{
-			std::hash<float> hasher;
-			size_t seed = 0;
-			seed ^= hasher(v.x) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
-			seed ^= hasher(v.y) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
-			seed ^= hasher(v.z) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
-			return seed;
-		}
-	};
-
-	template <>
-	struct hash<DirectX::XMFLOAT4>
-	{
-		size_t operator()(const DirectX::XMFLOAT4& v) const
-		{
-			std::hash<float> hasher;
-			size_t seed = 0;
-			seed ^= hasher(v.x) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
-			seed ^= hasher(v.y) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
-			seed ^= hasher(v.z) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
-			seed ^= hasher(v.w) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
-			return seed;
-		}
-	};
-}
+//namespace std
+//{
+//	template <>
+//	struct hash<DirectX::XMFLOAT2>
+//	{
+//		size_t operator()(const DirectX::XMFLOAT2& v) const
+//		{
+//			std::hash<float> hasher;
+//			size_t seed = 0;
+//			seed ^= hasher(v.x) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+//			seed ^= hasher(v.y) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+//			return seed;
+//		}
+//	};
+//
+//	template <>
+//	struct hash<DirectX::XMFLOAT3>
+//	{
+//		size_t operator()(const DirectX::XMFLOAT3& v) const
+//		{
+//			std::hash<float> hasher;
+//			size_t seed = 0;
+//			seed ^= hasher(v.x) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+//			seed ^= hasher(v.y) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+//			seed ^= hasher(v.z) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+//			return seed;
+//		}
+//	};
+//
+//	template <>
+//	struct hash<DirectX::XMFLOAT4>
+//	{
+//		size_t operator()(const DirectX::XMFLOAT4& v) const
+//		{
+//			std::hash<float> hasher;
+//			size_t seed = 0;
+//			seed ^= hasher(v.x) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+//			seed ^= hasher(v.y) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+//			seed ^= hasher(v.z) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+//			seed ^= hasher(v.w) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+//			return seed;
+//		}
+//	};
+//}
 
 enum class INPUT_LAYOUT
 {
@@ -515,18 +519,18 @@ struct PNCTVertex
 	}
 };
 
-struct PNCTVertexHash
-{
-	size_t operator()(const PNCTVertex& vertex) const
-	{
-		size_t h1 = std::hash<XMFLOAT3>()(vertex.pos);
-		size_t h2 = std::hash<XMFLOAT3>()(vertex.normal);
-		size_t h3 = std::hash<XMFLOAT4>()(vertex.color);
-		size_t h4 = std::hash<XMFLOAT2>()(vertex.tex);
-
-		return h1 ^ (h2 << 1) ^ (h3 << 2) ^ (h4 << 3);
-	}
-};
+//struct PNCTVertexHash
+//{
+//	size_t operator()(const PNCTVertex& vertex) const
+//	{
+//		size_t h1 = std::hash<XMFLOAT3>()(vertex.pos);
+//		size_t h2 = std::hash<XMFLOAT3>()(vertex.normal);
+//		size_t h3 = std::hash<XMFLOAT4>()(vertex.color);
+//		size_t h4 = std::hash<XMFLOAT2>()(vertex.tex);
+//
+//		return h1 ^ (h2 << 1) ^ (h3 << 2) ^ (h4 << 3);
+//	}
+//};
 struct AnimTrack
 {
 	UINT      iFrame; //fTime;

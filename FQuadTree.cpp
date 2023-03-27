@@ -83,9 +83,7 @@ std::ostream& operator<<(std::ostream& os, const FQuadTree* pQuadTree)
     for (const auto& object : pQuadTree->m_pAllObjectList)
     {
         os << object;
-        if (object->GetSpecify() == OBJECT_SPECIFY::OBJECT_SIMPLE || object->GetSpecify() == OBJECT_SPECIFY::OBJECT_COLLIDER)
-            os <<", " << "m_fLength:" << static_cast<SimpleBox*>(object)->GetLength();
-        else if (object->GetSpecify() == OBJECT_SPECIFY::OBJECT_SKYDOME)
+        if (object->GetSpecify() == OBJECT_SPECIFY::OBJECT_SKYDOME)
         {
             os << ", " << "m_fRadius:" << static_cast<SimpleSphere*>(object)->GetRadius();
             os << ", " << "m_iSliceCount:" << static_cast<SimpleSphere*>(object)->GetSliceCount();
@@ -367,7 +365,8 @@ void FQuadTree::SetConstantData(CBufferData_Map cc)
 BOOL FQuadTree::AddObject(Object* pObj)
 {
     m_pAllObjectList.insert(pObj);
-
+    if (pObj->GetSpecify() == OBJECT_SPECIFY::OBJECT_SKYDOME)
+        return FALSE;
     FNode* pFindNode = FindCollisionNode(m_pRootNode, pObj);
     if (pFindNode != nullptr)
     {
@@ -381,7 +380,8 @@ BOOL FQuadTree::AddObject(Object* pObj)
 BOOL FQuadTree::DeleteObject(Object* pObj)
 {
     FNode* pNode = FindNode(m_pRootNode, pObj);
-    pNode->m_pDynamicObjectList.erase(pObj);
+    if(pNode)
+        pNode->m_pDynamicObjectList.erase(pObj);
     return m_pAllObjectList.erase(pObj);
 }
 

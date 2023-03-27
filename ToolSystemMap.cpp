@@ -168,6 +168,7 @@ bool ToolSystemMap::GetInterSection()
 
 Object* ToolSystemMap::ObjectPicking()
 {
+    std::map<float, Object*> objectContain;
     //교점체크
     for (const auto& node : m_pQuadTree->m_pDrawLeafNodeList)
     {
@@ -175,33 +176,64 @@ Object* ToolSystemMap::ObjectPicking()
         {
             for (const auto& meshnode : object->m_pMesh->GetMeshNodeList())
             {
-                for (const auto& attribute : meshnode->GetAttributeList())
+                UINT index = 0;
+                UINT iNumFace = meshnode->GetListIndex().size() / 3;
+                for (UINT face = 0; face < iNumFace; face++)
                 {
-                    UINT index = 0;
-                    UINT iNumFace = attribute->GetListIndex().size() / 3;
-                    for (UINT face = 0; face < iNumFace; face++)
+                    UINT i0 = meshnode->GetListIndex()[index + 0];
+                    UINT i1 = meshnode->GetListIndex()[index + 1];
+                    UINT i2 = meshnode->GetListIndex()[index + 2];
+                    XMFLOAT3 v0 = meshnode->GetListPNCT()[i0].pos;
+                    XMFLOAT3 v1 = meshnode->GetListPNCT()[i1].pos;
+                    XMFLOAT3 v2 = meshnode->GetListPNCT()[i2].pos;
+                    XMVECTOR v_0 = XMVector3TransformCoord(XMLoadFloat3(&v0), object->m_ConstantData.matWorld);
+                    XMVECTOR v_1 = XMVector3TransformCoord(XMLoadFloat3(&v1), object->m_ConstantData.matWorld);
+                    XMVECTOR v_2 = XMVector3TransformCoord(XMLoadFloat3(&v2), object->m_ConstantData.matWorld);
+                    float fDist;
+                    if (_PhysicsSystem.GetSelect().ChkPick(v_0, v_1, v_2, fDist))
                     {
-                        UINT i0 = attribute->GetListIndex()[index + 0];
-                        UINT i1 = attribute->GetListIndex()[index + 1];
-                        UINT i2 = attribute->GetListIndex()[index + 2];
-                        XMFLOAT3 v0 = attribute->GetListPNCT()[i0].pos;
-                        XMFLOAT3 v1 = attribute->GetListPNCT()[i1].pos;
-                        XMFLOAT3 v2 = attribute->GetListPNCT()[i2].pos;
-                        XMVECTOR v_0 = XMVector3TransformCoord(XMLoadFloat3(&v0), object->m_ConstantData.matWorld);
-                        XMVECTOR v_1 = XMVector3TransformCoord(XMLoadFloat3(&v1), object->m_ConstantData.matWorld);
-                        XMVECTOR v_2 = XMVector3TransformCoord(XMLoadFloat3(&v2), object->m_ConstantData.matWorld);
-                        float fDist;
-                        if (_PhysicsSystem.GetSelect().ChkPick(v_0, v_1, v_2, fDist))
-                        {
-                            return object;
-                        }
-                        index += 3;
+                        objectContain.insert(std::make_pair(fDist, object));
+                        break;
                     }
-                } 
+                    index += 3;
+                }
             }
         }
     }
-    return nullptr;
+    if (objectContain.empty())
+    {
+        for (const auto& object : m_pQuadTree->m_pAllObjectList)
+        {
+            for (const auto& meshnode : object->m_pMesh->GetMeshNodeList())
+            {
+                UINT index = 0;
+                UINT iNumFace = meshnode->GetListIndex().size() / 3;
+                for (UINT face = 0; face < iNumFace; face++)
+                {
+                    UINT i0 = meshnode->GetListIndex()[index + 0];
+                    UINT i1 = meshnode->GetListIndex()[index + 1];
+                    UINT i2 = meshnode->GetListIndex()[index + 2];
+                    XMFLOAT3 v0 = meshnode->GetListPNCT()[i0].pos;
+                    XMFLOAT3 v1 = meshnode->GetListPNCT()[i1].pos;
+                    XMFLOAT3 v2 = meshnode->GetListPNCT()[i2].pos;
+                    XMVECTOR v_0 = XMVector3TransformCoord(XMLoadFloat3(&v0), object->m_ConstantData.matWorld);
+                    XMVECTOR v_1 = XMVector3TransformCoord(XMLoadFloat3(&v1), object->m_ConstantData.matWorld);
+                    XMVECTOR v_2 = XMVector3TransformCoord(XMLoadFloat3(&v2), object->m_ConstantData.matWorld);
+                    float fDist;
+                    if (_PhysicsSystem.GetSelect().ChkPick(v_0, v_1, v_2, fDist))
+                    {
+                        objectContain.insert(std::make_pair(fDist, object));
+                        break;
+                    }
+                    index += 3;
+                }
+            }
+        }
+    }
+    if(!objectContain.empty())
+        return objectContain.begin()->second;
+    else
+        return nullptr; 
 }
 
 std::set<std::wstring>& ToolSystemMap::GetListTextureSplatting()
@@ -266,25 +298,23 @@ Object* ToolSystemMap::CreateFbxObject(std::wstring szFullPath, XMVECTOR vPos, X
             pMesh->SetMeshNode(pMeshNode);
             for (int nodeMaterialCount = 0; nodeMaterialCount < pFBXFile->m_ListNode[nodeCount]->m_ListVertexPNCT.size(); nodeMaterialCount++)
             {
-                NodeAttribute* pAttribute = new NodeAttribute();
-                pMeshNode->SetAttribute(pAttribute);
                 //SetVB
                 void* listVertex = &pFbxNode->m_ListVertexPNCT[nodeMaterialCount][0];
                 UINT iSizeVertices = pFbxNode->m_ListVertexPNCT[nodeMaterialCount].size();
-                pAttribute->SetListPNCT(listVertex, iSizeVertices);
-                VertexBuffer* pVertexBufferPNCT = _EngineSystem.GetRenderSystem()->CreateVertexBuffer(&pAttribute->GetListPNCT()[0], sizeof(PNCTVertex), pAttribute->GetListPNCT().size());
-                pAttribute->SetVertexBufferPNCT(pVertexBufferPNCT);
+                pMeshNode->SetListPNCT(listVertex, iSizeVertices);
+                VertexBuffer* pVertexBufferPNCT = _EngineSystem.GetRenderSystem()->CreateVertexBuffer(&pMeshNode->GetListPNCT()[0], sizeof(PNCTVertex), pMeshNode->GetListPNCT().size());
+                pMeshNode->SetVertexBufferPNCT(pVertexBufferPNCT);
 
                 //SetIB
                 void* listIndex = &pFbxNode->m_ListIndex[nodeMaterialCount][0];
                 UINT iSizeIndices = pFbxNode->m_ListIndex[nodeMaterialCount].size();
-                pAttribute->SetListIndex(listIndex, iSizeIndices);
-                IndexBuffer* pIndexBuffer = _EngineSystem.GetRenderSystem()->CreateIndexBuffer(&pAttribute->GetListIndex()[0], pAttribute->GetListIndex().size());
-                pAttribute->SetIndexBuffer(pIndexBuffer);
+                pMeshNode->SetListIndex(listIndex, iSizeIndices);
+                IndexBuffer* pIndexBuffer = _EngineSystem.GetRenderSystem()->CreateIndexBuffer(&pMeshNode->GetListIndex()[0], pMeshNode->GetListIndex().size());
+                pMeshNode->SetIndexBuffer(pIndexBuffer);
 
                 //SetInputLayout
                 InputLayout* pInputLayout = _EngineSystem.GetRenderSystem()->CreateInputLayout(shader_byte_code_vs, size_shader_vs, INPUT_LAYOUT::PNCT);
-                pAttribute->SetInputLayout(pInputLayout);
+                pMeshNode->SetInputLayout(pInputLayout);
 
                 //if (!pFBXFile->m_ListNode[nodeCount]->m_ListVertexIW.size())
                 //    continue;
@@ -342,24 +372,49 @@ Object* ToolSystemMap::CreateFbxObject(std::wstring szFullPath, XMVECTOR vPos, X
 }
 
 #include "SimpleBox.h"
-Object* ToolSystemMap::CreateSimpleBox(float fLength, OBJECT_SPECIFY specify, XMVECTOR vPos, XMVECTOR vRot, XMVECTOR vScale)
+Object* ToolSystemMap::CreateSimpleBox(OBJECT_SPECIFY specify, XMVECTOR vPos, XMVECTOR vRot, XMVECTOR vScale)
 {
-    SimpleBox* pObject = new SimpleBox(L"SimpleObjectBox");
-    pObject->SetLength(fLength);
-    float fboxLength = 0.5f * fLength;
+    std::wstring szBoxName;
+    XMFLOAT4 boxColor;
+    switch (specify)
+    {
+        case OBJECT_SPECIFY::OBJECT_SIMPLE:
+        {
+            szBoxName = L"SimpleObjectBox";
+            boxColor = { 0, 1, 0, 1 };
+        }break;
+        case OBJECT_SPECIFY::OBJECT_COLLIDER:
+        {
+            szBoxName = L"SimpleObjectCollider";
+            boxColor = { 1, 0, 0, 1 };
+        }break;
+        case OBJECT_SPECIFY::OBJECT_SPAWN:
+        {
+            szBoxName = L"SimpleObjectSpawn";
+            boxColor = { 0, 0, 1, 1 };
+        }break;
+        case OBJECT_SPECIFY::OBJECT_TRIGGER:
+        {
+            szBoxName = L"SimpleObjectTrigger";
+            boxColor = { 1, 0, 1, 1 };
+        }break;
+    }
+    SimpleBox* pObject = new SimpleBox(szBoxName);
+    float fboxLength = 0.5f * 1.0f;
+    
     PNCTVertex vertex_list[] =
     {
         //FrontFace
-        {XMFLOAT3(-fboxLength,-fboxLength,-fboxLength),	XMFLOAT3(1, 0, 0),      XMFLOAT4(0, 1, 0, 1),   XMFLOAT2(0,1)},
-        {XMFLOAT3(-fboxLength,fboxLength,-fboxLength), 	XMFLOAT3(0, 1, 0),      XMFLOAT4(0, 1, 0, 1),   XMFLOAT2(0,0)},
-        {XMFLOAT3(fboxLength,fboxLength,-fboxLength), 	XMFLOAT3(0, 0, 1),      XMFLOAT4(0, 1, 0, 1),   XMFLOAT2(1,0)},
-        {XMFLOAT3(fboxLength,-fboxLength,-fboxLength),	XMFLOAT3(1, 1, 0),      XMFLOAT4(0, 1, 0, 1),   XMFLOAT2(1,1)},
-
-        //BackFace
-        {XMFLOAT3(fboxLength,-fboxLength,fboxLength),	XMFLOAT3(1, 0, 0),      XMFLOAT4(0, 1, 0, 1),   XMFLOAT2(0,1)},
-        {XMFLOAT3(fboxLength,fboxLength,fboxLength),	XMFLOAT3(0, 1, 0),      XMFLOAT4(0, 1, 0, 1),   XMFLOAT2(0,0)},
-        {XMFLOAT3(-fboxLength,fboxLength,fboxLength), 	XMFLOAT3(0, 0, 1),      XMFLOAT4(0, 1, 0, 1),   XMFLOAT2(1,0)},
-        {XMFLOAT3(-fboxLength,-fboxLength,fboxLength),	XMFLOAT3(1, 1, 0),      XMFLOAT4(0, 1, 0, 1),   XMFLOAT2(1,1)},
+        {XMFLOAT3(-fboxLength,-fboxLength,-fboxLength),	XMFLOAT3(1, 0, 0),  boxColor,   XMFLOAT2(0,1)},
+        {XMFLOAT3(-fboxLength,fboxLength,-fboxLength), 	XMFLOAT3(0, 1, 0),  boxColor,   XMFLOAT2(0,0)},
+        {XMFLOAT3(fboxLength,fboxLength,-fboxLength), 	XMFLOAT3(0, 0, 1),  boxColor,   XMFLOAT2(1,0)},
+        {XMFLOAT3(fboxLength,-fboxLength,-fboxLength),	XMFLOAT3(1, 1, 0),  boxColor,   XMFLOAT2(1,1)},
+                                                                            
+        //BackFace                                                          
+        {XMFLOAT3(fboxLength,-fboxLength,fboxLength),	XMFLOAT3(1, 0, 0),  boxColor,   XMFLOAT2(0,1)},
+        {XMFLOAT3(fboxLength,fboxLength,fboxLength),	XMFLOAT3(0, 1, 0),  boxColor,   XMFLOAT2(0,0)},
+        {XMFLOAT3(-fboxLength,fboxLength,fboxLength), 	XMFLOAT3(0, 0, 1),  boxColor,   XMFLOAT2(1,0)},
+        {XMFLOAT3(-fboxLength,-fboxLength,fboxLength),	XMFLOAT3(1, 1, 0),  boxColor,   XMFLOAT2(1,1)},
     };
     UINT size_vertex_list = ARRAYSIZE(vertex_list);
 
@@ -396,8 +451,7 @@ Object* ToolSystemMap::CreateSimpleBox(float fLength, OBJECT_SPECIFY specify, XM
     cc.matView = m_pCamera->m_matCamera;
     cc.matProj = m_pCamera->m_matProj;
 
-    
-    Mesh* pMesh = _EngineSystem.GetMeshSystem()->CreateMeshFromFile(std::to_wstring(fboxLength));
+    Mesh* pMesh = _EngineSystem.GetMeshSystem()->CreateMeshFromFile(szBoxName);
 
     void* shader_byte_code_vs = nullptr;
     void* shader_byte_code_ps = nullptr;
@@ -410,21 +464,19 @@ Object* ToolSystemMap::CreateSimpleBox(float fLength, OBJECT_SPECIFY specify, XM
     
     if (pMesh->IsEmpty())
     {
-
-        VertexBuffer* pVertexBufferPNCT = _EngineSystem.GetRenderSystem()->CreateVertexBuffer(vertex_list, sizeof(PNCTVertex), size_vertex_list);
-        IndexBuffer* pIndexBuffer = _EngineSystem.GetRenderSystem()->CreateIndexBuffer(index_list, size_index_list);
-        InputLayout* pInputLayout = _EngineSystem.GetRenderSystem()->CreateInputLayout(shader_byte_code_vs, size_shader_vs, INPUT_LAYOUT::PNCT);
-
         MeshNode* pMeshNode = new MeshNode();
-        NodeAttribute* pAttribute = new NodeAttribute();
-        pAttribute->SetInputLayout(pInputLayout);
-        pAttribute->SetListPNCT(vertex_list, size_vertex_list);
-        pAttribute->SetVertexBufferPNCT(pVertexBufferPNCT);
-        pAttribute->SetListIndex(index_list, size_index_list);
-        pAttribute->SetIndexBuffer(pIndexBuffer);
-        pMeshNode->SetAttribute(pAttribute);
+        
+        pMeshNode->SetListPNCT(vertex_list, size_vertex_list);
+        pMeshNode->SetVertexBufferPNCT(_EngineSystem.GetRenderSystem()->CreateVertexBuffer(&pMeshNode->GetListPNCT()[0], sizeof(PNCTVertex), pMeshNode->GetListPNCT().size()));
+
+        pMeshNode->SetListIndex(index_list, size_index_list);
+        pMeshNode->SetIndexBuffer(_EngineSystem.GetRenderSystem()->CreateIndexBuffer(&pMeshNode->GetListIndex()[0], pMeshNode->GetListIndex().size()));
+
+        pMeshNode->SetInputLayout(_EngineSystem.GetRenderSystem()->CreateInputLayout(shader_byte_code_vs, size_shader_vs, INPUT_LAYOUT::PNCT));
+
         pMesh->SetMeshNode(pMeshNode);
     }
+
     _EngineSystem.GetRenderSystem()->ReleaseBlob();
     
     _ObjectSystem.AddObject(pObject);
@@ -524,18 +576,17 @@ Object* ToolSystemMap::CreateSimpleSphere(float radius, UINT sliceCount, UINT st
 
     if (pMesh->IsEmpty())
     {
-        VertexBuffer* pVertexBufferPNCT = _EngineSystem.GetRenderSystem()->CreateVertexBuffer(&vertices[0], sizeof(PNCTVertex), vertices.size());
-        IndexBuffer* pIndexBuffer = _EngineSystem.GetRenderSystem()->CreateIndexBuffer(&indices[0], indices.size());
-        InputLayout* pInputLayout = _EngineSystem.GetRenderSystem()->CreateInputLayout(shader_byte_code_vs, size_shader_vs, INPUT_LAYOUT::PNCT);
-
         MeshNode* pMeshNode = new MeshNode();
-        NodeAttribute* pAttribute = new NodeAttribute();
-        pAttribute->SetInputLayout(pInputLayout);
-        pAttribute->SetListPNCT(&vertices[0], vertices.size());
-        pAttribute->SetVertexBufferPNCT(pVertexBufferPNCT);
-        pAttribute->SetListIndex(&indices[0], indices.size());
-        pAttribute->SetIndexBuffer(pIndexBuffer);
-        pMeshNode->SetAttribute(pAttribute);
+
+        pMeshNode->SetListPNCT(&vertices[0], vertices.size());
+        pMeshNode->SetVertexBufferPNCT(_EngineSystem.GetRenderSystem()->CreateVertexBuffer(&pMeshNode->GetListPNCT()[0], sizeof(PNCTVertex), pMeshNode->GetListPNCT().size()));
+
+        pMeshNode->SetListIndex(&indices[0], indices.size());
+        pMeshNode->SetIndexBuffer(_EngineSystem.GetRenderSystem()->CreateIndexBuffer(&pMeshNode->GetListIndex()[0], pMeshNode->GetListIndex().size()));
+
+        InputLayout* pInputLayout = _EngineSystem.GetRenderSystem()->CreateInputLayout(shader_byte_code_vs, size_shader_vs, INPUT_LAYOUT::PNCT);
+        pMeshNode->SetInputLayout(pInputLayout);
+
         pMesh->SetMeshNode(pMeshNode);
     }
 
@@ -544,24 +595,18 @@ Object* ToolSystemMap::CreateSimpleSphere(float radius, UINT sliceCount, UINT st
         Material* pMaterial = _MaterialSystem.CreateMaterial(szName);
         if (pMaterial->IsEmpty())
         {
-            pMaterial->GetListTextures().resize(pMesh->GetMeshNodeList().size());
+            pMaterial->GetListTextures().resize(1);
             for (int nodeCount = 0; nodeCount < pMesh->GetMeshNodeList().size(); nodeCount++)
             {
-                pMaterial->GetListTextures()[nodeCount].resize(pMesh->GetMeshNodeList()[nodeCount]->GetAttributeList().size());
+                UINT iSubMtrl = pMesh->GetMeshNodeList()[nodeCount]->GetSubVertexBufferPNCT().size();
                 std::vector<Texture*> listTex;
-                for (int nodeMaterialCount = 0; nodeMaterialCount < pMesh->GetMeshNodeList()[nodeCount]->GetAttributeList().size(); nodeMaterialCount++)
+                if (!iSubMtrl)
                 {
-                    if (pMesh->GetMeshNodeList()[nodeCount]->GetAttributeList().empty())
-                    {
-                        listTex.push_back(nullptr);
-                    }
-                    else
-                    {
-                        listTex.push_back(_EngineSystem.GetTextureSystem()->CreateTextureFromFile(szCurrentImage.c_str()));
-                    }
-                }
-                for (int idx = 0; idx < listTex.size(); idx++)
-                    pMaterial->GetListTextures()[nodeCount][idx] = listTex[idx];
+                    pMaterial->GetListTextures()[nodeCount].resize(1);
+                    listTex.push_back(_EngineSystem.GetTextureSystem()->CreateTextureFromFile(szCurrentImage.c_str()));
+                    for (int idx = 0; idx < listTex.size(); idx++)
+                        pMaterial->GetListTextures()[nodeCount][idx] = listTex[idx];
+                }             
             }
         }
         pObject->SetMaterial(pMaterial);
@@ -661,8 +706,14 @@ void ToolSystemMap::OpenFile(std::wstring szFullPath)
             {
                 std::string textureName;
                 iss >> textureName;
-                pTexture = _EngineSystem.GetTextureSystem()->CreateTextureFromFile(_tomw(textureName));
-                m_ListTexture.insert(_tomw(textureName));
+                std::string delim = "Assets";
+                textureName = CutStringDelim(textureName, delim);
+                delim = "data";
+                textureName = CutStringDelim(textureName, delim);
+                std::wstring relativeStr = L"..\\..\\";
+                relativeStr += _tomw(textureName);
+                pTexture = _EngineSystem.GetTextureSystem()->CreateTextureFromFile(relativeStr);
+                m_ListTexture.insert(relativeStr);
             }
             else if (fieldName == "m_ListTextureSplatting")
             {
@@ -675,7 +726,13 @@ void ToolSystemMap::OpenFile(std::wstring szFullPath)
                     if (texturePath.size() > 1)
                     {
                         texturePath.erase(std::remove(texturePath.begin(), texturePath.end(), ' '), texturePath.end());
-                        auto texture = _EngineSystem.GetTextureSystem()->CreateTextureFromFile(_tomw(texturePath));
+                        std::string delim = "Assets";
+                        texturePath = CutStringDelim(texturePath, delim);
+                        delim = "data";
+                        texturePath = CutStringDelim(texturePath, delim);
+                        std::wstring relativeStr = L"..\\..\\";
+                        relativeStr += _tomw(texturePath);
+                        auto texture = _EngineSystem.GetTextureSystem()->CreateTextureFromFile(relativeStr);
                         m_ListTextureSplatting.insert(texture->GetTextureName());
                     }
                 }
@@ -734,20 +791,19 @@ void ToolSystemMap::OpenFile(std::wstring szFullPath)
                     T_BOX box;
                     texturesStream >> box;
 
-                    float fLength;
                     float fRadius;
                     UINT iSliceCount;
                     UINT iStackCount;
-                    if (specifyMode == OBJECT_SPECIFY::OBJECT_COLLIDER || specifyMode == OBJECT_SPECIFY::OBJECT_SIMPLE)
-                    {
-                        // Length 값을 추출합니다.
-                        size_t length_start = texturesStream.str().find("m_fLength:") + strlen("m_fLength:");
-                        size_t length_end = texturesStream.str().find(",", length_start);
-                        std::string length_str = texturesStream.str().substr(length_start, length_end - length_start);
-                        std::istringstream length_stream(length_str);
-                        length_stream >> fLength;
-                    }
-                    else if (specifyMode == OBJECT_SPECIFY::OBJECT_SKYDOME)
+                    //if (specifyMode == OBJECT_SPECIFY::OBJECT_COLLIDER || specifyMode == OBJECT_SPECIFY::OBJECT_SIMPLE)
+                    //{
+                    //    // Length 값을 추출합니다.
+                    //    size_t length_start = texturesStream.str().find("m_fLength:") + strlen("m_fLength:");
+                    //    size_t length_end = texturesStream.str().find(",", length_start);
+                    //    std::string length_str = texturesStream.str().substr(length_start, length_end - length_start);
+                    //    std::istringstream length_stream(length_str);
+                    //    length_stream >> fLength;
+                    //}
+                    if (specifyMode == OBJECT_SPECIFY::OBJECT_SKYDOME)
                     {
                         // radius 값을 추출합니다.
                         size_t radius_start = texturesStream.str().find("m_fRadius:") + strlen("m_fRadius:");
@@ -771,15 +827,25 @@ void ToolSystemMap::OpenFile(std::wstring szFullPath)
                         stack_stream >> iStackCount;
                     }
 
+                    std::string delim = "Assets";
+                    strName = CutStringDelim(strName, delim);
+                    delim = "data";
+                    strName = CutStringDelim(strName, delim);
+                    std::wstring relativeStr = L"..\\..\\";
+                    relativeStr += _tomw(strName);
+
                     Object* pObject = nullptr;
-                    if (specifyMode == OBJECT_SPECIFY::OBJECT_COLLIDER || specifyMode == OBJECT_SPECIFY::OBJECT_SIMPLE)
-                        pObject = CreateSimpleBox(fLength, specifyMode, transform.position, transform.rotation, transform.scale);
+                    if (specifyMode == OBJECT_SPECIFY::OBJECT_COLLIDER || 
+                        specifyMode == OBJECT_SPECIFY::OBJECT_SIMPLE || 
+                        specifyMode == OBJECT_SPECIFY::OBJECT_SPAWN ||
+                        specifyMode == OBJECT_SPECIFY::OBJECT_TRIGGER)
+                        pObject = CreateSimpleBox(specifyMode, transform.position, transform.rotation, transform.scale);
                     else if (specifyMode == OBJECT_SPECIFY::OBJECT_STATIC)
-                        pObject = CreateFbxObject(_tomw(strName), transform.position, transform.rotation, transform.scale);
+                        pObject = CreateFbxObject(relativeStr, transform.position, transform.rotation, transform.scale);
                    /* else if (specifyMode == OBJECT_SPECIFY::OBJECT_SKELETON)
                         pObject = CreateFbxObject(_tomw(str), transform.position, transform.rotation, transform.scale);*/
                     else if (specifyMode == OBJECT_SPECIFY::OBJECT_SKYDOME)
-                        pObject = CreateSimpleSphere(fRadius, iSliceCount, iStackCount, specifyMode, _tomw(strName), transform.position, transform.rotation, transform.scale);
+                        pObject = CreateSimpleSphere(fRadius, iSliceCount, iStackCount, specifyMode, relativeStr, transform.position, transform.rotation, transform.scale);
 
                     allObjectList.insert(pObject);
                     prevPos = is.tellg();
@@ -831,7 +897,7 @@ void ToolSystemMap::OpenFile(std::wstring szFullPath)
 
     for (const auto& obj : allObjectList)
     {
-        if (obj->GetSpecify() != OBJECT_SPECIFY::OBJECT_SIMPLE || obj->GetSpecify() != OBJECT_SPECIFY::OBJECT_COLLIDER)
+        if (obj->GetSpecify() == OBJECT_SPECIFY::OBJECT_STATIC || obj->GetSpecify() == OBJECT_SPECIFY::OBJECT_SKELETON)
             m_ListFbx.insert(obj->GetObjectName());
         m_pQuadTree->AddObject(obj);
     }

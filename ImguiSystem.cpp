@@ -95,6 +95,7 @@ void ImguiSystem::Update()
     static float fSimpleObjLength = 1.0f; 
     static bool bCollider = false;
     static bool bTrigger = false;
+    static bool bSpawn = false;
 
     static bool bFbxObj = false;
 
@@ -134,30 +135,37 @@ void ImguiSystem::Update()
                     if (ImGui::Checkbox("Simple", &bSimple))
                     {
                         ~bSimple;
-                        bCollider = bTrigger = false;
+                        bCollider = bTrigger = bSpawn = false;
                         
                     }
                     ImGui::SameLine();
                     if (ImGui::Checkbox("Collider", &bCollider))
                     {
                         ~bCollider;
-                        bSimple = bTrigger = false;
+                        bSimple = bTrigger = bSpawn = false;
+                    }
+                    ImGui::SameLine();
+                    if (ImGui::Checkbox("Spawn", &bSpawn))
+                    {
+                        ~bSpawn;
+                        bSimple = bCollider = bTrigger = false;
                     }
                     ImGui::SameLine();
                     if (ImGui::Checkbox("Trigger", &bTrigger))
                     {
                         ~bTrigger;
-                        bSimple = bCollider = false;
+                        bSimple = bCollider = bSpawn =false;
                     }
-        
                     if ((_InputSystem.GetKey(VK_RBUTTON) == KEY_STATE::KEY_DOWN) && _ToolSystemMap.GetInterSection())
                     {
                         if(bSimple)
-                            _ToolSystemMap.CreateSimpleBox(fSimpleObjLength, OBJECT_SPECIFY::OBJECT_SIMPLE, _PhysicsSystem.GetSelect().m_vIntersection);
+                            _ToolSystemMap.CreateSimpleBox(OBJECT_SPECIFY::OBJECT_SIMPLE, _PhysicsSystem.GetSelect().m_vIntersection, { 0, 0, 0, 0 }, { fSimpleObjLength, fSimpleObjLength , fSimpleObjLength , 0});
                         else if (bCollider)
-                            _ToolSystemMap.CreateSimpleBox(fSimpleObjLength, OBJECT_SPECIFY::OBJECT_COLLIDER, _PhysicsSystem.GetSelect().m_vIntersection);
-                        /*else if (bTrigger)
-                            _ToolSystemMap.CreateSimpleBox(fSimpleObjLength, OBJECT_SPECIFY::tri, _PhysicsSystem.GetSelect().m_vIntersection);*/
+                            _ToolSystemMap.CreateSimpleBox(OBJECT_SPECIFY::OBJECT_COLLIDER, _PhysicsSystem.GetSelect().m_vIntersection);
+                        else if (bSpawn)
+                            _ToolSystemMap.CreateSimpleBox(OBJECT_SPECIFY::OBJECT_SPAWN, _PhysicsSystem.GetSelect().m_vIntersection);
+                        else if (bTrigger)
+                            _ToolSystemMap.CreateSimpleBox(OBJECT_SPECIFY::OBJECT_TRIGGER, _PhysicsSystem.GetSelect().m_vIntersection);
                     }
                         
                 }

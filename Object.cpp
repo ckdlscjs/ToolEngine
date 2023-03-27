@@ -21,15 +21,12 @@ T_BOX Object::CreateBoundingBox()
 
 	for (const auto& node : m_pMesh->GetMeshNodeList())
 	{
-		for (const auto& attribute : node->GetAttributeList())
+		for (const auto& vertex : node->GetListPNCT())
 		{
-			for (const auto& vertex : attribute->GetListPNCT())
-			{
-				XMVECTOR v = XMLoadFloat3(&vertex.pos);
+			XMVECTOR v = XMLoadFloat3(&vertex.pos);
 
-				minVertex = XMVectorMin(minVertex, v);
-				maxVertex = XMVectorMax(maxVertex, v);
-			}
+			minVertex = XMVectorMin(minVertex, v);
+			maxVertex = XMVectorMax(maxVertex, v);
 		}
 	}
 
@@ -52,25 +49,22 @@ bool Object::Intersect(FSelect& select, float distance)
 {
 	for (const auto& node : m_pMesh->GetMeshNodeList())
 	{
-		for (const auto& attribute : node->GetAttributeList())
+		UINT index = 0;
+		UINT iNumFace = node->GetListIndex().size() / 3;
+		for (UINT face = 0; face < iNumFace; face++)
 		{
-			UINT index = 0;
-			UINT iNumFace = attribute->GetListIndex().size() / 3;
-			for (UINT face = 0; face < iNumFace; face++)
+			UINT i0 = node->GetListIndex()[index + 0];
+			UINT i1 = node->GetListIndex()[index + 1];
+			UINT i2 = node->GetListIndex()[index + 2];
+			XMFLOAT3 v0 = node->GetListPNCT()[i0].pos;
+			XMFLOAT3 v1 = node->GetListPNCT()[i1].pos;
+			XMFLOAT3 v2 = node->GetListPNCT()[i2].pos;
+			float fDist;
+			if (select.ChkPick(XMLoadFloat3(&v0), XMLoadFloat3(&v1), XMLoadFloat3(&v2), fDist))
 			{
-				UINT i0 = attribute->GetListIndex()[index + 0];
-				UINT i1 = attribute->GetListIndex()[index + 1];
-				UINT i2 = attribute->GetListIndex()[index + 2];
-				XMFLOAT3 v0 = attribute->GetListPNCT()[i0].pos;
-				XMFLOAT3 v1 = attribute->GetListPNCT()[i1].pos;
-				XMFLOAT3 v2 = attribute->GetListPNCT()[i2].pos;
-				float fDist;
-				if (select.ChkPick(XMLoadFloat3(&v0), XMLoadFloat3(&v1), XMLoadFloat3(&v2), fDist))
-				{
-					return true;
-				}
-				index += 3;
+				return true;
 			}
+			index += 3;
 		}
 	}
 	return false;
@@ -193,19 +187,37 @@ void Object::Render()
 	for (int idxNode = 0; idxNode < m_pMesh->GetMeshNodeList().size(); idxNode++)
 	{
 		MeshNode* pMeshNode = m_pMesh->GetMeshNodeList()[idxNode];
-		for (int idxSub = 0; idxSub < m_pMesh->GetMeshNodeList()[idxNode]->GetAttributeList().size(); idxSub++)
+		if (pMeshNode->GetListPNCT().empty() && pMeshNode->GetSubListPNCT().empty())
+			continue;
+		UINT iSubMtrl = pMeshNode->GetSubListPNCT().size();
+		_EngineSystem.GetRenderSystem()->SetInputLayout(pMeshNode->GetInputLayout());
+		if (iSubMtrl)
 		{
-			NodeAttribute* pAttribute = pMeshNode->GetAttributeList()[idxSub];
-			_EngineSystem.GetRenderSystem()->SetInputLayout(pAttribute->GetInputLayout());
-			_EngineSystem.GetRenderSystem()->SetVertexBuffer(pAttribute->GetVertexBufferPNCT());
+			for (int idxSub = 0; idxSub < m_pMesh->GetMeshNodeList()[idxNode]->GetSubListPNCT().size(); idxSub++)
+			{
+				_EngineSystem.GetRenderSystem()->SetVertexBuffer(pMeshNode->GetSubVertexBufferPNCT()[idxSub]);
+				//_EngineSystem.GetRenderSystem()->SetVertexBuffer(m_pMesh->GetMeshNodeList()[idxNode]->GetVertexBufferIW(), 1);
+				_EngineSystem.GetRenderSystem()->SetIndexBuffer(pMeshNode->GetSubIndexBuffer()[idxSub]);
+				if (m_pMaterial)
+				{
+					_EngineSystem.GetRenderSystem()->setTexture(m_pVertexShader, m_pMaterial->GetListTexture(idxNode)[idxSub]);
+					_EngineSystem.GetRenderSystem()->setTexture(m_pPixelShader, m_pMaterial->GetListTexture(idxNode)[idxSub]);
+				}
+				_EngineSystem.GetRenderSystem()->drawIndexedTriangleList(pMeshNode->GetSubIndexBuffer()[idxSub]->getSizeIndexList(), 0, 0);
+				//_EngineSystem.GetRenderSystem()->drawTriangleList(pAttribute->GetListPNCT().size(), 0);
+			}
+		}
+		else
+		{
+			_EngineSystem.GetRenderSystem()->SetVertexBuffer(pMeshNode->GetVertexBufferPNCT());
 			//_EngineSystem.GetRenderSystem()->SetVertexBuffer(m_pMesh->GetMeshNodeList()[idxNode]->GetVertexBufferIW(), 1);
-			_EngineSystem.GetRenderSystem()->SetIndexBuffer(pAttribute->GetIndexBuffer());
+			_EngineSystem.GetRenderSystem()->SetIndexBuffer(pMeshNode->GetIndexBuffer());
 			if (m_pMaterial)
 			{
-				_EngineSystem.GetRenderSystem()->setTexture(m_pVertexShader, m_pMaterial->GetListTexture(idxNode)[idxSub]);
-				_EngineSystem.GetRenderSystem()->setTexture(m_pPixelShader, m_pMaterial->GetListTexture(idxNode)[idxSub]);
+				_EngineSystem.GetRenderSystem()->setTexture(m_pVertexShader, m_pMaterial->GetListTexture(idxNode)[0]);
+				_EngineSystem.GetRenderSystem()->setTexture(m_pPixelShader, m_pMaterial->GetListTexture(idxNode)[0]);
 			}
-			_EngineSystem.GetRenderSystem()->drawIndexedTriangleList(pAttribute->GetIndexBuffer()->getSizeIndexList(), 0, 0);
+			_EngineSystem.GetRenderSystem()->drawIndexedTriangleList(pMeshNode->GetIndexBuffer()->getSizeIndexList(), 0, 0);
 			//_EngineSystem.GetRenderSystem()->drawTriangleList(pAttribute->GetListPNCT().size(), 0);
 		}
 	}
@@ -256,11 +268,16 @@ Object::~Object()
 std::ostream& operator<<(std::ostream& os, const Object* pObject)
 {
 	//os << pObject->m_szFullPath << ", ";
-	os << GetSplitExtension(pObject->m_szFullPath);
-	if (pObject->m_Specify != OBJECT_SPECIFY::OBJECT_SIMPLE || pObject->m_Specify != OBJECT_SPECIFY::OBJECT_COLLIDER)
+	
+	if (pObject->m_Specify == OBJECT_SPECIFY::OBJECT_STATIC || pObject->m_Specify == OBJECT_SPECIFY::OBJECT_SKELETON)
 	{
+		os << GetSplitExtension(pObject->m_szFullPath);
 		std::wstring scriptExtension = L".Script";
 		os << scriptExtension;
+	}
+	else
+	{
+		os << pObject->m_szFullPath;
 	}
 		
 	os<< ", ";
