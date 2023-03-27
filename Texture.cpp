@@ -1,4 +1,12 @@
 #include "Texture.h"
+//std::wstring Texture::GetDelim()
+//{
+//	return m_szDelim;
+//}
+//void Texture::SetDelim(std::wstring szDelim)
+//{
+//	m_szDelim = szDelim;
+//}
 std::wstring Texture::GetTextureName()
 {
 	return m_szFullPath;

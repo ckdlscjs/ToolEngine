@@ -425,9 +425,12 @@ void ImguiSystem::Update()
                 const std::vector<std::filesystem::path>& res = ifd::FileDialog::Instance().GetResults();
                 for (int idx = 0; idx < res.size(); idx++)
                 {
-                    if(_ToolSystemMap.GetListTextureSplatting().insert(res[idx].wstring()).second)
-                        _ToolSystemMap.SetSplattingTexture(_EngineSystem.GetTextureSystem()->CreateTextureFromFile(res[idx].wstring().c_str()));
-                    szCurrentSplat = res[idx].wstring();
+                    std::wstring delim = L"Assets";
+                    std::wstring cutString = L"..\\..\\";
+                    cutString += CutStringDelim(res[idx].wstring(), delim);
+                    if(_ToolSystemMap.GetListTextureSplatting().insert(cutString).second)
+                        _ToolSystemMap.SetSplattingTexture(_EngineSystem.GetTextureSystem()->CreateTextureFromFile(cutString.c_str()));
+                    szCurrentSplat = cutString;
                 }
             }
         }
@@ -440,10 +443,11 @@ void ImguiSystem::Update()
             for (int idx = 0; idx < res.size(); idx++)
             {
                 std::wstring delim = L"Assets";
-                std::wstring cutString = L"../../";
+                std::wstring cutString = L"..\\..\\";
                 cutString += CutStringDelim(res[idx].wstring(), delim);
                 auto texture = _EngineSystem.GetTextureSystem()->CreateTextureFromFile(cutString.c_str());
                 _ToolSystemMap.GetListTexture().insert(res[idx].wstring());
+                //texture->SetDelim(delim);
                 szCurrentImage = cutString;
             }
         }
@@ -457,8 +461,11 @@ void ImguiSystem::Update()
             const std::vector<std::filesystem::path>& res = ifd::FileDialog::Instance().GetResults();
             for (int idx = 0; idx < res.size(); idx++)
             {
+                std::wstring delim = L"data";
+                std::wstring cutString = L"..\\..\\";
+                cutString += CutStringDelim(res[idx].wstring(), delim);
                 _ToolSystemMap.GetListFbx().insert(res[idx].wstring());
-                szCurrentFbx = res[idx].wstring();
+                szCurrentFbx = cutString;
             }
         }
         ifd::FileDialog::Instance().Close();
