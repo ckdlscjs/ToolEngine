@@ -157,11 +157,19 @@ void FBXFile::ParseMesh(FBXNode* pNode, int nodeIdx)
 			//}
 		}
 	}
-	pNode->m_MapVertexPNCT.resize(iNumMtrl);
+
+	//std::vector<std::map<unsigned int, PNCTVertex>> m_MapVertexPNCT;
+	std::vector<std::vector<PNCTVertex>> m_ListVertexPNCT;
+	std::vector<std::vector<IW>> m_ListVertexIW;
+	//std::vector<std::vector<unsigned int>> m_ListOriginIdx;
+
+	std::vector<std::map<unsigned int, PNCTVertex>> mapVertexPNCT;
+	std::vector<std::vector<unsigned int>> listIndexOrigin;
+	mapVertexPNCT.resize(iNumMtrl);
 	pNode->m_ListVertexPNCT.resize(iNumMtrl);
 	if (pNode->m_bSkinning)
 		pNode->m_ListVertexIW.resize(iNumMtrl);
-	pNode->m_ListOriginIdx.resize(iNumMtrl);
+	listIndexOrigin.resize(iNumMtrl);
 
 	if (iNumMtrl == 1)
 	{
@@ -279,11 +287,11 @@ void FBXFile::ParseMesh(FBXNode* pNode, int nodeIdx)
 					iwVertex.weight.z = pIW->weight[2];
 					iwVertex.weight.w = pIW->weight[3];
 				}
-				pNode->m_MapVertexPNCT[iSubMtrl].insert(std::make_pair(vertexID, pnctVertex));
+				mapVertexPNCT[iSubMtrl].insert(std::make_pair(vertexID, pnctVertex));
 				/*pNode->m_ListVertexPNCT[iSubMtrl][vertexID] = pnctVertex;
 				if (pNode->m_bSkinning)
 					pNode->m_ListVertexIW[iSubMtrl][vertexID] = iwVertex;*/
-				pNode->m_ListOriginIdx[iSubMtrl].push_back(vertexID);
+				listIndexOrigin[iSubMtrl].push_back(vertexID);
 				//pNode->m_ListVertexPNCT[iSubMtrl].push_back(pnctVertex);
 			}
 		}
@@ -291,18 +299,17 @@ void FBXFile::ParseMesh(FBXNode* pNode, int nodeIdx)
 	pNode->m_ListIndex.resize(iNumMtrl);
 	for (int MtrlIdx = 0; MtrlIdx < iNumMtrl; MtrlIdx++)
 	{
-		std::vector<unsigned int> pnctIdx;
-		pnctIdx.resize(100000);
-		pNode->m_ListIndex[MtrlIdx].resize(pNode->m_ListOriginIdx[MtrlIdx].size());
-		for (const auto& pnct : pNode->m_MapVertexPNCT[MtrlIdx])
+		unsigned int pnctIdx[100000] = { 0, };
+		pNode->m_ListIndex[MtrlIdx].resize(listIndexOrigin[MtrlIdx].size());
+		for (const auto& pnct : mapVertexPNCT[MtrlIdx])
 		{
 			pNode->m_ListVertexPNCT[MtrlIdx].push_back(pnct.second);
 			pnctIdx[pnct.first] = pNode->m_ListVertexPNCT[MtrlIdx].size() - 1;
 		}
 
-		for (int idx = 0; idx < pNode->m_ListOriginIdx[MtrlIdx].size(); idx++)
+		for (int idx = 0; idx < listIndexOrigin[MtrlIdx].size(); idx++)
 		{
-			pNode->m_ListIndex[MtrlIdx][idx] = pnctIdx[pNode->m_ListOriginIdx[MtrlIdx][idx]];
+			pNode->m_ListIndex[MtrlIdx][idx] = pnctIdx[listIndexOrigin[MtrlIdx][idx]];
 		}
 	}
 }

@@ -9,10 +9,10 @@ private:
 	FbxNode* m_pNode;
 	std::wstring m_szName;
 	unsigned int m_iBoneIdx;
-	std::vector<std::map<unsigned int, PNCTVertex>> m_MapVertexPNCT;
+	//std::vector<std::map<unsigned int, PNCTVertex>> m_MapVertexPNCT;
 	std::vector<std::vector<PNCTVertex>> m_ListVertexPNCT;
 	std::vector<std::vector<IW>> m_ListVertexIW;
-	std::vector<std::vector<unsigned int>> m_ListOriginIdx;
+	//std::vector<std::vector<unsigned int>> m_ListOriginIdx;
 	std::vector<std::vector<unsigned int>> m_ListIndex;
 	std::vector<std::wstring> m_ListTexture;
 	std::vector<AnimTrack> m_AnimTracks;
