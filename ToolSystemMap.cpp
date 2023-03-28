@@ -262,20 +262,21 @@ FQuadTree* ToolSystemMap::GetCurrentQuadTree()
 }
 
 #include "FBXObject.h"
+#include "FBXMeshNode.h"
 Object* ToolSystemMap::CreateFbxObject(std::wstring szFullPath, XMVECTOR vPos, XMVECTOR vRot, XMVECTOR vScale)
 {
     if (szFullPath.empty())
         return nullptr;
-    ConstantData_Transform cc;
-    cc.matWorld = XMMatrixIdentity();
-    cc.matView = m_pCamera->m_matCamera;
-    cc.matProj = m_pCamera->m_matProj;
+    ConstantData_Transform constantData;
+    constantData.matWorld = XMMatrixIdentity();
+    constantData.matView = m_pCamera->m_matCamera;
+    constantData.matProj = m_pCamera->m_matProj;
     std::wstring fbxFullPath = GetSplitExtension(szFullPath);
     fbxFullPath += L".fbx";
     FBXFile* pFBXFile = _FBXSystem.LoadFile(_towm(fbxFullPath).c_str());
-    Object* pObject = _ObjectSystem.CreateObject(szFullPath);
-    //Object* pObject = new FBXObject(szFullPath);
-    //_ObjectSystem.AddObject(pObject);
+    /*Object* pObject = _ObjectSystem.CreateObject(szFullPath);*/
+    Object* pObject = new FBXObject(szFullPath);
+    _ObjectSystem.AddObject(pObject);
     Mesh* pMesh = _EngineSystem.GetMeshSystem()->CreateMeshFromFile(szFullPath);
     Material* pMaterial = _MaterialSystem.CreateMaterial(szFullPath);
 
@@ -294,7 +295,7 @@ Object* ToolSystemMap::CreateFbxObject(std::wstring szFullPath, XMVECTOR vPos, X
         for (int nodeCount = 0; nodeCount < pFBXFile->m_ListNode.size(); nodeCount++)
         {
             FBXNode* pFbxNode = pFBXFile->m_ListNode[nodeCount];
-            MeshNode* pMeshNode = new MeshNode();
+            MeshNode* pMeshNode = new FBXMeshNode(pFbxNode->m_szName, pFbxNode->m_iBoneIdx);
             pMesh->SetMeshNode(pMeshNode);
             for (int nodeMaterialCount = 0; nodeMaterialCount < pFBXFile->m_ListNode[nodeCount]->m_ListVertexPNCT.size(); nodeMaterialCount++)
             {
@@ -311,7 +312,7 @@ Object* ToolSystemMap::CreateFbxObject(std::wstring szFullPath, XMVECTOR vPos, X
                 pMeshNode->SetIndexBuffer(_EngineSystem.GetRenderSystem()->CreateIndexBuffer(&pMeshNode->GetListIndex()[0], pMeshNode->GetListIndex().size()));
 
                 //SetInputLayout
-                InputLayout* pInputLayout = _EngineSystem.GetRenderSystem()->CreateInputLayout(shader_byte_code_vs, size_shader_vs, INPUT_LAYOUT::PNCT);
+                InputLayout* pInputLayout = _EngineSystem.GetRenderSystem()->CreateInputLayout(shader_byte_code_vs, size_shader_vs, INPUT_LAYOUT::PNCTIW);
                 pMeshNode->SetInputLayout(pInputLayout);
 
                 if (!pFBXFile->m_ListNode[nodeCount]->m_ListVertexIW.size())
@@ -326,7 +327,21 @@ Object* ToolSystemMap::CreateFbxObject(std::wstring szFullPath, XMVECTOR vPos, X
                 UINT iSizelistIW = pFbxNode->m_ListVertexIW[nodeMaterialCount].size();
                 pMeshNode->SetListIW(listIW, iSizelistIW);
                 pMeshNode->SetVertexBufferIW(_EngineSystem.GetRenderSystem()->CreateVertexBuffer(&pMeshNode->GetListIW()[0], sizeof(IW), pMeshNode->GetListIW().size()));
+               
             }
+        }
+    }
+ 
+    if (!pFBXFile->m_ListAnimLayer.empty())
+    {
+        for (const auto& animLayer : pFBXFile->m_ListAnimLayer)
+        {
+            dynamic_cast<FBXObject*>(pObject)->SetAnimScene(animLayer);
+            for (int nodeCount = 0; nodeCount < pMesh->GetMeshNodeList().size(); nodeCount++)
+            {
+                dynamic_cast<FBXMeshNode*>(pMesh->GetMeshNodeList()[nodeCount])->SetAnimTracks(animLayer.pStackAnim->GetName(), pFBXFile->m_ListNode[nodeCount]->m_AnimTracks.find(animLayer.pStackAnim->GetName())->second);
+            }
+            dynamic_cast<FBXObject*>(pObject)->SetCurrentAnim(animLayer);
         }
     }
 
@@ -356,7 +371,7 @@ Object* ToolSystemMap::CreateFbxObject(std::wstring szFullPath, XMVECTOR vPos, X
     _EngineSystem.GetRenderSystem()->ReleaseBlob();
 
     pObject->SetShader(pVertexShader, pPixelShader);
-    pObject->SetConstantData(cc);
+    pObject->SetConstantData(constantData);
     pObject->SetMesh(pMesh);
     pObject->SetTransform({ vPos , vRot, vScale });
     pObject->SetMaterial(pMaterial);

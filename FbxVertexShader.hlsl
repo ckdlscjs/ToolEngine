@@ -4,6 +4,9 @@ struct VS_INPUT
 	float2 tex : TEXCOORD0;
 	float3 normal : NORMAL0;
 	float4 color : COLOR0;
+
+	float4 index : INDEX;
+	float4 weight : WEIGHT;
 };
 
 struct VS_OUTPUT
@@ -30,16 +33,30 @@ cbuffer constant : register(b1)
 	float4 cameraPosition;
 };
 
+cbuffer constant_animation : register(b2)
+{
+	row_major float4x4 matBone[255];
+};
+
 VS_OUTPUT vsmain(VS_INPUT input)
 {
 	VS_OUTPUT output = (VS_OUTPUT)0;
 	float4 vLocal = input.position;
-	float4 vWorld = mul(vLocal, matWorld);
+	float4 vAnim = 0;
+	float4 vAnimNormal = 0;
+	for (int iBone = 0; iBone < 4; iBone++)
+	{
+		uint iBoneIndex = input.index[iBone];
+		float fWeight = input.weight[iBone];
+		vAnim += mul(vLocal, matBone[iBoneIndex]) * fWeight;
+		vAnimNormal += mul(input.normal, matBone[iBoneIndex]) * fWeight;
+	}
+	float4 vWorld = mul(vAnim, matWorld);
 	float4 vView = mul(vWorld, matView);
 	float4 vProj = mul(vView, matProj);
 	
 	output.position = vProj;
-	output.normal = input.normal;
+	output.normal = vAnimNormal;
 	output.tex = input.tex;
 	output.color = input.color;
 	output.direction_to_camera = normalize(vWorld.xyz - cameraPosition.xyz);

@@ -277,14 +277,17 @@
     <ClInclude Include="InputLayout.h">
       <Filter>EngineSystem\RenderySystem\InputLayout</Filter>
     </ClInclude>
-    <ClInclude Include="FBXObject.h">
-      <Filter>EngineSystem\ObjectSystem</Filter>
-    </ClInclude>
     <ClInclude Include="NodeAttribute.h">
       <Filter>EngineSystem\ObjectSystem\MeshSystem\MeshNode</Filter>
     </ClInclude>
     <ClInclude Include="SimpleSphere.h">
       <Filter>ToolSystem\ToolSystemMap\MapObject</Filter>
+    </ClInclude>
+    <ClInclude Include="FBXObject.h">
+      <Filter>FBXSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="FBXMeshNode.h">
+      <Filter>FBXSystem</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -439,14 +442,17 @@
     <ClCompile Include="InputLayout.cpp">
       <Filter>EngineSystem\RenderySystem\InputLayout</Filter>
     </ClCompile>
-    <ClCompile Include="FBXObject.cpp">
-      <Filter>EngineSystem\ObjectSystem</Filter>
-    </ClCompile>
     <ClCompile Include="NodeAttribute.cpp">
       <Filter>EngineSystem\ObjectSystem\MeshSystem\MeshNode</Filter>
     </ClCompile>
     <ClCompile Include="SimpleSphere.cpp">
       <Filter>ToolSystem\ToolSystemMap\MapObject</Filter>
+    </ClCompile>
+    <ClCompile Include="FBXObject.cpp">
+      <Filter>FBXSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="FBXMeshNode.cpp">
+      <Filter>FBXSystem</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

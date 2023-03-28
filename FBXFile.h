@@ -5,7 +5,7 @@
 class FBXFile
 {
 	void InitAnim();
-	void ParseAnim(FbxLongLong t);
+	void ParseAnim(FbxLongLong t, const AnimLayer& animLayer);
 	void ParseNode(FbxNode* pFbxNode);
 	void ParseMesh(FBXNode* pNode, int nodeIdx);
 	void ParseSkinning(FBXNode* pNode);
@@ -19,7 +19,7 @@ public:
 	FBXFile(FbxScene* pFbxScene);
 	~FBXFile();
 public:
-	AnimScene m_AnimScene;
+	std::vector<AnimLayer> m_ListAnimLayer;
 	FbxScene* m_pFbxScene;
 	FbxNode* m_pRootNode;
 	std::vector<FBXNode*> m_ListNode;

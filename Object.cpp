@@ -204,7 +204,7 @@ void Object::Render()
 			for (int idxSub = 0; idxSub < m_pMesh->GetMeshNodeList()[idxNode]->GetSubListPNCT().size(); idxSub++)
 			{
 				_EngineSystem.GetRenderSystem()->SetVertexBuffer(pMeshNode->GetSubVertexBufferPNCT()[idxSub]);
-				//_EngineSystem.GetRenderSystem()->SetVertexBuffer(m_pMesh->GetMeshNodeList()[idxNode]->GetVertexBufferIW(), 1);
+				_EngineSystem.GetRenderSystem()->SetVertexBuffer(pMeshNode->GetSubVertexBufferIW()[idxNode]);
 				_EngineSystem.GetRenderSystem()->SetIndexBuffer(pMeshNode->GetSubIndexBuffer()[idxSub]);
 				if (m_pMaterial)
 				{
@@ -212,13 +212,12 @@ void Object::Render()
 					_EngineSystem.GetRenderSystem()->setTexture(m_pPixelShader, m_pMaterial->GetListTexture(idxNode)[idxSub]);
 				}
 				_EngineSystem.GetRenderSystem()->drawIndexedTriangleList(pMeshNode->GetSubIndexBuffer()[idxSub]->getSizeIndexList(), 0, 0);
-				//_EngineSystem.GetRenderSystem()->drawTriangleList(pAttribute->GetListPNCT().size(), 0);
 			}
 		}
 		else
 		{
 			_EngineSystem.GetRenderSystem()->SetVertexBuffer(pMeshNode->GetVertexBufferPNCT());
-			//_EngineSystem.GetRenderSystem()->SetVertexBuffer(m_pMesh->GetMeshNodeList()[idxNode]->GetVertexBufferIW(), 1);
+			_EngineSystem.GetRenderSystem()->SetVertexBuffer(pMeshNode->GetVertexBufferIW());
 			_EngineSystem.GetRenderSystem()->SetIndexBuffer(pMeshNode->GetIndexBuffer());
 			if (m_pMaterial)
 			{
@@ -226,7 +225,6 @@ void Object::Render()
 				_EngineSystem.GetRenderSystem()->setTexture(m_pPixelShader, m_pMaterial->GetListTexture(idxNode)[0]);
 			}
 			_EngineSystem.GetRenderSystem()->drawIndexedTriangleList(pMeshNode->GetIndexBuffer()->getSizeIndexList(), 0, 0);
-			//_EngineSystem.GetRenderSystem()->drawTriangleList(pAttribute->GetListPNCT().size(), 0);
 		}
 	}
 	if (_InputSystem.GetKey('V'))

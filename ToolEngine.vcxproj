@@ -26,6 +26,7 @@
     <ClInclude Include="EngineSystem.h" />
     <ClInclude Include="EntrySystem.h" />
     <ClInclude Include="FBXFile.h" />
+    <ClInclude Include="FBXMeshNode.h" />
     <ClInclude Include="FBXNode.h" />
     <ClInclude Include="FBXObject.h" />
     <ClInclude Include="FBXSample.h" />
@@ -84,6 +85,7 @@
     <ClCompile Include="EngineSystem.cpp" />
     <ClCompile Include="EntrySystem.cpp" />
     <ClCompile Include="FBXFile.cpp" />
+    <ClCompile Include="FBXMeshNode.cpp" />
     <ClCompile Include="FBXNode.cpp" />
     <ClCompile Include="FBXObject.cpp" />
     <ClCompile Include="FBXSample.cpp" />

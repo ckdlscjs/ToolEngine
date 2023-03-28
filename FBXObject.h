@@ -3,15 +3,20 @@
 class FBXObject : public Object
 {
 public:
-	XMMATRIX Interplate(float fFrame, AnimScene tScene);
-	void SetAnimScene(AnimScene animScene);
+	void SetCurrentAnim(AnimLayer animLayer);
+	void SetAnimScene(AnimLayer animLayer);
 	void Update() override;
 	void Render() override;
 public:
 	FBXObject(std::wstring szFullPath);
 	~FBXObject();
 private:
-	AnimScene m_AnimScene;
+	std::vector<AnimLayer> m_ListAnimLayer;
+	UINT m_iCurrentAnimIdx = 0;
+	AnimLayer m_CurrentAnim;
+	float m_fCurrentAnimFrame = 0;
+	float m_fCurrentAnimInverse = 1.0f;
+	float m_fCurrentAnimSpeed = 1.0f;
 	ConstantData_Bone m_ConstantDataBone;
 	ConstantBuffer* m_pConstantBufferBone;
 };

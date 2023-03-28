@@ -2,43 +2,53 @@
 
 void FBXFile::InitAnim()
 {
-	FbxAnimStack* pStackAnim = m_pFbxScene->GetSrcObject<FbxAnimStack>(0);
-	FbxLongLong s = 0;
-	FbxLongLong n = 0;
-	FbxTime::EMode TimeMode = FbxTime::GetGlobalTimeMode();
-	if (pStackAnim)
+	int animStackCount = m_pFbxScene->GetSrcObjectCount<FbxAnimStack>();
+	for (int i = 0; i < animStackCount; i++)
 	{
-		FbxString takeName = pStackAnim->GetName();
-		FbxTakeInfo* take = m_pFbxScene->GetTakeInfo(takeName);
-		FbxTime::SetGlobalTimeMode(FbxTime::eFrames30);
-		TimeMode = FbxTime::GetGlobalTimeMode();
-		FbxTimeSpan localTimeSpan = take->mLocalTimeSpan;
-		FbxTime start = localTimeSpan.GetStart();
-		FbxTime end = localTimeSpan.GetStop();
-		FbxTime Duration = localTimeSpan.GetDirection();
-		s = start.GetFrameCount(TimeMode);
-		n = end.GetFrameCount(TimeMode);
+		AnimLayer animLayer;
+		FbxAnimStack* pStackAnim = m_pFbxScene->GetSrcObject<FbxAnimStack>(i);
+		FbxLongLong s = 0;
+		FbxLongLong n = 0;
+		FbxTime::EMode TimeMode = FbxTime::GetGlobalTimeMode();
+		if (pStackAnim)
+		{
+			FbxTakeInfo* take = m_pFbxScene->GetTakeInfo(pStackAnim->GetName());
+			FbxTime::SetGlobalTimeMode(FbxTime::eFrames30);
+			TimeMode = FbxTime::GetGlobalTimeMode();
+			FbxTimeSpan localTimeSpan = take->mLocalTimeSpan;
+			FbxTime start = localTimeSpan.GetStart();
+			FbxTime end = localTimeSpan.GetStop();
+			FbxTime Duration = localTimeSpan.GetDirection();
+			s = start.GetFrameCount(TimeMode);
+			n = end.GetFrameCount(TimeMode);
+		}
+		animLayer.pStackAnim = pStackAnim;
+		animLayer.iStartFrame = s;
+		animLayer.iEndFrame = n;
+		animLayer.fFrameSpeed = 30.0f;
+		animLayer.fTickPerFrame = 160;
+		animLayer.TimeMode = TimeMode;
+		m_ListAnimLayer.push_back(animLayer);
+		for (auto& tNode : m_ListNode)
+		{
+			tNode->m_AnimTracks.insert(std::make_pair(animLayer.pStackAnim->GetName(), 0));
+		}
 	}
-	m_AnimScene.iStartFrame = s;
-	m_AnimScene.iEndFrame = n;
-	m_AnimScene.fFrameSpeed = 30.0f;
-	m_AnimScene.fTickPerFrame = 160;
-	m_AnimScene.TimeMode = TimeMode;
 }
 
-void FBXFile::ParseAnim(FbxLongLong t)
+void FBXFile::ParseAnim(FbxLongLong t, const AnimLayer& animLayer)
 {
 	for (auto& tNode : m_ListNode)
 	{
 		FbxTime time;
-		time.SetFrame(t, m_AnimScene.TimeMode);
+		time.SetFrame(t, animLayer.TimeMode);
 		FbxNode* pNode = tNode->m_pNode;
 		AnimTrack track;						//특정노드의 특정시간에 해당하는 애니메이션행렬값(트랙)
 		track.iFrame = t;
 		FbxAMatrix fbxMatrix = pNode->EvaluateGlobalTransform(time);
 		track.matAnim = DxConvertMatrix(fbxMatrix);
 		XMMatrixDecompose(&track.scale, &track.rotation, &track.translation, track.matAnim);
-		tNode->m_AnimTracks.push_back(track);
+		tNode->m_AnimTracks.find(animLayer.pStackAnim->GetName())->second.push_back(track);
 	}
 }
 
@@ -548,7 +558,7 @@ XMMATRIX FBXFile::DxConvertMatrix(FbxAMatrix& fbxMatrix)
 FBXFile::FBXFile(FbxScene* pFbxScene)
 {
 	m_pFbxScene = pFbxScene;
-	InitAnim();												//InitAnimation
+												//InitAnimation
 	ParseNode(m_pFbxScene->GetRootNode());					//ParsingNodeStruct
 
 	// mesh
@@ -557,11 +567,16 @@ FBXFile::FBXFile(FbxScene* pFbxScene)
 		ParseMesh(m_ListNode[iNodeIdx], iNodeIdx);
 	}
 
-	// animation					
-	FbxTime time;
-	for (FbxLongLong t = m_AnimScene.iStartFrame; t <= m_AnimScene.iEndFrame; t++)
+	// animation	
+	InitAnim();
+	for (const auto& animLayer : m_ListAnimLayer)
 	{
-		ParseAnim(t);
+		m_pFbxScene->SetCurrentAnimationStack(animLayer.pStackAnim);
+		FbxTime time;
+		for (FbxLongLong t = animLayer.iStartFrame; t <= animLayer.iEndFrame; t++)
+		{
+			ParseAnim(t, animLayer);
+		}
 	}
 }
 
