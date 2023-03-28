@@ -554,29 +554,31 @@ struct AnimScene
 };
 
 __declspec(align(16))
-struct CBufferData
+struct ConstantData_Transform
 {
 	XMMATRIX matWorld;
 	XMMATRIX matView;
 	XMMATRIX matProj;
-	XMFLOAT4 m_light_direction;
-	XMFLOAT4 m_camera_position;
+	
 };
 
 __declspec(align(16))
-struct CBufferData_Map
+struct ConstantData_Map
 {
-	//XMMATRIX matWorld;
-	//XMMATRIX matView;
-	//XMMATRIX matProj;
-	XMFLOAT4 m_light_direction;
-	XMFLOAT4 m_camera_position;
-	XMFLOAT2 m_world_size;
-	float m_cell_distance;
+	XMFLOAT2 worldSize;
+	float cellDistance;
+	UINT tileCount;
 };
 
 __declspec(align(16))
-struct CBufferData_Bone
+struct ConstantData_Light
+{
+	XMFLOAT4 lightDirection;
+	XMFLOAT4 cameraPosition;
+};
+
+__declspec(align(16))
+struct ConstantData_Bone
 {
 	XMMATRIX matBone[255];
 };

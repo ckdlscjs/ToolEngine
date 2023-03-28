@@ -11,7 +11,9 @@ public:
 	void	SetTransform(Transform transform);
 	void	SetTexture(Texture* pTexture);
 	void	SetShader(std::wstring vsPath, VertexShader* pVertexShader, std::wstring psPath, PixelShader* pPixelShader);
-	void	SetConstantData(CBufferData_Map cc);
+	void	SetConstantData(ConstantData_Transform constantData);
+	void	SetConstantData(ConstantData_Map constantData);
+	void	SetConstantData(ConstantData_Light constantData);
 	UINT	SelectVertexList(T_BOX& box, std::vector<FNode*>& selectNodeList);
 	void	UpdateNode(FNode* pNode);
 	BOOL	AddObject(Object* pObj);
@@ -44,8 +46,12 @@ private:
 	ID3D11ShaderResourceView* m_pMaskAlphaSrv;
 	
 	Transform m_Transform;
-	ConstantBuffer* m_pConstantBuffer;
-	CBufferData_Map m_constantDataMap;
+	ConstantBuffer* m_pConstantBuffer_Transform;
+	ConstantData_Transform m_ConstantData_Transform;
+	ConstantBuffer* m_pConstantBuffer_Map;
+	ConstantData_Map m_ConstantData_Map;
+	ConstantBuffer* m_pConstantBuffer_Light;
+	ConstantData_Light m_ConstantData_Light;
 
 	std::wstring m_szVSPath;
 	VertexShader* m_pVertexShader;

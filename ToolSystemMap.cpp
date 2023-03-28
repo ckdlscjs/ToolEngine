@@ -186,9 +186,9 @@ Object* ToolSystemMap::ObjectPicking()
                     XMFLOAT3 v0 = meshnode->GetListPNCT()[i0].pos;
                     XMFLOAT3 v1 = meshnode->GetListPNCT()[i1].pos;
                     XMFLOAT3 v2 = meshnode->GetListPNCT()[i2].pos;
-                    XMVECTOR v_0 = XMVector3TransformCoord(XMLoadFloat3(&v0), object->m_ConstantData.matWorld);
-                    XMVECTOR v_1 = XMVector3TransformCoord(XMLoadFloat3(&v1), object->m_ConstantData.matWorld);
-                    XMVECTOR v_2 = XMVector3TransformCoord(XMLoadFloat3(&v2), object->m_ConstantData.matWorld);
+                    XMVECTOR v_0 = XMVector3TransformCoord(XMLoadFloat3(&v0), object->m_ConstantData_Transform.matWorld);
+                    XMVECTOR v_1 = XMVector3TransformCoord(XMLoadFloat3(&v1), object->m_ConstantData_Transform.matWorld);
+                    XMVECTOR v_2 = XMVector3TransformCoord(XMLoadFloat3(&v2), object->m_ConstantData_Transform.matWorld);
                     float fDist;
                     if (_PhysicsSystem.GetSelect().ChkPick(v_0, v_1, v_2, fDist))
                     {
@@ -216,9 +216,9 @@ Object* ToolSystemMap::ObjectPicking()
                     XMFLOAT3 v0 = meshnode->GetListPNCT()[i0].pos;
                     XMFLOAT3 v1 = meshnode->GetListPNCT()[i1].pos;
                     XMFLOAT3 v2 = meshnode->GetListPNCT()[i2].pos;
-                    XMVECTOR v_0 = XMVector3TransformCoord(XMLoadFloat3(&v0), object->m_ConstantData.matWorld);
-                    XMVECTOR v_1 = XMVector3TransformCoord(XMLoadFloat3(&v1), object->m_ConstantData.matWorld);
-                    XMVECTOR v_2 = XMVector3TransformCoord(XMLoadFloat3(&v2), object->m_ConstantData.matWorld);
+                    XMVECTOR v_0 = XMVector3TransformCoord(XMLoadFloat3(&v0), object->m_ConstantData_Transform.matWorld);
+                    XMVECTOR v_1 = XMVector3TransformCoord(XMLoadFloat3(&v1), object->m_ConstantData_Transform.matWorld);
+                    XMVECTOR v_2 = XMVector3TransformCoord(XMLoadFloat3(&v2), object->m_ConstantData_Transform.matWorld);
                     float fDist;
                     if (_PhysicsSystem.GetSelect().ChkPick(v_0, v_1, v_2, fDist))
                     {
@@ -266,7 +266,7 @@ Object* ToolSystemMap::CreateFbxObject(std::wstring szFullPath, XMVECTOR vPos, X
 {
     if (szFullPath.empty())
         return nullptr;
-    CBufferData cc;
+    ConstantData_Transform cc;
     cc.matWorld = XMMatrixIdentity();
     cc.matView = m_pCamera->m_matCamera;
     cc.matProj = m_pCamera->m_matProj;
@@ -444,7 +444,7 @@ Object* ToolSystemMap::CreateSimpleBox(OBJECT_SPECIFY specify, XMVECTOR vPos, XM
     };
     UINT size_index_list = ARRAYSIZE(index_list);
     
-    CBufferData cc;
+    ConstantData_Transform cc;
     cc.matWorld = XMMatrixIdentity();
     cc.matView = m_pCamera->m_matCamera;
     cc.matProj = m_pCamera->m_matProj;
@@ -554,7 +554,7 @@ Object* ToolSystemMap::CreateSimpleSphere(float radius, UINT sliceCount, UINT st
     }
 
 
-    CBufferData cc;
+    ConstantData_Transform cc;
     cc.matWorld = XMMatrixIdentity();
     cc.matView = m_pCamera->m_matCamera;
     cc.matProj = m_pCamera->m_matProj;
@@ -633,10 +633,10 @@ FQuadTree* ToolSystemMap::CreateSimpleMap(int iWidth, int iHeight, float fDistan
 {
     if (szFullPath.empty())
         return nullptr;
-    CBufferData_Map cc;
-    cc.matWorld = XMMatrixIdentity();
-    cc.matView = m_pCamera->m_matCamera;
-    cc.matProj = m_pCamera->m_matProj;
+    ConstantData_Transform constantData_Transform;
+    constantData_Transform.matWorld = XMMatrixIdentity();
+    constantData_Transform.matView = m_pCamera->m_matCamera;
+    constantData_Transform.matProj = m_pCamera->m_matProj;
 
     MeshMap* pMapMesh = new MeshMap(iWidth, iHeight, fDistance);
 
@@ -663,7 +663,9 @@ FQuadTree* ToolSystemMap::CreateSimpleMap(int iWidth, int iHeight, float fDistan
     pMapMesh->m_pInputLayout = pInputLayout;
    
     m_pQuadTree = new FQuadTree(pMapMesh);
-    m_pQuadTree->SetConstantData(cc);
+    m_pQuadTree->SetConstantData(constantData_Transform);
+    /*m_pQuadTree->SetConstantData(constantData_Map);
+    m_pQuadTree->SetConstantData(constantData_Light);*/
     m_pQuadTree->SetTransform({ {0, 0, 0} , {0, 0, 0}, {1, 1, 1} });
     m_pQuadTree->SetTexture(_EngineSystem.GetTextureSystem()->GetTexture(szFullPath));
     m_pQuadTree->SetShader(szVSPath, pVertexShader, szPSPath, pPixelShader);
@@ -865,10 +867,10 @@ void ToolSystemMap::OpenFile(std::wstring szFullPath)
 
     is.close();
 
-    CBufferData_Map cc;
-    cc.matWorld = XMMatrixIdentity();
-    cc.matView = m_pCamera->m_matCamera;
-    cc.matProj = m_pCamera->m_matProj;
+    ConstantData_Transform constantData_Transform;
+    constantData_Transform.matWorld = XMMatrixIdentity();
+    constantData_Transform.matView = m_pCamera->m_matCamera;
+    constantData_Transform.matProj = m_pCamera->m_matProj;
 
     _EngineSystem.GetRenderSystem()->CompileVertexShader(szVSPath.c_str(), "vsmain", "vs_5_0", &shader_byte_code_vs, &size_shader_vs);
     VertexShader* pVertexShader = _EngineSystem.GetRenderSystem()->CreateVertexShader(shader_byte_code_vs, size_shader_vs);
@@ -886,7 +888,7 @@ void ToolSystemMap::OpenFile(std::wstring szFullPath)
     pMapMesh->m_pInputLayout = pInputLayout;
 
     m_pQuadTree = new FQuadTree(pMapMesh, iMaxDepth, fAlphaData);
-    m_pQuadTree->SetConstantData(cc);
+    m_pQuadTree->SetConstantData(constantData_Transform);
     m_pQuadTree->SetTransform({ mapTransform.position, mapTransform.rotation, mapTransform.scale });
     m_pQuadTree->SetTexture(pTexture);
     for (const auto& texture : m_ListTextureSplatting)
@@ -966,7 +968,7 @@ void ToolSystemMap::DrawBoxCollider(T_BOX tBox, XMFLOAT3 color, XMMATRIX matWorl
     VertexBuffer* pVertexBuffer = _EngineSystem.GetRenderSystem()->CreateVertexBuffer(vertex_list, sizeof(PNCTVertex), size_vertex_list);
     IndexBuffer* pIndexBuffer = _EngineSystem.GetRenderSystem()->CreateIndexBuffer(tBox.vRectIndices, sizeof(unsigned int) * 36);
     InputLayout* pInputLayout = _EngineSystem.GetRenderSystem()->CreateInputLayout(shader_byte_code_vs, size_shader_vs, INPUT_LAYOUT::PNCT);
-    CBufferData cbData;
+    ConstantData_Transform cbData;
     cbData.matWorld = matWorld;
     cbData.matView = matView;
     cbData.matProj = matProj;

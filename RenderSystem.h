@@ -44,8 +44,8 @@ public:
 	void SetInputLayout(InputLayout* pInputLayout);
 	void SetVertexBuffer(VertexBuffer* pVertexBuffer, int iStartSlot = 0);
 	void SetIndexBuffer(IndexBuffer* pIndexBuffer);
-	void SetConstantBuffer(VertexShader* pVertexShader, ConstantBuffer* pConstantBuffer);
-	void SetConstantBuffer(PixelShader* pPixelShader, ConstantBuffer* pConstantBuffer);
+	void SetConstantBuffer(VertexShader* pVertexShader, ConstantBuffer* pConstantBuffer, UINT iStartSlot = 0);
+	void SetConstantBuffer(PixelShader* pPixelShader, ConstantBuffer* pConstantBuffer, UINT iStartSlot = 0);
 	void UpdateIndexBuffer(IndexBuffer* pIndexBuffer, void* pBuffer);
 	void UpdateVertexBuffer(VertexBuffer* pVertexBuffer, void* pBuffer);
 	void UpdateConstantBuffer(ConstantBuffer* pConstantBuffer, void* pBuffer);

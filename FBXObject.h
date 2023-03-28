@@ -12,7 +12,7 @@ public:
 	~FBXObject();
 private:
 	AnimScene m_AnimScene;
-	CBufferData_Bone m_ConstantDataBone;
+	ConstantData_Bone m_ConstantDataBone;
 	ConstantBuffer* m_pConstantBufferBone;
 };
 

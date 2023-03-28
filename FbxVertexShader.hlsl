@@ -22,8 +22,12 @@ cbuffer constant : register(b0)
 	row_major float4x4 matWorld;
 	row_major float4x4 matView;
 	row_major float4x4 matProj;
-	float4 m_light_direction;
-	float4 m_camera_position;
+};
+
+cbuffer constant : register(b1)
+{
+	float4 lightDirection;
+	float4 cameraPosition;
 };
 
 VS_OUTPUT vsmain(VS_INPUT input)
@@ -38,7 +42,7 @@ VS_OUTPUT vsmain(VS_INPUT input)
 	output.normal = input.normal;
 	output.tex = input.tex;
 	output.color = input.color;
-	output.direction_to_camera = normalize(vWorld.xyz - m_camera_position.xyz);
+	output.direction_to_camera = normalize(vWorld.xyz - cameraPosition.xyz);
 	output.m_light_direction = float4(output.direction_to_camera, 1.0f);
 	return output;
 }

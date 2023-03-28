@@ -255,10 +255,17 @@ FQuadTree::FQuadTree(MeshMap* pMap, int iMaxDepth, BYTE* fAlphaData)
     m_iMaxDepth = iMaxDepth;
     m_pRootNode = new FNode(nullptr, pMap, 0, m_pMap->m_dwNumColumns - 1, m_pMap->m_dwNumRows * (m_pMap->m_dwNumColumns - 1), m_pMap->m_dwNumRows * m_pMap->m_dwNumColumns - 1);
 
-    m_constantDataMap.matWorld = XMMatrixIdentity();
-    m_constantDataMap.matView = XMMatrixIdentity();
-    m_constantDataMap.matProj = XMMatrixIdentity();
-    m_pConstantBuffer = _EngineSystem.GetRenderSystem()->CreateConstantBuffer(&m_constantDataMap, sizeof(m_constantDataMap));
+    m_ConstantData_Transform.matWorld = XMMatrixIdentity();
+    m_ConstantData_Transform.matView = XMMatrixIdentity();
+    m_ConstantData_Transform.matProj = XMMatrixIdentity();
+    m_pConstantBuffer_Transform = _EngineSystem.GetRenderSystem()->CreateConstantBuffer(&m_ConstantData_Transform, sizeof(m_ConstantData_Transform));
+
+    m_ConstantData_Map.worldSize = XMFLOAT2(m_pMap->m_dwNumColumns, m_pMap->m_dwNumRows);
+    m_ConstantData_Map.cellDistance = m_pMap->m_fCellDistance;
+    //m_ConstantData_Map.tileCount
+    m_pConstantBuffer_Map = _EngineSystem.GetRenderSystem()->CreateConstantBuffer(&m_ConstantData_Map, sizeof(m_ConstantData_Map));
+
+    m_pConstantBuffer_Light = _EngineSystem.GetRenderSystem()->CreateConstantBuffer(&m_ConstantData_Light, sizeof(m_ConstantData_Light));
 
     CreateAlphaTexture(m_pMap->m_dwNumRows, m_pMap->m_dwNumColumns, fAlphaData);
     BuildTree(m_pRootNode, pMap);
@@ -271,7 +278,9 @@ FQuadTree::~FQuadTree()
     if (m_pMaskAlphaTexture) m_pMaskAlphaTexture->Release();
     if (m_pMaskAlphaSrv) m_pMaskAlphaSrv->Release();
     if (m_pRootNode) delete m_pRootNode;
-    if (m_pConstantBuffer) delete m_pConstantBuffer;
+    if (m_pConstantBuffer_Transform) delete m_pConstantBuffer_Transform;
+    if (m_pConstantBuffer_Map) delete m_pConstantBuffer_Map;
+    if (m_pConstantBuffer_Light) delete m_pConstantBuffer_Light;
     if (m_pVertexShader) delete m_pVertexShader;
     if (m_pPixelShader) delete m_pPixelShader;
 }
@@ -340,7 +349,7 @@ void FQuadTree::SetTransform(Transform transform)
             _DegreeToRadian(rotateAngle.y),
             _DegreeToRadian(rotateAngle.z));
     XMVECTOR translation = m_Transform.position;
-    m_constantDataMap.matWorld = XMMatrixTransformation({ 0,0,0,1 }, { 0,0,0,1 }, scale, { 0,0,0,1 }, rotation, translation);
+    m_ConstantData_Transform.matWorld = XMMatrixTransformation({ 0,0,0,1 }, { 0,0,0,1 }, scale, { 0,0,0,1 }, rotation, translation);
 }
 
 void FQuadTree::SetTexture(Texture* pTexture)
@@ -356,10 +365,20 @@ void FQuadTree::SetShader(std::wstring vsPath, VertexShader* pVertexShader, std:
     m_pPixelShader = pPixelShader;
 }
 
-
-void FQuadTree::SetConstantData(CBufferData_Map cc)
+void FQuadTree::SetConstantData(ConstantData_Transform constantData)
 {
-    m_constantDataMap = cc;
+    m_ConstantData_Transform = constantData;
+}
+
+
+void FQuadTree::SetConstantData(ConstantData_Map cc)
+{
+    m_ConstantData_Map = cc;
+}
+
+void FQuadTree::SetConstantData(ConstantData_Light constantData)
+{
+    //m_ConstantData_Light = constantData;
 }
 
 BOOL FQuadTree::AddObject(Object* pObj)
@@ -483,15 +502,15 @@ void FQuadTree::Update()
     m_pDrawLeafNodeList.clear();
     //ClearObjectList(m_pRootNode);
 
-    m_constantDataMap.matView = _CameraSystem.GetCurrentCamera()->m_matCamera;
-    m_constantDataMap.m_camera_position = XMFLOAT4(
+    m_ConstantData_Transform.matView = _CameraSystem.GetCurrentCamera()->m_matCamera;
+    m_ConstantData_Light.cameraPosition = XMFLOAT4(
         XMVectorGetX(_CameraSystem.GetCurrentCamera()->m_matWorld.r[3]),
         XMVectorGetY(_CameraSystem.GetCurrentCamera()->m_matWorld.r[3]),
         XMVectorGetZ(_CameraSystem.GetCurrentCamera()->m_matWorld.r[3]),
         XMVectorGetW(_CameraSystem.GetCurrentCamera()->m_matWorld.r[3]));
-    m_constantDataMap.m_world_size = XMFLOAT2(m_pMap->m_dwNumColumns, m_pMap->m_dwNumRows);
-    m_constantDataMap.m_cell_distance = m_pMap->m_fCellDistance;
-    _EngineSystem.GetRenderSystem()->UpdateConstantBuffer(m_pConstantBuffer, &m_constantDataMap);
+   
+    _EngineSystem.GetRenderSystem()->UpdateConstantBuffer(m_pConstantBuffer_Transform, &m_ConstantData_Transform);
+    _EngineSystem.GetRenderSystem()->UpdateConstantBuffer(m_pConstantBuffer_Light, &m_ConstantData_Light);
 
     VisibleNode(m_pRootNode); //Àç±Í·Î VisibleNodeÃ¼Å©
 }
@@ -499,8 +518,14 @@ void FQuadTree::Update()
 void FQuadTree::Render()
 {
     _EngineSystem.GetRenderSystem()->SetWireFrame(g_bWireFrame ? DRAW_MODE::MODE_WIRE : DRAW_MODE::MODE_SOLID);
-    _EngineSystem.GetRenderSystem()->SetConstantBuffer(m_pVertexShader, m_pConstantBuffer);
-    _EngineSystem.GetRenderSystem()->SetConstantBuffer(m_pPixelShader, m_pConstantBuffer);
+    _EngineSystem.GetRenderSystem()->SetConstantBuffer(m_pVertexShader, m_pConstantBuffer_Transform, 0);
+    _EngineSystem.GetRenderSystem()->SetConstantBuffer(m_pVertexShader, m_pConstantBuffer_Map, 1);
+    _EngineSystem.GetRenderSystem()->SetConstantBuffer(m_pVertexShader, m_pConstantBuffer_Light, 2);
+
+    _EngineSystem.GetRenderSystem()->SetConstantBuffer(m_pPixelShader, m_pConstantBuffer_Transform, 0);
+    _EngineSystem.GetRenderSystem()->SetConstantBuffer(m_pPixelShader, m_pConstantBuffer_Map, 1);
+    _EngineSystem.GetRenderSystem()->SetConstantBuffer(m_pPixelShader, m_pConstantBuffer_Light, 2);
+
     _EngineSystem.GetRenderSystem()->SetVertexShader(m_pVertexShader);
     _EngineSystem.GetRenderSystem()->SetPixelShader(m_pPixelShader);
     _EngineSystem.GetRenderSystem()->SetInputLayout(m_pMap->m_pInputLayout);
@@ -519,7 +544,7 @@ void FQuadTree::Render()
         
         if (_InputSystem.GetKey('V'))
         {
-            _ToolSystemMap.DrawBoxCollider(m_pDrawLeafNodeList[idx]->m_Box, {0, 0, 1}, m_constantDataMap.matWorld, m_constantDataMap.matView, m_constantDataMap.matProj);
+            _ToolSystemMap.DrawBoxCollider(m_pDrawLeafNodeList[idx]->m_Box, {0, 0, 1}, m_ConstantData_Transform.matWorld, m_ConstantData_Transform.matView, m_ConstantData_Transform.matProj);
         }
     }
 }

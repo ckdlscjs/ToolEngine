@@ -11,12 +11,18 @@ struct PS_INPUT
 	float4 m_light_direction : TEXCOORD2;
 };
 
+//if using row_major, not transpose in cpp
 cbuffer constant : register(b0)
 {
 	row_major float4x4 matWorld;
 	row_major float4x4 matView;
 	row_major float4x4 matProj;
-	float4 m_light_direction;
+};
+
+cbuffer constant : register(b1)
+{
+	float4 lightDirection;
+	float4 cameraPosition;
 };
 
 float4 psmain(PS_INPUT input) : SV_TARGET

@@ -19,7 +19,8 @@ public:
 	void SetMaterial(Material* pMaterial);
 	void SetShader(VertexShader* pVertexShader, PixelShader* pPixelShader);
 	void SetShaderName(std::wstring vsName, std::wstring psName);
-	void SetConstantData(CBufferData cc);
+	void SetConstantData(ConstantData_Transform constantData);
+	void SetConstantData(ConstantData_Light constantData);
 	void SetCullMode(CULL_MODE mode);
 	void SetInteraciveMode(INTERACTIVE_MODE mode);
 	void SetDrawMode(DRAW_MODE mode);
@@ -49,8 +50,11 @@ protected:
 	std::wstring m_szPSName;
 	VertexShader* m_pVertexShader;
 	PixelShader* m_pPixelShader;
-	CBufferData m_ConstantData;
-	ConstantBuffer* m_pConstantBuffer;
+	ConstantData_Transform m_ConstantData_Transform;
+	ConstantBuffer* m_pConstantBuffer_Transform;
+	ConstantData_Light m_ConstantData_Light;
+	ConstantBuffer* m_pConstantBuffer_Light;
+
 	CULL_MODE m_CullMode = CULL_MODE::CULL_MODE_NONE;
 	INTERACTIVE_MODE m_InteractiveMode = INTERACTIVE_MODE::MODE_NONE;
 	DRAW_MODE m_DrawMode = DRAW_MODE::MODE_SOLID;

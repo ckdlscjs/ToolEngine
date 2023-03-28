@@ -89,7 +89,7 @@ void Object::SetTransform(Transform transform)
 	XMFLOAT3 rotateAngle;
 	XMStoreFloat3(&rotateAngle, m_Transform.rotation);
 	XMVECTOR translation = m_Transform.position;
-	m_ConstantData.matWorld = XMMatrixTransformation({ 0,0,0,1 }, { 0,0,0,1 },scale, { 0,0,0,1 }, XMQuaternionRotationRollPitchYaw(
+	m_ConstantData_Transform.matWorld = XMMatrixTransformation({ 0,0,0,1 }, { 0,0,0,1 },scale, { 0,0,0,1 }, XMQuaternionRotationRollPitchYaw(
 		_DegreeToRadian(rotateAngle.x),
 		_DegreeToRadian(rotateAngle.y),
 		_DegreeToRadian(rotateAngle.z)), translation);
@@ -119,9 +119,14 @@ void Object::SetShaderName(std::wstring vsName, std::wstring psName)
 }
 
 
-void Object::SetConstantData(CBufferData cc)
+void Object::SetConstantData(ConstantData_Transform constantDat)
 {
-	m_ConstantData = cc;
+	m_ConstantData_Transform = constantDat;
+}
+
+void Object::SetConstantData(ConstantData_Light constantDat)
+{
+	m_ConstantData_Light = constantDat;
 }
 
 void Object::SetCullMode(CULL_MODE mode)
@@ -166,13 +171,14 @@ OBJECT_SPECIFY Object::GetSpecify()
 
 void Object::Update()
 {
-	m_ConstantData.matView = _CameraSystem.GetCurrentCamera()->m_matCamera;
-	m_ConstantData.m_camera_position = XMFLOAT4(
+	m_ConstantData_Transform.matView = _CameraSystem.GetCurrentCamera()->m_matCamera;
+	m_ConstantData_Light.cameraPosition = XMFLOAT4(
 		XMVectorGetX(_CameraSystem.GetCurrentCamera()->m_matWorld.r[3]),
 		XMVectorGetY(_CameraSystem.GetCurrentCamera()->m_matWorld.r[3]),
 		XMVectorGetZ(_CameraSystem.GetCurrentCamera()->m_matWorld.r[3]),
 		XMVectorGetW(_CameraSystem.GetCurrentCamera()->m_matWorld.r[3]));
-	_EngineSystem.GetRenderSystem()->UpdateConstantBuffer(m_pConstantBuffer, &m_ConstantData);
+	_EngineSystem.GetRenderSystem()->UpdateConstantBuffer(m_pConstantBuffer_Transform, &m_ConstantData_Transform);
+	_EngineSystem.GetRenderSystem()->UpdateConstantBuffer(m_pConstantBuffer_Light, &m_ConstantData_Light);
 }
 
 #include "InputSystem.h"
@@ -180,8 +186,10 @@ void Object::Update()
 void Object::Render()
 {
 	_EngineSystem.GetRenderSystem()->SetWireFrame(g_bWireFrame ? DRAW_MODE::MODE_WIRE : m_DrawMode);
-	_EngineSystem.GetRenderSystem()->SetConstantBuffer(m_pVertexShader, m_pConstantBuffer);
-	_EngineSystem.GetRenderSystem()->SetConstantBuffer(m_pPixelShader, m_pConstantBuffer);
+	_EngineSystem.GetRenderSystem()->SetConstantBuffer(m_pVertexShader, m_pConstantBuffer_Transform, 0);
+	_EngineSystem.GetRenderSystem()->SetConstantBuffer(m_pVertexShader, m_pConstantBuffer_Light, 1);
+	_EngineSystem.GetRenderSystem()->SetConstantBuffer(m_pPixelShader, m_pConstantBuffer_Transform, 0);
+	_EngineSystem.GetRenderSystem()->SetConstantBuffer(m_pPixelShader, m_pConstantBuffer_Light, 1);
 	_EngineSystem.GetRenderSystem()->SetVertexShader(m_pVertexShader);
 	_EngineSystem.GetRenderSystem()->SetPixelShader(m_pPixelShader);
 	for (int idxNode = 0; idxNode < m_pMesh->GetMeshNodeList().size(); idxNode++)
@@ -223,7 +231,7 @@ void Object::Render()
 	}
 	if (_InputSystem.GetKey('V'))
 	{
-		_ToolSystemMap.DrawBoxCollider(m_Box, { 1, 0, 0 }, m_ConstantData.matWorld, m_ConstantData.matView, m_ConstantData.matProj);
+		_ToolSystemMap.DrawBoxCollider(m_Box, { 1, 0, 0 }, m_ConstantData_Transform.matWorld, m_ConstantData_Transform.matView, m_ConstantData_Transform.matProj);
 	}
 }
 
@@ -252,15 +260,18 @@ void Object::Render()
 
 Object::Object(std::wstring szFullPath) : m_szFullPath(szFullPath)
 {
-	m_ConstantData.matWorld = XMMatrixIdentity();
-	m_ConstantData.matView = XMMatrixIdentity();
-	m_ConstantData.matProj = XMMatrixIdentity();
-	m_pConstantBuffer = _EngineSystem.GetRenderSystem()->CreateConstantBuffer(&m_ConstantData, sizeof(m_ConstantData));
+	m_ConstantData_Transform.matWorld = XMMatrixIdentity();
+	m_ConstantData_Transform.matView = XMMatrixIdentity();
+	m_ConstantData_Transform.matProj = XMMatrixIdentity();
+	m_pConstantBuffer_Transform = _EngineSystem.GetRenderSystem()->CreateConstantBuffer(&m_ConstantData_Transform, sizeof(m_ConstantData_Transform));
+
+	m_pConstantBuffer_Light = _EngineSystem.GetRenderSystem()->CreateConstantBuffer(&m_ConstantData_Light, sizeof(m_ConstantData_Light));
 }
 
 Object::~Object()
 {
-	if (m_pConstantBuffer) delete m_pConstantBuffer;
+	if (m_pConstantBuffer_Transform) delete m_pConstantBuffer_Transform;
+	if (m_pConstantBuffer_Light) delete m_pConstantBuffer_Light;
 	if (m_pVertexShader) delete m_pVertexShader;
 	if (m_pPixelShader) delete m_pPixelShader;
 }

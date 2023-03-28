@@ -188,9 +188,14 @@ void RenderSystem::SetIndexBuffer(IndexBuffer* pIndexBuffer)
 	m_pCDevice->m_pImmediateContext->IASetIndexBuffer(pIndexBuffer->m_pBuffer, DXGI_FORMAT_R32_UINT, 0);
 }
 
-void RenderSystem::SetConstantBuffer(VertexShader* pVertexShader, ConstantBuffer* pConstantBuffer)
+void RenderSystem::SetConstantBuffer(VertexShader* pVertexShader, ConstantBuffer* pConstantBuffer, UINT startSlot)
 {
-	m_pCDevice->m_pImmediateContext->VSSetConstantBuffers(0, 1, &pConstantBuffer->m_pBuffer);
+	m_pCDevice->m_pImmediateContext->VSSetConstantBuffers(startSlot, 1, &pConstantBuffer->m_pBuffer);
+}
+
+void RenderSystem::SetConstantBuffer(PixelShader* pPixelShader, ConstantBuffer* pConstantBuffer, UINT startSlot)
+{
+	m_pCDevice->m_pImmediateContext->PSSetConstantBuffers(startSlot, 1, &pConstantBuffer->m_pBuffer);
 }
 
 void RenderSystem::SetInputLayout(InputLayout* pInputLayout)
@@ -198,10 +203,6 @@ void RenderSystem::SetInputLayout(InputLayout* pInputLayout)
 	m_pCDevice->m_pImmediateContext->IASetInputLayout(pInputLayout->m_pInputLayout);
 }
 
-void RenderSystem::SetConstantBuffer(PixelShader* pPixelShader, ConstantBuffer* pConstantBuffer)
-{
-	m_pCDevice->m_pImmediateContext->PSSetConstantBuffers(0, 1, &pConstantBuffer->m_pBuffer);
-}
 
 void RenderSystem::UpdateIndexBuffer(IndexBuffer* pIndexBuffer, void* pBuffer)
 {

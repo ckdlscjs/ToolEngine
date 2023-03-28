@@ -176,8 +176,13 @@ void FBXFile::ParseMesh(FBXNode* pNode, int nodeIdx)
 	mapVertexPNCT.resize(iNumMtrl);
 	pNode->m_ListVertexPNCT.resize(iNumMtrl);
 	if (pNode->m_bSkinning)
+	{
+		mapVertexIW.resize(iNumMtrl);
 		pNode->m_ListVertexIW.resize(iNumMtrl);
+	}
+
 	listIndexOrigin.resize(iNumMtrl);
+	pNode->m_ListIndex.resize(iNumMtrl);
 
 	for (int idxPolygon = 0; idxPolygon < iNumPolygonCount; idxPolygon++)
 	{
@@ -252,18 +257,7 @@ void FBXFile::ParseMesh(FBXNode* pNode, int nodeIdx)
 					pnctVertex.normal.z = n.mData[1];
 				}
 
-				if (!pNode->m_bSkinning)
-				{
-					iwVertex.index.x = pNode->m_iBoneIdx;
-					iwVertex.index.y = 0;
-					iwVertex.index.z = 0;
-					iwVertex.index.w = 0;
-					iwVertex.weight.x = 1.0f;
-					iwVertex.weight.y = 0.0f;
-					iwVertex.weight.z = 0.0f;
-					iwVertex.weight.w = 0.0f;
-				}
-				else
+				if (pNode->m_bSkinning)
 				{
 					IWData* pIW = &pNode->m_ListIW[vertexID];
 					iwVertex.index.x = pIW->index[0];
@@ -274,10 +268,9 @@ void FBXFile::ParseMesh(FBXNode* pNode, int nodeIdx)
 					iwVertex.weight.y = pIW->weight[1];
 					iwVertex.weight.z = pIW->weight[2];
 					iwVertex.weight.w = pIW->weight[3];
+					mapVertexIW[iSubMtrl].insert(std::make_pair(vertexID, iwVertex));
 				}
 				mapVertexPNCT[iSubMtrl].insert(std::make_pair(vertexID, pnctVertex));
-				if (pNode->m_bSkinning)
-					mapVertexIW[iSubMtrl].insert(std::make_pair(vertexID, iwVertex));
 				listIndexOrigin[iSubMtrl].push_back(vertexID);
 			}
 		}
@@ -290,7 +283,8 @@ void FBXFile::ParseMesh(FBXNode* pNode, int nodeIdx)
 		for (const auto& pnct : mapVertexPNCT[MtrlIdx])
 		{
 			pNode->m_ListVertexPNCT[MtrlIdx].push_back(mapVertexPNCT[MtrlIdx].find(pnct.first)->second);
-			pNode->m_ListVertexIW[MtrlIdx].push_back(mapVertexIW[MtrlIdx].find(pnct.first)->second);
+			if(pNode->m_bSkinning)
+				pNode->m_ListVertexIW[MtrlIdx].push_back(mapVertexIW[MtrlIdx].find(pnct.first)->second);
 			pnctIdx[pnct.first] = pNode->m_ListVertexPNCT[MtrlIdx].size() - 1;
 		}
 
