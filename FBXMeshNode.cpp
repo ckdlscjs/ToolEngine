@@ -50,8 +50,12 @@ XMMATRIX FBXMeshNode::Interplate(float fFrame, AnimLayer tScene)
 
 FBXMeshNode::FBXMeshNode(std::wstring szName, UINT iBondIdx) : MeshNode(), m_szName(szName), m_iBoneIdx(iBondIdx)
 {
+	for (int idx = 0; idx < 255; idx++)
+		m_ConstantDataBone.matBone[idx] = XMMatrixIdentity();
+	m_pConstantBufferBone = _EngineSystem.GetRenderSystem()->CreateConstantBuffer(&m_ConstantDataBone, sizeof(m_ConstantDataBone));
 }
 
 FBXMeshNode::~FBXMeshNode()
 {
+	if (m_pConstantBufferBone) delete m_pConstantBufferBone;
 }

@@ -327,7 +327,12 @@ Object* ToolSystemMap::CreateFbxObject(std::wstring szFullPath, XMVECTOR vPos, X
                 UINT iSizelistIW = pFbxNode->m_ListVertexIW[nodeMaterialCount].size();
                 pMeshNode->SetListIW(listIW, iSizelistIW);
                 pMeshNode->SetVertexBufferIW(_EngineSystem.GetRenderSystem()->CreateVertexBuffer(&pMeshNode->GetListIW()[0], sizeof(IW), pMeshNode->GetListIW().size()));
-               
+                
+                FBXMeshNode* pFbxMeshNode = dynamic_cast<FBXMeshNode*>(pMeshNode);
+                for (const auto& mat : pFbxNode->m_mapBindPoseMatrix)
+                {
+                    pFbxMeshNode->SetBindPoseMatrix(mat.first, mat.second);
+                }
             }
         }
     }

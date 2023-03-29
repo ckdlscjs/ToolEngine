@@ -5,8 +5,8 @@ struct VS_INPUT
 	float3 normal : NORMAL0;
 	float4 color : COLOR0;
 
-	float4 index : INDEX;
-	float4 weight : WEIGHT;
+	float4 index : INDEX0;
+	float4 weight : WEIGHT0;
 };
 
 struct VS_OUTPUT

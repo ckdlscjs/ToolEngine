@@ -40,10 +40,11 @@ void FBXObject::Update()
 	//	m_pFbxFile->UpdateSkeleton(pContext, m_fObjFrameCurrent, m_cbBoneData);		//Bone오브젝트를 업데이트
 	//	m_pFbxFile->UpdateSkinning(pContext, m_cbBoneData, m_ListCbBoneData);		//Bone오브젝트를 스킨업데이트	
 	//}
-
+	std::vector<XMMATRIX> matCurrentAnimList;
 	for (int iBone = 0; iBone < m_pMesh->GetMeshNodeList().size(); iBone++)
 	{
-		m_ConstantDataBone.matBone[iBone] = dynamic_cast<FBXMeshNode*>(m_pMesh->GetMeshNodeList()[iBone])->Interplate(m_fCurrentAnimFrame, m_CurrentAnim);
+		//m_ConstantDataBone.matBone[iBone] = dynamic_cast<FBXMeshNode*>(m_pMesh->GetMeshNodeList()[iBone])->Interplate(m_fCurrentAnimFrame, m_CurrentAnim);
+		matCurrentAnimList.push_back(dynamic_cast<FBXMeshNode*>(m_pMesh->GetMeshNodeList()[iBone])->Interplate(m_fCurrentAnimFrame, m_CurrentAnim));
 	}
 
 	// skinning
@@ -58,12 +59,15 @@ void FBXObject::Update()
 			if (iter != drawMeshNode->GetMapBindPoseMatrix().end())
 			{
 				XMMATRIX matBind = iter->second;
-				XMMATRIX matAnim = matBind * m_ConstantDataBone.matBone[iBone];				//최종적으로 원점에 보내진(matBind)행렬 * skeleton으로 가져온애니메이션행렬을 곱하고 전치함
-				m_ConstantDataBone.matBone[iBone] = matAnim;
+				XMMATRIX matAnim = matBind * matCurrentAnimList[iBone];				//최종적으로 원점에 보내진(matBind)행렬 * skeleton으로 가져온애니메이션행렬을 곱하고 전치함
+				drawMeshNode->m_ConstantDataBone.matBone[iBone] = matAnim;
 			}
 		}
+		_EngineSystem.GetRenderSystem()->UpdateConstantBuffer(drawMeshNode->m_pConstantBufferBone, &drawMeshNode->m_ConstantDataBone);
 	}
-	_EngineSystem.GetRenderSystem()->UpdateConstantBuffer(m_pConstantBufferBone, &m_ConstantDataBone.matBone[0]);
+
+	//_EngineSystem.GetRenderSystem()->UpdateConstantBuffer(m_pConstantBufferBone, &m_ConstantDataBone);
+	
 	//for (int ibone = 0; ibone < m_pMesh->GetMeshNodeList().size(); ibone++)
 	//{
 	//	_EngineSystem.GetRenderSystem()->UpdateConstantBuffer()
@@ -77,14 +81,57 @@ void FBXObject::Update()
 	//	D3DXMatrixTranspose(&m_cbBoneData.matBone[iBone], &m_cbBoneData.matBone[iBone]);	//사용할 본매트릭스도 전치하여 상수버퍼에 업데이트
 	//}
 	//pContext->UpdateSubresource(m_pCbBoneBufferAnim, 0, nullptr, &m_cbBoneData, 0, 0);
-
-	
 }
 void FBXObject::Render()
 {
-	_EngineSystem.GetRenderSystem()->SetConstantBuffer(m_pVertexShader, m_pConstantBufferBone, 2);
-	_EngineSystem.GetRenderSystem()->SetConstantBuffer(m_pPixelShader, m_pConstantBufferBone, 2);
-	Object::Render();
+	_EngineSystem.GetRenderSystem()->SetWireFrame(g_bWireFrame ? DRAW_MODE::MODE_WIRE : m_DrawMode);
+	_EngineSystem.GetRenderSystem()->SetConstantBuffer(m_pVertexShader, m_pConstantBuffer_Transform, 0);
+	_EngineSystem.GetRenderSystem()->SetConstantBuffer(m_pVertexShader, m_pConstantBuffer_Light, 1);
+	_EngineSystem.GetRenderSystem()->SetConstantBuffer(m_pPixelShader, m_pConstantBuffer_Transform, 0);
+	_EngineSystem.GetRenderSystem()->SetConstantBuffer(m_pPixelShader, m_pConstantBuffer_Light, 1);
+	_EngineSystem.GetRenderSystem()->SetVertexShader(m_pVertexShader);
+	_EngineSystem.GetRenderSystem()->SetPixelShader(m_pPixelShader);
+	for (int idxNode = 0; idxNode < m_pMesh->GetMeshNodeList().size(); idxNode++)
+	{
+		MeshNode* pMeshNode = m_pMesh->GetMeshNodeList()[idxNode];
+		_EngineSystem.GetRenderSystem()->SetConstantBuffer(m_pVertexShader, dynamic_cast<FBXMeshNode*>(pMeshNode)->m_pConstantBufferBone, 2);
+		_EngineSystem.GetRenderSystem()->SetConstantBuffer(m_pPixelShader, dynamic_cast<FBXMeshNode*>(pMeshNode)->m_pConstantBufferBone, 2);
+		if (pMeshNode->GetListPNCT().empty() && pMeshNode->GetSubListPNCT().empty())
+			continue;
+		UINT iSubMtrl = pMeshNode->GetSubListPNCT().size();
+		_EngineSystem.GetRenderSystem()->SetInputLayout(pMeshNode->GetInputLayout());
+		if (iSubMtrl)
+		{
+			for (int idxSub = 0; idxSub < m_pMesh->GetMeshNodeList()[idxNode]->GetSubListPNCT().size(); idxSub++)
+			{
+				_EngineSystem.GetRenderSystem()->SetVertexBuffer(pMeshNode->GetSubVertexBufferPNCT()[idxSub], 0);
+				_EngineSystem.GetRenderSystem()->SetVertexBuffer(pMeshNode->GetSubVertexBufferIW()[idxNode], 1);
+				_EngineSystem.GetRenderSystem()->SetIndexBuffer(pMeshNode->GetSubIndexBuffer()[idxSub]);
+				if (m_pMaterial)
+				{
+					_EngineSystem.GetRenderSystem()->setTexture(m_pVertexShader, m_pMaterial->GetListTexture(idxNode)[idxSub]);
+					_EngineSystem.GetRenderSystem()->setTexture(m_pPixelShader, m_pMaterial->GetListTexture(idxNode)[idxSub]);
+				}
+				_EngineSystem.GetRenderSystem()->drawIndexedTriangleList(pMeshNode->GetSubIndexBuffer()[idxSub]->getSizeIndexList(), 0, 0);
+			}
+		}
+		else
+		{
+			_EngineSystem.GetRenderSystem()->SetVertexBuffer(pMeshNode->GetVertexBufferPNCT(), 0);
+			_EngineSystem.GetRenderSystem()->SetVertexBuffer(pMeshNode->GetVertexBufferIW(), 1);
+			_EngineSystem.GetRenderSystem()->SetIndexBuffer(pMeshNode->GetIndexBuffer());
+			if (m_pMaterial)
+			{
+				_EngineSystem.GetRenderSystem()->setTexture(m_pVertexShader, m_pMaterial->GetListTexture(idxNode)[0]);
+				_EngineSystem.GetRenderSystem()->setTexture(m_pPixelShader, m_pMaterial->GetListTexture(idxNode)[0]);
+			}
+			_EngineSystem.GetRenderSystem()->drawIndexedTriangleList(pMeshNode->GetIndexBuffer()->getSizeIndexList(), 0, 0);
+		}
+	}
+	/*if (_InputSystem.GetKey('V'))
+	{
+		_ToolSystemMap.DrawBoxCollider(m_Box, { 1, 0, 0 }, m_ConstantData_Transform.matWorld, m_ConstantData_Transform.matView, m_ConstantData_Transform.matProj);
+	}*/
 }
 
 FBXObject::FBXObject(std::wstring szFullPath) : Object(szFullPath)
