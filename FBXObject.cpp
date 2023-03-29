@@ -14,7 +14,7 @@ void FBXObject::SetAnimScene(AnimLayer animLayer)
 #include "FBXMeshNode.h"
 void FBXObject::Update()
 {
-	float g_fSecondPerFrame = 0.04f;
+	float g_fSecondPerFrame = 0.004f;
 	Object::Update();
 	//각 obj의 frame계산
 	m_fCurrentAnimFrame += g_fSecondPerFrame * m_fCurrentAnimSpeed * m_CurrentAnim.fFrameSpeed;// *m_fAnimInverse;
@@ -82,6 +82,9 @@ void FBXObject::Update()
 	//}
 	//pContext->UpdateSubresource(m_pCbBoneBufferAnim, 0, nullptr, &m_cbBoneData, 0, 0);
 }
+
+#include "InputSystem.h"
+#include "ToolSystemMap.h"
 void FBXObject::Render()
 {
 	_EngineSystem.GetRenderSystem()->SetWireFrame(g_bWireFrame ? DRAW_MODE::MODE_WIRE : m_DrawMode);
@@ -94,10 +97,10 @@ void FBXObject::Render()
 	for (int idxNode = 0; idxNode < m_pMesh->GetMeshNodeList().size(); idxNode++)
 	{
 		MeshNode* pMeshNode = m_pMesh->GetMeshNodeList()[idxNode];
-		_EngineSystem.GetRenderSystem()->SetConstantBuffer(m_pVertexShader, dynamic_cast<FBXMeshNode*>(pMeshNode)->m_pConstantBufferBone, 2);
-		_EngineSystem.GetRenderSystem()->SetConstantBuffer(m_pPixelShader, dynamic_cast<FBXMeshNode*>(pMeshNode)->m_pConstantBufferBone, 2);
 		if (pMeshNode->GetListPNCT().empty() && pMeshNode->GetSubListPNCT().empty())
 			continue;
+		_EngineSystem.GetRenderSystem()->SetConstantBuffer(m_pVertexShader, dynamic_cast<FBXMeshNode*>(pMeshNode)->m_pConstantBufferBone, 2);
+		_EngineSystem.GetRenderSystem()->SetConstantBuffer(m_pPixelShader, dynamic_cast<FBXMeshNode*>(pMeshNode)->m_pConstantBufferBone, 2);
 		UINT iSubMtrl = pMeshNode->GetSubListPNCT().size();
 		_EngineSystem.GetRenderSystem()->SetInputLayout(pMeshNode->GetInputLayout());
 		if (iSubMtrl)
@@ -128,10 +131,10 @@ void FBXObject::Render()
 			_EngineSystem.GetRenderSystem()->drawIndexedTriangleList(pMeshNode->GetIndexBuffer()->getSizeIndexList(), 0, 0);
 		}
 	}
-	/*if (_InputSystem.GetKey('V'))
+	if (_InputSystem.GetKey('V'))
 	{
 		_ToolSystemMap.DrawBoxCollider(m_Box, { 1, 0, 0 }, m_ConstantData_Transform.matWorld, m_ConstantData_Transform.matView, m_ConstantData_Transform.matProj);
-	}*/
+	}
 }
 
 FBXObject::FBXObject(std::wstring szFullPath) : Object(szFullPath)

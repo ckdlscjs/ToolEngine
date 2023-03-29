@@ -299,6 +299,8 @@ Object* ToolSystemMap::CreateFbxObject(std::wstring szFullPath, XMVECTOR vPos, X
             pMesh->SetMeshNode(pMeshNode);
             for (int nodeMaterialCount = 0; nodeMaterialCount < pFBXFile->m_ListNode[nodeCount]->m_ListVertexPNCT.size(); nodeMaterialCount++)
             {
+                if (pFbxNode->m_ListVertexPNCT[nodeMaterialCount].empty())
+                    continue;
                 //SetVB
                 void* listVertex = &pFbxNode->m_ListVertexPNCT[nodeMaterialCount][0];
                 UINT iSizeVertices = pFbxNode->m_ListVertexPNCT[nodeMaterialCount].size();
@@ -329,7 +331,7 @@ Object* ToolSystemMap::CreateFbxObject(std::wstring szFullPath, XMVECTOR vPos, X
                 pMeshNode->SetVertexBufferIW(_EngineSystem.GetRenderSystem()->CreateVertexBuffer(&pMeshNode->GetListIW()[0], sizeof(IW), pMeshNode->GetListIW().size()));
                 
                 FBXMeshNode* pFbxMeshNode = dynamic_cast<FBXMeshNode*>(pMeshNode);
-                for (const auto& mat : pFbxNode->m_mapBindPoseMatrix)
+                for (auto mat : pFbxNode->m_mapBindPoseMatrix)
                 {
                     pFbxMeshNode->SetBindPoseMatrix(mat.first, mat.second);
                 }

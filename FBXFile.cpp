@@ -72,14 +72,13 @@ void FBXFile::ParseNode(FbxNode* pFbxNode)
 
 void FBXFile::ParseMesh(FBXNode* pNode, int nodeIdx)
 {
-	ParseSkinning(pNode);
-
 	FbxNode* pFbxNode = pNode->m_pNode;
 	if (!pFbxNode)
 		return;
 	FbxMesh* pFbxMesh = pFbxNode->GetMesh();
 	if (!pFbxMesh)
 		return;
+	ParseSkinning(pNode);
 
 	//using Normalvector
 	FbxAMatrix geom; // 기하(로칼)행렬(초기 정점 위치를 변환할 때 사용한다.)
@@ -159,12 +158,6 @@ void FBXFile::ParseMesh(FBXNode* pNode, int nodeIdx)
 					texFullNameList[iMtrl] = szFileName;
 				}
 			}
-			//else
-			//{
-			//	pNode->m_ListTexture.resize(0);
-			//	pNode->m_ListTexture.clear();
-			//	return;
-			//}
 		}
 	}
 
@@ -307,24 +300,20 @@ void FBXFile::ParseMesh(FBXNode* pNode, int nodeIdx)
 
 void FBXFile::ParseSkinning(FBXNode* pNode)
 {
-	FbxNode* pFbxNode = pNode->m_pNode;
-	if (!pFbxNode)
-		return;
-	FbxMesh* pFbxMesh = pFbxNode->GetMesh();
-	if (!pFbxMesh)
-		return;
+	FbxMesh* pMesh = pNode->m_pNode->GetMesh();
+
 	// 리깅 도구( 뼈대에 스킨을 붙이는 작업도구)
-	int iDeformerCount = pFbxMesh->GetDeformerCount(FbxDeformer::eSkin);
+	int iDeformerCount = pMesh->GetDeformerCount(FbxDeformer::eSkin);
 	if (iDeformerCount == 0)
 		return;
 
 	// iNumVertex == 메쉬의 정점 개수와 동일해야 한다.
-	int iNumVertex = pFbxMesh->GetControlPointsCount();
+	int iNumVertex = pMesh->GetControlPointsCount();
 	pNode->m_ListIW.resize(iNumVertex);
 
 	for (int iDeformer = 0; iDeformer < iDeformerCount; iDeformer++)
 	{
-		FbxDeformer* deformer = pFbxMesh->GetDeformer(iDeformer, FbxDeformer::eSkin);
+		FbxDeformer* deformer = pMesh->GetDeformer(iDeformer, FbxDeformer::eSkin);
 		FbxSkin* pSkin = (FbxSkin*)deformer;
 		// 뼈대가 영향을 미치는 정점 덩어리
 		int iNumClusterCount = pSkin->GetClusterCount();
@@ -332,7 +321,7 @@ void FBXFile::ParseSkinning(FBXNode* pNode)
 		{
 			FbxCluster* pCluster = pSkin->GetCluster(iCluster);
 			FbxNode* pFbxNode = pCluster->GetLink();
-			int iBoneIdx = m_SetNode.find(pFbxNode)->second->m_iBoneIdx;
+			FBXNode* pFBXNode = m_SetNode.find(pFbxNode)->second;
 
 			// 뼈대공간으로 변환하는 행렬이 필요하다.
 			FbxAMatrix matXBindPose;
@@ -343,7 +332,7 @@ void FBXFile::ParseSkinning(FBXNode* pNode)
 
 			XMMATRIX matInvBindPos = DxConvertMatrix(matBindPos);
 			matInvBindPos = XMMatrixInverse(NULL, matInvBindPos);
-			pNode->m_mapBindPoseMatrix.insert(std::make_pair(pNode->m_szName, matInvBindPos));
+			pNode->m_mapBindPoseMatrix.insert(std::make_pair(pFBXNode->m_szName, matInvBindPos));
 
 			// 임의의 1개 정점에 영향을 미치는 뼈대의 개수
 			int iNumWeightCounter = pCluster->GetControlPointIndicesCount();
@@ -353,7 +342,7 @@ void FBXFile::ParseSkinning(FBXNode* pNode)
 			{
 				int iVertexIndex = pIndicss[iVertex];
 				float fWeight = pWeights[iVertex];
-				pNode->m_ListIW[iVertexIndex].insert(iBoneIdx, fWeight);
+				pNode->m_ListIW[iVertexIndex].insert(pFBXNode->m_iBoneIdx, fWeight);
 			}
 		}
 	}
