@@ -332,7 +332,7 @@ void ImguiSystem::Update()
     ImGui::Begin("Control Panel");
     {
         if (ImGui::Button("CreateObject"))
-            pObjectAnim = _ToolSystemMap.CreateFbxObject(szCurrentFbx, _CameraSystem.GetCurrentCamera()->m_vCameraPos);
+            /*pObjectAnim = */_ToolSystemMap.CreateFbxObject(szCurrentFbx, _CameraSystem.GetCurrentCamera()->m_vCameraPos);
 
     }
     ImGui::Dummy({ 0, 10 });

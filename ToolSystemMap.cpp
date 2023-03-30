@@ -251,10 +251,10 @@ std::set<std::wstring>& ToolSystemMap::GetListFbx()
     return m_ListFbx;
 }
 
-std::vector<AnimLayer>& ToolSystemMap::GetListAnim()
-{
-    return m_ListAnim;
-}
+//std::vector<AnimLayer>& ToolSystemMap::GetListAnim()
+//{
+//    return m_ListAnim;
+//}
 
 Camera* ToolSystemMap::GetCurrentCamera()
 {
@@ -533,7 +533,7 @@ Object* ToolSystemMap::CreateSimpleBox(OBJECT_SPECIFY specify, XMVECTOR vPos, XM
         pMeshNode->SetListIndex(index_list, size_index_list);
         pMeshNode->SetIndexBuffer(_EngineSystem.GetRenderSystem()->CreateIndexBuffer(&pMeshNode->GetListIndex()[0], pMeshNode->GetListIndex().size()));
 
-        pMeshNode->SetInputLayout(_EngineSystem.GetRenderSystem()->CreateInputLayout(shader_byte_code_vs, size_shader_vs, INPUT_LAYOUT::PNCT));
+        pMeshNode->SetInputLayout(_EngineSystem.GetRenderSystem()->CreateInputLayout(shader_byte_code_vs, size_shader_vs, INPUT_LAYOUT::PNCTIW));
 
         pMesh->SetMeshNode(pMeshNode);
     }
@@ -645,7 +645,7 @@ Object* ToolSystemMap::CreateSimpleSphere(float radius, UINT sliceCount, UINT st
         pMeshNode->SetListIndex(&indices[0], indices.size());
         pMeshNode->SetIndexBuffer(_EngineSystem.GetRenderSystem()->CreateIndexBuffer(&pMeshNode->GetListIndex()[0], pMeshNode->GetListIndex().size()));
 
-        InputLayout* pInputLayout = _EngineSystem.GetRenderSystem()->CreateInputLayout(shader_byte_code_vs, size_shader_vs, INPUT_LAYOUT::PNCT);
+        InputLayout* pInputLayout = _EngineSystem.GetRenderSystem()->CreateInputLayout(shader_byte_code_vs, size_shader_vs, INPUT_LAYOUT::PNCTIW);
         pMeshNode->SetInputLayout(pInputLayout);
 
         pMesh->SetMeshNode(pMeshNode);
