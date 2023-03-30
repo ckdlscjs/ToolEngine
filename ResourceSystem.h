@@ -5,7 +5,7 @@ class ResourceSystem
 {
 public:
 	Resource* CreateResourceFromFile(std::wstring szFilePath);
-	void AddResource(std::wstring szName, Resource* pResource);
+	void AddResource(Resource* pResource);
 protected:
 	virtual Resource* CreateResourceFromFileConcrete(std::wstring szFilePath) = 0;
 

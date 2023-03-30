@@ -3,6 +3,7 @@
 class Resource
 {
 public:
+	std::wstring GetName();
 	Resource();
 	Resource(std::wstring szFullPath);
 	virtual ~Resource();

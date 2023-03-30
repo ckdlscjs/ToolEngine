@@ -1,5 +1,10 @@
 #include "Resource.h"
 
+std::wstring Resource::GetName()
+{
+    return m_szFullPath;
+}
+
 Resource::Resource()
 {
 }

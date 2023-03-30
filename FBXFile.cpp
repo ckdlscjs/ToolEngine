@@ -28,11 +28,11 @@ void FBXFile::InitAnim()
 		animLayer.fFrameSpeed = 30.0f;
 		animLayer.fTickPerFrame = 160;
 		animLayer.TimeMode = TimeMode;
-		m_ListAnimLayer.push_back(animLayer);
 		for (auto& tNode : m_ListNode)
 		{
-			tNode->m_AnimTracks.insert(std::make_pair(animLayer.pStackAnim->GetName(), 0));
+			tNode->m_AnimTracks.insert(std::make_pair(pStackAnim->GetName(), 0));
 		}
+		m_ListAnimLayer.push_back(animLayer);
 	}
 }
 
@@ -272,6 +272,7 @@ void FBXFile::ParseMesh(FBXNode* pNode, int nodeIdx)
 					iwVertex.weight.z = pIW->weight[2];
 					iwVertex.weight.w = pIW->weight[3];
 					mapVertexIW[iSubMtrl].insert(std::make_pair(vertexID, iwVertex));
+					m_bSkeleton = true;
 				}
 				mapVertexPNCT[iSubMtrl].insert(std::make_pair(vertexID, pnctVertex));
 				listIndexOrigin[iSubMtrl].push_back(vertexID);
@@ -347,6 +348,7 @@ void FBXFile::ParseSkinning(FBXNode* pNode)
 		}
 	}
 	pNode->m_bSkinning = true;
+
 }
 
 FbxVector2 FBXFile::ReadTextureCoord(FbxMesh* pFbxMesh, FbxLayerElementUV* pVertexUVSet, int posIndex, int uvIndex)
@@ -547,7 +549,7 @@ XMMATRIX FBXFile::DxConvertMatrix(FbxAMatrix& fbxMatrix)
 FBXFile::FBXFile(FbxScene* pFbxScene)
 {
 	m_pFbxScene = pFbxScene;
-												//InitAnimation
+												
 	ParseNode(m_pFbxScene->GetRootNode());					//ParsingNodeStruct
 
 	// mesh
@@ -557,7 +559,7 @@ FBXFile::FBXFile(FbxScene* pFbxScene)
 	}
 
 	// animation	
-	InitAnim();
+	InitAnim();				//InitAnimation
 	for (const auto& animLayer : m_ListAnimLayer)
 	{
 		m_pFbxScene->SetCurrentAnimationStack(animLayer.pStackAnim);

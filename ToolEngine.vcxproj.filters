@@ -91,9 +91,6 @@
     <Filter Include="FBXSystem\FBXFile">
       <UniqueIdentifier>{23b06e83-3f45-4917-afd8-838c8909f845}</UniqueIdentifier>
     </Filter>
-    <Filter Include="FBXSystem\FBXFile\FBXNode">
-      <UniqueIdentifier>{c4a1539a-e82c-4ae8-a494-42bebb08bf97}</UniqueIdentifier>
-    </Filter>
     <Filter Include="ToolSystem\ToolSystemUI">
       <UniqueIdentifier>{4c3993ff-40a4-4631-af39-1db93c7627ef}</UniqueIdentifier>
     </Filter>
@@ -117,6 +114,9 @@
     </Filter>
     <Filter Include="EngineSystem\RenderySystem\InputLayout">
       <UniqueIdentifier>{ed1bbf7c-21a8-4105-a539-10d60270419d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="FBXSystem\FBXObject">
+      <UniqueIdentifier>{08af9a8a-7b31-4db5-b3a7-65ed53fc2257}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -250,9 +250,6 @@
     <ClInclude Include="FBXFile.h">
       <Filter>FBXSystem\FBXFile</Filter>
     </ClInclude>
-    <ClInclude Include="FBXNode.h">
-      <Filter>FBXSystem\FBXFile\FBXNode</Filter>
-    </ClInclude>
     <ClInclude Include="ToolSystemMap.h">
       <Filter>ToolSystem\ToolSystemMap</Filter>
     </ClInclude>
@@ -277,17 +274,20 @@
     <ClInclude Include="InputLayout.h">
       <Filter>EngineSystem\RenderySystem\InputLayout</Filter>
     </ClInclude>
-    <ClInclude Include="NodeAttribute.h">
-      <Filter>EngineSystem\ObjectSystem\MeshSystem\MeshNode</Filter>
-    </ClInclude>
     <ClInclude Include="SimpleSphere.h">
       <Filter>ToolSystem\ToolSystemMap\MapObject</Filter>
     </ClInclude>
     <ClInclude Include="FBXObject.h">
-      <Filter>FBXSystem</Filter>
+      <Filter>FBXSystem\FBXObject</Filter>
     </ClInclude>
     <ClInclude Include="FBXMeshNode.h">
-      <Filter>FBXSystem</Filter>
+      <Filter>FBXSystem\FBXObject</Filter>
+    </ClInclude>
+    <ClInclude Include="FBXNode.h">
+      <Filter>FBXSystem\FBXFile</Filter>
+    </ClInclude>
+    <ClInclude Include="FBXMesh.h">
+      <Filter>FBXSystem\FBXObject</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -415,9 +415,6 @@
     <ClCompile Include="FBXFile.cpp">
       <Filter>FBXSystem\FBXFile</Filter>
     </ClCompile>
-    <ClCompile Include="FBXNode.cpp">
-      <Filter>FBXSystem\FBXFile\FBXNode</Filter>
-    </ClCompile>
     <ClCompile Include="ToolSystemMap.cpp">
       <Filter>ToolSystem\ToolSystemMap</Filter>
     </ClCompile>
@@ -442,17 +439,20 @@
     <ClCompile Include="InputLayout.cpp">
       <Filter>EngineSystem\RenderySystem\InputLayout</Filter>
     </ClCompile>
-    <ClCompile Include="NodeAttribute.cpp">
-      <Filter>EngineSystem\ObjectSystem\MeshSystem\MeshNode</Filter>
-    </ClCompile>
     <ClCompile Include="SimpleSphere.cpp">
       <Filter>ToolSystem\ToolSystemMap\MapObject</Filter>
     </ClCompile>
-    <ClCompile Include="FBXObject.cpp">
-      <Filter>FBXSystem</Filter>
-    </ClCompile>
     <ClCompile Include="FBXMeshNode.cpp">
-      <Filter>FBXSystem</Filter>
+      <Filter>FBXSystem\FBXObject</Filter>
+    </ClCompile>
+    <ClCompile Include="FBXObject.cpp">
+      <Filter>FBXSystem\FBXObject</Filter>
+    </ClCompile>
+    <ClCompile Include="FBXNode.cpp">
+      <Filter>FBXSystem\FBXFile</Filter>
+    </ClCompile>
+    <ClCompile Include="FBXMesh.cpp">
+      <Filter>FBXSystem\FBXObject</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -472,10 +472,10 @@
     <FxCompile Include="DefaultPixelShader.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="FbxPixelShader.hlsl">
+    <FxCompile Include="SkeletonPixelShader.hlsl">
       <Filter>Shaders\Fbx</Filter>
     </FxCompile>
-    <FxCompile Include="FbxVertexShader.hlsl">
+    <FxCompile Include="SkeletonVertexShader.hlsl">
       <Filter>Shaders\Fbx</Filter>
     </FxCompile>
     <FxCompile Include="MapPixelShader.hlsl">
@@ -486,6 +486,12 @@
     </FxCompile>
     <FxCompile Include="SimpleObjectPixelShader.hlsl">
       <Filter>Shaders\SimpleObj</Filter>
+    </FxCompile>
+    <FxCompile Include="StaticVertexShader.hlsl">
+      <Filter>Shaders\Fbx</Filter>
+    </FxCompile>
+    <FxCompile Include="StaticPixelShader.hlsl">
+      <Filter>Shaders\Fbx</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>

@@ -48,18 +48,14 @@ Resource* ResourceSystem::CreateResourceFromFile(std::wstring szFilePath)
 	return nullptr;
 }
 
-void ResourceSystem::AddResource(std::wstring szName, Resource* pResource)
+void ResourceSystem::AddResource(Resource* pResource)
 {
 	if (!pResource)
 		return;
 
-	auto it = m_mapResources.find(szName);
+	auto it = m_mapResources.find(pResource->GetName());
 	if (it != m_mapResources.end())
-	{
-		delete it->second;
-		m_mapResources.erase(it);
-	}
-	
+		return;
 
-	m_mapResources[szName] = pResource;
+	m_mapResources[pResource->GetName()] = pResource;
 }

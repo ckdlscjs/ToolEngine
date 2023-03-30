@@ -15,16 +15,15 @@ void FBXMeshNode::SetBindPoseMatrix(std::wstring bipadName, const XMMATRIX& matB
 	m_mapBindPoseMatrix.insert(std::make_pair(bipadName, matBind));
 }
 
-void FBXMeshNode::SetAnimTracks(std::string animName, const std::vector<AnimTrack>& listTrack)
+void FBXMeshNode::SetAnimTracks(std::string animName, std::vector<AnimTrack>* listTrack)
 {
 	if (m_AnimTracks.find(animName) == m_AnimTracks.end())
 	{
-		m_AnimTracks.insert(std::make_pair(animName, 0));
+		m_AnimTracks.insert(std::make_pair(animName, nullptr));
 	}
-	std::vector<AnimTrack>& animTrack = m_AnimTracks.find(animName)->second;
-	for (const auto& track : listTrack)
-		animTrack.push_back(track);
+	m_AnimTracks.find(animName)->second = listTrack;
 }
+
 
 XMMATRIX FBXMeshNode::Interplate(float fFrame, AnimLayer tScene)
 {
@@ -34,14 +33,14 @@ XMMATRIX FBXMeshNode::Interplate(float fFrame, AnimLayer tScene)
 	auto iter = m_AnimTracks.find(tScene.pStackAnim->GetName());
 	if (iter == m_AnimTracks.end())
 		return XMMatrixIdentity();
-	std::vector<AnimTrack>& animTracks = iter->second;
+	std::vector<AnimTrack>* animTracks = iter->second;
 	AnimTrack A, B;
 	if (fFrame > tScene.iEndFrame - 1) fFrame = tScene.iEndFrame - 1;
-	A = animTracks[max(tScene.iStartFrame, fFrame + 0)];
-	B = animTracks[min(tScene.iEndFrame - 1, fFrame + 1)];
+	A = animTracks->at(max(tScene.iStartFrame, fFrame + 0));
+	B = animTracks->at(min(tScene.iEndFrame - 1, fFrame + 1)); 
 	if (A.iFrame == B.iFrame)
 	{
-		return animTracks[fFrame].matAnim;
+		return animTracks->at(fFrame).matAnim;
 	}
 	float t = (fFrame - A.iFrame) / (B.iFrame - A.iFrame);		//특정프레임 계산, srt보간
 	XMVECTOR scale = XMVectorLerp(A.scale, B.scale, t);

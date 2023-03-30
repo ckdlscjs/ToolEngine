@@ -14,6 +14,7 @@ public:
 	XMVECTOR GetPosition();
 	XMVECTOR GetRotation();
 	XMVECTOR GetScale();
+	Mesh* GetMesh();
 	void SetTransform(Transform transform);
 	void SetMesh(Mesh* pMesh);
 	void SetMaterial(Material* pMaterial);

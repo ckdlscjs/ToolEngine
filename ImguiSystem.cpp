@@ -16,6 +16,7 @@ LRESULT ImguiSystem::MessageHandler(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM l
 }
 
 #include "FBXObject.h"
+#include "FBXMesh.h"
 void ImguiSystem::Update()
 {
 
@@ -80,9 +81,9 @@ void ImguiSystem::Update()
     static std::wstring szCurrentSplat;
     static std::wstring szCurrentImage;
     static std::wstring szCurrentFbx;
-    /*static std::wstring szCurrentAnim;
+    static std::wstring szCurrentAnim;
     static AnimLayer currentAnim;
-    static Object* pObjectAnim;*/
+    static FBXObject* pObjectAnim;
 
     static bool bMouseMove = true;
     static int iMapSize = 4;
@@ -332,7 +333,7 @@ void ImguiSystem::Update()
     ImGui::Begin("Control Panel");
     {
         if (ImGui::Button("CreateObject"))
-            /*pObjectAnim = */_ToolSystemMap.CreateFbxObject(szCurrentFbx, _CameraSystem.GetCurrentCamera()->m_vCameraPos);
+            pObjectAnim = dynamic_cast<FBXObject*>(_ToolSystemMap.CreateFbxObject(szCurrentFbx, _CameraSystem.GetCurrentCamera()->m_vCameraPos));
 
     }
     ImGui::Dummy({ 0, 10 });
@@ -425,33 +426,36 @@ void ImguiSystem::Update()
     ImGui::End();
 
 
-    //ImGui::Begin("animPanel");
-    //{
-    //    if (ImGui::BeginListBox("animList"))
-    //    {
-    //        for (const auto& animLayer : _ToolSystemMap.GetListAnim())
-    //        {
-    //            std::wstring fullpath = _tomw(animLayer.pStackAnim->GetName());
+    ImGui::Begin("animPanel");
+    {
+        if (ImGui::BeginListBox("animList"))
+        {
+            if (pObjectAnim)
+            {
+                for (const auto& animLayer : dynamic_cast<FBXMesh*>(pObjectAnim->GetMesh())->GetListAnim())
+                {
+                    std::wstring fullpath = _tomw(animLayer.pStackAnim->GetName());
 
-    //            const bool is_selected = (szCurrentAnim == fullpath);
-    //            if (ImGui::Selectable(_towm(fullpath).c_str(), is_selected))
-    //            {
-    //                szCurrentAnim = fullpath;
-    //                currentAnim = animLayer;
-    //            }
+                    const bool is_selected = (szCurrentAnim == fullpath);
+                    if (ImGui::Selectable(_towm(fullpath).c_str(), is_selected))
+                    {
+                        szCurrentAnim = fullpath;
+                        currentAnim = animLayer;
+                    }
 
-    //            // Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
-    //            if (is_selected)
-    //            {
-    //                ImGui::SetItemDefaultFocus();
-    //                dynamic_cast<FBXObject*>(pObjectAnim)->SetCurrentAnim(animLayer);
-    //            }
+                    // Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
+                    if (is_selected)
+                    {
+                        ImGui::SetItemDefaultFocus();
+                        pObjectAnim->SetCurrentAnim(animLayer);
+                    }
 
-    //        }
-    //        ImGui::EndListBox();
-    //    }
-    //}
-    //ImGui::End();
+                }
+            }
+            ImGui::EndListBox();
+        }
+    }
+    ImGui::End();
 
     // Using the generic BeginListBox() API, you have full control over how to display the combo contents.
         // (your selection data could be an index, a pointer to the object, an id for the object, a flag intrusively
