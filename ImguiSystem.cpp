@@ -491,7 +491,7 @@ void ImguiSystem::Update()
                 std::wstring cutString = L"..\\..\\";
                 cutString += CutStringDelim(res[idx].wstring(), delim);
                 auto texture = _EngineSystem.GetTextureSystem()->CreateTextureFromFile(cutString.c_str());
-                _ToolSystemMap.GetListTexture().insert(res[idx].wstring());
+                _ToolSystemMap.GetListTexture().insert(cutString);
                 //texture->SetDelim(delim);
                 szCurrentImage = cutString;
             }
@@ -509,7 +509,7 @@ void ImguiSystem::Update()
                 std::wstring delim = L"data";
                 std::wstring cutString = L"..\\..\\";
                 cutString += CutStringDelim(res[idx].wstring(), delim);
-                _ToolSystemMap.GetListFbx().insert(res[idx].wstring());
+                _ToolSystemMap.GetListFbx().insert(cutString);
                 szCurrentFbx = cutString;
             }
         }

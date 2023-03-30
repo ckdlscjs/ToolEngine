@@ -212,9 +212,10 @@ void Object::Render()
 		_EngineSystem.GetRenderSystem()->SetInputLayout(pMeshNode->GetInputLayout());
 		for (int idxSub = 0; idxSub < pMeshNode->GetListPNCT().size(); idxSub++)
 		{
+			if (pMeshNode->GetListPNCT()[idxSub].empty())
+				continue;
 			_EngineSystem.GetRenderSystem()->SetVertexBuffer(pMeshNode->GetListVertexBufferPNCT()[idxSub], 0);
-			//if(!pMeshNode->GetListVertexBufferIW().empty())
-			//	_EngineSystem.GetRenderSystem()->SetVertexBuffer(pMeshNode->GetListVertexBufferIW()[idxSub], 1);
+			_EngineSystem.GetRenderSystem()->SetVertexBuffer(pMeshNode->GetListVertexBufferIW()[idxSub], 1);
 			_EngineSystem.GetRenderSystem()->SetIndexBuffer(pMeshNode->GetListIndexBuffer()[idxSub]);
 			if (m_pMaterial)
 			{

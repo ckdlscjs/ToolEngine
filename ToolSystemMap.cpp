@@ -329,11 +329,13 @@ Object* ToolSystemMap::CreateFbxObject(std::wstring szFullPath, XMVECTOR vPos, X
             pMeshNode->GetListIndex().resize(pFbxNode->m_ListIndex.size());
             pMeshNode->GetListIndexBuffer().resize(pFbxNode->m_ListIndex.size());
 
-            pMeshNode->GetListIW().resize(pFbxNode->m_ListIW.size());
-            pMeshNode->GetListVertexBufferIW().resize(pFbxNode->m_ListIW.size());
+            pMeshNode->GetListIW().resize(pFbxNode->m_ListVertexIW.size());
+            pMeshNode->GetListVertexBufferIW().resize(pFbxNode->m_ListVertexIW.size());
 
             for (int nodeMaterialCount = 0; nodeMaterialCount < pFbxNode->m_ListVertexPNCT.size(); nodeMaterialCount++)
             {
+                if (pFbxNode->m_ListVertexPNCT[nodeMaterialCount].empty())
+                    continue;
                 //SetVB
                 void* listVertex = &pFbxNode->m_ListVertexPNCT[nodeMaterialCount][0];
                 UINT iSizeVertices = pFbxNode->m_ListVertexPNCT[nodeMaterialCount].size();
@@ -350,8 +352,8 @@ Object* ToolSystemMap::CreateFbxObject(std::wstring szFullPath, XMVECTOR vPos, X
                 InputLayout* pInputLayout = _EngineSystem.GetRenderSystem()->CreateInputLayout(shader_byte_code_vs, size_shader_vs, pFBXFile->m_bSkeleton ? INPUT_LAYOUT::PNCTIW : INPUT_LAYOUT::PNCT);
                 pMeshNode->SetInputLayout(pInputLayout);
 
-                if (pFbxNode->m_ListVertexIW.empty())
-                    continue;
+    /*            if (pFbxNode->m_ListVertexIW.empty())
+                    continue;*/
 
                 //SetVBIW
                 void* listIW = &pFbxNode->m_ListVertexIW[nodeMaterialCount][0];
@@ -891,7 +893,7 @@ void ToolSystemMap::OpenFile(std::wstring szFullPath)
                         specifyMode == OBJECT_SPECIFY::OBJECT_SPAWN ||
                         specifyMode == OBJECT_SPECIFY::OBJECT_TRIGGER)
                         pObject = CreateSimpleBox(specifyMode, transform.position, transform.rotation, transform.scale);
-                    else if (specifyMode == OBJECT_SPECIFY::OBJECT_STATIC)
+                    else if (specifyMode == OBJECT_SPECIFY::OBJECT_STATIC || specifyMode == OBJECT_SPECIFY::OBJECT_SKELETON)
                         pObject = CreateFbxObject(relativeStr, transform.position, transform.rotation, transform.scale);
                    /* else if (specifyMode == OBJECT_SPECIFY::OBJECT_SKELETON)
                         pObject = CreateFbxObject(_tomw(str), transform.position, transform.rotation, transform.scale);*/
@@ -996,7 +998,7 @@ void ToolSystemMap::DrawBoxCollider(T_BOX tBox, XMFLOAT3 color, XMMATRIX matWorl
     void* shader_byte_code_ps = nullptr;
     size_t size_shader_vs = 0;
     size_t size_shader_ps = 0;
-    _EngineSystem.GetRenderSystem()->CompileVertexShader(L"FbxVertexShader.hlsl", "vsmain", "vs_5_0", &shader_byte_code_vs, &size_shader_vs);
+    _EngineSystem.GetRenderSystem()->CompileVertexShader(L"StaticVertexShader.hlsl", "vsmain", "vs_5_0", &shader_byte_code_vs, &size_shader_vs);
     VertexShader* pVertexShader = _EngineSystem.GetRenderSystem()->CreateVertexShader(shader_byte_code_vs, size_shader_vs);
     _EngineSystem.GetRenderSystem()->CompilePixelShader(L"SimpleObjectPixelShader.hlsl", "psmain", "ps_5_0", &shader_byte_code_ps, &size_shader_ps);
     PixelShader* pPixelShader = _EngineSystem.GetRenderSystem()->CreatePixelShader(shader_byte_code_ps, size_shader_ps);

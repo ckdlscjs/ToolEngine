@@ -112,6 +112,8 @@ void FBXObject::Render()
 	
 		for (int idxSub = 0; idxSub < pMeshNode->GetListPNCT().size(); idxSub++)
 		{
+			if (pMeshNode->GetListPNCT()[idxSub].empty())
+				continue;
 			_EngineSystem.GetRenderSystem()->SetVertexBuffer(pMeshNode->GetListVertexBufferPNCT()[idxSub], 0);
 			_EngineSystem.GetRenderSystem()->SetVertexBuffer(pMeshNode->GetListVertexBufferIW()[idxSub], 1);
 			_EngineSystem.GetRenderSystem()->SetIndexBuffer(pMeshNode->GetListIndexBuffer()[idxSub]);
