@@ -31,7 +31,10 @@ XMMATRIX FBXMeshNode::Interplate(float fFrame, AnimLayer tScene)
 	//   10                20
 	//   A=0 --------------- B=20
 	//   t=0 ~ t=0.5f     t=1
-	std::vector<AnimTrack>& animTracks = m_AnimTracks.find(tScene.pStackAnim->GetName())->second;
+	auto iter = m_AnimTracks.find(tScene.pStackAnim->GetName());
+	if (iter == m_AnimTracks.end())
+		return XMMatrixIdentity();
+	std::vector<AnimTrack>& animTracks = iter->second;
 	AnimTrack A, B;
 	if (fFrame > tScene.iEndFrame - 1) fFrame = tScene.iEndFrame - 1;
 	A = animTracks[max(tScene.iStartFrame, fFrame + 0)];

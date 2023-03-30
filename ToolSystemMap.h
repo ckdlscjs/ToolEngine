@@ -23,6 +23,7 @@ public:
 	std::set<std::wstring>& GetListTextureSplatting();
 	std::set<std::wstring>& GetListTexture();
 	std::set<std::wstring>& GetListFbx();
+	//std::vector<AnimLayer>& GetListAnim();
 	Camera* GetCurrentCamera();
 	FQuadTree* GetCurrentQuadTree();
 
@@ -47,6 +48,7 @@ private:
 	std::set<std::wstring> m_ListTextureSplatting;
 	std::set<std::wstring> m_ListTexture;
 	std::set<std::wstring> m_ListFbx;
+	/*std::vector<AnimLayer> m_ListAnim;*/
 };
 #define _ToolSystemMap Singleton<ToolSystemMap>::GetInstance()
 

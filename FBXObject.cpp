@@ -14,7 +14,7 @@ void FBXObject::SetAnimScene(AnimLayer animLayer)
 #include "FBXMeshNode.h"
 void FBXObject::Update()
 {
-	float g_fSecondPerFrame = 0.004f;
+	float g_fSecondPerFrame = 0.04f;
 	Object::Update();
 	//각 obj의 frame계산
 	m_fCurrentAnimFrame += g_fSecondPerFrame * m_fCurrentAnimSpeed * m_CurrentAnim.fFrameSpeed;// *m_fAnimInverse;
