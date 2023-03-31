@@ -45,7 +45,6 @@ void FBXObject::Render()
 	std::vector<XMMATRIX> matCurrentAnimList;
 	for (int iBone = 0; iBone < m_pMesh->GetMeshNodeList().size(); iBone++)
 	{
-		//m_ConstantDataBone.matBone[iBone] = dynamic_cast<FBXMeshNode*>(m_pMesh->GetMeshNodeList()[iBone])->Interplate(m_fCurrentAnimFrame, m_CurrentAnim);
 		matCurrentAnimList.push_back(dynamic_cast<FBXMeshNode*>(m_pMesh->GetMeshNodeList()[iBone])->Interplate(m_fCurrentAnimFrame, m_CurrentAnim));
 	}
 
@@ -57,6 +56,11 @@ void FBXObject::Render()
 		FBXMeshNode* drawMeshNode = dynamic_cast<FBXMeshNode*>(m_pMesh->GetMeshNodeList()[iDraw]);
 		for (int iBone = 0; iBone < m_pMesh->GetMeshNodeList().size(); iBone++)
 		{
+			if (drawMeshNode->GetMapBindPoseMatrix().empty())
+			{
+				drawMeshNode->m_ConstantDataBone.matBone[iBone] = matCurrentAnimList[iBone];
+				continue;
+			}
 			auto iter = drawMeshNode->GetMapBindPoseMatrix().find(dynamic_cast<FBXMeshNode*>(m_pMesh->GetMeshNodeList()[iBone])->GetName());	//오브젝트를 바인드로보낼 iBoneIdx에해당하는 값을 찾아서 사용
 			if (iter != drawMeshNode->GetMapBindPoseMatrix().end())
 			{

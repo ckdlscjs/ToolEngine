@@ -5,6 +5,7 @@ void FBXFile::InitAnim()
 	int animStackCount = m_pFbxScene->GetSrcObjectCount<FbxAnimStack>();
 	for (int i = 0; i < animStackCount; i++)
 	{
+		m_bAnimation = true;
 		AnimLayer animLayer;
 		FbxAnimStack* pStackAnim = m_pFbxScene->GetSrcObject<FbxAnimStack>(i);
 		FbxLongLong s = 0;
@@ -269,21 +270,17 @@ void FBXFile::ParseMesh(FBXNode* pNode, int nodeIdx)
 					iwVertex.weight.y = pIW->weight[1];
 					iwVertex.weight.z = pIW->weight[2];
 					iwVertex.weight.w = pIW->weight[3];
-					m_bSkeleton = true;
 				}
 				else
 				{
-					if (!pNode->m_bSkinning)
-					{
-						iwVertex.index.x = pNode->m_iBoneIdx;
-						iwVertex.index.y = 0;
-						iwVertex.index.z = 0;
-						iwVertex.index.w = 0;
-						iwVertex.weight.x = 1.0f;
-						iwVertex.weight.y = 0.0f;
-						iwVertex.weight.z = 0.0f;
-						iwVertex.weight.w = 0.0f;
-					}
+					iwVertex.index.x = pNode->m_iBoneIdx;
+					iwVertex.index.y = 0;
+					iwVertex.index.z = 0;
+					iwVertex.index.w = 0;
+					iwVertex.weight.x = 1.0f;
+					iwVertex.weight.y = 0.0f;
+					iwVertex.weight.z = 0.0f;
+					iwVertex.weight.w = 0.0f;
 				}
 				mapVertexPNCT[iSubMtrl].insert(std::make_pair(vertexID, pnctVertex));
 				mapVertexIW[iSubMtrl].insert(std::make_pair(vertexID, iwVertex));

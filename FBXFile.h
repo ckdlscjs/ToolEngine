@@ -19,7 +19,7 @@ public:
 	FBXFile(FbxScene* pFbxScene);
 	virtual ~FBXFile();
 public:
-	bool m_bSkeleton;
+	bool m_bAnimation;
 	std::vector<AnimLayer> m_ListAnimLayer;
 	FbxScene* m_pFbxScene;
 	FbxNode* m_pRootNode;

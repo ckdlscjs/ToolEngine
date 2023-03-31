@@ -337,8 +337,8 @@ Object* ToolSystemMap::CreateFbxObject(std::wstring szFullPath, XMVECTOR vPos, X
     void* shader_byte_code_ps = nullptr;
     size_t size_shader_vs = 0;
     size_t size_shader_ps = 0;
-    std::wstring szVSPath = pFBXFile->m_bSkeleton ? L"SkeletonVertexShader.hlsl" : L"StaticVertexShader.hlsl";
-    std::wstring szPSPath = pFBXFile->m_bSkeleton ? L"SkeletonPixelShader.hlsl" : L"StaticPixelShader.hlsl";
+    std::wstring szVSPath = pFBXFile->m_bAnimation ? L"SkeletonVertexShader.hlsl" : L"StaticVertexShader.hlsl";
+    std::wstring szPSPath = pFBXFile->m_bAnimation ? L"SkeletonPixelShader.hlsl" : L"StaticPixelShader.hlsl";
 
     _EngineSystem.GetRenderSystem()->CompileVertexShader(szVSPath.c_str(), "vsmain", "vs_5_0", &shader_byte_code_vs, &size_shader_vs);
     VertexShader* pVertexShader = _EngineSystem.GetRenderSystem()->CreateVertexShader(shader_byte_code_vs, size_shader_vs);
@@ -380,6 +380,12 @@ Object* ToolSystemMap::CreateFbxObject(std::wstring szFullPath, XMVECTOR vPos, X
                 pMeshNode->SetListPNCT(listVertex, iSizeVertices, nodeMaterialCount);
                 pMeshNode->SetListVertexBufferPNCT(_EngineSystem.GetRenderSystem()->CreateVertexBuffer(&pMeshNode->GetListPNCT()[nodeMaterialCount][0], sizeof(PNCTVertex), pMeshNode->GetListPNCT()[nodeMaterialCount].size()), nodeMaterialCount);
 
+                //SetVBIW
+                void* listIW = &pFbxNode->m_ListVertexIW[nodeMaterialCount][0];
+                UINT iSizelistIW = pFbxNode->m_ListVertexIW[nodeMaterialCount].size();
+                pMeshNode->SetListIW(listIW, iSizelistIW, nodeMaterialCount);
+                pMeshNode->SetListVertexBufferIW(_EngineSystem.GetRenderSystem()->CreateVertexBuffer(&pMeshNode->GetListIW()[nodeMaterialCount][0], sizeof(IW), pMeshNode->GetListIW()[nodeMaterialCount].size()), nodeMaterialCount);
+
                 //SetIB
                 void* listIndex = &pFbxNode->m_ListIndex[nodeMaterialCount][0];
                 UINT iSizeIndices = pFbxNode->m_ListIndex[nodeMaterialCount].size();
@@ -387,17 +393,7 @@ Object* ToolSystemMap::CreateFbxObject(std::wstring szFullPath, XMVECTOR vPos, X
                 pMeshNode->SetListIndexBuffer(_EngineSystem.GetRenderSystem()->CreateIndexBuffer(&pMeshNode->GetListIndex()[nodeMaterialCount][0], pMeshNode->GetListIndex()[nodeMaterialCount].size()), nodeMaterialCount);
 
                 //SetInputLayout
-                pMeshNode->SetInputLayout(_EngineSystem.GetRenderSystem()->CreateInputLayout(shader_byte_code_vs, size_shader_vs, pFBXFile->m_bSkeleton ? INPUT_LAYOUT::PNCTIW : INPUT_LAYOUT::PNCT));
-
-    /*            if (pFbxNode->m_ListVertexIW.empty())
-                    continue;*/
-
-                //SetVBIW
-                void* listIW = &pFbxNode->m_ListVertexIW[nodeMaterialCount][0];
-                UINT iSizelistIW = pFbxNode->m_ListVertexIW[nodeMaterialCount].size();
-                pMeshNode->SetListIW(listIW, iSizelistIW, nodeMaterialCount);
-                pMeshNode->SetListVertexBufferIW(_EngineSystem.GetRenderSystem()->CreateVertexBuffer(&pMeshNode->GetListIW()[nodeMaterialCount][0], sizeof(IW), pMeshNode->GetListIW()[nodeMaterialCount].size()), nodeMaterialCount);
-
+                pMeshNode->SetInputLayout(_EngineSystem.GetRenderSystem()->CreateInputLayout(shader_byte_code_vs, size_shader_vs, pFBXFile->m_bAnimation ? INPUT_LAYOUT::PNCTIW : INPUT_LAYOUT::PNCT));  
             }   
         }
         for (const auto& animLayer : pFBXFile->m_ListAnimLayer)
@@ -436,7 +432,7 @@ Object* ToolSystemMap::CreateFbxObject(std::wstring szFullPath, XMVECTOR vPos, X
     pObject->SetTransform({ vPos , vRot, vScale });
     pObject->SetMaterial(pMaterial);
     pObject->SetDrawMode(DRAW_MODE::MODE_SOLID);
-    pObject->SetSpecify(pFBXFile->m_bSkeleton ? OBJECT_SPECIFY::OBJECT_SKELETON : OBJECT_SPECIFY::OBJECT_STATIC);
+    pObject->SetSpecify(pFBXFile->m_bAnimation ? OBJECT_SPECIFY::OBJECT_SKELETON : OBJECT_SPECIFY::OBJECT_STATIC);
     pObject->UpdateBoundigBox(box);
     if(!pMesh->GetListAnim().empty())
         pObject->SetCurrentAnim(pMesh->GetListAnim()[0]);

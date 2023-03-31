@@ -245,6 +245,8 @@ void RenderSystem::setTexture(const VertexShader* pVertexShader, const std::vect
 
 void RenderSystem::setTexture(const VertexShader* pVertexShader, const Texture* pTexture, unsigned int iNumSlot)
 {
+	if (!pTexture)
+		return;
 	m_pCDevice->m_pImmediateContext->VSSetShaderResources(iNumSlot, 1, &pTexture->m_pShaderResourceView);
 }
 
@@ -271,6 +273,8 @@ void RenderSystem::setTexture(const PixelShader* pPixelShader, const std::vector
 
 void RenderSystem::setTexture(const PixelShader* pPixelShader, const Texture* pTexture, unsigned int iNumSlot)
 {
+	if (!pTexture)
+		return;
 	m_pCDevice->m_pImmediateContext->PSSetShaderResources(iNumSlot, 1, &pTexture->m_pShaderResourceView);
 	m_pCDevice->m_pImmediateContext->PSSetSamplers(iNumSlot, 1, &pTexture->m_pSamplerState);
 }
