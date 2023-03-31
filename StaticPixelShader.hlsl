@@ -29,6 +29,9 @@ float4 psmain(PS_INPUT input) : SV_TARGET
 {
 	float4 tex = TextureColor.Sample(TextureSamplerColor, input.tex);
 
+	if (tex.a < 0.5f)
+		discard;
+
 	//AmbientLight
 	float ka = 0.1f;
 	float3 ia = float3(1.0f, 1.0f, 1.0f);
