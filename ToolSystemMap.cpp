@@ -170,42 +170,78 @@ Object* ToolSystemMap::ObjectPicking()
 {
     std::map<float, Object*> objectContain;
     //교점체크
-    for (const auto& node : m_pQuadTree->m_pDrawLeafNodeList)
+    if (m_pQuadTree)
     {
-        for (const auto& object : node->m_pDynamicObjectList)
+        for (const auto& node : m_pQuadTree->m_pDrawLeafNodeList)
         {
-            for (const auto& meshnode : object->m_pMesh->GetMeshNodeList())
+            for (const auto& object : node->m_pDynamicObjectList)
             {
-                for (int idx = 0; idx < meshnode->GetListIndex().size(); idx++)
+                for (const auto& meshnode : object->m_pMesh->GetMeshNodeList())
                 {
-                    UINT index = 0;
-                    UINT iNumFace = meshnode->GetListIndex()[idx].size() / 3;
-                    for (UINT face = 0; face < iNumFace; face++)
+                    for (int idx = 0; idx < meshnode->GetListIndex().size(); idx++)
                     {
-                        UINT i0 = meshnode->GetListIndex()[idx][index + 0];
-                        UINT i1 = meshnode->GetListIndex()[idx][index + 1];
-                        UINT i2 = meshnode->GetListIndex()[idx][index + 2];
-                        XMFLOAT3 v0 = meshnode->GetListPNCT()[idx][i0].pos;
-                        XMFLOAT3 v1 = meshnode->GetListPNCT()[idx][i1].pos;
-                        XMFLOAT3 v2 = meshnode->GetListPNCT()[idx][i2].pos;
-                        XMVECTOR v_0 = XMVector3TransformCoord(XMLoadFloat3(&v0), object->m_ConstantData_Transform.matWorld);
-                        XMVECTOR v_1 = XMVector3TransformCoord(XMLoadFloat3(&v1), object->m_ConstantData_Transform.matWorld);
-                        XMVECTOR v_2 = XMVector3TransformCoord(XMLoadFloat3(&v2), object->m_ConstantData_Transform.matWorld);
-                        float fDist;
-                        if (_PhysicsSystem.GetSelect().ChkPick(v_0, v_1, v_2, fDist))
+                        UINT index = 0;
+                        UINT iNumFace = meshnode->GetListIndex()[idx].size() / 3;
+                        for (UINT face = 0; face < iNumFace; face++)
                         {
-                            objectContain.insert(std::make_pair(fDist, object));
-                            break;
+                            UINT i0 = meshnode->GetListIndex()[idx][index + 0];
+                            UINT i1 = meshnode->GetListIndex()[idx][index + 1];
+                            UINT i2 = meshnode->GetListIndex()[idx][index + 2];
+                            XMFLOAT3 v0 = meshnode->GetListPNCT()[idx][i0].pos;
+                            XMFLOAT3 v1 = meshnode->GetListPNCT()[idx][i1].pos;
+                            XMFLOAT3 v2 = meshnode->GetListPNCT()[idx][i2].pos;
+                            XMVECTOR v_0 = XMVector3TransformCoord(XMLoadFloat3(&v0), object->m_ConstantData_Transform.matWorld);
+                            XMVECTOR v_1 = XMVector3TransformCoord(XMLoadFloat3(&v1), object->m_ConstantData_Transform.matWorld);
+                            XMVECTOR v_2 = XMVector3TransformCoord(XMLoadFloat3(&v2), object->m_ConstantData_Transform.matWorld);
+                            float fDist;
+                            if (_PhysicsSystem.GetSelect().ChkPick(v_0, v_1, v_2, fDist))
+                            {
+                                objectContain.insert(std::make_pair(fDist, object));
+                                break;
+                            }
+                            index += 3;
                         }
-                        index += 3;
                     }
-                } 
+                }
+            }
+        }
+        if (objectContain.empty())
+        {
+            for (const auto& object : m_pQuadTree->m_pAllObjectList)
+            {
+                for (const auto& meshnode : object->m_pMesh->GetMeshNodeList())
+                {
+                    for (int idx = 0; idx < meshnode->GetListIndex().size(); idx++)
+                    {
+                        UINT index = 0;
+                        UINT iNumFace = meshnode->GetListIndex()[idx].size() / 3;
+                        for (UINT face = 0; face < iNumFace; face++)
+                        {
+                            UINT i0 = meshnode->GetListIndex()[idx][index + 0];
+                            UINT i1 = meshnode->GetListIndex()[idx][index + 1];
+                            UINT i2 = meshnode->GetListIndex()[idx][index + 2];
+                            XMFLOAT3 v0 = meshnode->GetListPNCT()[idx][i0].pos;
+                            XMFLOAT3 v1 = meshnode->GetListPNCT()[idx][i1].pos;
+                            XMFLOAT3 v2 = meshnode->GetListPNCT()[idx][i2].pos;
+                            XMVECTOR v_0 = XMVector3TransformCoord(XMLoadFloat3(&v0), object->m_ConstantData_Transform.matWorld);
+                            XMVECTOR v_1 = XMVector3TransformCoord(XMLoadFloat3(&v1), object->m_ConstantData_Transform.matWorld);
+                            XMVECTOR v_2 = XMVector3TransformCoord(XMLoadFloat3(&v2), object->m_ConstantData_Transform.matWorld);
+                            float fDist;
+                            if (_PhysicsSystem.GetSelect().ChkPick(v_0, v_1, v_2, fDist))
+                            {
+                                objectContain.insert(std::make_pair(fDist, object));
+                                break;
+                            }
+                            index += 3;
+                        }
+                    }
+                }
             }
         }
     }
-    if (objectContain.empty())
+    else
     {
-        for (const auto& object : m_pQuadTree->m_pAllObjectList)
+        for (const auto& object : _ObjectSystem.m_ListObject)
         {
             for (const auto& meshnode : object->m_pMesh->GetMeshNodeList())
             {
@@ -234,7 +270,7 @@ Object* ToolSystemMap::ObjectPicking()
                     }
                 }
             }
-        }
+        }    
     }
     if(!objectContain.empty())
         return objectContain.begin()->second;
@@ -275,7 +311,7 @@ FQuadTree* ToolSystemMap::GetCurrentQuadTree()
 #include "FBXObject.h"
 #include "FBXMesh.h"
 #include "FBXMeshNode.h"
-Object* ToolSystemMap::CreateFbxObject(std::wstring szFullPath, XMVECTOR vPos, XMVECTOR vRot, XMVECTOR vScale)
+Object* ToolSystemMap::CreateFbxObject(std::wstring szFullPath, XMVECTOR vPos, XMVECTOR vRot, XMVECTOR vScale, T_BOX box)
 {
     if (szFullPath.empty())
         return nullptr;
@@ -401,6 +437,7 @@ Object* ToolSystemMap::CreateFbxObject(std::wstring szFullPath, XMVECTOR vPos, X
     pObject->SetMaterial(pMaterial);
     pObject->SetDrawMode(DRAW_MODE::MODE_SOLID);
     pObject->SetSpecify(pFBXFile->m_bSkeleton ? OBJECT_SPECIFY::OBJECT_SKELETON : OBJECT_SPECIFY::OBJECT_STATIC);
+    pObject->UpdateBoundigBox(box);
     if(!pMesh->GetListAnim().empty())
         pObject->SetCurrentAnim(pMesh->GetListAnim()[0]);
     if (m_pQuadTree)
@@ -410,7 +447,7 @@ Object* ToolSystemMap::CreateFbxObject(std::wstring szFullPath, XMVECTOR vPos, X
 }
 
 #include "SimpleBox.h"
-Object* ToolSystemMap::CreateSimpleBox(OBJECT_SPECIFY specify, XMVECTOR vPos, XMVECTOR vRot, XMVECTOR vScale)
+Object* ToolSystemMap::CreateSimpleBox(OBJECT_SPECIFY specify, XMVECTOR vPos, XMVECTOR vRot, XMVECTOR vScale, T_BOX box)
 {
     std::wstring szBoxName;
     XMFLOAT4 boxColor;
@@ -530,6 +567,7 @@ Object* ToolSystemMap::CreateSimpleBox(OBJECT_SPECIFY specify, XMVECTOR vPos, XM
     pObject->SetTransform({ vPos , vRot, vScale });
     pObject->SetDrawMode(DRAW_MODE::MODE_WIRE);
     pObject->SetSpecify(specify);
+    pObject->UpdateBoundigBox(box);
 
     if (m_pQuadTree)
         m_pQuadTree->AddObject(pObject);
@@ -891,9 +929,9 @@ void ToolSystemMap::OpenFile(std::wstring szFullPath)
                         specifyMode == OBJECT_SPECIFY::OBJECT_SIMPLE || 
                         specifyMode == OBJECT_SPECIFY::OBJECT_SPAWN ||
                         specifyMode == OBJECT_SPECIFY::OBJECT_TRIGGER)
-                        pObject = CreateSimpleBox(specifyMode, transform.position, transform.rotation, transform.scale);
+                        pObject = CreateSimpleBox(specifyMode, transform.position, transform.rotation, transform.scale, box);
                     else if (specifyMode == OBJECT_SPECIFY::OBJECT_STATIC || specifyMode == OBJECT_SPECIFY::OBJECT_SKELETON)
-                        pObject = CreateFbxObject(relativeStr, transform.position, transform.rotation, transform.scale);
+                        pObject = CreateFbxObject(relativeStr, transform.position, transform.rotation, transform.scale, box);
                    /* else if (specifyMode == OBJECT_SPECIFY::OBJECT_SKELETON)
                         pObject = CreateFbxObject(_tomw(str), transform.position, transform.rotation, transform.scale);*/
                     else if (specifyMode == OBJECT_SPECIFY::OBJECT_SKYDOME)

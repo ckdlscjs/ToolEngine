@@ -8,6 +8,7 @@
 #include "MaterialSystem.h"
 #include "CameraSystem.h"
 #include "PhysicsSystem.h"
+#include "TimerSystem.h"
 #include "ToolSystemMap.h"
 #include "FBXSystem.h"
 

@@ -72,6 +72,7 @@
     <ClInclude Include="TCollision.h" />
     <ClInclude Include="Texture.h" />
     <ClInclude Include="TextureSystem.h" />
+    <ClInclude Include="TimerSystem.h" />
     <ClInclude Include="ToolSystemMap.h" />
     <ClInclude Include="VertexBuffer.h" />
     <ClInclude Include="VertexShader.h" />
@@ -129,6 +130,7 @@
     <ClCompile Include="TCollision.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="TextureSystem.cpp" />
+    <ClCompile Include="TimerSystem.cpp" />
     <ClCompile Include="ToolSystemMap.cpp" />
     <ClCompile Include="VertexBuffer.cpp" />
     <ClCompile Include="VertexShader.cpp" />

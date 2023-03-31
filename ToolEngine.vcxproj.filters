@@ -118,6 +118,9 @@
     <Filter Include="FBXSystem\FBXObject">
       <UniqueIdentifier>{08af9a8a-7b31-4db5-b3a7-65ed53fc2257}</UniqueIdentifier>
     </Filter>
+    <Filter Include="TimerSystem">
+      <UniqueIdentifier>{dd776864-2d3a-4805-9b64-b59fd1269cd3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="WindowSystem.h">
@@ -289,6 +292,9 @@
     <ClInclude Include="FBXMesh.h">
       <Filter>FBXSystem\FBXObject</Filter>
     </ClInclude>
+    <ClInclude Include="TimerSystem.h">
+      <Filter>TimerSystem</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WindowSystem.cpp">
@@ -453,6 +459,9 @@
     </ClCompile>
     <ClCompile Include="FBXMesh.cpp">
       <Filter>FBXSystem\FBXObject</Filter>
+    </ClCompile>
+    <ClCompile Include="TimerSystem.cpp">
+      <Filter>TimerSystem</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

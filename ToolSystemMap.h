@@ -28,8 +28,8 @@ public:
 	FQuadTree* GetCurrentQuadTree();
 
 	/*CreateBlock*/
-	Object* CreateFbxObject(std::wstring szFullPath, XMVECTOR vPos, XMVECTOR vRot = { 0, 0, 0, 0 }, XMVECTOR vScale = { 1, 1, 1, 0 });
-	Object* CreateSimpleBox(OBJECT_SPECIFY specify, XMVECTOR vPos, XMVECTOR vRot = { 0, 0, 0, 0 }, XMVECTOR vScale = { 1, 1, 1, 0 });
+	Object* CreateFbxObject(std::wstring szFullPath, XMVECTOR vPos, XMVECTOR vRot = { 0, 0, 0, 0 }, XMVECTOR vScale = { 1, 1, 1, 0 }, T_BOX box = {});
+	Object* CreateSimpleBox(OBJECT_SPECIFY specify, XMVECTOR vPos, XMVECTOR vRot = { 0, 0, 0, 0 }, XMVECTOR vScale = { 1, 1, 1, 0 }, T_BOX box = {});
 	Object* CreateSimpleSphere(float radius, UINT sliceCount, UINT stackCount, OBJECT_SPECIFY specify, std::wstring szCurrentImage = L"", XMVECTOR vPos = { 0, 0, 0, 0 }, XMVECTOR vRot = { 0, 0, 0, 0 }, XMVECTOR vScale = { 1, 1, 1, 0 });
 	FQuadTree* CreateSimpleMap(int iWidth, int iHeight,float fDistance, std::wstring szFullPath);
 	void DeleteSimpleMap();
@@ -49,6 +49,8 @@ private:
 	std::set<std::wstring> m_ListTexture;
 	std::set<std::wstring> m_ListFbx;
 	/*std::vector<AnimLayer> m_ListAnim;*/
+public:
+	bool bDrawBox = false;
 };
 #define _ToolSystemMap Singleton<ToolSystemMap>::GetInstance()
 

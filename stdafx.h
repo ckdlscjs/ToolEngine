@@ -51,6 +51,8 @@ extern WindowSystem* g_pWindow;
 extern ID3D11Device* g_pDevice;
 extern ID3D11DeviceContext* g_pDeviceContext;
 extern bool g_bWireFrame;
+extern float g_fGameTimer;
+extern float g_fSecondPerFrame;
 
 template<class T> class Singleton
 {

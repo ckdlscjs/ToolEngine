@@ -17,7 +17,6 @@ void FBXObject::Update()
 	Object::Update();
 	if (m_Specify == OBJECT_SPECIFY::OBJECT_STATIC)
 		return;
-	float g_fSecondPerFrame = 0.04f;
 	//각 obj의 frame계산
 	m_fCurrentAnimFrame += g_fSecondPerFrame * m_fCurrentAnimSpeed * m_CurrentAnim.fFrameSpeed;// *m_fAnimInverse;
 	if (m_fCurrentAnimFrame > m_CurrentAnim.iEndFrame || m_fCurrentAnimFrame < m_CurrentAnim.iStartFrame)
@@ -31,17 +30,18 @@ void FBXObject::Update()
 		//if(!m_AnimCurrent.bLoop) m_AnimCurrent = m_AnimList.find(L"idle")->second;
 		m_fCurrentAnimFrame = m_CurrentAnim.iStartFrame;
 	}
+}
 
-	//if (m_pFbxFileAnim)
-	//{
-	//	m_pFbxFileAnim->UpdateSkeleton(pContext, m_fObjFrameCurrent, m_cbBoneData);
-	//	m_pFbxFile->UpdateSkinning(pContext, m_cbBoneData, m_ListCbBoneData);
-	//}
-	//else
-	//{
-	//	m_pFbxFile->UpdateSkeleton(pContext, m_fObjFrameCurrent, m_cbBoneData);		//Bone오브젝트를 업데이트
-	//	m_pFbxFile->UpdateSkinning(pContext, m_cbBoneData, m_ListCbBoneData);		//Bone오브젝트를 스킨업데이트	
-	//}
+#include "InputSystem.h"
+#include "ToolSystemMap.h"
+void FBXObject::Render()
+{
+	if (m_Specify == OBJECT_SPECIFY::OBJECT_STATIC)
+	{
+		Object::Render();
+		return;
+	}
+
 	std::vector<XMMATRIX> matCurrentAnimList;
 	for (int iBone = 0; iBone < m_pMesh->GetMeshNodeList().size(); iBone++)
 	{
@@ -68,32 +68,6 @@ void FBXObject::Update()
 		_EngineSystem.GetRenderSystem()->UpdateConstantBuffer(drawMeshNode->m_pConstantBufferBone, &drawMeshNode->m_ConstantDataBone);
 	}
 
-	//_EngineSystem.GetRenderSystem()->UpdateConstantBuffer(m_pConstantBufferBone, &m_ConstantDataBone);
-	
-	//for (int ibone = 0; ibone < m_pMesh->GetMeshNodeList().size(); ibone++)
-	//{
-	//	_EngineSystem.GetRenderSystem()->UpdateConstantBuffer()
-	//	pContext->UpdateSubresource(											//상수버퍼에 업로드
-	//		m_pListCbBoneBufferAnim[ibone], 0, nullptr,
-	//		&m_ListCbBoneData[ibone], 0, 0);
-	//}
-
-	//for (int iBone = 0; iBone < m_pFbxFile->m_pObjectList.size(); iBone++)
-	//{
-	//	D3DXMatrixTranspose(&m_cbBoneData.matBone[iBone], &m_cbBoneData.matBone[iBone]);	//사용할 본매트릭스도 전치하여 상수버퍼에 업데이트
-	//}
-	//pContext->UpdateSubresource(m_pCbBoneBufferAnim, 0, nullptr, &m_cbBoneData, 0, 0);
-}
-
-#include "InputSystem.h"
-#include "ToolSystemMap.h"
-void FBXObject::Render()
-{
-	if (m_Specify == OBJECT_SPECIFY::OBJECT_STATIC)
-	{
-		Object::Render();
-		return;
-	}
 	_EngineSystem.GetRenderSystem()->SetWireFrame(g_bWireFrame ? DRAW_MODE::MODE_WIRE : m_DrawMode);
 	_EngineSystem.GetRenderSystem()->SetConstantBuffer(m_pVertexShader, m_pConstantBuffer_Transform, 0);
 	_EngineSystem.GetRenderSystem()->SetConstantBuffer(m_pVertexShader, m_pConstantBuffer_Light, 1);
@@ -125,7 +99,7 @@ void FBXObject::Render()
 			_EngineSystem.GetRenderSystem()->drawIndexedTriangleList(pMeshNode->GetListIndexBuffer()[idxSub]->getSizeIndexList(), 0, 0);
 		}	
 	}
-	if (_InputSystem.GetKey('V'))
+	if (_ToolSystemMap.bDrawBox)
 	{
 		_ToolSystemMap.DrawBoxCollider(m_Box, { 1, 0, 0 }, m_ConstantData_Transform.matWorld, m_ConstantData_Transform.matView, m_ConstantData_Transform.matProj);
 	}

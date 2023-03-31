@@ -117,6 +117,7 @@ void ImguiSystem::Update()
     static float rotation[3] = { 0.0f, 0.0f, 0.0f };
     static float position[3] = { 0.0f, 0.0f, 0.0f };
     static Object* pObject;
+    static bool bObjBoundingBox = false;
 
     ImGui::Begin("Demo");
     {
@@ -194,7 +195,7 @@ void ImguiSystem::Update()
             {
                 if (ImGui::Checkbox("OjbectPicking", &bOjbectPicking))
                     ~bOjbectPicking;
-                if (bOjbectPicking && _ToolSystemMap.GetCurrentQuadTree() != nullptr)
+                if (bOjbectPicking)
                 {
                     if (_InputSystem.GetKey(VK_RBUTTON) == KEY_STATE::KEY_DOWN)
                         pObject = _ToolSystemMap.ObjectPicking();
@@ -381,40 +382,67 @@ void ImguiSystem::Update()
             }
             ImGui::Dummy({ 0, 10 });
 
-            if (_ToolSystemMap.GetCurrentQuadTree() != nullptr)
+            if (pObject)
             {
-                if (pObject)
-                {
-                    XMVECTOR v_scale, v_rotation, v_translation;
-                    v_scale = pObject->GetScale();
-                    v_rotation = pObject->GetRotation();
-                    v_translation = pObject->GetPosition();
-                    scale[0] = v_scale.m128_f32[0]; scale[1] = v_scale.m128_f32[1]; scale[2] = v_scale.m128_f32[2];
-                    rotation[0] = v_rotation.m128_f32[0]; rotation[1] = v_rotation.m128_f32[1]; rotation[2] = v_rotation.m128_f32[2];
-                    position[0] = v_translation.m128_f32[0]; position[1] = v_translation.m128_f32[1]; position[2] = v_translation.m128_f32[2];
-                }
-                else
-                {
-                    scale[0] = 0; scale[1] = 0; scale[2] = 0;
-                    rotation[0] = 0; rotation[1] = 0; rotation[2] = 0;
-                    position[0] = 0; position[1] = 0; position[2] = 0;
-                }
+                XMVECTOR v_scale, v_rotation, v_translation;
+                v_scale = pObject->GetScale();
+                v_rotation = pObject->GetRotation();
+                v_translation = pObject->GetPosition();
+                scale[0] = v_scale.m128_f32[0]; scale[1] = v_scale.m128_f32[1]; scale[2] = v_scale.m128_f32[2];
+                rotation[0] = v_rotation.m128_f32[0]; rotation[1] = v_rotation.m128_f32[1]; rotation[2] = v_rotation.m128_f32[2];
+                position[0] = v_translation.m128_f32[0]; position[1] = v_translation.m128_f32[1]; position[2] = v_translation.m128_f32[2];
             }
+            else
+            {
+                scale[0] = 0; scale[1] = 0; scale[2] = 0;
+                rotation[0] = 0; rotation[1] = 0; rotation[2] = 0;
+                position[0] = 0; position[1] = 0; position[2] = 0;
+            }
+
             if (ImGui::Button("Object") && pObject != nullptr)
             {
                 pObject->SetTransform({ {position[0], position[1],position[2]}, {rotation[0],rotation[1],rotation[2]}, {scale[0],scale[1],scale[2]} });
             }
+
             ImGui::SameLine();
             if (ImGui::Button("Delete") && pObject != nullptr)
             {
-                _ToolSystemMap.GetCurrentQuadTree()->DeleteObject(pObject);
+                if(_ToolSystemMap.GetCurrentQuadTree())
+                    _ToolSystemMap.GetCurrentQuadTree()->DeleteObject(pObject);
                 _ObjectSystem.DeleteObject(pObject);
                 scale[0] = 0; scale[1] = 0; scale[2] = 0;
                 rotation[0] = 0; rotation[1] = 0; rotation[2] = 0;
                 position[0] = 0; position[1] = 0; position[2] = 0;
                 pObject = nullptr;
+                pObjectAnim = nullptr;
+                bObjBoundingBox = false;
+                _ToolSystemMap.bDrawBox = false;
             }
-            if(ImGui::DragFloat3("scale", scale) && pObject != nullptr)
+    
+            if (pObject)
+            {
+                ImGui::SameLine();
+                if (ImGui::Checkbox("ObjBoundBox", &bObjBoundingBox))
+                {
+                    ~bObjBoundingBox;
+                    _ToolSystemMap.bDrawBox = bObjBoundingBox;
+                }
+
+                if (bObjBoundingBox)
+                {
+                    /*static float extent[3] = { 0, };
+                    extent[0] = pObject->m_Box.fExtent[0];
+                    extent[1] = pObject->m_Box.fExtent[1];
+                    extent[2] = pObject->m_Box.fExtent[2];*/
+                    if(ImGui::DragFloat3("Extent", pObject->m_Box.fExtent))
+                        pObject->m_Box.UpdateBox({ pObject->m_Box.fExtent[0], pObject->m_Box.fExtent[1], pObject->m_Box.fExtent[2] });
+                    float center[3] = { pObject->m_Box.vCenter.x, pObject->m_Box.vCenter.y, pObject->m_Box.vCenter.z };
+                    if (ImGui::DragFloat3("Center", center))
+                        pObject->m_Box.UpdateBox({ pObject->m_Box.fExtent[0], pObject->m_Box.fExtent[1], pObject->m_Box.fExtent[2] } , { center[0], center[1], center[2] });
+                }
+            }
+            
+            if (ImGui::DragFloat3("scale", scale) && pObject != nullptr)
                 pObject->SetTransform({ {position[0], position[1],position[2]}, {rotation[0],rotation[1],rotation[2]}, {scale[0],scale[1],scale[2]} });
             if(ImGui::DragFloat3("rotation", rotation) && pObject != nullptr)
                 pObject->SetTransform({ {position[0], position[1],position[2]}, {rotation[0],rotation[1],rotation[2]}, {scale[0],scale[1],scale[2]} });

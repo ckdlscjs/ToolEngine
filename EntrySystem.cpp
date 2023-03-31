@@ -9,6 +9,7 @@ void EntrySystem::OnCreate()
     _ImguiSystem;
     _CameraSystem;
     _PhysicsSystem;
+    _TimerSystem;
     _ObjectSystem;
     _MaterialSystem;
     _ToolSystemMap;
@@ -60,6 +61,7 @@ LRESULT EntrySystem::MessageHandler(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM l
 
 void EntrySystem::Update()
 {
+    _TimerSystem.Update();
     _InputSystem.Update();
     _CameraSystem.Update();
     _PhysicsSystem.Update();

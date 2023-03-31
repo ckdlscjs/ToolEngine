@@ -16,6 +16,7 @@ public:
 	XMVECTOR GetScale();
 	Mesh* GetMesh();
 	void SetTransform(Transform transform);
+	void UpdateBoundigBox(T_BOX box);
 	void SetMesh(Mesh* pMesh);
 	void SetMaterial(Material* pMaterial);
 	void SetShader(VertexShader* pVertexShader, PixelShader* pPixelShader);

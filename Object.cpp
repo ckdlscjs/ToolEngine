@@ -107,6 +107,12 @@ void Object::SetTransform(Transform transform)
 		_DegreeToRadian(rotateAngle.z)), translation);
 }
 
+void Object::UpdateBoundigBox(T_BOX box)
+{
+	if (box.fExtent[0] > _Epsilon && box.fExtent[1] > _Epsilon && box.fExtent[2] > _Epsilon)
+		m_Box.UpdateBox({ box.fExtent[0], box.fExtent[1], box.fExtent[2] }, box.vCenter);
+}
+
 void Object::SetMesh(Mesh* pMesh)
 {
 	m_pMesh = pMesh;
@@ -225,10 +231,10 @@ void Object::Render()
 			_EngineSystem.GetRenderSystem()->drawIndexedTriangleList(pMeshNode->GetListIndexBuffer()[idxSub]->getSizeIndexList(), 0, 0);
 		}
 	}
-	/*if (_InputSystem.GetKey('V'))
+	if (_ToolSystemMap.bDrawBox)
 	{
 		_ToolSystemMap.DrawBoxCollider(m_Box, { 1, 0, 0 }, m_ConstantData_Transform.matWorld, m_ConstantData_Transform.matView, m_ConstantData_Transform.matProj);
-	}*/
+	}
 }
 
 //void Object::DeSerialize() const

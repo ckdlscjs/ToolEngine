@@ -102,12 +102,29 @@ struct T_BOX
 
     unsigned int vRectIndices[36] =
     {
-        0, 1, 2, 2, 3, 0,
-        3, 2, 6, 6, 7, 3,
-        7, 6, 5, 5, 4, 7,
-        4, 5, 1, 1, 0, 4,
-        4, 0, 3, 3, 7, 4,
-        1, 5, 6, 6, 2, 1
+        //Front
+       0, 1, 2,
+       2, 3, 0,
+
+       //Back
+       7, 6, 5, 
+       5, 4, 7, 
+
+       //Right
+       3, 2, 6, 
+       6, 7, 3, 
+
+       //Left
+       4, 5, 1,
+       1, 0, 4,
+
+       //Top
+       1, 5, 6,
+       6, 2, 1,
+
+       //Bottom
+       4, 0, 3,
+       3, 7, 4,
     };
    
     T_BOX()
@@ -118,6 +135,38 @@ struct T_BOX
     {
         Set(max, min);
     }
+    void UpdateBox(const XMFLOAT3& extent, const XMFLOAT3& center = {0, 0, 0})
+    {
+        vCenter = center;
+        // Update AABB
+        vMin = XMFLOAT3(vCenter.x - extent.x, vCenter.y - extent.y, vCenter.z - extent.z);
+        vMax = XMFLOAT3(vCenter.x + extent.x, vCenter.y + extent.y, vCenter.z + extent.z);
+
+        // OBB
+        XMFLOAT3 xAxis = XMFLOAT3(vAxis[0].x * extent.x, vAxis[0].y * extent.x, vAxis[0].z * extent.x);
+        XMFLOAT3 yAxis = XMFLOAT3(vAxis[1].x * extent.y, vAxis[1].y * extent.y, vAxis[1].z * extent.y);
+        XMFLOAT3 zAxis = XMFLOAT3(vAxis[2].x * extent.z, vAxis[2].y * extent.z, vAxis[2].z * extent.z);
+
+        fExtent[0] = fabsf(xAxis.x) + fabsf(yAxis.x) + fabsf(zAxis.x);
+        fExtent[1] = fabsf(xAxis.y) + fabsf(yAxis.y) + fabsf(zAxis.y);
+        fExtent[2] = fabsf(xAxis.z) + fabsf(yAxis.z) + fabsf(zAxis.z);
+
+        /*for (int i = 0; i < 8; i++)
+        {
+            vPos[i].x = vCenter.x + ((i & 1) ? extent.x : -extent.x);
+            vPos[i].y = vCenter.y + ((i & 2) ? extent.y : -extent.y);
+            vPos[i].z = vCenter.z + ((i & 4) ? extent.z : -extent.z);
+        }*/
+        vPos[0] = XMFLOAT3(vCenter.x + -extent.x, vCenter.y + -extent.y, vCenter.z + -extent.z);
+        vPos[1] = XMFLOAT3(vCenter.x + -extent.x, vCenter.y + extent.y, vCenter.z + -extent.z);
+        vPos[2] = XMFLOAT3(vCenter.x + extent.x, vCenter.y + extent.y, vCenter.z + -extent.z);
+        vPos[3] = XMFLOAT3(vCenter.x + extent.x, vCenter.y + -extent.y, vCenter.z + -extent.z);
+        vPos[4] = XMFLOAT3(vCenter.x + -extent.x, vCenter.y + -extent.y, vCenter.z + extent.z);
+        vPos[5] = XMFLOAT3(vCenter.x + -extent.x, vCenter.y + extent.y, vCenter.z + extent.z);
+        vPos[6] = XMFLOAT3(vCenter.x + extent.x, vCenter.y + extent.y, vCenter.z + extent.z);
+        vPos[7] = XMFLOAT3(vCenter.x + extent.x, vCenter.y + -extent.y, vCenter.z + extent.z);
+    }
+
     void Set(XMFLOAT3 max, XMFLOAT3	min)
     {
         vMax = max;
@@ -131,13 +180,13 @@ struct T_BOX
         fExtent[2] = vMax.z - vCenter.z;
 
         vPos[0] = XMFLOAT3(vMin.x, vMin.y, vMin.z);
-        vPos[1] = XMFLOAT3(vMin.x, vMin.y, vMax.z);
-        vPos[2] = XMFLOAT3(vMax.x, vMin.y, vMax.z);
+        vPos[1] = XMFLOAT3(vMin.x, vMax.y, vMin.z);
+        vPos[2] = XMFLOAT3(vMax.x, vMax.y, vMin.z);
         vPos[3] = XMFLOAT3(vMax.x, vMin.y, vMin.z);
-        vPos[4] = XMFLOAT3(vMin.x, vMax.y, vMin.z);
+        vPos[4] = XMFLOAT3(vMin.x, vMin.y, vMax.z);
         vPos[5] = XMFLOAT3(vMin.x, vMax.y, vMax.z);
         vPos[6] = XMFLOAT3(vMax.x, vMax.y, vMax.z);
-        vPos[7] = XMFLOAT3(vMax.x, vMax.y, vMin.z);
+        vPos[7] = XMFLOAT3(vMax.x, vMin.y, vMax.z);
     }
 
     //ThisFunction ErrorOccured!
@@ -184,7 +233,8 @@ struct T_BOX
         os << "vAxis:" << tBox.vAxis[0].x << " " << tBox.vAxis[0].y << " " << tBox.vAxis[0].z << " " 
             << tBox.vAxis[1].x << " " << tBox.vAxis[1].y << " " << tBox.vAxis[1].z << " " 
             << tBox.vAxis[2].x << " " << tBox.vAxis[2].y << " " << tBox.vAxis[2].z << ", ";
-        os << "fExtent:" << tBox.fExtent[0] << " " << tBox.fExtent[1] << " " << tBox.fExtent[2];
+        os << "fExtent:" << tBox.fExtent[0] << " " << tBox.fExtent[1] << " " << tBox.fExtent[2] << ", ";
+        os << "vCenter:" << tBox.vCenter.x << " " << tBox.vCenter.y << " " << tBox.vCenter.z;
         return os;
     }
 
@@ -214,6 +264,17 @@ struct T_BOX
         tBox.fExtent[0] = extent[0];
         tBox.fExtent[1] = extent[1];
         tBox.fExtent[2] = extent[2];
+
+        // center 값을 추출합니다.
+        size_t center_start = is.str().find("vCenter:") + strlen("vCenter:");
+        size_t center_end = is.str().find(",", extent_start);
+        std::string center_str = is.str().substr(center_start, center_end - center_start);
+        std::istringstream center_stream(center_str);
+        float center[3];
+        center_stream >> center[0] >> center[1] >> center[2];
+        tBox.vCenter.x = center[0];
+        tBox.vCenter.y = center[1];
+        tBox.vCenter.z = center[2];
 
         return is;
     }

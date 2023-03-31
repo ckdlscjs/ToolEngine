@@ -33,10 +33,11 @@ RasterizerState::RasterizerState(ID3D11Device* pDevice)
     ZeroMemory(&rd, sizeof(rd));
     rd.DepthClipEnable = TRUE;
     rd.FillMode = D3D11_FILL_WIREFRAME;
-    rd.CullMode = D3D11_CULL_BACK;
+    rd.CullMode = D3D11_CULL_NONE;
     pDevice->CreateRasterizerState(&rd, &m_pDefaultRSWireFrame);
 
     rd.FillMode = D3D11_FILL_SOLID;
+    rd.CullMode = D3D11_CULL_BACK;
     pDevice->CreateRasterizerState(&rd, &m_pDefaultRSSolid);
 
     D3D11_BLEND_DESC bd;
