@@ -4,6 +4,6 @@ class SimpleBox : public Object
 {
 public:
 	SimpleBox(std::wstring szFullPath = L"");
-	~SimpleBox();
+	virtual ~SimpleBox();
 };
 

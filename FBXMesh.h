@@ -7,7 +7,7 @@ public:
 	std::vector<AnimLayer>& GetListAnim();
 public:
 	FBXMesh(std::wstring szFullPath);
-	~FBXMesh();
+	virtual ~FBXMesh();
 private:
 	std::vector<AnimLayer> m_ListAnimLayer;
 };

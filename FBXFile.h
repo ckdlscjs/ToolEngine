@@ -4,9 +4,9 @@
 
 class FBXFile
 {
+	void ParseNode(FbxNode* pFbxNode);
 	void InitAnim();
 	void ParseAnim(FbxLongLong t, const AnimLayer& animLayer);
-	void ParseNode(FbxNode* pFbxNode);
 	void ParseMesh(FBXNode* pNode, int nodeIdx);
 	void ParseSkinning(FBXNode* pNode);
 	FbxVector2 ReadTextureCoord(FbxMesh* pFbxMesh, FbxLayerElementUV* pVertexUVSet, int posIndex, int uvIndex);
@@ -17,7 +17,7 @@ class FBXFile
 	XMMATRIX DxConvertMatrix(FbxAMatrix& fbxMatrix);
 public:
 	FBXFile(FbxScene* pFbxScene);
-	~FBXFile();
+	virtual ~FBXFile();
 public:
 	bool m_bSkeleton;
 	std::vector<AnimLayer> m_ListAnimLayer;

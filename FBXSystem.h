@@ -8,7 +8,7 @@ public:
 	FBXFile* LoadFile(const char* szFullPath);
 public:
 	FBXSystem();
-	~FBXSystem();
+	virtual ~FBXSystem();
 private:
 	FbxManager* m_pFbxManager;
 	FbxImporter* m_pFbxImporter;

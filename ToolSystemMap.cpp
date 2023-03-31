@@ -288,8 +288,13 @@ Object* ToolSystemMap::CreateFbxObject(std::wstring szFullPath, XMVECTOR vPos, X
     FBXFile* pFBXFile = _FBXSystem.LoadFile(_towm(fbxFullPath).c_str());
     FBXObject* pObject = new FBXObject(szFullPath);
     _ObjectSystem.AddObject(pObject);
-    FBXMesh* pMesh = new FBXMesh(szFullPath);
-    _EngineSystem.GetMeshSystem()->AddResource(pMesh);
+
+    FBXMesh* pMesh = (FBXMesh*)_EngineSystem.GetMeshSystem()->GetMesh(szFullPath);
+    if (!pMesh)
+    {
+        pMesh = new FBXMesh(szFullPath);
+        _EngineSystem.GetMeshSystem()->AddResource(pMesh);
+    }
     Material* pMaterial = _MaterialSystem.CreateMaterial(szFullPath);
 
     void* shader_byte_code_vs = nullptr;
@@ -316,10 +321,7 @@ Object* ToolSystemMap::CreateFbxObject(std::wstring szFullPath, XMVECTOR vPos, X
                 pMeshNode->SetBindPoseMatrix(mat.first, mat.second);
 
             for (const auto& animLayer : pFBXFile->m_ListAnimLayer)
-            {
                 pMeshNode->SetAnimTracks(animLayer.pStackAnim->GetName(), &pFbxNode->m_AnimTracks.find(animLayer.pStackAnim->GetName())->second);
-                pObject->SetCurrentAnim(animLayer);
-            }
 
             if (pFbxNode->m_ListVertexPNCT.empty())
                 continue;
@@ -349,8 +351,7 @@ Object* ToolSystemMap::CreateFbxObject(std::wstring szFullPath, XMVECTOR vPos, X
                 pMeshNode->SetListIndexBuffer(_EngineSystem.GetRenderSystem()->CreateIndexBuffer(&pMeshNode->GetListIndex()[nodeMaterialCount][0], pMeshNode->GetListIndex()[nodeMaterialCount].size()), nodeMaterialCount);
 
                 //SetInputLayout
-                InputLayout* pInputLayout = _EngineSystem.GetRenderSystem()->CreateInputLayout(shader_byte_code_vs, size_shader_vs, pFBXFile->m_bSkeleton ? INPUT_LAYOUT::PNCTIW : INPUT_LAYOUT::PNCT);
-                pMeshNode->SetInputLayout(pInputLayout);
+                pMeshNode->SetInputLayout(_EngineSystem.GetRenderSystem()->CreateInputLayout(shader_byte_code_vs, size_shader_vs, pFBXFile->m_bSkeleton ? INPUT_LAYOUT::PNCTIW : INPUT_LAYOUT::PNCT));
 
     /*            if (pFbxNode->m_ListVertexIW.empty())
                     continue;*/
@@ -363,13 +364,11 @@ Object* ToolSystemMap::CreateFbxObject(std::wstring szFullPath, XMVECTOR vPos, X
 
             }   
         }
+        for (const auto& animLayer : pFBXFile->m_ListAnimLayer)
+            pMesh->SetAnimScene(animLayer);
     }
-    for (const auto& animLayer : pFBXFile->m_ListAnimLayer)
-    {
-        pMesh->SetAnimScene(animLayer);
-    }
+  
 
- 
     if (pMaterial->IsEmpty())
     {
         pMaterial->GetListTextures().resize(pFBXFile->m_ListNode.size());
@@ -402,7 +401,8 @@ Object* ToolSystemMap::CreateFbxObject(std::wstring szFullPath, XMVECTOR vPos, X
     pObject->SetMaterial(pMaterial);
     pObject->SetDrawMode(DRAW_MODE::MODE_SOLID);
     pObject->SetSpecify(pFBXFile->m_bSkeleton ? OBJECT_SPECIFY::OBJECT_SKELETON : OBJECT_SPECIFY::OBJECT_STATIC);
-
+    if(!pMesh->GetListAnim().empty())
+        pObject->SetCurrentAnim(pMesh->GetListAnim()[0]);
     if (m_pQuadTree)
         m_pQuadTree->AddObject(pObject);
 
@@ -516,7 +516,7 @@ Object* ToolSystemMap::CreateSimpleBox(OBJECT_SPECIFY specify, XMVECTOR vPos, XM
         pMeshNode->SetListIndex(index_list, size_index_list);
         pMeshNode->SetListIndexBuffer(_EngineSystem.GetRenderSystem()->CreateIndexBuffer(&pMeshNode->GetListIndex()[0][0], pMeshNode->GetListIndex()[0].size()));
 
-        pMeshNode->SetInputLayout(_EngineSystem.GetRenderSystem()->CreateInputLayout(shader_byte_code_vs, size_shader_vs, INPUT_LAYOUT::PNCTIW));
+        pMeshNode->SetInputLayout(_EngineSystem.GetRenderSystem()->CreateInputLayout(shader_byte_code_vs, size_shader_vs, INPUT_LAYOUT::PNCT));
 
         pMesh->SetMeshNode(pMeshNode);
     }
@@ -632,7 +632,7 @@ Object* ToolSystemMap::CreateSimpleSphere(float radius, UINT sliceCount, UINT st
         pMeshNode->SetListIndex(&indices[0], indices.size());
         pMeshNode->SetListIndexBuffer(_EngineSystem.GetRenderSystem()->CreateIndexBuffer(&pMeshNode->GetListIndex()[0][0], pMeshNode->GetListIndex()[0].size()));
 
-        InputLayout* pInputLayout = _EngineSystem.GetRenderSystem()->CreateInputLayout(shader_byte_code_vs, size_shader_vs, INPUT_LAYOUT::PNCTIW);
+        InputLayout* pInputLayout = _EngineSystem.GetRenderSystem()->CreateInputLayout(shader_byte_code_vs, size_shader_vs, INPUT_LAYOUT::PNCT);
         pMeshNode->SetInputLayout(pInputLayout);
 
         pMesh->SetMeshNode(pMeshNode);
@@ -665,7 +665,6 @@ Object* ToolSystemMap::CreateSimpleSphere(float radius, UINT sliceCount, UINT st
     }
    
     _EngineSystem.GetRenderSystem()->ReleaseBlob();
-
 
     _ObjectSystem.AddObject(pObject);
     pObject->SetShader(pVertexShader, pPixelShader);

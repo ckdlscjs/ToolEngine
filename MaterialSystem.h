@@ -9,7 +9,7 @@ public:
 	void DeleteMaterial(std::wstring szMtrlName);
 public:
 	MaterialSystem();
-	~MaterialSystem();
+	virtual ~MaterialSystem();
 private:
 	std::unordered_map<std::wstring, Material*> m_ListMaterial;
 	friend class ToolSystemMap;

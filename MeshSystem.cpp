@@ -3,9 +3,10 @@
 
 Mesh* MeshSystem::GetMesh(std::wstring szName)
 {
-	Mesh* ret = nullptr;
-	ret = (Mesh*)m_mapResources.find(szName)->second;
-	return ret;
+	auto iter = m_mapResources.find(szName);
+	if (iter == m_mapResources.end())
+		return nullptr;
+	return (Mesh*)iter->second;
 }
 
 MeshSystem::MeshSystem() : ResourceSystem()

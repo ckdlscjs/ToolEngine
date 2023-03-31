@@ -9,7 +9,7 @@ public:
 	void Render() override;
 public:
 	FBXObject(std::wstring szFullPath);
-	~FBXObject();
+	virtual ~FBXObject();
 private:
 	//std::vector<AnimLayer> m_ListAnimLayer;
 	AnimLayer m_CurrentAnim;

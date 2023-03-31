@@ -11,7 +11,7 @@ public:
 	void SetSliceCount(UINT iSliceCount);
 	void SetStackCount(UINT iStackCount);
 	SimpleSphere(std::wstring szFullPath = L"");
-	~SimpleSphere();
+	virtual ~SimpleSphere();
 private:
 	float m_fRadius = 1.0f;
 	UINT m_iSliceCount;

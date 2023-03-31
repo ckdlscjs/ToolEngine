@@ -4,7 +4,7 @@ class FBXNode
 {
 public:
 	FBXNode(std::wstring szName);
-	~FBXNode();
+	virtual ~FBXNode();
 private:
 	FbxNode* m_pNode;
 	std::wstring m_szName;

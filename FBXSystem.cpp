@@ -29,7 +29,7 @@ FBXSystem::~FBXSystem()
 	std::cout << "Release : FBXSystem" << std::endl;
 	for (auto iter = m_mapFile.begin(); iter != m_mapFile.end(); )
 	{
-		delete (*iter).second;
+		delete iter->second;
 		iter = m_mapFile.erase(iter);
 	}
 	m_mapFile.clear();
