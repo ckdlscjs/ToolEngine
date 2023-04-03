@@ -6,7 +6,7 @@ class TextureSystem : public ResourceSystem
 public:
 	Texture* GetTexture(std::wstring szName);
 	TextureSystem();
-	~TextureSystem();
+	virtual ~TextureSystem();
 	Texture* CreateTextureFromFile(std::wstring szFilePath);
 protected:
 	// ResourceSystem을(를) 통해 상속됨

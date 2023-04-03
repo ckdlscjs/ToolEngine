@@ -14,7 +14,7 @@ public:
 	void Render();
 public:
 	ObjectSystem();
-	~ObjectSystem();
+	virtual ~ObjectSystem();
 private:
 	std::unordered_set<Object*> m_ListObject;
 	friend class ToolSystemMap;
