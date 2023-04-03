@@ -166,6 +166,7 @@ bool ToolSystemMap::GetInterSection()
     return true;
 }
 
+#include "SimpleSphere.h"
 Object* ToolSystemMap::ObjectPicking()
 {
     std::map<float, Object*> objectContain;
@@ -196,6 +197,8 @@ Object* ToolSystemMap::ObjectPicking()
                             float fDist;
                             if (_PhysicsSystem.GetSelect().ChkPick(v_0, v_1, v_2, fDist))
                             {
+                                if (object->GetSpecify() == OBJECT_SPECIFY::OBJECT_SKYDOME)
+                                    fDist += dynamic_cast<SimpleSphere*>(object)->GetRadius();
                                 objectContain.insert(std::make_pair(fDist, object));
                                 break;
                             }
@@ -229,6 +232,8 @@ Object* ToolSystemMap::ObjectPicking()
                             float fDist;
                             if (_PhysicsSystem.GetSelect().ChkPick(v_0, v_1, v_2, fDist))
                             {
+                                if (object->GetSpecify() == OBJECT_SPECIFY::OBJECT_SKYDOME)
+                                    fDist += dynamic_cast<SimpleSphere*>(object)->GetRadius();
                                 objectContain.insert(std::make_pair(fDist, object));
                                 break;
                             }
@@ -263,6 +268,8 @@ Object* ToolSystemMap::ObjectPicking()
                         float fDist;
                         if (_PhysicsSystem.GetSelect().ChkPick(v_0, v_1, v_2, fDist))
                         {
+                            if (object->GetSpecify() == OBJECT_SPECIFY::OBJECT_SKYDOME)
+                                fDist += dynamic_cast<SimpleSphere*>(object)->GetRadius();
                             objectContain.insert(std::make_pair(fDist, object));
                             break;
                         }
@@ -272,8 +279,9 @@ Object* ToolSystemMap::ObjectPicking()
             }
         }    
     }
-    if(!objectContain.empty())
+    if (!objectContain.empty())
         return objectContain.begin()->second;
+       
     else
         return nullptr; 
 }

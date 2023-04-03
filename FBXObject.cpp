@@ -103,9 +103,9 @@ void FBXObject::Render()
 			_EngineSystem.GetRenderSystem()->drawIndexedTriangleList(pMeshNode->GetListIndexBuffer()[idxSub]->getSizeIndexList(), 0, 0);
 		}	
 	}
-	if (_ToolSystemMap.bDrawBox)
+	if (_ToolSystemMap.bDrawBox || _InputSystem.GetKey('V'))
 	{
-		_ToolSystemMap.DrawBoxCollider(m_Box, { 1, 0, 0 }, m_ConstantData_Transform.matWorld, m_ConstantData_Transform.matView, m_ConstantData_Transform.matProj);
+		_ToolSystemMap.DrawBoxCollider(m_Box, { 0, 1, 1 }, m_ConstantData_Transform.matWorld, m_ConstantData_Transform.matView, m_ConstantData_Transform.matProj);
 	}
 }
 
