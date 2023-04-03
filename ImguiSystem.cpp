@@ -335,7 +335,6 @@ void ImguiSystem::Update()
     {
         if (ImGui::Button("CreateObject"))
             pObjectAnim = dynamic_cast<FBXObject*>(_ToolSystemMap.CreateFbxObject(szCurrentFbx, _CameraSystem.GetCurrentCamera()->m_vCameraPos));
-
     }
     ImGui::Dummy({ 0, 10 });
 
@@ -452,7 +451,7 @@ void ImguiSystem::Update()
         ImGui::Dummy({ 0, 10 });
     }
     ImGui::End();
-
+     
 
     ImGui::Begin("animPanel");
     {

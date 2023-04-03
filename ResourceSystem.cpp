@@ -18,7 +18,7 @@ ResourceSystem::ResourceSystem()
 ResourceSystem::~ResourceSystem()
 {
 	std::cout << "Release : ResourceSystem" << std::endl;
-	for (auto& pResource : m_mapResources)
+	for (const auto& pResource : m_mapResources)
 	{
 		delete pResource.second;
 	}

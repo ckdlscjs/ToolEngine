@@ -21,7 +21,7 @@ void RenderSystem::CompilePixelShader(const wchar_t* szFilePath, const char* ent
 	{
 		OutputDebugStringA((char*)m_pBlobErr->GetBufferPointer());
 		if (m_pBlobErr) m_pBlobErr->Release();
-		if (m_pVSBlobCode) m_pPSBlobCode->Release();
+		if (m_pPSBlobCode) m_pPSBlobCode->Release();
 		throw std::exception("PixelShader not create successfully");
 	}
 	*shaderCode = m_pPSBlobCode->GetBufferPointer();
