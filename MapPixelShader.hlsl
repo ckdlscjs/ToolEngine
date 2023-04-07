@@ -53,7 +53,6 @@ float4 psmain(PS_INPUT input) : SV_TARGET
 	float4 weights = mask.rgba;
 
 	// Calculate final color based on weights and splat textures
-
 	float4 finalColor = texelColor * (1.0f - weights.r) + splatTex2 * weights.r;
 	finalColor = finalColor * (1.0f - weights.g) + splatTex3 * weights.g;
 	finalColor = finalColor * (1.0f - weights.b) + splatTex4 * weights.b;
