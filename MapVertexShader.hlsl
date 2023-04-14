@@ -14,8 +14,7 @@ struct VS_OUTPUT
 	float2 tex : TEXCOORD0;
 	float3 direction_to_camera : TEXCOORD1;
 	float4 m_light_direction : TEXCOORD2;
-	float3 world : TEXCOORD3;
-	float4 tex2 : TEXCOORD4;
+	float4 tex2 : TEXCOORD3;
 };
 
 //if using row_major, not transpose in cpp
@@ -52,23 +51,23 @@ VS_OUTPUT vsmain(VS_INPUT input)
 	output.m_light_direction = float4(output.direction_to_camera, 1.0f);
 
 
-	output.world = vWorld.xyz;
+	//normalize to texcoord(vertex to 0 ~ 1)
+	int world_half = worldSize.x / 2.0f;
+	output.tex2.x = (vWorld.x + (float)world_half * cellDistance) / worldSize.x; //0 ~ 1
+	output.tex2.y = 1.0f - (((float)vWorld.z / world_half * cellDistance) * 0.5f + 0.5f); //0 ~ 1
+	output.tex2.x = output.tex2.x * (float)tileCount;
+	output.tex2.y = output.tex2.y * (float)tileCount;
 
-	float tileCnt = 1.0f; //tileCount;
-	int world_half = worldSize.x / 2;
-	output.tex2.x = (vWorld.x + world_half * cellDistance) / worldSize.x; //0 ~ 1
-	output.tex2.x = output.tex2.x * tileCnt;
-	output.tex2.y = 1.0f - ((vWorld.z / world_half * cellDistance) / 2.0f + 0.5f); //0 ~ 1
-	output.tex2.y = output.tex2.y * tileCnt;
-	// 텍스처 변환 행렬 사용 world to tex
-	matrix matTex = 0;
-	matTex._11 = 1.0f / ((worldSize.x / tileCnt) * cellDistance);
-	matTex._32 = -1.0f / ((worldSize.x / tileCnt) * cellDistance);
-	matTex._41 = 0.0f; // 타일에 개수 홀수=0.5f, 짝수=0.0f
-	matTex._42 = 0.0f;
-	float4 vUV = mul(vWorld, matTex);
-	output.tex2.x = vUV.x;
-	output.tex2.y = vUV.y;
+	//// 텍스처 변환 행렬 사용 world to tex
+	//matrix matTex = 0;
+	//matTex._11 = 1.0f / (((float)worldSize.x / tileCount) * cellDistance);
+	//matTex._32 = -1.0f / (((float)worldSize.x / tileCount) * cellDistance);
+	//matTex._41 = 0.0f; // 타일에 개수 홀수=0.5f, 짝수=0.0f
+	//matTex._42 = 0.0f;
+
+	//float4 vUV = mul(vWorld, matTex);
+	//output.tex2.x = vUV.x;
+	//output.tex2.y = vUV.y;
 
 	// 투영좌표 사용
 	output.tex2.z = (vProj.x / vProj.w) * 0.5f + 0.5f;

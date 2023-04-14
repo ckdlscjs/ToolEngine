@@ -15,8 +15,7 @@ struct PS_INPUT
 	float2 tex : TEXCOORD0;
 	float3 direction_to_camera : TEXCOORD1;
 	float4 m_light_direction : TEXCOORD2;
-	float3 world : TEXCOORD3;
-	float4 tex2 : TEXCOORD4;
+	float4 tex2 : TEXCOORD3;
 };
 
 //if using row_major, not transpose in cpp
@@ -42,12 +41,12 @@ cbuffer constant : register(b2)
 
 float4 psmain(PS_INPUT input) : SV_TARGET
 {
-	float4 texelColor = TextureColor.Sample(TextureSamplerColor, input.tex);
+	float4 texelColor = TextureColor.Sample(TextureSamplerColor, input.tex * tileCount);
 	float4 mask = g_txMaskTex.Sample(TextureSamplerColor, input.tex);
-	float4 splatTex2 = g_txTex2.Sample(TextureSamplerColor, input.tex);
-	float4 splatTex3 = g_txTex3.Sample(TextureSamplerColor, input.tex);
-	float4 splatTex4 = g_txTex4.Sample(TextureSamplerColor, input.tex);
-	float4 splatTex5 = g_txTex5.Sample(TextureSamplerColor, input.tex);
+	float4 splatTex2 = g_txTex2.Sample(TextureSamplerColor, input.tex * tileCount);
+	float4 splatTex3 = g_txTex3.Sample(TextureSamplerColor, input.tex * tileCount);
+	float4 splatTex4 = g_txTex4.Sample(TextureSamplerColor, input.tex * tileCount);
+	float4 splatTex5 = g_txTex5.Sample(TextureSamplerColor, input.tex * tileCount);
 
 	// Calculate weights based on mask
 	float4 weights = mask.rgba;

@@ -262,7 +262,7 @@ FQuadTree::FQuadTree(MeshMap* pMap, int iMaxDepth, BYTE* fAlphaData)
 
     m_ConstantData_Map.worldSize = XMFLOAT2(m_pMap->m_dwNumColumns, m_pMap->m_dwNumRows);
     m_ConstantData_Map.cellDistance = m_pMap->m_fCellDistance;
-    //m_ConstantData_Map.tileCount
+    m_ConstantData_Map.tileCount = m_pMap->m_iTileCount;
     m_pConstantBuffer_Map = _EngineSystem.GetRenderSystem()->CreateConstantBuffer(&m_ConstantData_Map, sizeof(m_ConstantData_Map));
 
     m_pConstantBuffer_Light = _EngineSystem.GetRenderSystem()->CreateConstantBuffer(&m_ConstantData_Light, sizeof(m_ConstantData_Light));
@@ -283,6 +283,15 @@ FQuadTree::~FQuadTree()
     if (m_pConstantBuffer_Light) delete m_pConstantBuffer_Light;
     if (m_pVertexShader) delete m_pVertexShader;
     if (m_pPixelShader) delete m_pPixelShader;
+    if (!m_pAllObjectList.empty())
+    {
+        for (auto iter = m_pAllObjectList.begin(); iter != m_pAllObjectList.end(); )
+        {
+            _ObjectSystem.DeleteObject(*iter);
+            iter = m_pAllObjectList.erase(iter);
+        }
+        m_pAllObjectList.clear();
+    }
 }
 
 void FQuadTree::UpdateNode(FNode* pNode)

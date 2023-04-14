@@ -453,7 +453,7 @@ Object* ToolSystemMap::CreateFbxObject(std::wstring szFullPath, XMVECTOR vPos, X
 }
 
 #include "SimpleBox.h"
-Object* ToolSystemMap::CreateSimpleBox(OBJECT_SPECIFY specify, XMVECTOR vPos, XMVECTOR vRot, XMVECTOR vScale, T_BOX box)
+Object* ToolSystemMap::CreateSimpleBox(OBJECT_SPECIFY specify, XMVECTOR vPos, XMVECTOR vRot, XMVECTOR vScale, std::wstring szObjName, T_BOX box)
 {
     std::wstring szBoxName;
     XMFLOAT4 boxColor;
@@ -477,10 +477,15 @@ Object* ToolSystemMap::CreateSimpleBox(OBJECT_SPECIFY specify, XMVECTOR vPos, XM
         case OBJECT_SPECIFY::OBJECT_TRIGGER:
         {
             szBoxName = L"SimpleObjectTrigger";
+            boxColor = { 0, 1, 1, 1 };
+        }break;
+        case OBJECT_SPECIFY::OBJECT_EFFECT:
+        {
+            szBoxName = L"SimpleObjectEffect";
             boxColor = { 1, 0, 1, 1 };
         }break;
     }
-    SimpleBox* pObject = new SimpleBox(szBoxName);
+    SimpleBox* pObject = new SimpleBox(szObjName.empty() ? szBoxName : szObjName);
     float fboxLength = 0.5f * 1.0f;
     
     PNCTVertex vertex_list[] =
@@ -725,7 +730,7 @@ Object* ToolSystemMap::CreateSimpleSphere(float radius, UINT sliceCount, UINT st
     return pObject;
 }
 
-FQuadTree* ToolSystemMap::CreateSimpleMap(int iWidth, int iHeight, float fDistance, std::wstring szFullPath)
+FQuadTree* ToolSystemMap::CreateSimpleMap(int iWidth, int iHeight, float fDistance, int iTileCount, std::wstring szFullPath)
 {
     if (szFullPath.empty())
         return nullptr;
@@ -734,7 +739,7 @@ FQuadTree* ToolSystemMap::CreateSimpleMap(int iWidth, int iHeight, float fDistan
     constantData_Transform.matView = m_pCamera->m_matCamera;
     constantData_Transform.matProj = m_pCamera->m_matProj;
 
-    MeshMap* pMapMesh = new MeshMap(iWidth, iHeight, fDistance);
+    MeshMap* pMapMesh = new MeshMap(iWidth, iHeight, fDistance, iTileCount);
 
     std::wstring szVSPath = L"MapVertexShader.hlsl";
     std::wstring szPSPath = L"MapPixelShader.hlsl";
@@ -778,6 +783,14 @@ void ToolSystemMap::DeleteSimpleMap()
 
 void ToolSystemMap::OpenFile(std::wstring szFullPath)
 {
+    if (m_pQuadTree)
+    {
+        delete m_pQuadTree;
+        m_pQuadTree = nullptr;
+        m_ListTexture.clear();
+        m_ListTextureSplatting.clear();
+        m_ListFbx.clear();
+    }
     Texture* pTexture = nullptr;
     Transform mapTransform = {};
     UINT iMaxDepth = 0;
@@ -934,8 +947,9 @@ void ToolSystemMap::OpenFile(std::wstring szFullPath)
                     if (specifyMode == OBJECT_SPECIFY::OBJECT_COLLIDER || 
                         specifyMode == OBJECT_SPECIFY::OBJECT_SIMPLE || 
                         specifyMode == OBJECT_SPECIFY::OBJECT_SPAWN ||
-                        specifyMode == OBJECT_SPECIFY::OBJECT_TRIGGER)
-                        pObject = CreateSimpleBox(specifyMode, transform.position, transform.rotation, transform.scale, box);
+                        specifyMode == OBJECT_SPECIFY::OBJECT_TRIGGER ||
+                        specifyMode == OBJECT_SPECIFY::OBJECT_EFFECT)
+                        pObject = CreateSimpleBox(specifyMode, transform.position, transform.rotation, transform.scale, _tomw(strName), box);
                     else if (specifyMode == OBJECT_SPECIFY::OBJECT_STATIC || specifyMode == OBJECT_SPECIFY::OBJECT_SKELETON)
                         pObject = CreateFbxObject(relativeStr, transform.position, transform.rotation, transform.scale, box);
                    /* else if (specifyMode == OBJECT_SPECIFY::OBJECT_SKELETON)

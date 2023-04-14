@@ -88,7 +88,7 @@ void ImguiSystem::Update()
     static bool bMouseMove = true;
     static int iMapSize = 4;
     static float fMapDistance = 1.0f;
-
+    static int iMapTileCount = 1;
 
     static float fSkyRadius = 1.0f;
     static int iSliceCount = 0;
@@ -98,9 +98,12 @@ void ImguiSystem::Update()
     static bool bSimpleObj = false;
     static bool bSimple = false;
     static float fSimpleObjLength = 1.0f; 
+    static char buff[255];
+    static std::wstring szSimpleObjName = L"";
     static bool bCollider = false;
     static bool bTrigger = false;
     static bool bSpawn = false;
+    static bool bEffect = false;
 
     static bool bFbxObj = false;
 
@@ -138,6 +141,10 @@ void ImguiSystem::Update()
                 if (bSimpleObj && _ToolSystemMap.GetCurrentQuadTree() != nullptr)
                 {
                     ImGui::InputFloat("length", &fSimpleObjLength);
+                    
+                    if (ImGui::InputText("objName", buff, 255))
+                        szSimpleObjName = _tomw(buff);
+
                     if (ImGui::Checkbox("Simple", &bSimple))
                     {
                         ~bSimple;
@@ -148,30 +155,37 @@ void ImguiSystem::Update()
                     if (ImGui::Checkbox("Collider", &bCollider))
                     {
                         ~bCollider;
-                        bSimple = bTrigger = bSpawn = false;
+                        bSimple = bTrigger = bSpawn = bEffect = false;
                     }
                     ImGui::SameLine();
                     if (ImGui::Checkbox("Spawn", &bSpawn))
                     {
                         ~bSpawn;
-                        bSimple = bCollider = bTrigger = false;
+                        bSimple = bCollider = bTrigger = bEffect = false;
                     }
                     ImGui::SameLine();
                     if (ImGui::Checkbox("Trigger", &bTrigger))
                     {
                         ~bTrigger;
-                        bSimple = bCollider = bSpawn =false;
+                        bSimple = bCollider = bSpawn = bEffect = false;
+                    }
+                    if (ImGui::Checkbox("Effect", &bEffect))
+                    {
+                        ~bEffect;
+                        bSimple = bCollider = bSpawn = bTrigger = false;
                     }
                     if ((_InputSystem.GetKey(VK_RBUTTON) == KEY_STATE::KEY_DOWN) && _ToolSystemMap.GetInterSection())
                     {
                         if(bSimple)
                             _ToolSystemMap.CreateSimpleBox(OBJECT_SPECIFY::OBJECT_SIMPLE, _PhysicsSystem.GetSelect().m_vIntersection, { 0, 0, 0, 0 }, { fSimpleObjLength, fSimpleObjLength , fSimpleObjLength , 0});
                         else if (bCollider)
-                            _ToolSystemMap.CreateSimpleBox(OBJECT_SPECIFY::OBJECT_COLLIDER, _PhysicsSystem.GetSelect().m_vIntersection);
+                            _ToolSystemMap.CreateSimpleBox(OBJECT_SPECIFY::OBJECT_COLLIDER, _PhysicsSystem.GetSelect().m_vIntersection, { 0, 0, 0, 0 }, { fSimpleObjLength, fSimpleObjLength , fSimpleObjLength , 0 });
                         else if (bSpawn)
-                            _ToolSystemMap.CreateSimpleBox(OBJECT_SPECIFY::OBJECT_SPAWN, _PhysicsSystem.GetSelect().m_vIntersection);
+                            _ToolSystemMap.CreateSimpleBox(OBJECT_SPECIFY::OBJECT_SPAWN, _PhysicsSystem.GetSelect().m_vIntersection, { 0, 0, 0, 0 }, { fSimpleObjLength, fSimpleObjLength , fSimpleObjLength , 0 }, szSimpleObjName);
                         else if (bTrigger)
-                            _ToolSystemMap.CreateSimpleBox(OBJECT_SPECIFY::OBJECT_TRIGGER, _PhysicsSystem.GetSelect().m_vIntersection);
+                            _ToolSystemMap.CreateSimpleBox(OBJECT_SPECIFY::OBJECT_TRIGGER, _PhysicsSystem.GetSelect().m_vIntersection, { 0, 0, 0, 0 }, { fSimpleObjLength, fSimpleObjLength , fSimpleObjLength , 0 }, szSimpleObjName);
+                        else if (bEffect)
+                            _ToolSystemMap.CreateSimpleBox(OBJECT_SPECIFY::OBJECT_EFFECT, _PhysicsSystem.GetSelect().m_vIntersection, { 0, 0, 0, 0 }, { fSimpleObjLength, fSimpleObjLength , fSimpleObjLength , 0 }, szSimpleObjName);
                     }
                         
                 }
@@ -262,7 +276,7 @@ void ImguiSystem::Update()
         {
             if (ImGui::Button("CreateMap"))
             {
-                _ToolSystemMap.CreateSimpleMap(iMapSize + 1, iMapSize + 1, fMapDistance, szCurrentImage);
+                _ToolSystemMap.CreateSimpleMap(iMapSize + 1, iMapSize + 1, fMapDistance, iMapTileCount, szCurrentImage);
             }
             ImGui::SameLine();
             if (ImGui::Button("DeleteMap"))
@@ -271,8 +285,11 @@ void ImguiSystem::Update()
             }
             ImGui::InputInt("MapSize", &iMapSize);
 
-            ImGui::InputFloat("CellDistance", &fMapDistance);
-
+            ImGui::PushItemWidth(100);
+            ImGui::InputFloat("CellDist", &fMapDistance);
+            ImGui::SameLine();
+            ImGui::InputInt("TileCnt", &iMapTileCount);
+            ImGui::PopItemWidth();
         }
         ImGui::Dummy({ 0, 10 });
 

@@ -276,6 +276,8 @@ static std::ostream& operator<<(std::ostream& os, const OBJECT_SPECIFY& mode)
 			os << "OBJECT_SKYDOME"; break;
 		case OBJECT_SPECIFY::OBJECT_TRIGGER:
 			os << "OBJECT_TRIGGER"; break;
+		case OBJECT_SPECIFY::OBJECT_EFFECT:
+			os << "OBJECT_EFFECT"; break;
 	}
 	return os;
 }
@@ -300,6 +302,8 @@ static std::stringstream& operator>>(std::stringstream& is, OBJECT_SPECIFY& mode
 		mode = OBJECT_SPECIFY::OBJECT_SKYDOME;
 	else if (pos_str == "OBJECT_TRIGGER")
 		mode = OBJECT_SPECIFY::OBJECT_TRIGGER;
+	else if (pos_str == "OBJECT_EFFECT")
+		mode = OBJECT_SPECIFY::OBJECT_EFFECT;
 	return is;
 }
 

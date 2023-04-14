@@ -178,11 +178,12 @@ void MeshMap::ComputeVertexNormal(UINT iVertex)
     XMStoreFloat3(&m_ListVertex[iVertex].normal, m_ListVertexInfo[iVertex].vNormal);
 }
 
-MeshMap::MeshMap(UINT iWidth, UINT iHeight, float fCellDistance)
+MeshMap::MeshMap(UINT iWidth, UINT iHeight, float fCellDistance, UINT iTileCount)
 {
-    m_fCellDistance = fCellDistance;
     m_dwNumRows = iHeight;
     m_dwNumColumns = iWidth;
+    m_fCellDistance = fCellDistance;
+    m_iTileCount = iTileCount;
     m_ListVertex.resize(m_dwNumRows * m_dwNumColumns);
     int iHalfWidth = m_dwNumColumns / 2;
     int iHalfHeight = m_dwNumRows / 2;
@@ -204,7 +205,7 @@ MeshMap::MeshMap(UINT iWidth, UINT iHeight, float fCellDistance)
                 
             m_ListVertex[iRow * m_dwNumColumns + iCol].color = { 1, 1, 1, 1 };
             //m_ListVertex[iRow * m_dwNumColumns + iCol].tex = { (float)iCol / (float)(iWidth - 1), (float)iRow / (float)(iHeight - 1) };
-            m_ListVertex[iRow * m_dwNumColumns + iCol].tex = { (float)iCol / (float)(iWidth - 1) , (float)iRow / (float)(iHeight - 1) };
+            m_ListVertex[iRow * m_dwNumColumns + iCol].tex = { (float)iCol / (float)(iWidth - 1) , (float)iRow / (float)(iHeight - 1)};
         }
     }
     m_ListIndex.resize((m_dwNumRows - 1) * (m_dwNumColumns - 1) * 2 * 3.0f);
@@ -248,6 +249,7 @@ std::ostream& operator<<(std::ostream& os, const MeshMap* pMap)
     os << "m_dwNumRows:" << pMap->m_dwNumRows << std::endl;
     os << "m_dwNumColumns:" << pMap->m_dwNumColumns << std::endl;
     os << "m_fCellDistance:" << pMap->m_fCellDistance << std::endl;
+    os << "m_iTileCount:" << pMap->m_iTileCount << std::endl;
     os << "m_ListVertex:"<<std::endl;
     for (const auto& vertex : pMap->m_ListVertex)
     {
@@ -277,6 +279,10 @@ std::ifstream& operator>>(std::ifstream& is, MeshMap* pMap)
             else if (fieldName == "m_fCellDistance")
             {
                 iss >> pMap->m_fCellDistance;
+            }
+            else if (fieldName == "m_iTileCount")
+            {
+                iss >> pMap->m_iTileCount;
             }
             else if (fieldName == "m_ListVertex")
             {
