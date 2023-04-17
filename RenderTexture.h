@@ -18,6 +18,8 @@ private:
 	ID3D11ShaderResourceView* m_pShaderResourceView = nullptr;
 	ID3D11Texture2D* m_pDepthTexture = nullptr;
 	ID3D11DepthStencilView* m_pDepthStencilView = nullptr;
+public:
+	ID3D11ShaderResourceView* m_pSRVDS = nullptr;
 	D3D11_VIEWPORT m_Viewport;
 	friend class RenderSystem;
 };

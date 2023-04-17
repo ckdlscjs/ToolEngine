@@ -497,16 +497,16 @@ Object* ToolSystemMap::CreateSimpleBox(OBJECT_SPECIFY specify, XMVECTOR vPos, XM
     PNCTVertex vertex_list[] =
     {
         //FrontFace
-        {XMFLOAT3(-fboxLength,-fboxLength,-fboxLength),	XMFLOAT3(1, 0, 0),  boxColor,   XMFLOAT2(0,1)},
-        {XMFLOAT3(-fboxLength,fboxLength,-fboxLength), 	XMFLOAT3(0, 1, 0),  boxColor,   XMFLOAT2(0,0)},
-        {XMFLOAT3(fboxLength,fboxLength,-fboxLength), 	XMFLOAT3(0, 0, 1),  boxColor,   XMFLOAT2(1,0)},
-        {XMFLOAT3(fboxLength,-fboxLength,-fboxLength),	XMFLOAT3(1, 1, 0),  boxColor,   XMFLOAT2(1,1)},
-                                                                            
-        //BackFace                                                          
-        {XMFLOAT3(fboxLength,-fboxLength,fboxLength),	XMFLOAT3(1, 0, 0),  boxColor,   XMFLOAT2(0,1)},
-        {XMFLOAT3(fboxLength,fboxLength,fboxLength),	XMFLOAT3(0, 1, 0),  boxColor,   XMFLOAT2(0,0)},
-        {XMFLOAT3(-fboxLength,fboxLength,fboxLength), 	XMFLOAT3(0, 0, 1),  boxColor,   XMFLOAT2(1,0)},
-        {XMFLOAT3(-fboxLength,-fboxLength,fboxLength),	XMFLOAT3(1, 1, 0),  boxColor,   XMFLOAT2(1,1)},
+        {XMFLOAT3(-fboxLength,-fboxLength,-fboxLength),	XMFLOAT3(0, 0, 0),  boxColor,   XMFLOAT2(0,1)},
+        {XMFLOAT3(-fboxLength,fboxLength,-fboxLength), 	XMFLOAT3(0, 0, 0),  boxColor,   XMFLOAT2(0,0)},
+        {XMFLOAT3(fboxLength,fboxLength,-fboxLength), 	XMFLOAT3(0, 0, 0),  boxColor,   XMFLOAT2(1,0)},
+        {XMFLOAT3(fboxLength,-fboxLength,-fboxLength),	XMFLOAT3(0, 0, 0),  boxColor,   XMFLOAT2(1,1)},
+                                                          
+        //BackFace                                        
+        {XMFLOAT3(fboxLength,-fboxLength,fboxLength),	XMFLOAT3(0, 0, 0),  boxColor,   XMFLOAT2(0,1)},
+        {XMFLOAT3(fboxLength,fboxLength,fboxLength),	XMFLOAT3(0, 0, 0),  boxColor,   XMFLOAT2(0,0)},
+        {XMFLOAT3(-fboxLength,fboxLength,fboxLength), 	XMFLOAT3(0, 0, 0),  boxColor,   XMFLOAT2(1,0)},
+        {XMFLOAT3(-fboxLength,-fboxLength,fboxLength),	XMFLOAT3(0, 0, 0),  boxColor,   XMFLOAT2(1,1)},
     };
     UINT size_vertex_list = ARRAYSIZE(vertex_list);
 
@@ -538,6 +538,41 @@ Object* ToolSystemMap::CreateSimpleBox(OBJECT_SPECIFY specify, XMVECTOR vPos, XM
     };
     UINT size_index_list = ARRAYSIZE(index_list);
     
+    std::vector<XMFLOAT3> normals(size_vertex_list, XMFLOAT3(0.0f, 0.0f, 0.0f));
+
+    // 각 면에서의 법선 노말 값을 계산하고, 각 정점의 법선 노말 값을 누적합니다.
+    for (size_t i = 0; i < size_index_list; i += 3) {
+        // 현재 면에서의 정점 인덱스
+        uint32_t i0 = index_list[i];
+        uint32_t i1 = index_list[i + 1];
+        uint32_t i2 = index_list[i + 2];
+        // 현재 면에서의 정점 위치
+        XMFLOAT3 v0 = vertex_list[i0].pos;
+        XMFLOAT3 v1 = vertex_list[i1].pos;
+        XMFLOAT3 v2 = vertex_list[i2].pos;
+
+        // 현재 면에서의 법선 노말 값 계산
+        XMVECTOR edge1 = XMLoadFloat3(&v1) - XMLoadFloat3(&v0);
+        XMVECTOR edge2 = XMLoadFloat3(&v2) - XMLoadFloat3(&v0);
+        XMVECTOR normal = XMVector3Normalize(XMVector3Cross(edge1, edge2));
+        XMFLOAT3 normalFloat3;
+        XMStoreFloat3(&normalFloat3, normal);
+
+        // 각 정점의 법선 노말 값을 누적합니다.
+        normals[i0] = XMFLOAT3(normals[i0].x + normalFloat3.x, normals[i0].y + normalFloat3.y, normals[i0].z + normalFloat3.z);
+        normals[i1] = XMFLOAT3(normals[i1].x + normalFloat3.x, normals[i1].y + normalFloat3.y, normals[i1].z + normalFloat3.z);
+        normals[i2] = XMFLOAT3(normals[i2].x + normalFloat3.x, normals[i2].y + normalFloat3.y, normals[i2].z + normalFloat3.z);
+    }
+
+    for (size_t i = 0; i < size_vertex_list; i++)
+    {
+        XMVECTOR normal = XMVector3Normalize(XMLoadFloat3(&normals[i]));
+        XMFLOAT3 normalFloat3;
+        XMStoreFloat3(&normalFloat3, normal);
+        vertex_list[i].normal = normalFloat3;
+    }
+
+
     ConstantData_Transform cc;
     cc.matWorld = XMMatrixIdentity();
     cc.matView = m_pCamera->m_matCamera;

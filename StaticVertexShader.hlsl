@@ -24,10 +24,17 @@ cbuffer constant : register(b0)
 	row_major float4x4 matProj;
 };
 
+//cbuffer constant : register(b1)
+//{
+//	float4 lightDirection;
+//	float4 cameraPosition;
+//};
+
 cbuffer constant : register(b1)
 {
-	float4 lightDirection;
-	float4 cameraPosition;
+	row_major float4x4 lightViewMatrix;
+	row_major float4x4 lightProjectionMatrix;
+	float3 lightPosition;
 };
 
 VS_OUTPUT vsmain(VS_INPUT input)
@@ -39,9 +46,12 @@ VS_OUTPUT vsmain(VS_INPUT input)
 	float4 vView = mul(vWorld, matView);
 	float4 vProj = mul(vView, matProj);
 
-	float3 direction_to_camera = normalize(vWorld.xyz - cameraPosition.xyz);
-	output.lightViewPosition = vProj;
-	output.lightPosition = cameraPosition.xyz - vWorld.xyz;
+	output.lightViewPosition = mul(input.position, matWorld);
+	output.lightViewPosition = mul(output.lightViewPosition, lightViewMatrix);
+	output.lightViewPosition = mul(output.lightViewPosition, lightProjectionMatrix);
+
+	output.lightPosition = lightPosition.xyz - vWorld.xyz;
+	output.lightPosition = normalize(output.lightPosition);
 
 	output.normal = mul(input.normal, (float3x3)matWorld);
 	output.normal = normalize(output.normal);

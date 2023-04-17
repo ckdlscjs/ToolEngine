@@ -201,7 +201,7 @@ void Object::Update()
 	XMFLOAT3 lookat(0.0f, 0.0f, 0.0f);
 	XMFLOAT3 up(0.0f, 1.0f, 0.0f);
 	m_ConstantData_Light2.lightViewMatrix = XMMatrixLookAtLH(XMLoadFloat3(&m_ConstantData_Light2.lightPosition), XMLoadFloat3(&lookat), XMLoadFloat3(&up)); 
-	m_ConstantData_Light2.lightProjectionMatrix = _CameraSystem.GetCurrentCamera()->m_matProj;
+	m_ConstantData_Light2.lightProjectionMatrix = XMMatrixPerspectiveFovLH((float)XM_PI / 2.0f, 1260.0f / 917.0f, 1, 100);
 	_EngineSystem.GetRenderSystem()->UpdateConstantBuffer(m_pConstantBuffer_Transform, &m_ConstantData_Transform);
 	_EngineSystem.GetRenderSystem()->UpdateConstantBuffer(m_pConstantBuffer_Light, &m_ConstantData_Light2);
 }

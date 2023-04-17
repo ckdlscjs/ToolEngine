@@ -126,7 +126,7 @@ void RenderSystem::ReloadBuffer(unsigned int iWidth, unsigned int iHeight)
 	renderTargetViewDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
 	renderTargetViewDesc.Texture2D.MipSlice = 0;
 
-	hr = m_pCDevice->m_pDevice->CreateRenderTargetView(buffer, NULL, &m_pCDevice->m_pRenderTargetView); //해당버퍼를 이용하여 렌더타겟뷰를 생성
+	hr = m_pCDevice->m_pDevice->CreateRenderTargetView(buffer, nullptr, &m_pCDevice->m_pRenderTargetView); //해당버퍼를 이용하여 렌더타겟뷰를 생성
 	if (FAILED(hr))
 	{
 		throw std::exception("RenderTargetView not create successfully");
@@ -184,7 +184,7 @@ void RenderSystem::ReloadBuffer(unsigned int iWidth, unsigned int iHeight)
 	}
 
 	// 깊이 스텐실 상태를 설정합니다
-	m_pCDevice->m_pImmediateContext->OMSetDepthStencilState(m_pCDevice->m_pDepthStenilState, 1);
+	//m_pCDevice->m_pImmediateContext->OMSetDepthStencilState(m_pCDevice->m_pDepthStenilState, 1);
 
 	// 깊이 스텐실 뷰의 구조체를 초기화합니다
 	D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc;
@@ -210,6 +210,7 @@ void RenderSystem::ClearRenderTargetColor(float fRed, float fGreen, float fBlue,
 	m_pCDevice->m_pImmediateContext->ClearRenderTargetView(m_pCDevice->m_pRenderTargetView, clear_color);
 	m_pCDevice->m_pImmediateContext->ClearDepthStencilView(m_pCDevice->m_pDetphStenilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1, 0);
 	m_pCDevice->m_pImmediateContext->OMSetRenderTargets(1, &m_pCDevice->m_pRenderTargetView, m_pCDevice->m_pDetphStenilView);
+	m_pCDevice->m_pImmediateContext->OMSetDepthStencilState(m_pCDevice->m_pDepthStenilState, 1);
 }
 
 void RenderSystem::SetMainRenderTarget()

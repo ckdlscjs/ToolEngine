@@ -519,21 +519,32 @@ FNode* FQuadTree::VisibleNode(FNode* pNode)
         m_pDrawLeafNodeList.push_back(pNode);
         return pNode;
     }
-    if (F_SPANNING == dwRet) // 걸쳐있다.
+    //if (F_SPANNING == dwRet) // 걸쳐있다.
+    //{
+    //    if (pNode->m_bLeaf)
+    //    {
+    //        m_pDrawLeafNodeList.push_back(pNode);
+    //    }
+    //    else
+    //    {
+    //        for (int iNode = 0; iNode < 4; iNode++)
+    //        {
+    //            VisibleNode(pNode->m_pChild[iNode]);
+    //        }
+    //    }
+    //}
+    //return pNode;
+    if (pNode->m_bLeaf)
     {
-        if (pNode->m_bLeaf)
+        m_pDrawLeafNodeList.push_back(pNode);
+    }
+    else
+    {
+        for (int iNode = 0; iNode < 4; iNode++)
         {
-            m_pDrawLeafNodeList.push_back(pNode);
-        }
-        else
-        {
-            for (int iNode = 0; iNode < 4; iNode++)
-            {
-                VisibleNode(pNode->m_pChild[iNode]);
-            }
+            VisibleNode(pNode->m_pChild[iNode]);
         }
     }
-    return pNode;
 }
 
 #include <chrono>
@@ -554,7 +565,7 @@ void FQuadTree::Update()
     XMFLOAT3 lookat(0.0f, 0.0f, 0.0f);
     XMFLOAT3 up(0.0f, 1.0f, 0.0f);
     m_ConstantData_Light2.lightViewMatrix = XMMatrixLookAtLH(XMLoadFloat3(&m_ConstantData_Light2.lightPosition), XMLoadFloat3(&lookat), XMLoadFloat3(&up));
-    m_ConstantData_Light2.lightProjectionMatrix = _CameraSystem.GetCurrentCamera()->m_matProj;
+    m_ConstantData_Light2.lightProjectionMatrix = XMMatrixPerspectiveFovLH((float)XM_PI / 2.0f, 1260.0f / 917.0f, 1, 100);
     _EngineSystem.GetRenderSystem()->UpdateConstantBuffer(m_pConstantBuffer_Transform, &m_ConstantData_Transform);
     _EngineSystem.GetRenderSystem()->UpdateConstantBuffer(m_pConstantBuffer_Light, &m_ConstantData_Light2);
 

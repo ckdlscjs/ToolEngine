@@ -26,8 +26,9 @@ SwapChain::SwapChain(ID3D11Device* pDevice)
 	desc.OutputWindow = g_hWnd;
 	desc.SampleDesc.Count = 1;
 	desc.SampleDesc.Quality = 0;
-	desc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
+	desc.Flags = 0;
 	desc.Windowed = TRUE;
+	desc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
 
 	IDXGIDevice* pDxgiDevice;
 	IDXGIAdapter* pDxgiAdapter;

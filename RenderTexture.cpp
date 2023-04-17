@@ -18,7 +18,7 @@ void RenderTexture::ClearRenderTarget(ID3D11DeviceContext* pDeviceContext)
 	pDeviceContext->ClearRenderTargetView(m_pRenderTargetView, color);
 
 	// 깊이 버퍼를 지운다.
-	pDeviceContext->ClearDepthStencilView(m_pDepthStencilView, D3D11_CLEAR_DEPTH, 1.0f, 0);
+	pDeviceContext->ClearDepthStencilView(m_pDepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 }
 
 ID3D11ShaderResourceView* RenderTexture::GetShaderResourceView()

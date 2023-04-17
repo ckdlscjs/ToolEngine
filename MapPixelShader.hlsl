@@ -100,9 +100,9 @@ float4 psmain(PS_INPUT input) : SV_TARGET
 		lightDepthValue = input.lightViewPosition.z / input.lightViewPosition.w;
 		/*color = float4(1.0f, 1.0f, 1.0f, 1.0f);*/
 		// lightDepthValue에서 바이어스를 뺍니다.
-		lightDepthValue = lightDepthValue - 0.001f;
+		lightDepthValue = lightDepthValue - 0.002f;
 
-		if (lightDepthValue < depthValue)
+		if (lightDepthValue > depthValue)
 		{
 			lightIntensity = saturate(dot(input.normal, input.lightPosition));
 

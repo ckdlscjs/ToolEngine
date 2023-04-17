@@ -13,6 +13,6 @@ float4 psmain(PS_INPUT input) : SV_TARGET
 	float depthValue;
 
 	depthValue = input.depthPosition.z / input.depthPosition.w;
-	//depthValue = depthValue * depthValue * depthValue * depthValue * depthValue * depthValue;
+	/*depthValue = depthValue * depthValue;*/
 	return float4(depthValue, depthValue, depthValue, 1.0f);
 }
