@@ -56,6 +56,34 @@ HRESULT FQuadTree::CreateAlphaTexture(DWORD dwWidth, DWORD dwHeight, BYTE* fAlph
     return hr;
 }
 
+void FQuadTree::ShadowRender()
+{
+    if (m_pVertexShader_Depth && m_pPixelShader_Depth)
+    {
+        _EngineSystem.GetRenderSystem()->m_pRenderTexture->SetRenderTarget(g_pDeviceContext);
+        XMMATRIX originView = m_ConstantData_Transform.matView;
+        XMMATRIX originProj = m_ConstantData_Transform.matProj;
+        m_ConstantData_Transform.matView = m_ConstantData_Light2.lightViewMatrix;
+        m_ConstantData_Transform.matProj = m_ConstantData_Light2.lightProjectionMatrix;
+        _EngineSystem.GetRenderSystem()->UpdateConstantBuffer(m_pConstantBuffer_Transform, &m_ConstantData_Transform);
+
+        _EngineSystem.GetRenderSystem()->SetConstantBuffer(m_pVertexShader_Depth, m_pConstantBuffer_Transform, 0);
+        _EngineSystem.GetRenderSystem()->SetVertexShader(m_pVertexShader_Depth);
+        _EngineSystem.GetRenderSystem()->SetPixelShader(m_pPixelShader_Depth);
+        _EngineSystem.GetRenderSystem()->SetInputLayout(m_pMap->m_pInputLayout);
+        _EngineSystem.GetRenderSystem()->SetVertexBuffer(m_pMap->m_pVertexBuffer);
+
+        for (int idx = 0; idx < m_pDrawLeafNodeList.size(); idx++)
+        {
+            g_pDeviceContext->IASetIndexBuffer(m_pDrawLeafNodeList[idx]->m_pIndexBuffer, DXGI_FORMAT_R32_UINT, 0);
+            _EngineSystem.GetRenderSystem()->drawIndexedTriangleList(m_pDrawLeafNodeList[idx]->m_dwFace * 3, 0, 0);
+        }
+        m_ConstantData_Transform.matView = originView;
+        m_ConstantData_Transform.matProj = originProj;
+        _EngineSystem.GetRenderSystem()->UpdateConstantBuffer(m_pConstantBuffer_Transform, &m_ConstantData_Transform);
+    }
+}
+
 #include "SimpleBox.h"
 #include "SimpleSphere.h"
 std::ostream& operator<<(std::ostream& os, const FQuadTree* pQuadTree)
@@ -265,7 +293,8 @@ FQuadTree::FQuadTree(MeshMap* pMap, int iMaxDepth, BYTE* fAlphaData)
     m_ConstantData_Map.tileCount = m_pMap->m_iTileCount;
     m_pConstantBuffer_Map = _EngineSystem.GetRenderSystem()->CreateConstantBuffer(&m_ConstantData_Map, sizeof(m_ConstantData_Map));
 
-    m_pConstantBuffer_Light = _EngineSystem.GetRenderSystem()->CreateConstantBuffer(&m_ConstantData_Light, sizeof(m_ConstantData_Light));
+    //m_pConstantBuffer_Light = _EngineSystem.GetRenderSystem()->CreateConstantBuffer(&m_ConstantData_Light, sizeof(m_ConstantData_Light));
+    m_pConstantBuffer_Light = _EngineSystem.GetRenderSystem()->CreateConstantBuffer(&m_ConstantData_Light2, sizeof(m_ConstantData_Light2));
 
     CreateAlphaTexture(m_pMap->m_dwNumRows, m_pMap->m_dwNumColumns, fAlphaData);
     BuildTree(m_pRootNode, pMap);
@@ -283,6 +312,8 @@ FQuadTree::~FQuadTree()
     if (m_pConstantBuffer_Light) delete m_pConstantBuffer_Light;
     if (m_pVertexShader) delete m_pVertexShader;
     if (m_pPixelShader) delete m_pPixelShader;
+    if (m_pVertexShader_Depth) delete m_pVertexShader_Depth;
+    if (m_pPixelShader_Depth) delete m_pPixelShader_Depth;
     if (!m_pAllObjectList.empty())
     {
         for (auto iter = m_pAllObjectList.begin(); iter != m_pAllObjectList.end(); )
@@ -517,9 +548,15 @@ void FQuadTree::Update()
         XMVectorGetY(_CameraSystem.GetCurrentCamera()->m_matWorld.r[3]),
         XMVectorGetZ(_CameraSystem.GetCurrentCamera()->m_matWorld.r[3]),
         XMVectorGetW(_CameraSystem.GetCurrentCamera()->m_matWorld.r[3]));
-   
+    m_ConstantData_Light2.lightPosition.x = cos(g_fGameTimer) * 10.0f;
+    m_ConstantData_Light2.lightPosition.y = 8.0f;
+    m_ConstantData_Light2.lightPosition.z = -5.0f;
+    XMFLOAT3 lookat(0.0f, 0.0f, 0.0f);
+    XMFLOAT3 up(0.0f, 1.0f, 0.0f);
+    m_ConstantData_Light2.lightViewMatrix = XMMatrixLookAtLH(XMLoadFloat3(&m_ConstantData_Light2.lightPosition), XMLoadFloat3(&lookat), XMLoadFloat3(&up));
+    m_ConstantData_Light2.lightProjectionMatrix = _CameraSystem.GetCurrentCamera()->m_matProj;
     _EngineSystem.GetRenderSystem()->UpdateConstantBuffer(m_pConstantBuffer_Transform, &m_ConstantData_Transform);
-    _EngineSystem.GetRenderSystem()->UpdateConstantBuffer(m_pConstantBuffer_Light, &m_ConstantData_Light);
+    _EngineSystem.GetRenderSystem()->UpdateConstantBuffer(m_pConstantBuffer_Light, &m_ConstantData_Light2);
 
     VisibleNode(m_pRootNode); //Àç±Í·Î VisibleNodeÃ¼Å©
 }
@@ -527,6 +564,10 @@ void FQuadTree::Update()
 void FQuadTree::Render()
 {
     _EngineSystem.GetRenderSystem()->SetWireFrame(g_bWireFrame ? DRAW_MODE::MODE_WIRE : DRAW_MODE::MODE_SOLID);
+
+    
+    _EngineSystem.GetRenderSystem()->SetMainRenderTarget();
+
     _EngineSystem.GetRenderSystem()->SetConstantBuffer(m_pVertexShader, m_pConstantBuffer_Transform, 0);
     _EngineSystem.GetRenderSystem()->SetConstantBuffer(m_pVertexShader, m_pConstantBuffer_Map, 1);
     _EngineSystem.GetRenderSystem()->SetConstantBuffer(m_pVertexShader, m_pConstantBuffer_Light, 2);
@@ -546,6 +587,8 @@ void FQuadTree::Render()
     for (int idx = 0; idx < m_ListTextureSplatting.size(); idx++)
         g_pDeviceContext->PSSetShaderResources(2 + idx, 1, &m_ListTextureSplatting[idx]->m_pShaderResourceView);
     
+    ID3D11ShaderResourceView* pSrv = _EngineSystem.GetRenderSystem()->m_pRenderTexture->GetShaderResourceView();
+    g_pDeviceContext->PSSetShaderResources(6, 1, &pSrv);
     for (int idx = 0;  idx < m_pDrawLeafNodeList.size(); idx++)
     {
         g_pDeviceContext->IASetIndexBuffer(m_pDrawLeafNodeList[idx]->m_pIndexBuffer, DXGI_FORMAT_R32_UINT, 0);

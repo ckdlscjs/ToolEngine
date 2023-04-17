@@ -38,6 +38,7 @@ public:
 public:
 	virtual void Update();
 	virtual void Render();
+	void ShadowRender();
 public:
 	Object(std::wstring szFullPath = L"");
 	virtual ~Object();
@@ -54,13 +55,18 @@ protected:
 	PixelShader* m_pPixelShader;
 	ConstantData_Transform m_ConstantData_Transform;
 	ConstantBuffer* m_pConstantBuffer_Transform;
-	ConstantData_Light m_ConstantData_Light;
 	ConstantBuffer* m_pConstantBuffer_Light;
+	ConstantData_Light m_ConstantData_Light;
+	ConstantData_Lightbuffer m_ConstantData_Light2;
 
 	CULL_MODE m_CullMode = CULL_MODE::CULL_MODE_NONE;
 	INTERACTIVE_MODE m_InteractiveMode = INTERACTIVE_MODE::MODE_NONE;
 	DRAW_MODE m_DrawMode = DRAW_MODE::MODE_SOLID;
 	OBJECT_SPECIFY m_Specify = OBJECT_SPECIFY::OBJECT_STATIC;
+
+public:
+	VertexShader* m_pVertexShader_Depth;
+	PixelShader* m_pPixelShader_Depth;
 	
 	friend class FQuadTree;
 	friend class FNode;

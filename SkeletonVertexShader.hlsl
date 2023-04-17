@@ -1,9 +1,9 @@
 struct VS_INPUT
 {
 	float4 position : POSITION0;
-	float2 tex : TEXCOORD0;
 	float3 normal : NORMAL0;
 	float4 color : COLOR0;
+	float2 tex : TEXCOORD0;
 
 	float4 index : INDEX0;
 	float4 weight : WEIGHT0;

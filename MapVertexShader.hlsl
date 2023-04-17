@@ -12,8 +12,8 @@ struct VS_OUTPUT
 	float3 normal : NORMAL0;
 	float4 color : COLOR0;
 	float2 tex : TEXCOORD0;
-	float3 direction_to_camera : TEXCOORD1;
-	float4 m_light_direction : TEXCOORD2;
+	float4 lightViewPosition : TEXCOORD1;
+	float3 lightPosition : TEXCOORD2;
 	float4 tex2 : TEXCOORD3;
 };
 
@@ -32,24 +32,36 @@ cbuffer constant : register(b1)
 	int tileCount;
 };
 
+//cbuffer constant : register(b2)
+//{
+//	float4 lightDirection;
+//	float4 cameraPosition;
+//};
+
 cbuffer constant : register(b2)
 {
-	float4 lightDirection;
-	float4 cameraPosition;
+	row_major float4x4 lightViewMatrix;
+	row_major float4x4 lightProjectionMatrix;
+	float3 lightPosition;
 };
+
 
 VS_OUTPUT vsmain(VS_INPUT input)
 {
 	VS_OUTPUT output = (VS_OUTPUT)0;
+	input.position.w = 1.0f;
 	float4 vLocal = input.position;
 	float4 vWorld = mul(vLocal, matWorld);
 	float4 vView = mul(vWorld, matView);
 	float4 vProj = mul(vView, matProj);
-	//output.direction_to_camera = normalize(output.position.xyz - m_camera_position.xyz); //dlight
-	//output.direction_to_camera = normalize(m_camera_position.xyz - output.position.xyz); //plight
-	output.direction_to_camera = normalize(vWorld.xyz - cameraPosition.xyz);
-	output.m_light_direction = float4(output.direction_to_camera, 1.0f);
+	output.position = vProj;
 
+	output.lightViewPosition = mul(input.position, matWorld);
+	output.lightViewPosition = mul(output.lightViewPosition, lightViewMatrix);
+	output.lightViewPosition = mul(output.lightViewPosition, lightProjectionMatrix);
+
+	output.lightPosition = lightPosition.xyz - vWorld.xyz;
+	output.lightPosition = normalize(output.lightPosition);
 
 	//normalize to texcoord(vertex to 0 ~ 1)
 	int world_half = worldSize.x / 2.0f;
@@ -73,8 +85,9 @@ VS_OUTPUT vsmain(VS_INPUT input)
 	output.tex2.z = (vProj.x / vProj.w) * 0.5f + 0.5f;
 	output.tex2.w = (vProj.y / vProj.w) * 0.5f + 0.5f;
 
-	output.position = vProj;
-	output.normal = input.normal;
+	output.normal = mul(float4(input.normal, 1.0f), matWorld).xyz;
+	output.normal = normalize(output.normal);
+
 	output.tex = input.tex;
 	output.color = input.color;
 	return output;

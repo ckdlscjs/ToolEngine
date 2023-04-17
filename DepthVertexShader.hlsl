@@ -12,8 +12,7 @@ struct VS_OUTPUT
 	float3 normal : NORMAL0;
 	float4 color : COLOR0;
 	float2 tex : TEXCOORD0;
-	float4 lightViewPosition : TEXCOORD1;
-	float3 lightPosition : TEXCOORD2;
+	float4 depthPosition : TEXCOORD1;
 };
 
 //if using row_major, not transpose in cpp
@@ -24,32 +23,20 @@ cbuffer constant : register(b0)
 	row_major float4x4 matProj;
 };
 
-cbuffer constant : register(b1)
-{
-	float4 lightDirection;
-	float4 cameraPosition;
-};
-
 VS_OUTPUT vsmain(VS_INPUT input)
 {
 	VS_OUTPUT output = (VS_OUTPUT)0;
 	input.position.w = 1.0f;
+	output.position = mul(input.position, matWorld);
+	output.position = mul(output.position, matView);
+	output.position = mul(output.position, matProj);
 
-	float4 vWorld = mul(input.position, matWorld);
-	float4 vView = mul(vWorld, matView);
-	float4 vProj = mul(vView, matProj);
-
-	float3 direction_to_camera = normalize(vWorld.xyz - cameraPosition.xyz);
-	output.lightViewPosition = vProj;
-	output.lightPosition = cameraPosition.xyz - vWorld.xyz;
-
+	output.depthPosition = output.position;
+	
 	output.normal = mul(input.normal, (float3x3)matWorld);
 	output.normal = normalize(output.normal);
 
-	output.position = vProj;
-
 	output.tex = input.tex;
 	output.color = input.color;
-
 	return output;
 }

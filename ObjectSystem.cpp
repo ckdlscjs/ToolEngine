@@ -28,6 +28,11 @@ void ObjectSystem::Update()
 		object->Update();
 }
 
+void ObjectSystem::ShadowRender()
+{
+	for (auto object : m_ListObject)
+		object->ShadowRender();
+}
 void ObjectSystem::Render()
 {
 	for (auto object : m_ListObject)

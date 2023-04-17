@@ -195,8 +195,15 @@ void Object::Update()
 		XMVectorGetY(_CameraSystem.GetCurrentCamera()->m_matWorld.r[3]),
 		XMVectorGetZ(_CameraSystem.GetCurrentCamera()->m_matWorld.r[3]),
 		XMVectorGetW(_CameraSystem.GetCurrentCamera()->m_matWorld.r[3]));
+	m_ConstantData_Light2.lightPosition.x = cos(g_fGameTimer) * 10.0f;
+	m_ConstantData_Light2.lightPosition.y = 8.0f;
+	m_ConstantData_Light2.lightPosition.z = -5.0f;
+	XMFLOAT3 lookat(0.0f, 0.0f, 0.0f);
+	XMFLOAT3 up(0.0f, 1.0f, 0.0f);
+	m_ConstantData_Light2.lightViewMatrix = XMMatrixLookAtLH(XMLoadFloat3(&m_ConstantData_Light2.lightPosition), XMLoadFloat3(&lookat), XMLoadFloat3(&up)); 
+	m_ConstantData_Light2.lightProjectionMatrix = _CameraSystem.GetCurrentCamera()->m_matProj;
 	_EngineSystem.GetRenderSystem()->UpdateConstantBuffer(m_pConstantBuffer_Transform, &m_ConstantData_Transform);
-	_EngineSystem.GetRenderSystem()->UpdateConstantBuffer(m_pConstantBuffer_Light, &m_ConstantData_Light);
+	_EngineSystem.GetRenderSystem()->UpdateConstantBuffer(m_pConstantBuffer_Light, &m_ConstantData_Light2);
 }
 
 #include "InputSystem.h"
@@ -204,6 +211,8 @@ void Object::Update()
 void Object::Render()
 {
 	_EngineSystem.GetRenderSystem()->SetWireFrame(g_bWireFrame ? DRAW_MODE::MODE_WIRE : m_DrawMode);
+
+	_EngineSystem.GetRenderSystem()->SetMainRenderTarget();
 	_EngineSystem.GetRenderSystem()->SetConstantBuffer(m_pVertexShader, m_pConstantBuffer_Transform, 0);
 	_EngineSystem.GetRenderSystem()->SetConstantBuffer(m_pVertexShader, m_pConstantBuffer_Light, 1);
 	_EngineSystem.GetRenderSystem()->SetConstantBuffer(m_pPixelShader, m_pConstantBuffer_Transform, 0);
@@ -227,6 +236,8 @@ void Object::Render()
 			{
 				_EngineSystem.GetRenderSystem()->setTexture(m_pVertexShader, m_pMaterial->GetListTexture(idxNode)[idxSub]);
 				_EngineSystem.GetRenderSystem()->setTexture(m_pPixelShader, m_pMaterial->GetListTexture(idxNode)[idxSub]);
+				ID3D11ShaderResourceView* pSrv = _EngineSystem.GetRenderSystem()->m_pRenderTexture->GetShaderResourceView();
+				g_pDeviceContext->PSSetShaderResources(1, 1, &pSrv);
 			}
 			_EngineSystem.GetRenderSystem()->drawIndexedTriangleList(pMeshNode->GetListIndexBuffer()[idxSub]->getSizeIndexList(), 0, 0);
 		}
@@ -234,6 +245,41 @@ void Object::Render()
 	if (_ToolSystemMap.bDrawBox || _InputSystem.GetKey('V'))
 	{
 		_ToolSystemMap.DrawBoxCollider(m_Box, { 0, 1, 1 }, m_ConstantData_Transform.matWorld, m_ConstantData_Transform.matView, m_ConstantData_Transform.matProj);
+	}
+}
+
+void Object::ShadowRender()
+{
+	if (m_pVertexShader_Depth && m_pPixelShader_Depth)
+	{
+		_EngineSystem.GetRenderSystem()->m_pRenderTexture->SetRenderTarget(g_pDeviceContext);
+		XMMATRIX originView = m_ConstantData_Transform.matView;
+		XMMATRIX originProj = m_ConstantData_Transform.matProj;
+		m_ConstantData_Transform.matView = m_ConstantData_Light2.lightViewMatrix;
+		m_ConstantData_Transform.matProj = m_ConstantData_Light2.lightProjectionMatrix;
+		_EngineSystem.GetRenderSystem()->UpdateConstantBuffer(m_pConstantBuffer_Transform, &m_ConstantData_Transform);
+		_EngineSystem.GetRenderSystem()->SetConstantBuffer(m_pVertexShader, m_pConstantBuffer_Transform, 0);
+		_EngineSystem.GetRenderSystem()->SetVertexShader(m_pVertexShader_Depth);
+		_EngineSystem.GetRenderSystem()->SetPixelShader(m_pPixelShader_Depth);
+		for (int idxNode = 0; idxNode < m_pMesh->GetMeshNodeList().size(); idxNode++)
+		{
+			MeshNode* pMeshNode = m_pMesh->GetMeshNodeList()[idxNode];
+			if (pMeshNode->GetListPNCT().empty())
+				continue;
+			_EngineSystem.GetRenderSystem()->SetInputLayout(pMeshNode->GetInputLayout());
+			for (int idxSub = 0; idxSub < pMeshNode->GetListPNCT().size(); idxSub++)
+			{
+				if (pMeshNode->GetListPNCT()[idxSub].empty())
+					continue;
+				_EngineSystem.GetRenderSystem()->SetVertexBuffer(pMeshNode->GetListVertexBufferPNCT()[idxSub], 0);
+				//_EngineSystem.GetRenderSystem()->SetVertexBuffer(pMeshNode->GetListVertexBufferIW()[idxSub], 1);
+				_EngineSystem.GetRenderSystem()->SetIndexBuffer(pMeshNode->GetListIndexBuffer()[idxSub]);
+				_EngineSystem.GetRenderSystem()->drawIndexedTriangleList(pMeshNode->GetListIndexBuffer()[idxSub]->getSizeIndexList(), 0, 0);
+			}
+		}
+		m_ConstantData_Transform.matView = originView;
+		m_ConstantData_Transform.matProj = originProj;
+		_EngineSystem.GetRenderSystem()->UpdateConstantBuffer(m_pConstantBuffer_Transform, &m_ConstantData_Transform);
 	}
 }
 
@@ -267,7 +313,7 @@ Object::Object(std::wstring szFullPath) : m_szFullPath(szFullPath)
 	m_ConstantData_Transform.matProj = XMMatrixIdentity();
 	m_pConstantBuffer_Transform = _EngineSystem.GetRenderSystem()->CreateConstantBuffer(&m_ConstantData_Transform, sizeof(m_ConstantData_Transform));
 
-	m_pConstantBuffer_Light = _EngineSystem.GetRenderSystem()->CreateConstantBuffer(&m_ConstantData_Light, sizeof(m_ConstantData_Light));
+	m_pConstantBuffer_Light = _EngineSystem.GetRenderSystem()->CreateConstantBuffer(&m_ConstantData_Light2, sizeof(m_ConstantData_Light2));
 }
 
 Object::~Object()
@@ -276,6 +322,8 @@ Object::~Object()
 	if (m_pConstantBuffer_Light) delete m_pConstantBuffer_Light;
 	if (m_pVertexShader) delete m_pVertexShader;
 	if (m_pPixelShader) delete m_pPixelShader;
+	if (m_pVertexShader_Depth) delete m_pVertexShader_Depth;
+	if (m_pPixelShader_Depth) delete m_pPixelShader_Depth;
 }
 
 std::ostream& operator<<(std::ostream& os, const Object* pObject)

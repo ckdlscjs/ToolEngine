@@ -69,11 +69,13 @@ void EntrySystem::Update()
     _ImguiSystem.Update();
     _ToolSystemMap.Update();
     _ObjectSystem.Update();
-
 }
 
 void EntrySystem::Render()
 {
+    _ObjectSystem.ShadowRender();
+    _ToolSystemMap.ShadowRender();
+
     _ObjectSystem.Render();
     _ToolSystemMap.Render();
     _ImguiSystem.Render();

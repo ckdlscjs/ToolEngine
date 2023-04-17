@@ -436,6 +436,12 @@ Object* ToolSystemMap::CreateFbxObject(std::wstring szFullPath, XMVECTOR vPos, X
     }
     _EngineSystem.GetRenderSystem()->ReleaseBlob();
 
+    _EngineSystem.GetRenderSystem()->CompileVertexShader(L"DepthVertexShader.hlsl", "vsmain", "vs_5_0", &shader_byte_code_vs, &size_shader_vs);
+    pObject->m_pVertexShader_Depth = _EngineSystem.GetRenderSystem()->CreateVertexShader(shader_byte_code_vs, size_shader_vs);
+    _EngineSystem.GetRenderSystem()->CompilePixelShader(L"DepthPixelShader.hlsl", "psmain", "ps_5_0", &shader_byte_code_ps, &size_shader_ps);
+    pObject->m_pPixelShader_Depth = _EngineSystem.GetRenderSystem()->CreatePixelShader(shader_byte_code_ps, size_shader_ps);
+    _EngineSystem.GetRenderSystem()->ReleaseBlob();
+
     pObject->SetShader(pVertexShader, pPixelShader);
     pObject->SetConstantData(constantData);
     pObject->SetMesh(pMesh);
@@ -571,12 +577,18 @@ Object* ToolSystemMap::CreateSimpleBox(OBJECT_SPECIFY specify, XMVECTOR vPos, XM
 
     _EngineSystem.GetRenderSystem()->ReleaseBlob();
     
+    _EngineSystem.GetRenderSystem()->CompileVertexShader(L"DepthVertexShader.hlsl", "vsmain", "vs_5_0", &shader_byte_code_vs, &size_shader_vs);
+    pObject->m_pVertexShader_Depth = _EngineSystem.GetRenderSystem()->CreateVertexShader(shader_byte_code_vs, size_shader_vs);
+    _EngineSystem.GetRenderSystem()->CompilePixelShader(L"DepthPixelShader.hlsl", "psmain", "ps_5_0", &shader_byte_code_ps, &size_shader_ps);
+    pObject->m_pPixelShader_Depth = _EngineSystem.GetRenderSystem()->CreatePixelShader(shader_byte_code_ps, size_shader_ps);
+    _EngineSystem.GetRenderSystem()->ReleaseBlob();
+
     _ObjectSystem.AddObject(pObject);
     pObject->SetShader(pVertexShader, pPixelShader);
     pObject->SetConstantData(cc);
     pObject->SetMesh(pMesh);
     pObject->SetTransform({ vPos , vRot, vScale });
-    pObject->SetDrawMode(DRAW_MODE::MODE_WIRE);
+    pObject->SetDrawMode(DRAW_MODE::MODE_SOLID);
     pObject->SetSpecify(specify);
     pObject->UpdateBoundigBox(box);
 
@@ -759,6 +771,8 @@ FQuadTree* ToolSystemMap::CreateSimpleMap(int iWidth, int iHeight, float fDistan
 
     _EngineSystem.GetRenderSystem()->ReleaseBlob();
 
+   
+
     pMapMesh->m_pVertexBuffer = pVertexBuffer;
     pMapMesh->m_pIndexBuffer = pIndexBuffer;
     pMapMesh->m_pInputLayout = pInputLayout;
@@ -770,6 +784,12 @@ FQuadTree* ToolSystemMap::CreateSimpleMap(int iWidth, int iHeight, float fDistan
     m_pQuadTree->SetTransform({ {0, 0, 0} , {0, 0, 0}, {1, 1, 1} });
     m_pQuadTree->SetTexture(_EngineSystem.GetTextureSystem()->GetTexture(szFullPath));
     m_pQuadTree->SetShader(szVSPath, pVertexShader, szPSPath, pPixelShader);
+
+    _EngineSystem.GetRenderSystem()->CompileVertexShader(L"DepthVertexShader.hlsl", "vsmain", "vs_5_0", &shader_byte_code_vs, &size_shader_vs);
+    m_pQuadTree->m_pVertexShader_Depth = _EngineSystem.GetRenderSystem()->CreateVertexShader(shader_byte_code_vs, size_shader_vs);
+    _EngineSystem.GetRenderSystem()->CompilePixelShader(L"DepthPixelShader.hlsl", "psmain", "ps_5_0", &shader_byte_code_ps, &size_shader_ps);
+    m_pQuadTree->m_pPixelShader_Depth = _EngineSystem.GetRenderSystem()->CreatePixelShader(shader_byte_code_ps, size_shader_ps);
+    _EngineSystem.GetRenderSystem()->ReleaseBlob();
 
     return m_pQuadTree;
 }
@@ -1018,6 +1038,12 @@ void ToolSystemMap::SaveFile(std::wstring szFullPath)
     std::ofstream os(szFullPath);
     os << m_pQuadTree;
     os.close();
+}
+
+void ToolSystemMap::ShadowRender()
+{
+    if (m_pQuadTree)
+        m_pQuadTree->ShadowRender();
 }
 
 void ToolSystemMap::Update()

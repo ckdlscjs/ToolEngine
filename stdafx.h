@@ -580,7 +580,13 @@ struct ConstantData_Light
 	XMFLOAT4 lightDirection;
 	XMFLOAT4 cameraPosition;
 };
-
+__declspec(align(16))
+struct ConstantData_Lightbuffer
+{
+	XMMATRIX lightViewMatrix;
+	XMMATRIX lightProjectionMatrix;
+	XMFLOAT3 lightPosition;
+};
 __declspec(align(16))
 struct ConstantData_Bone
 {

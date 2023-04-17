@@ -10,6 +10,7 @@
 #include "VertexShader.h"
 #include "PixelShader.h"
 #include "Texture.h"
+#include "RenderTexture.h"
 
 class RenderSystem
 {
@@ -18,6 +19,8 @@ public:
 	void CreateDevice();
 	void CreateSwapChain();
 	void CreateRasterizeState(ID3D11Device* pDevice);
+	void CreateViewport(UINT iWidth, UINT iHeight);
+	void CreateRenderTexture(UINT iWidth, UINT iHeight);
 
 	/*Shader Block*/
 	void CompileVertexShader(const wchar_t* szFilePath, const char* entryPointName, const char* shaderVersion, void** shaderCode, size_t* shaderSize);
@@ -36,8 +39,9 @@ public:
 public:
 	/*Set Block*/
 	void ClearRenderTargetColor(float red, float green, float blue, float alpha);
+	void SetMainRenderTarget();
 	void SetWireFrame(DRAW_MODE drawMode);
-	void SetViewport(UINT iWidth, UINT iHeight);
+	void SetMainViewport();
 	void SetFullScreen(bool bFullscreen, unsigned int iWidth, unsigned int iHeight);
 	void Resize(unsigned int iWidth, unsigned int iHeight);
 	void ReloadBuffer(unsigned int iWidth, unsigned int iHeight);
@@ -78,7 +82,9 @@ private:
 	ID3DBlob* m_pVSBlobCode;
 	ID3DBlob* m_pPSBlobCode;
 	ID3DBlob* m_pBlobErr;
-
+	D3D11_VIEWPORT m_Viewport;
+public:
+	RenderTexture* m_pRenderTexture;
 	friend class EngineSystem;
 	friend class ImguiSystem;
 };
