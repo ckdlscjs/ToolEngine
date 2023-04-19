@@ -392,12 +392,81 @@ void ImguiSystem::Update()
                 float cam_dir[3] = { XMVectorGetX(dir),XMVectorGetY(dir),XMVectorGetZ(dir) };
                 XMVECTOR up = _ToolSystemMap.GetCurrentCamera()->m_vCameraUp;
                 float cam_up[3] = { XMVectorGetX(up),XMVectorGetY(up),XMVectorGetZ(up) };
-                ImGui::InputFloat3("cam_pos", cam_pos);
-                ImGui::InputFloat3("cam_dir", cam_dir);
-                ImGui::InputFloat3("cam_up", cam_up);
+                if (ImGui::DragFloat3("cam_pos", cam_pos, 0.05f))
+                    _ToolSystemMap.GetCurrentCamera()->SetCameraPos({ cam_pos[0], cam_pos[1], cam_pos[2] });
+                ImGui::DragFloat3("cam_dir", cam_dir);
+                ImGui::DragFloat3("cam_up", cam_up);
             }
             ImGui::Dummy({ 0, 10 });
+            {
+                static float cam_pos[4][3] = { 0, };
+                static float cam_dir[4][3] = { 0, };
+                static int posCount = 0;
+                static float moveCameraDuration = 5.0f;
+                static float moveCameraTime = 0.0f;
+                static bool playMove = false;
+                if (ImGui::Button("Rec") && posCount < 4)
+                {
+                    posCount++;
+                    XMVECTOR pos = _ToolSystemMap.GetCurrentCamera()->m_vCameraPos;
+                    cam_pos[posCount - 1][0] = XMVectorGetX(pos);
+                    cam_pos[posCount - 1][1] = XMVectorGetY(pos);
+                    cam_pos[posCount - 1][2] = XMVectorGetZ(pos);
 
+                    cam_dir[posCount - 1][0] = _ToolSystemMap.GetCurrentCamera()->m_fYaw;
+                    cam_dir[posCount - 1][1] = _ToolSystemMap.GetCurrentCamera()->m_fPitch;
+                    cam_dir[posCount - 1][2] = _ToolSystemMap.GetCurrentCamera()->m_fRoll;
+                }
+                ImGui::SameLine();
+                if (ImGui::Button("Reset"))
+                {
+                    posCount = 0;
+                    playMove = false;
+                    moveCameraTime = 0.0f;
+                    bMouseMove = true;
+                }
+                ImGui::SameLine();
+                if (ImGui::Button("PlayCamera"))
+                {
+                    playMove = true;
+                }
+                ImGui::SameLine();
+                ImGui::PushItemWidth(50.0f);
+                ImGui::InputFloat("Duration", &moveCameraDuration);
+                ImGui::PopItemWidth();
+                if (playMove)
+                {
+                    if (moveCameraTime > moveCameraDuration)
+                    {
+                        playMove = false;
+                        moveCameraTime = 0.0f;
+                        bMouseMove = true;
+                    }
+                    bMouseMove = false;
+                    moveCameraTime += g_fSecondPerFrame;
+                    XMFLOAT3 movePos;
+                    XMFLOAT3 moveDir;
+                    _ToolSystemMap.GetCurrentCamera()->MoveCameraBezierSpline(moveCameraTime, moveCameraDuration,
+                        { cam_pos[0][0], cam_pos[0][1], cam_pos[0][2] },
+                        { cam_pos[1][0], cam_pos[1][1], cam_pos[1][2] },
+                        { cam_pos[2][0], cam_pos[2][1], cam_pos[2][2] },
+                        { cam_pos[3][0], cam_pos[3][1], cam_pos[3][2] },
+                        { cam_dir[0][0], cam_dir[0][1], cam_dir[0][2] },
+                        { cam_dir[1][0], cam_dir[1][1], cam_dir[1][2] },
+                        { cam_dir[2][0], cam_dir[2][1], cam_dir[2][2] },
+                        { cam_dir[3][0], cam_dir[3][1], cam_dir[3][2] }, movePos, moveDir);
+                    _ToolSystemMap.GetCurrentCamera()->m_vCameraPos = XMLoadFloat3(&movePos);
+                    _ToolSystemMap.GetCurrentCamera()->m_fYaw = moveDir.x;
+                    _ToolSystemMap.GetCurrentCamera()->m_fPitch = moveDir.y;
+                    _ToolSystemMap.GetCurrentCamera()->m_fRoll = moveDir.z;
+                }
+                for (int idx = 1; idx <= posCount; idx++)
+                {
+                    std::string pos = "pos_";
+                    pos += std::to_string(idx);
+                    ImGui::InputFloat3(pos.c_str(), cam_pos[idx-1]);
+                }
+            }
             if (pObject)
             {
                 XMVECTOR v_scale, v_rotation, v_translation;

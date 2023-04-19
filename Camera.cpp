@@ -1,9 +1,64 @@
 #include "Camera.h"
 #include "WindowSystem.h"
 #include "InputSystem.h"
+void Camera::MoveCameraBezierSpline(float time, float duration, XMFLOAT3 p0, XMFLOAT3 p1, XMFLOAT3 p2, XMFLOAT3 p3, XMFLOAT3 d0, XMFLOAT3 d1, XMFLOAT3 d2, XMFLOAT3 d3, XMFLOAT3& getPos, XMFLOAT3& getDir)
+{
+	float u = time / duration;
+	float u1 = 1.0f - u;
+	float u2 = u1 * u1;
+	float u3 = u * u;
+	float b1 = u1 * u1 * u1;
+	float b2 = 3 * u1 * u1 * u;
+	float b3 = 3 * u1 * u * u;
+	float b4 = u * u * u;
+
+	XMFLOAT3 pos(
+		b1 * p0.x + b2 * p1.x + b3 * p2.x + b4 * p3.x,
+		b1 * p0.y + b2 * p1.y + b3 * p2.y + b4 * p3.y,
+		b1 * p0.z + b2 * p1.z + b3 * p3.z + b4 * p3.z
+	);
+
+	XMFLOAT3 dir(
+		b1 * d0.x + b2 * d1.x + b3 * d2.x + b4 * d3.x,
+		b1 * d0.y + b2 * d1.y + b3 * d2.y + b4 * d3.y,
+		b1 * d0.z + b2 * d1.z + b3 * d2.z + b4 * d3.z
+	);
+	getPos = pos;
+	getDir = dir;
+}
 void Camera::SetCameraMove(bool bCameraMove)
 {
 	m_bCameraMove = bCameraMove;
+}
+void Camera::SetCameraDirToLookat(XMFLOAT3 vLookat)
+{
+	/*m_vCameraDir = XMLoadFloat3(&vLookat) - m_vCameraPos;
+	m_vCameraDir = XMVector3Normalize(m_vCameraDir);
+
+	m_vCameraRight = XMVector3Normalize(XMVector3Cross(m_vCameraDir, m_vCameraUp));
+	m_vCameraUp = XMVector3Normalize(XMVector3Cross(m_vCameraRight, m_vCameraDir));
+
+	m_matCamera = XMMatrixLookAtLH(m_vCameraPos, m_vCameraDir, m_vCameraUp);
+
+	m_fYaw = _RadianToDegree(atan2f(XMVectorGetZ(m_vCameraDir), XMVectorGetX(m_vCameraDir)));
+	float fLength = sqrtf(XMVectorGetX(m_vCameraDir) * XMVectorGetX(m_vCameraDir) + XMVectorGetZ(m_vCameraDir) * XMVectorGetZ(m_vCameraDir));
+	m_fPitch = _RadianToDegree(atan2f(-XMVectorGetY(m_vCameraDir), fLength));
+
+	XMVECTOR scale = XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f);
+	XMVECTOR rotation =
+		XMQuaternionRotationRollPitchYaw(
+			_DegreeToRadian(m_fPitch),
+			_DegreeToRadian(m_fYaw),
+			_DegreeToRadian(m_fRoll));
+
+	XMVECTOR translation = m_vCameraPos;
+
+	m_matWorld = XMMatrixTransformation({ 0,0,0,0 }, { 0,0,0,0 }, scale, { 0,0,0,0 }, rotation, translation);
+	m_matCamera = XMMatrixInverse(NULL, m_matWorld);*/
+}
+void Camera::SetCameraPos(XMFLOAT3 vPos)
+{
+	m_vCameraPos = XMLoadFloat3(&vPos);
 }
 void Camera::Update()
 {
@@ -54,8 +109,6 @@ void Camera::Update()
 			m_fPitch += _InputSystem.m_ptOffSet.y * m_fCameraSpeed * m_fDelta;
 		}
 	}
-	
-	
 	XMVECTOR scale = XMVectorSet(1.0f, 1.0f, 1.0f, 1.0f);
 	XMVECTOR rotation =
 		XMQuaternionRotationRollPitchYaw(
@@ -65,18 +118,17 @@ void Camera::Update()
 
 	XMVECTOR translation = m_vCameraPos;
 
-	//m_matWorld = XMMatrixScalingFromVector(scale) * XMMatrixRotationX(_DegreeToRadian(m_fPitch)) * XMMatrixRotationY(_DegreeToRadian(m_fYaw)) * XMMatrixRotationZ(_DegreeToRadian(m_fRoll)) * XMMatrixTranslationFromVector(translation);
-	m_matWorld = XMMatrixTransformation({ 0,0,0,0 }, { 0,0,0,0 }, scale, {0,0,0,0}, rotation, translation);
+	m_matWorld = XMMatrixTransformation({ 0,0,0,0 }, { 0,0,0,0 }, scale, { 0,0,0,0 }, rotation, translation);
 	m_matCamera = XMMatrixInverse(NULL, m_matWorld);
 
 	m_vCameraRight = XMVectorSet(XMVectorGetX(m_matCamera.r[0]), XMVectorGetX(m_matCamera.r[1]), XMVectorGetX(m_matCamera.r[2]), XMVectorGetX(m_matCamera.r[3]));
-	XMVector3Normalize(m_vCameraRight);
+	m_vCameraRight = XMVector3Normalize(m_vCameraRight);
 
 	m_vCameraUp = XMVectorSet(XMVectorGetY(m_matCamera.r[0]), XMVectorGetY(m_matCamera.r[1]), XMVectorGetY(m_matCamera.r[2]), XMVectorGetY(m_matCamera.r[3]));
-	XMVector3Normalize(m_vCameraUp);
+	m_vCameraUp = XMVector3Normalize(m_vCameraUp);
 
 	m_vCameraDir = XMVectorSet(XMVectorGetZ(m_matCamera.r[0]), XMVectorGetZ(m_matCamera.r[1]), XMVectorGetZ(m_matCamera.r[2]), XMVectorGetZ(m_matCamera.r[3]));
-	XMVector3Normalize(m_vCameraDir);
+	m_vCameraDir = XMVector3Normalize(m_vCameraDir);
 
 
 	RECT rt = g_pWindow->GetClientWindowRect();
@@ -90,11 +142,11 @@ void Camera::Update()
 	}
 
 	m_Frustum.CreateFrustum(&m_matCamera, &m_matProj);
-	
+
 }
 
 Camera::Camera(
-	std::wstring szCameraName, MAT_PROJ cameraType, XMVECTOR vCameraPos, XMVECTOR vCameraDir, XMVECTOR vCameraUp) : m_szCameraName(szCameraName), m_type(cameraType), m_vCameraPos(vCameraPos), m_vCameraDir(vCameraDir), m_vCameraUp(vCameraUp), m_vCameraRight({1,0,0})
+	std::wstring szCameraName, MAT_PROJ cameraType, XMVECTOR vCameraPos, XMVECTOR vCameraDir, XMVECTOR vCameraUp) : m_szCameraName(szCameraName), m_type(cameraType), m_vCameraPos(vCameraPos), m_vCameraDir(vCameraDir), m_vCameraUp(vCameraUp), m_vCameraRight({ 1,0,0 })
 {
 	Update();
 }
