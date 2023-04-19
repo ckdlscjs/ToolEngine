@@ -37,6 +37,7 @@ public:
 	void OpenFile(std::wstring szFullPath);
 	void SaveFile(std::wstring szFullPath);
 public:
+	void ShadowRender();
 	void Update();
 	void Render();
 public:

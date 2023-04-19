@@ -26,6 +26,7 @@ public:
 	FNode*	VisibleNode(FNode* pNode);
 	
 	HRESULT CreateAlphaTexture(DWORD dwWidth, DWORD dwHeight, BYTE* fAlphaData);
+	void	ShadowRender();
 	void	Update();
 	void	Render();
 
@@ -52,6 +53,8 @@ private:
 	ConstantData_Map m_ConstantData_Map;
 	ConstantBuffer* m_pConstantBuffer_Light;
 	ConstantData_Light m_ConstantData_Light;
+	ConstantData_Lightbuffer m_ConstantData_Light2;
+
 
 	std::wstring m_szVSPath;
 	VertexShader* m_pVertexShader;
@@ -61,6 +64,9 @@ private:
 	std::unordered_set<Object*> m_pAllObjectList;
 	std::vector<FNode*> m_pLeafNodeList;
 	std::vector<FNode*> m_pDrawLeafNodeList;
+public:
+	VertexShader* m_pVertexShader_Depth;
+	PixelShader* m_pPixelShader_Depth;
 
 	friend class FNode;
 	friend class ToolSystemMap;

@@ -22,6 +22,7 @@ private:
 	ID3D11RenderTargetView* m_pRenderTargetView = nullptr;
 	ID3D11DepthStencilView* m_pDetphStenilView = nullptr;
 	ID3D11ShaderResourceView* m_pShaderResourceView = nullptr;
+	ID3D11DepthStencilState* m_pDepthStenilState = nullptr;
 	friend class RenderSystem;
 	friend class ImguiSystem;
 };

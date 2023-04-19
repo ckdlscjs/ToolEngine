@@ -121,6 +121,12 @@
     <Filter Include="TimerSystem">
       <UniqueIdentifier>{dd776864-2d3a-4805-9b64-b59fd1269cd3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shaders\Shadow">
+      <UniqueIdentifier>{dbc334de-f96e-4af6-9364-106292f85a1b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="EngineSystem\RenderySystem\RenderTextrue">
+      <UniqueIdentifier>{3c5c8dcf-fa6a-4673-9963-8441ef1165f7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="WindowSystem.h">
@@ -295,6 +301,9 @@
     <ClInclude Include="TimerSystem.h">
       <Filter>TimerSystem</Filter>
     </ClInclude>
+    <ClInclude Include="RenderTexture.h">
+      <Filter>EngineSystem\RenderySystem\RenderTextrue</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WindowSystem.cpp">
@@ -463,6 +472,9 @@
     <ClCompile Include="TimerSystem.cpp">
       <Filter>TimerSystem</Filter>
     </ClCompile>
+    <ClCompile Include="RenderTexture.cpp">
+      <Filter>EngineSystem\RenderySystem\RenderTextrue</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="imgui.ini">
@@ -501,6 +513,12 @@
     </FxCompile>
     <FxCompile Include="StaticPixelShader.hlsl">
       <Filter>Shaders\Fbx</Filter>
+    </FxCompile>
+    <FxCompile Include="DepthVertexShader.hlsl">
+      <Filter>Shaders\Shadow</Filter>
+    </FxCompile>
+    <FxCompile Include="DepthPixelShader.hlsl">
+      <Filter>Shaders\Shadow</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>

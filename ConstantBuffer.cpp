@@ -9,8 +9,9 @@ ConstantBuffer::ConstantBuffer(ID3D11Device* pDevice, void* pBuffer, UINT iSizeB
 	bufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 	bufferDesc.CPUAccessFlags = 0;
 	bufferDesc.MiscFlags = 0;
-
+	  
 	D3D11_SUBRESOURCE_DATA resourceData;
+
 	ZeroMemory(&resourceData, sizeof(D3D11_SUBRESOURCE_DATA));
 	resourceData.pSysMem = pBuffer;
 

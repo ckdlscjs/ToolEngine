@@ -11,6 +11,7 @@ public:
 	void DeleteObject(Object* pObject);
 public:
 	void Update();
+	void ShadowRender();
 	void Render();
 public:
 	ObjectSystem();
