@@ -16,7 +16,7 @@ public:
 	bool GetInterSection();
 	void SetSplattingTexture(Texture* pTexture);
 	void Sculpting(XMVECTOR m_vIntersection, float fSculptRadius, float fSculptIntensity);
-	void Splatting(XMVECTOR vIntersection, float fSplattingRadius, std::wstring szFullPath);
+	void Splatting(XMVECTOR vIntersection, float fSplattingRadius, float fIntensity, std::wstring szFullPath);
 	Object* ObjectPicking();
 
 	/*GetBlock*/

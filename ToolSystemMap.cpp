@@ -78,7 +78,7 @@ void ToolSystemMap::Sculpting(XMVECTOR vIntersection, float fSculptRadius, float
     }
 }
 
-void ToolSystemMap::Splatting(XMVECTOR vIntersection, float fSplattingRadius, std::wstring szFullPath)
+void ToolSystemMap::Splatting(XMVECTOR vIntersection, float fSplattingRadius, float fIntensity, std::wstring szFullPath)
 {
     MeshMap* pMap = m_pQuadTree->m_pMap;
     UINT const DataSize = sizeof(BYTE) * 4;
@@ -95,7 +95,6 @@ void ToolSystemMap::Splatting(XMVECTOR vIntersection, float fSplattingRadius, st
     XMFLOAT3 vTexPos;
     XMFLOAT3 vPickPos;
     XMStoreFloat3(&vPickPos, vIntersection);
-
     for (UINT y = 0; y < pMap->m_dwNumColumns; y++)
     {
         vTexIndex.y = y;
@@ -110,14 +109,25 @@ void ToolSystemMap::Splatting(XMVECTOR vIntersection, float fSplattingRadius, st
             BYTE* pixel = &m_pQuadTree->m_fAlphaData[pMap->m_dwNumRows * y * 4 + x * 4];
             XMFLOAT3 radius = vPickPos - vTexPos;
             float fRadius = XMVectorGetX(XMVector3Length(XMLoadFloat3(&radius)));
-
-            if (fRadius < fSplattingRadius)
+            if (fSplattingRadius > 0)
             {
-                float fDot = 1.0f - (fRadius / fSplattingRadius); //지점부터 범위까지, splattingRadius가 기준, 멀어질수록 fdot의값이 작아져 연해진다
-                for (int idx = 0; idx < m_pQuadTree->m_ListTextureSplatting.size(); idx++)
-                    if (szFullPath == m_pQuadTree->m_ListTextureSplatting[idx]->GetTextureName() && (fDot * 255) > pixel[idx])
-                        pixel[idx] = fDot * 255;//rgba -> this size rimited under 4
+                if (fRadius < fSplattingRadius)
+                {
+                    float fDot = 1.0f - (fRadius / fSplattingRadius); //지점부터 범위까지, splattingRadius가 기준, 멀어질수록 fdot의값이 작아져 연해진다
+                    for (int idx = 0; idx < m_pQuadTree->m_ListTextureSplatting.size(); idx++)
+                        if (szFullPath == m_pQuadTree->m_ListTextureSplatting[idx]->GetTextureName() && (fDot * 255) > pixel[idx])
+                            pixel[idx] = fDot * 255 * fIntensity;//rgba -> this size rimited under 4
+                }
             }
+            else
+            {
+                if (fRadius < abs(fSplattingRadius))
+                {
+                    float fDot = 1.0f - (fRadius / abs(fSplattingRadius)); //지점부터 범위까지, splattingRadius가 기준, 멀어질수록 fdot의값이 작아져 연해진다
+                    for (int idx = 0; idx < m_pQuadTree->m_ListTextureSplatting.size(); idx++)
+                        pixel[idx] = fDot * 1 / 255 * fIntensity;
+                }
+            } 
         }
     }
     g_pDeviceContext->UpdateSubresource(m_pQuadTree->m_pMaskAlphaTexture, 0, nullptr, m_pQuadTree->m_fAlphaData, RowPitch, DepthPitch);
@@ -623,7 +633,7 @@ Object* ToolSystemMap::CreateSimpleBox(OBJECT_SPECIFY specify, XMVECTOR vPos, XM
     pObject->SetConstantData(cc);
     pObject->SetMesh(pMesh);
     pObject->SetTransform({ vPos , vRot, vScale });
-    pObject->SetDrawMode(DRAW_MODE::MODE_SOLID);
+    pObject->SetDrawMode(DRAW_MODE::MODE_WIRE);
     pObject->SetSpecify(specify);
     pObject->UpdateBoundigBox(box);
 
@@ -855,6 +865,8 @@ void ToolSystemMap::OpenFile(std::wstring szFullPath)
     void* shader_byte_code_ps = nullptr;
     size_t size_shader_vs = 0;
     size_t size_shader_ps = 0;
+    CameraMove CamMove[4];
+    float fCamMoveDuration = 0.0f;
     MeshMap* pMapMesh = new MeshMap();
     std::unordered_set<Object*> allObjectList;
     BYTE* fAlphaData = nullptr;
@@ -920,6 +932,26 @@ void ToolSystemMap::OpenFile(std::wstring szFullPath)
                 std::string str;
                 std::getline(iss, str);
                 szPSPath = _tomw(str);
+            }
+            else if (fieldName == "m_CamMove0")
+            {
+                iss >> CamMove[0];
+            }
+            else if (fieldName == "m_CamMove1")
+            {
+                iss >> CamMove[1];
+            }
+            else if (fieldName == "m_CamMove2")
+            {
+                iss >> CamMove[2];
+            }
+            else if (fieldName == "m_CamMove3")
+            {
+                iss >> CamMove[3];
+            }
+            else if (fieldName == "m_fCamMoveDuration")
+            {
+                iss >> fCamMoveDuration;
             }
             else if (fieldName == "m_pMap")
             {
@@ -1066,6 +1098,12 @@ void ToolSystemMap::OpenFile(std::wstring szFullPath)
             m_ListFbx.insert(obj->GetObjectName());
         m_pQuadTree->AddObject(obj);
     }
+
+    for (int idx = 0; idx < 4; idx++)
+    {
+        m_pQuadTree->m_CamMove[idx] = CamMove[idx];
+    }
+    m_pQuadTree->m_fCamMoveDuration = fCamMoveDuration;
 }
 
 void ToolSystemMap::SaveFile(std::wstring szFullPath)

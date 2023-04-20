@@ -113,6 +113,7 @@ void ImguiSystem::Update()
     static float fSculptRadius = 10.0f;
     static float fSculptIntensity = 0.1f;
     static float fSplatRadius = 5.0f;
+    static float fSplatIntensity = 1.0f;
 
     static bool bOjbectPicking = false;
     std::string objectname;
@@ -239,10 +240,18 @@ void ImguiSystem::Update()
 
                 if (bSplatting && _ToolSystemMap.GetCurrentQuadTree() != nullptr)
                 {
-                    ImGui::InputFloat("SplatRadius", &fSplatRadius);
+                    ImGui::PushItemWidth(50.0f);
+                    ImGui::InputFloat("Radius", &fSplatRadius);
+                    ImGui::PopItemWidth();
+
+                    ImGui::SameLine();
+                    ImGui::PushItemWidth(50.0f);
+                    ImGui::InputFloat("Intensity", &fSplatIntensity);
+                    ImGui::PopItemWidth();
+
                     if (_InputSystem.GetKey(VK_RBUTTON) && _ToolSystemMap.GetInterSection())
                     {
-                        _ToolSystemMap.Splatting(_PhysicsSystem.GetSelect().m_vIntersection, fSplatRadius ,szCurrentSplat);
+                        _ToolSystemMap.Splatting(_PhysicsSystem.GetSelect().m_vIntersection, fSplatRadius , fSplatIntensity, szCurrentSplat);
                     }
                 }
             }
@@ -426,9 +435,24 @@ void ImguiSystem::Update()
                     bMouseMove = true;
                 }
                 ImGui::SameLine();
-                if (ImGui::Button("PlayCamera"))
+                if (ImGui::Button("PlayCam"))
                 {
                     playMove = true;
+                }
+                ImGui::SameLine();
+                if (ImGui::Button("OpenRec"))
+                {
+                    posCount = 4;
+                    for (int idx = 0; idx < 4; idx++)
+                    {
+                        cam_pos[idx][0] = _ToolSystemMap.GetCurrentQuadTree()->m_CamMove[idx].camPos.x;
+                        cam_pos[idx][1] = _ToolSystemMap.GetCurrentQuadTree()->m_CamMove[idx].camPos.y;
+                        cam_pos[idx][2] = _ToolSystemMap.GetCurrentQuadTree()->m_CamMove[idx].camPos.z;
+                        cam_dir[idx][0] = _ToolSystemMap.GetCurrentQuadTree()->m_CamMove[idx].fYaw;
+                        cam_dir[idx][1] = _ToolSystemMap.GetCurrentQuadTree()->m_CamMove[idx].fPitch;
+                        cam_dir[idx][2] = _ToolSystemMap.GetCurrentQuadTree()->m_CamMove[idx].fRoll;
+                    }
+                    moveCameraDuration = _ToolSystemMap.GetCurrentQuadTree()->m_fCamMoveDuration;
                 }
                 ImGui::SameLine();
                 ImGui::PushItemWidth(50.0f);
@@ -465,6 +489,20 @@ void ImguiSystem::Update()
                     std::string pos = "pos_";
                     pos += std::to_string(idx);
                     ImGui::InputFloat3(pos.c_str(), cam_pos[idx-1]);
+                }
+                if (posCount >= 4)
+                {
+                    if (ImGui::Button("SaveCamMove"))
+                    {
+                        XMFLOAT3 camPos[4];
+                        XMFLOAT3 camDir[4];
+                        for (int idx = 0; idx < 4; idx++)
+                        {
+                            camPos[idx] = XMFLOAT3(cam_pos[idx][0], cam_pos[idx][1], cam_pos[idx][2]);
+                            camDir[idx] = XMFLOAT3(cam_dir[idx][0], cam_dir[idx][1], cam_dir[idx][2]);
+                        }
+                        _ToolSystemMap.GetCurrentQuadTree()->SetCamMove(camPos, camDir, moveCameraDuration);
+                    }
                 }
             }
             if (pObject)

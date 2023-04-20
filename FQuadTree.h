@@ -55,7 +55,6 @@ private:
 	ConstantData_Light m_ConstantData_Light;
 	ConstantData_Lightbuffer m_ConstantData_Light2;
 
-
 	std::wstring m_szVSPath;
 	VertexShader* m_pVertexShader;
 	std::wstring m_szPSPath;
@@ -64,6 +63,10 @@ private:
 	std::unordered_set<Object*> m_pAllObjectList;
 	std::vector<FNode*> m_pLeafNodeList;
 	std::vector<FNode*> m_pDrawLeafNodeList;
+public:
+	CameraMove m_CamMove[4];
+	float m_fCamMoveDuration;
+	void SetCamMove(XMFLOAT3* pos, XMFLOAT3* dir, float fDuration);
 public:
 	VertexShader* m_pVertexShader_Depth;
 	PixelShader* m_pPixelShader_Depth;

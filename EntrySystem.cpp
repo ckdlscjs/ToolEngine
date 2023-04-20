@@ -73,8 +73,8 @@ void EntrySystem::Update()
 
 void EntrySystem::Render()
 {
-    _ObjectSystem.ShadowRender();
-    _ToolSystemMap.ShadowRender();
+    /*_ObjectSystem.ShadowRender();
+    _ToolSystemMap.ShadowRender();*/
 
     _ObjectSystem.Render();
     _ToolSystemMap.Render();

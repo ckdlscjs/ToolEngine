@@ -1,7 +1,7 @@
 Texture2D TextureColor : register(t0);
 Texture2D DepthmapColor : register(t1);
 
-sampler TextureSamplerColor : register(s0);
+//sampler TextureSamplerColor : register(s0);
 
 struct PS_INPUT
 {
@@ -31,43 +31,44 @@ cbuffer constant : register(b1)
 
 float4 psmain(PS_INPUT input) : SV_TARGET
 {
-	//depthMap
-	float4 color = float4(1.0f, 1.0f, 1.0f, 1.0f);
-	float4 lightColor = float4(0.15f, 0.15f, 0.15f, 1.0f);
-	float2 projectTexcoord;
-	float depthValue;
-	float lightDepthValue;
-	float lightIntensity;
-	projectTexcoord.x = input.lightViewPosition.x / input.lightViewPosition.w / 2.0f + 0.5f;
-	projectTexcoord.y = -input.lightViewPosition.y / input.lightViewPosition.w / 2.0f + 0.5f;
+	////depthMap
+	//float4 color = float4(1.0f, 1.0f, 1.0f, 1.0f);
+	//float4 lightColor = float4(0.15f, 0.15f, 0.15f, 1.0f);
+	//float2 projectTexcoord;
+	//float depthValue;
+	//float lightDepthValue;
+	//float lightIntensity;
+	//projectTexcoord.x = input.lightViewPosition.x / input.lightViewPosition.w / 2.0f + 0.5f;
+	//projectTexcoord.y = -input.lightViewPosition.y / input.lightViewPosition.w / 2.0f + 0.5f;
 
-	if ((saturate(projectTexcoord.x) == projectTexcoord.x) && (saturate(projectTexcoord.y) == projectTexcoord.y))
-	{
-		depthValue = DepthmapColor.Sample(TextureSamplerColor, projectTexcoord).r;
+	//if ((saturate(projectTexcoord.x) == projectTexcoord.x) && (saturate(projectTexcoord.y) == projectTexcoord.y))
+	//{
+	//	depthValue = DepthmapColor.Sample(TextureSamplerColor, projectTexcoord).r;
 
-		lightDepthValue = input.lightViewPosition.z / input.lightViewPosition.w;
-		/*color = float4(1.0f, 1.0f, 1.0f, 1.0f);*/
-		// lightDepthValue에서 바이어스를 뺍니다.
-		lightDepthValue = lightDepthValue - 0.001f;
+	//	lightDepthValue = input.lightViewPosition.z / input.lightViewPosition.w;
+	//	/*color = float4(1.0f, 1.0f, 1.0f, 1.0f);*/
+	//	// lightDepthValue에서 바이어스를 뺍니다.
+	//	lightDepthValue = lightDepthValue - 0.001f;
 
-		if (lightDepthValue > depthValue)
-		{
-			lightIntensity = saturate(dot(input.normal, input.lightPosition));
+	//	if (lightDepthValue > depthValue)
+	//	{
+	//		lightIntensity = saturate(dot(input.normal, input.lightPosition));
 
-			if (lightIntensity > 0.0f)
-			{
-				color = lightIntensity * color;
+	//		if (lightIntensity > 0.0f)
+	//		{
+	//			color = lightIntensity * color;
 
-				color = saturate(color);
-			}
-		}
-	}
-	lightIntensity = saturate(dot(input.normal, input.lightPosition));
+	//			color = saturate(color);
+	//		}
+	//	}
+	//}
+	//lightIntensity = saturate(dot(input.normal, input.lightPosition));
 
-	if (lightIntensity > 0.0f)
-	{
-		lightColor += (lightIntensity * float4(1.0f, 1.0f, 1.0f, 1.0f));
-	}
-	lightColor = saturate(lightColor);
-	return input.color * lightColor;
+	//if (lightIntensity > 0.0f)
+	//{
+	//	lightColor += (lightIntensity * float4(1.0f, 1.0f, 1.0f, 1.0f));
+	//}
+	//lightColor = saturate(lightColor);
+	//return input.color * lightColor;
+	return input.color;
 }

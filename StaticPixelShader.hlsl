@@ -1,7 +1,7 @@
 Texture2D TextureColor : register(t0);
 sampler TextureSamplerColor : register(s0);
 
-Texture2D DepthmapColor : register(t1);
+//Texture2D DepthmapColor : register(t1);
 
 struct PS_INPUT
 {
@@ -61,7 +61,7 @@ float4 psmain(PS_INPUT input) : SV_TARGET
 	//float3 final_light = ambient_light + diffuse_light + specular_light;
 
 	//depthMap
-	float4 color = float4(0.1f, 0.1f, 0.1f, 1.0f);
+	/*float4 color = float4(0.1f, 0.1f, 0.1f, 1.0f);
 	float2 projectTexcoord;
 	float depthValue;
 	float lightDepthValue;
@@ -90,5 +90,6 @@ float4 psmain(PS_INPUT input) : SV_TARGET
 		}
 	}
 
-	return float4(tex.rgb * color.rgb, 1.0f);
+	return float4(tex.rgb * color.rgb, 1.0f);*/
+	return tex;
 }
