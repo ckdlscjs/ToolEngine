@@ -1,31 +1,41 @@
 #include "Camera.h"
 #include "WindowSystem.h"
 #include "InputSystem.h"
-void Camera::MoveCameraBezierSpline(float time, float duration, XMFLOAT3 p0, XMFLOAT3 p1, XMFLOAT3 p2, XMFLOAT3 p3, XMFLOAT3 d0, XMFLOAT3 d1, XMFLOAT3 d2, XMFLOAT3 d3, XMFLOAT3& getPos, XMFLOAT3& getDir)
+void Camera::MoveCameraBezierSpline(float time, float duration, std::vector<XMFLOAT3> posList, std::vector<XMFLOAT3> dirList, XMFLOAT3& getPos, XMFLOAT3& getDir)
 {
-	float u = time / duration;
-	float u1 = 1.0f - u;
-	float u2 = u1 * u1;
-	float u3 = u * u;
-	float b1 = u1 * u1 * u1;
-	float b2 = 3 * u1 * u1 * u;
-	float b3 = 3 * u1 * u * u;
-	float b4 = u * u * u;
+	float t = time / duration;
+	int n = static_cast<int>(posList.size()) - 1;
+	float u = 1.0f - t;
+	float un = pow(u, n);
+	float tn = pow(t, n);
+	XMFLOAT3 pos(0, 0, 0);
+	XMFLOAT3 dir(0, 0, 0);
+	for (int i = 0; i <= n; ++i)
+	{
+		float binomial = BinomialCoefficient(n, i);
+		float basis = binomial * pow(u, n - i) * pow(t, i);
+		pos.x += basis * posList[i].x;
+		pos.y += basis * posList[i].y;
+		pos.z += basis * posList[i].z;
+		
+		dir.x += basis * dirList[i].x;
+		dir.y += basis * dirList[i].y;
+		dir.z += basis * dirList[i].z;
+	}
 
-	XMFLOAT3 pos(
-		b1 * p0.x + b2 * p1.x + b3 * p2.x + b4 * p3.x,
-		b1 * p0.y + b2 * p1.y + b3 * p2.y + b4 * p3.y,
-		b1 * p0.z + b2 * p1.z + b3 * p3.z + b4 * p3.z
-	);
-
-	XMFLOAT3 dir(
-		b1 * d0.x + b2 * d1.x + b3 * d2.x + b4 * d3.x,
-		b1 * d0.y + b2 * d1.y + b3 * d2.y + b4 * d3.y,
-		b1 * d0.z + b2 * d1.z + b3 * d2.z + b4 * d3.z
-	);
 	getPos = pos;
 	getDir = dir;
 }
+float Camera::BinomialCoefficient(int n, int k)
+{
+	float result = 1;
+	for (int i = 1; i <= k; ++i)
+	{
+		result *= (n - k + i) / static_cast<float>(i);
+	}
+	return result;
+}
+
 void Camera::SetCameraMove(bool bCameraMove)
 {
 	m_bCameraMove = bCameraMove;

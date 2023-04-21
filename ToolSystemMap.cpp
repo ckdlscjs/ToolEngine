@@ -865,7 +865,7 @@ void ToolSystemMap::OpenFile(std::wstring szFullPath)
     void* shader_byte_code_ps = nullptr;
     size_t size_shader_vs = 0;
     size_t size_shader_ps = 0;
-    CameraMove CamMove[4];
+    std::vector<CameraMove> CamMoveList;
     float fCamMoveDuration = 0.0f;
     MeshMap* pMapMesh = new MeshMap();
     std::unordered_set<Object*> allObjectList;
@@ -933,21 +933,11 @@ void ToolSystemMap::OpenFile(std::wstring szFullPath)
                 std::getline(iss, str);
                 szPSPath = _tomw(str);
             }
-            else if (fieldName == "m_CamMove0")
+            else if (fieldName == "m_CamMove")
             {
-                iss >> CamMove[0];
-            }
-            else if (fieldName == "m_CamMove1")
-            {
-                iss >> CamMove[1];
-            }
-            else if (fieldName == "m_CamMove2")
-            {
-                iss >> CamMove[2];
-            }
-            else if (fieldName == "m_CamMove3")
-            {
-                iss >> CamMove[3];
+                CameraMove move;
+                iss >> move;
+                CamMoveList.push_back(move);
             }
             else if (fieldName == "m_fCamMoveDuration")
             {
@@ -1099,9 +1089,9 @@ void ToolSystemMap::OpenFile(std::wstring szFullPath)
         m_pQuadTree->AddObject(obj);
     }
 
-    for (int idx = 0; idx < 4; idx++)
+    for (int idx = 0; idx < CamMoveList.size(); idx++)
     {
-        m_pQuadTree->m_CamMove[idx] = CamMove[idx];
+        m_pQuadTree->m_CamMoveList.push_back(CamMoveList[idx]);
     }
     m_pQuadTree->m_fCamMoveDuration = fCamMoveDuration;
 }

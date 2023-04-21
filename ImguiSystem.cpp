@@ -408,28 +408,32 @@ void ImguiSystem::Update()
             }
             ImGui::Dummy({ 0, 10 });
             {
-                static float cam_pos[4][3] = { 0, };
-                static float cam_dir[4][3] = { 0, };
+                static std::vector<XMFLOAT3> camPosList;
+                static std::vector<XMFLOAT3> camDirList;
                 static int posCount = 0;
                 static float moveCameraDuration = 5.0f;
                 static float moveCameraTime = 0.0f;
                 static bool playMove = false;
-                if (ImGui::Button("Rec") && posCount < 4)
+                if (ImGui::Button("Rec"))
                 {
-                    posCount++;
-                    XMVECTOR pos = _ToolSystemMap.GetCurrentCamera()->m_vCameraPos;
-                    cam_pos[posCount - 1][0] = XMVectorGetX(pos);
-                    cam_pos[posCount - 1][1] = XMVectorGetY(pos);
-                    cam_pos[posCount - 1][2] = XMVectorGetZ(pos);
+                    XMFLOAT3 pos;
+                    XMStoreFloat3(&pos, _ToolSystemMap.GetCurrentCamera()->m_vCameraPos);
+                    camPosList.push_back(pos);
 
-                    cam_dir[posCount - 1][0] = _ToolSystemMap.GetCurrentCamera()->m_fYaw;
-                    cam_dir[posCount - 1][1] = _ToolSystemMap.GetCurrentCamera()->m_fPitch;
-                    cam_dir[posCount - 1][2] = _ToolSystemMap.GetCurrentCamera()->m_fRoll;
+                    XMFLOAT3 dir;
+                    dir.x = _ToolSystemMap.GetCurrentCamera()->m_fYaw;
+                    dir.y = _ToolSystemMap.GetCurrentCamera()->m_fPitch;
+                    dir.z = _ToolSystemMap.GetCurrentCamera()->m_fRoll;
+                    camDirList.push_back(dir);
+
+                    posCount = camPosList.size();
                 }
                 ImGui::SameLine();
                 if (ImGui::Button("Reset"))
                 {
-                    posCount = 0;
+                    camPosList.clear();
+                    camDirList.clear();
+                    posCount = camPosList.size();
                     playMove = false;
                     moveCameraTime = 0.0f;
                     bMouseMove = true;
@@ -442,17 +446,22 @@ void ImguiSystem::Update()
                 ImGui::SameLine();
                 if (ImGui::Button("OpenRec"))
                 {
-                    posCount = 4;
-                    for (int idx = 0; idx < 4; idx++)
+                    if (_ToolSystemMap.GetCurrentQuadTree()->m_CamMoveList.size())
                     {
-                        cam_pos[idx][0] = _ToolSystemMap.GetCurrentQuadTree()->m_CamMove[idx].camPos.x;
-                        cam_pos[idx][1] = _ToolSystemMap.GetCurrentQuadTree()->m_CamMove[idx].camPos.y;
-                        cam_pos[idx][2] = _ToolSystemMap.GetCurrentQuadTree()->m_CamMove[idx].camPos.z;
-                        cam_dir[idx][0] = _ToolSystemMap.GetCurrentQuadTree()->m_CamMove[idx].fYaw;
-                        cam_dir[idx][1] = _ToolSystemMap.GetCurrentQuadTree()->m_CamMove[idx].fPitch;
-                        cam_dir[idx][2] = _ToolSystemMap.GetCurrentQuadTree()->m_CamMove[idx].fRoll;
+                        camPosList.clear();
+                        camDirList.clear();
+                        for (int idx = 0; idx < _ToolSystemMap.GetCurrentQuadTree()->m_CamMoveList.size(); idx++)
+                        {
+                            XMFLOAT3 pos = _ToolSystemMap.GetCurrentQuadTree()->m_CamMoveList[idx].camPos;
+                            XMFLOAT3 dir;
+                            dir.x = _ToolSystemMap.GetCurrentQuadTree()->m_CamMoveList[idx].fYaw;
+                            dir.y = _ToolSystemMap.GetCurrentQuadTree()->m_CamMoveList[idx].fPitch;
+                            dir.z = _ToolSystemMap.GetCurrentQuadTree()->m_CamMoveList[idx].fRoll;
+                            camPosList.push_back(pos);
+                            camDirList.push_back(dir);
+                        }
+                        posCount = camPosList.size();
                     }
-                    moveCameraDuration = _ToolSystemMap.GetCurrentQuadTree()->m_fCamMoveDuration;
                 }
                 ImGui::SameLine();
                 ImGui::PushItemWidth(50.0f);
@@ -470,38 +479,27 @@ void ImguiSystem::Update()
                     moveCameraTime += g_fSecondPerFrame;
                     XMFLOAT3 movePos;
                     XMFLOAT3 moveDir;
-                    _ToolSystemMap.GetCurrentCamera()->MoveCameraBezierSpline(moveCameraTime, moveCameraDuration,
-                        { cam_pos[0][0], cam_pos[0][1], cam_pos[0][2] },
-                        { cam_pos[1][0], cam_pos[1][1], cam_pos[1][2] },
-                        { cam_pos[2][0], cam_pos[2][1], cam_pos[2][2] },
-                        { cam_pos[3][0], cam_pos[3][1], cam_pos[3][2] },
-                        { cam_dir[0][0], cam_dir[0][1], cam_dir[0][2] },
-                        { cam_dir[1][0], cam_dir[1][1], cam_dir[1][2] },
-                        { cam_dir[2][0], cam_dir[2][1], cam_dir[2][2] },
-                        { cam_dir[3][0], cam_dir[3][1], cam_dir[3][2] }, movePos, moveDir);
+                    _ToolSystemMap.GetCurrentCamera()->MoveCameraBezierSpline(moveCameraTime, moveCameraDuration, camPosList, camDirList, movePos, moveDir);
                     _ToolSystemMap.GetCurrentCamera()->m_vCameraPos = XMLoadFloat3(&movePos);
                     _ToolSystemMap.GetCurrentCamera()->m_fYaw = moveDir.x;
                     _ToolSystemMap.GetCurrentCamera()->m_fPitch = moveDir.y;
                     _ToolSystemMap.GetCurrentCamera()->m_fRoll = moveDir.z;
                 }
-                for (int idx = 1; idx <= posCount; idx++)
+                for (int idx = 0; idx < posCount; idx++)
                 {
                     std::string pos = "pos_";
                     pos += std::to_string(idx);
-                    ImGui::InputFloat3(pos.c_str(), cam_pos[idx-1]);
+                    float camPos[3];
+                    camPos[0] = camPosList[idx].x;
+                    camPos[1] = camPosList[idx].y;
+                    camPos[2] = camPosList[idx].z;
+                    ImGui::InputFloat3(pos.c_str(), camPos);
                 }
-                if (posCount >= 4)
+                if (posCount > 0)
                 {
                     if (ImGui::Button("SaveCamMove"))
                     {
-                        XMFLOAT3 camPos[4];
-                        XMFLOAT3 camDir[4];
-                        for (int idx = 0; idx < 4; idx++)
-                        {
-                            camPos[idx] = XMFLOAT3(cam_pos[idx][0], cam_pos[idx][1], cam_pos[idx][2]);
-                            camDir[idx] = XMFLOAT3(cam_dir[idx][0], cam_dir[idx][1], cam_dir[idx][2]);
-                        }
-                        _ToolSystemMap.GetCurrentQuadTree()->SetCamMove(camPos, camDir, moveCameraDuration);
+                        _ToolSystemMap.GetCurrentQuadTree()->SetCamMove(camPosList, camDirList, moveCameraDuration);
                     }
                 }
             }

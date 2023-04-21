@@ -9,7 +9,8 @@ enum MAT_PROJ
 class Camera
 {
 public:
-	void MoveCameraBezierSpline(float time, float duration, XMFLOAT3 p0, XMFLOAT3 p1, XMFLOAT3 p2, XMFLOAT3 p3, XMFLOAT3 d0, XMFLOAT3 d1, XMFLOAT3 d2, XMFLOAT3 d3, XMFLOAT3& getPos, XMFLOAT3& getDir);
+	void MoveCameraBezierSpline(float time, float duration, std::vector<XMFLOAT3> posList , std::vector<XMFLOAT3> dirList, XMFLOAT3& getPos, XMFLOAT3& getDir);
+	float BinomialCoefficient(int n, int k);
 	void SetCameraMove(bool bCameraMove);
 	void SetCameraDirToLookat(XMFLOAT3 vLookat);
 	void SetCameraPos(XMFLOAT3 vPos);

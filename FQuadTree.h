@@ -64,9 +64,9 @@ private:
 	std::vector<FNode*> m_pLeafNodeList;
 	std::vector<FNode*> m_pDrawLeafNodeList;
 public:
-	CameraMove m_CamMove[4];
+	std::vector<CameraMove> m_CamMoveList;
 	float m_fCamMoveDuration;
-	void SetCamMove(XMFLOAT3* pos, XMFLOAT3* dir, float fDuration);
+	void SetCamMove(std::vector<XMFLOAT3>& pos, std::vector<XMFLOAT3>& dir, float fDuration);
 public:
 	VertexShader* m_pVertexShader_Depth;
 	PixelShader* m_pPixelShader_Depth;

@@ -104,14 +104,15 @@ std::ostream& operator<<(std::ostream& os, const FQuadTree* pQuadTree)
     os << "m_szVSName:" << pQuadTree->m_szVSPath << std::endl;
 
     os << "m_szPSName:" << pQuadTree->m_szPSPath << std::endl;
-
-    os << "m_CamMove0:" << pQuadTree->m_CamMove[0] << std::endl;
-
-    os << "m_CamMove1:" << pQuadTree->m_CamMove[1] << std::endl;
-
-    os << "m_CamMove2:" << pQuadTree->m_CamMove[2] << std::endl;
-
-    os << "m_CamMove3:" << pQuadTree->m_CamMove[3] << std::endl;
+    
+    /*std::string camMove = "m_CamMove:";*/
+    for (int idx = 0; idx < pQuadTree->m_CamMoveList.size(); idx++)
+    {
+     /*   std::string idxMove = camMove;
+        idxMove += std::to_string(idx);
+        idxMove += ":";*/
+        os << "m_CamMove:" << pQuadTree->m_CamMoveList[idx] << std::endl;
+    }
 
     os << "m_fCamMoveDuration:" << pQuadTree->m_fCamMoveDuration << std::endl;
 
@@ -335,17 +336,21 @@ FQuadTree::~FQuadTree()
     }
 }
 
-void FQuadTree::SetCamMove(XMFLOAT3* pos, XMFLOAT3* dir, float fDuration)
+void FQuadTree::SetCamMove(std::vector<XMFLOAT3>& pos, std::vector<XMFLOAT3>& dir, float fDuration)
 {
-    for (int idx = 0; idx < 4; idx++)
+    m_CamMoveList.clear();
+    for (int idx = 0; idx < pos.size(); idx++)
     {
-        m_CamMove[idx].camPos = pos[idx];
-        m_CamMove[idx].fYaw = dir[idx].x;
-        m_CamMove[idx].fPitch = dir[idx].y;
-        m_CamMove[idx].fRoll = dir[idx].z;
+        CameraMove move;
+        move.camPos = pos[idx];
+        move.fYaw = dir[idx].x;
+        move.fPitch = dir[idx].y;
+        move.fRoll = dir[idx].z;
+        m_CamMoveList.push_back(move);
     }
     m_fCamMoveDuration = fDuration;
 }
+
 
 void FQuadTree::UpdateNode(FNode* pNode)
 {
