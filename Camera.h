@@ -26,6 +26,9 @@ public:
 	float m_fYaw = 0.0f;
 	float m_fPitch = 0.0f;
 	float m_fRoll = 0.0f;
+	float m_fFogStart = 50.0f;
+	float m_fFogEnd = 150.0f;
+	float m_fFogDensity = 0.00001f;
 	MAT_PROJ m_type;
 
 	XMVECTOR m_vCameraPos;

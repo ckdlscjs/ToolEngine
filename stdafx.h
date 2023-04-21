@@ -646,6 +646,15 @@ struct ConstantData_Bone
 	XMMATRIX matBone[255];
 };
 
+__declspec(align(16))
+struct ConstantData_Fog
+{
+	XMFLOAT3 cameraPosition;
+	float linearFogStart;
+	float linearFogEnd;
+	float expFogDensity;
+};
+
 struct IWData
 {
 	std::vector<int> index;

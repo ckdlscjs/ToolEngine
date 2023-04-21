@@ -49,11 +49,17 @@ private:
 	Transform m_Transform;
 	ConstantBuffer* m_pConstantBuffer_Transform;
 	ConstantData_Transform m_ConstantData_Transform;
+
 	ConstantBuffer* m_pConstantBuffer_Map;
 	ConstantData_Map m_ConstantData_Map;
+
 	ConstantBuffer* m_pConstantBuffer_Light;
 	ConstantData_Light m_ConstantData_Light;
 	ConstantData_Lightbuffer m_ConstantData_Light2;
+
+	ConstantBuffer* m_pConstantBuffer_Fog;
+	ConstantData_Fog m_ConstantData_Fog;
+	
 
 	std::wstring m_szVSPath;
 	VertexShader* m_pVertexShader;

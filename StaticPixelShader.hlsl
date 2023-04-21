@@ -11,6 +11,8 @@ struct PS_INPUT
 	float2 tex : TEXCOORD0;
 	float4 lightViewPosition : TEXCOORD1;
 	float3 lightPosition : TEXCOORD2;
+	float linearFogAmount : LINEAR_FOG_AMOUNT;
+	float expFogAmount : EXP_FOG_AMOUNT;
 };
 
 //if using row_major, not transpose in cpp
@@ -91,5 +93,14 @@ float4 psmain(PS_INPUT input) : SV_TARGET
 	}
 
 	return float4(tex.rgb * color.rgb, 1.0f);*/
-	return tex;
+
+	//fog
+	float3 fogColor = float3(0.5f, 0.5f, 0.5f);
+
+	// 선형 Fog와 지수 Fog의 양을 결합하여 최종 Fog 양을 계산
+	float fogAmount = lerp(input.linearFogAmount, input.expFogAmount, 0.0f);
+
+	// 개체의 색상에 Fog를 적용
+	float3 finalColor = lerp(tex.rgb, fogColor, fogAmount);
+	return float4(finalColor, 1.0f);
 }

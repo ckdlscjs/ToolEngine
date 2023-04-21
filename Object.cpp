@@ -202,8 +202,14 @@ void Object::Update()
 	XMFLOAT3 up(0.0f, 1.0f, 0.0f);
 	m_ConstantData_Light2.lightViewMatrix = XMMatrixLookAtLH(XMLoadFloat3(&m_ConstantData_Light2.lightPosition), XMLoadFloat3(&lookat), XMLoadFloat3(&up)); 
 	m_ConstantData_Light2.lightProjectionMatrix = XMMatrixPerspectiveFovLH((float)XM_PI / 2.0f, 1260.0f / 917.0f, 1, 100);
+	XMStoreFloat3(&m_ConstantData_Fog.cameraPosition, _CameraSystem.GetCurrentCamera()->m_vCameraPos);
+	m_ConstantData_Fog.linearFogStart = _CameraSystem.GetCurrentCamera()->m_fFogStart;
+	m_ConstantData_Fog.linearFogEnd = _CameraSystem.GetCurrentCamera()->m_fFogEnd;
+	m_ConstantData_Fog.expFogDensity = _CameraSystem.GetCurrentCamera()->m_fFogDensity;
+
 	_EngineSystem.GetRenderSystem()->UpdateConstantBuffer(m_pConstantBuffer_Transform, &m_ConstantData_Transform);
 	_EngineSystem.GetRenderSystem()->UpdateConstantBuffer(m_pConstantBuffer_Light, &m_ConstantData_Light2);
+	_EngineSystem.GetRenderSystem()->UpdateConstantBuffer(m_pConstantBuffer_Fog, &m_ConstantData_Fog);
 }
 
 #include "InputSystem.h"
@@ -215,6 +221,7 @@ void Object::Render()
 	_EngineSystem.GetRenderSystem()->SetMainRenderTarget();
 	_EngineSystem.GetRenderSystem()->SetConstantBuffer(m_pVertexShader, m_pConstantBuffer_Transform, 0);
 	_EngineSystem.GetRenderSystem()->SetConstantBuffer(m_pVertexShader, m_pConstantBuffer_Light, 1);
+	_EngineSystem.GetRenderSystem()->SetConstantBuffer(m_pVertexShader, m_pConstantBuffer_Fog, 2);
 	_EngineSystem.GetRenderSystem()->SetConstantBuffer(m_pPixelShader, m_pConstantBuffer_Transform, 0);
 	_EngineSystem.GetRenderSystem()->SetConstantBuffer(m_pPixelShader, m_pConstantBuffer_Light, 1);
 	_EngineSystem.GetRenderSystem()->SetVertexShader(m_pVertexShader);
@@ -314,12 +321,18 @@ Object::Object(std::wstring szFullPath) : m_szFullPath(szFullPath)
 	m_pConstantBuffer_Transform = _EngineSystem.GetRenderSystem()->CreateConstantBuffer(&m_ConstantData_Transform, sizeof(m_ConstantData_Transform));
 
 	m_pConstantBuffer_Light = _EngineSystem.GetRenderSystem()->CreateConstantBuffer(&m_ConstantData_Light2, sizeof(m_ConstantData_Light2));
+
+	m_ConstantData_Fog.linearFogStart = 0.0f;
+	m_ConstantData_Fog.linearFogEnd = 100.0f;
+	m_ConstantData_Fog.expFogDensity = 0.005f;
+	m_pConstantBuffer_Fog = _EngineSystem.GetRenderSystem()->CreateConstantBuffer(&m_ConstantData_Fog, sizeof(m_ConstantData_Fog));
 }
 
 Object::~Object()
 {
 	if (m_pConstantBuffer_Transform) delete m_pConstantBuffer_Transform;
 	if (m_pConstantBuffer_Light) delete m_pConstantBuffer_Light;
+	if (m_pConstantBuffer_Fog) delete m_pConstantBuffer_Fog;
 	if (m_pVertexShader) delete m_pVertexShader;
 	if (m_pPixelShader) delete m_pPixelShader;
 	if (m_pVertexShader_Depth) delete m_pVertexShader_Depth;

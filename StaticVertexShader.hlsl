@@ -14,6 +14,8 @@ struct VS_OUTPUT
 	float2 tex : TEXCOORD0;
 	float4 lightViewPosition : TEXCOORD1;
 	float3 lightPosition : TEXCOORD2;
+	float linearFogAmount : LINEAR_FOG_AMOUNT;
+	float expFogAmount : EXP_FOG_AMOUNT;
 };
 
 //if using row_major, not transpose in cpp
@@ -35,6 +37,14 @@ cbuffer constant : register(b1)
 	row_major float4x4 lightViewMatrix;
 	row_major float4x4 lightProjectionMatrix;
 	float3 lightPosition;
+};
+
+cbuffer constant : register(b2)
+{
+	float4 cameraPosition;
+	float linearFogStart;
+	float linearFogEnd;
+	float expFogDensity;
 };
 
 VS_OUTPUT vsmain(VS_INPUT input)
@@ -60,6 +70,14 @@ VS_OUTPUT vsmain(VS_INPUT input)
 
 	output.tex = input.tex;
 	output.color = input.color;
+
+	// 선형 Fog 계산
+	float fogDist = distance(cameraPosition, vWorld.xyz);
+	output.linearFogAmount = (linearFogEnd - fogDist) / (linearFogEnd - linearFogStart);
+	output.linearFogAmount = saturate(output.linearFogAmount);
+
+	// 지수 Fog 계산
+	output.expFogAmount = exp(-fogDist * expFogDensity);
 
 	return output;
 }

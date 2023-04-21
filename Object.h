@@ -58,6 +58,8 @@ protected:
 	ConstantBuffer* m_pConstantBuffer_Light;
 	ConstantData_Light m_ConstantData_Light;
 	ConstantData_Lightbuffer m_ConstantData_Light2;
+	ConstantBuffer* m_pConstantBuffer_Fog;
+	ConstantData_Fog m_ConstantData_Fog;
 
 	CULL_MODE m_CullMode = CULL_MODE::CULL_MODE_NONE;
 	INTERACTIVE_MODE m_InteractiveMode = INTERACTIVE_MODE::MODE_NONE;
