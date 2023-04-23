@@ -865,8 +865,10 @@ void ToolSystemMap::OpenFile(std::wstring szFullPath)
     void* shader_byte_code_ps = nullptr;
     size_t size_shader_vs = 0;
     size_t size_shader_ps = 0;
-    std::vector<CameraMove> CamMoveList;
-    float fCamMoveDuration = 0.0f;
+    std::vector<Cinema> CinemaList;
+    /*std::vector<CameraMove> CamMoveList;
+    float fCamMoveDuration = 0.0f;*/
+
     MeshMap* pMapMesh = new MeshMap();
     std::unordered_set<Object*> allObjectList;
     BYTE* fAlphaData = nullptr;
@@ -933,15 +935,21 @@ void ToolSystemMap::OpenFile(std::wstring szFullPath)
                 std::getline(iss, str);
                 szPSPath = _tomw(str);
             }
-            else if (fieldName == "m_CamMove")
+            else if (fieldName == "m_CinemaList")
             {
-                CameraMove move;
-                iss >> move;
-                CamMoveList.push_back(move);
-            }
-            else if (fieldName == "m_fCamMoveDuration")
-            {
-                iss >> fCamMoveDuration;
+                std::streampos prevPos = is.tellg();
+                std::string cinemaLine;
+                while (std::getline(is, cinemaLine)) 
+                {
+                    Cinema cinema;
+                    if (cinemaLine.find("m_pMap:") != std::string::npos)
+                            break;
+                    is.seekg(prevPos);
+                    is >> cinema;
+                    CinemaList.push_back(cinema);
+                    prevPos = is.tellg();
+                }
+                is.seekg(prevPos);
             }
             else if (fieldName == "m_pMap")
             {
@@ -1089,11 +1097,10 @@ void ToolSystemMap::OpenFile(std::wstring szFullPath)
         m_pQuadTree->AddObject(obj);
     }
 
-    for (int idx = 0; idx < CamMoveList.size(); idx++)
+    for (int idx = 0; idx < CinemaList.size(); idx++)
     {
-        m_pQuadTree->m_CamMoveList.push_back(CamMoveList[idx]);
+        m_pQuadTree->m_CinemaList.push_back(CinemaList[idx]);
     }
-    m_pQuadTree->m_fCamMoveDuration = fCamMoveDuration;
 }
 
 void ToolSystemMap::SaveFile(std::wstring szFullPath)

@@ -123,6 +123,9 @@ void ImguiSystem::Update()
     static Object* pObject;
     static bool bObjBoundingBox = false;
 
+    static char Cinemabuff[255];
+    static std::wstring szCinemaName = L"";
+
     ImGui::Begin("Demo");
     {
         {
@@ -389,7 +392,6 @@ void ImguiSystem::Update()
     }
     ImGui::End();
 
-    
     // Simple window
     ImGui::Begin("Control Panel2");
     {
@@ -408,6 +410,21 @@ void ImguiSystem::Update()
             }
             ImGui::Dummy({ 0, 10 });
             {
+                ImGui::PushItemWidth(50.0f);
+                ImGui::DragFloat("fogS", &_ToolSystemMap.GetCurrentCamera()->m_fFogStart);
+                ImGui::PopItemWidth();
+                ImGui::SameLine();
+                ImGui::PushItemWidth(50.0f);
+                ImGui::DragFloat("fogE", &_ToolSystemMap.GetCurrentCamera()->m_fFogEnd);
+                ImGui::PopItemWidth();
+                ImGui::SameLine();
+                ImGui::PushItemWidth(50.0f);
+                ImGui::DragFloat("fogD", &_ToolSystemMap.GetCurrentCamera()->m_fFogDensity, 0.0001f, 0.0f, 0.1f, "%.5f");
+                ImGui::PopItemWidth();
+            }
+            ImGui::Dummy({ 0, 10 });
+            {
+                static std::vector<Cinema> cinemaList;
                 static std::vector<XMFLOAT3> camPosList;
                 static std::vector<XMFLOAT3> camDirList;
                 static int posCount = 0;
@@ -446,27 +463,56 @@ void ImguiSystem::Update()
                 ImGui::SameLine();
                 if (ImGui::Button("OpenRec"))
                 {
-                    if (_ToolSystemMap.GetCurrentQuadTree()->m_CamMoveList.size())
+                    if (_ToolSystemMap.GetCurrentQuadTree()->m_CinemaList.size())
                     {
-                        camPosList.clear();
-                        camDirList.clear();
-                        for (int idx = 0; idx < _ToolSystemMap.GetCurrentQuadTree()->m_CamMoveList.size(); idx++)
+                        cinemaList.clear();
+                        for (int idx = 0; idx < _ToolSystemMap.GetCurrentQuadTree()->m_CinemaList.size(); idx++)
                         {
-                            XMFLOAT3 pos = _ToolSystemMap.GetCurrentQuadTree()->m_CamMoveList[idx].camPos;
-                            XMFLOAT3 dir;
-                            dir.x = _ToolSystemMap.GetCurrentQuadTree()->m_CamMoveList[idx].fYaw;
-                            dir.y = _ToolSystemMap.GetCurrentQuadTree()->m_CamMoveList[idx].fPitch;
-                            dir.z = _ToolSystemMap.GetCurrentQuadTree()->m_CamMoveList[idx].fRoll;
-                            camPosList.push_back(pos);
-                            camDirList.push_back(dir);
+                            cinemaList.push_back(_ToolSystemMap.GetCurrentQuadTree()->m_CinemaList[idx]);
                         }
-                        posCount = camPosList.size();
                     }
                 }
+
                 ImGui::SameLine();
                 ImGui::PushItemWidth(50.0f);
                 ImGui::InputFloat("Duration", &moveCameraDuration);
                 ImGui::PopItemWidth();
+
+                if (cinemaList.size())
+                {
+                    if (ImGui::Button("DeleteAllCinema"))
+                    {
+                        camPosList.clear();
+                        camDirList.clear();
+                        cinemaList.clear();
+                        posCount = camPosList.size();
+                        _ToolSystemMap.GetCurrentQuadTree()->m_CinemaList.clear();
+                    }
+                    for (int idx = 0; idx < cinemaList.size(); idx++)
+                    {
+                        if (ImGui::Button(_towm(cinemaList[idx].szCinemaName).c_str()))
+                        {
+                            Cinema cine = cinemaList[idx];
+                            camPosList.clear();
+                            camDirList.clear();
+                            for (int moveIdx = 0; moveIdx < cine.CamMoveList.size(); moveIdx++)
+                            {
+                                XMFLOAT3 pos = cine.CamMoveList[moveIdx].camPos;
+                                XMFLOAT3 dir;
+                                dir.x = cine.CamMoveList[moveIdx].fYaw;
+                                dir.y = cine.CamMoveList[moveIdx].fPitch;
+                                dir.z = cine.CamMoveList[moveIdx].fRoll;
+                                camPosList.push_back(pos);
+                                camDirList.push_back(dir);
+                            }
+                            posCount = camPosList.size();
+                            moveCameraDuration = cinemaList[idx].fDuration;
+                            cinemaList.clear();
+                            break;
+                        }
+                    }
+                }
+
                 if (playMove)
                 {
                     if (moveCameraTime > moveCameraDuration)
@@ -497,9 +543,15 @@ void ImguiSystem::Update()
                 }
                 if (posCount > 0)
                 {
+                    ImGui::PushItemWidth(100.0f);
+                    if (ImGui::InputText("CinemaName", Cinemabuff, 255))
+                        szCinemaName = _tomw(Cinemabuff);
+                    ImGui::PopItemWidth();
+
+                    ImGui::SameLine();
                     if (ImGui::Button("SaveCamMove"))
                     {
-                        _ToolSystemMap.GetCurrentQuadTree()->SetCamMove(camPosList, camDirList, moveCameraDuration);
+                        _ToolSystemMap.GetCurrentQuadTree()->SetCamMove(szCinemaName, camPosList, camDirList, moveCameraDuration);
                     }
                 }
             }
