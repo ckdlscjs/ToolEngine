@@ -140,7 +140,7 @@ void Camera::Update()
 	m_vCameraDir = XMVectorSet(XMVectorGetZ(m_matCamera.r[0]), XMVectorGetZ(m_matCamera.r[1]), XMVectorGetZ(m_matCamera.r[2]), XMVectorGetZ(m_matCamera.r[3]));
 	m_vCameraDir = XMVector3Normalize(m_vCameraDir);
 
-
+	UpdateCameraShake();
 	RECT rt = g_pWindow->GetClientWindowRect();
 	if (m_type == MAT_PROJ::ORTHO)
 	{
@@ -152,13 +152,73 @@ void Camera::Update()
 	}
 
 	m_Frustum.CreateFrustum(&m_matCamera, &m_matProj);
-
 }
 
-Camera::Camera(
-	std::wstring szCameraName, MAT_PROJ cameraType, XMVECTOR vCameraPos, XMVECTOR vCameraDir, XMVECTOR vCameraUp) : m_szCameraName(szCameraName), m_type(cameraType), m_vCameraPos(vCameraPos), m_vCameraDir(vCameraDir), m_vCameraUp(vCameraUp), m_vCameraRight({ 1,0,0 })
+float Camera::Fade(float t)
 {
+	return t * t * t * (t * (t * 6.0f - 15.0f) + 10.0f);
+}
+
+float Camera::Lerp(float a, float b, float t)
+{
+	return a + t * (b - a);
+}
+
+float Camera::Gradient(int hash, float x)
+{
+	int h = hash & 15;
+	float u = h < 8 ? x : -x;
+	return u * (h < 4 ? 1.0f : -1.0f);
+}
+
+float Camera::PerlinNoise1D(float x)
+{
+	int X = (int)floor(x) & 255;
+	x -= floor(x);
+	float u = Fade(x);
+	int A = hash[X];
+	int B = hash[(X + 1) & 255];
+	return Lerp(Gradient(hash[A], x), Gradient(hash[B], x - 1.0f), u);
+}
+void Camera::CameraShake()
+{
+	m_shakeCurrent = 0.0f;
+	m_vShakeOriginPos = m_vCameraPos;
+}
+#include <random>
+void Camera::InitHash(int seed)
+{
+	std::mt19937 gen(seed);
+	std::uniform_int_distribution<int> dist(0, 255);
+	for (int i = 0; i < 256; ++i)
+	{
+		hash[i] = dist(gen);
+	}
+}
+
+void Camera::UpdateCameraShake()
+{
+	if (m_shakeCurrent < m_shakeDuration)
+	{
+		float shakeFactor = 1.0f - (m_shakeCurrent / m_shakeDuration);
+		float offsetX = PerlinNoise1D(m_shakeCurrent * m_shakeFrequency) * m_shakeAmplitude * shakeFactor;
+		float offsetY = PerlinNoise1D((m_shakeCurrent + 1000.0f) * m_shakeFrequency) * m_shakeAmplitude * shakeFactor;
+		XMFLOAT3 noisePos(offsetX, offsetY, 0.0f);
+		m_vCameraPos += XMLoadFloat3(&noisePos);
+		m_shakeCurrent += g_fSecondPerFrame;
+	}
+	else
+	{
+		m_vCameraPos = XMVectorLerp(m_vCameraPos, m_vShakeOriginPos, g_fSecondPerFrame * 30.0f);
+	}
+}
+
+
+Camera::Camera(std::wstring szCameraName, MAT_PROJ cameraType, XMVECTOR vCameraPos, XMVECTOR vCameraDir, XMVECTOR vCameraUp) : m_szCameraName(szCameraName), m_type(cameraType), m_vCameraPos(vCameraPos), m_vCameraDir(vCameraDir), m_vCameraUp(vCameraUp), m_vCameraRight({ 1,0,0 })
+{
+	InitHash(100);
 	Update();
+	m_vShakeOriginPos = m_vCameraPos;
 }
 
 Camera::~Camera()

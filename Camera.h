@@ -15,6 +15,13 @@ public:
 	void SetCameraDirToLookat(XMFLOAT3 vLookat);
 	void SetCameraPos(XMFLOAT3 vPos);
 	void Update();
+	float Fade(float t);
+	float Lerp(float a, float b, float t);
+	float Gradient(int hash, float x);
+	float PerlinNoise1D(float x);
+	void CameraShake();
+	void UpdateCameraShake();
+	void InitHash(int seed);
 public:
 	Camera(std::wstring szCameraName, MAT_PROJ cameraType, XMVECTOR vCameraPos, XMVECTOR vCameraDir, XMVECTOR vCameraUp);
 	~Camera();
@@ -29,6 +36,13 @@ public:
 	float m_fFogStart = 50.0f;
 	float m_fFogEnd = 150.0f;
 	float m_fFogDensity = 0.00001f;
+	//UsingPerlinNoise;
+	int hash[256];
+	float m_shakeCurrent = 0.0f;
+	float m_shakeDuration = 1.0f;
+	float m_shakeAmplitude = 1.0f;
+	float m_shakeFrequency = 100.0f;
+	XMVECTOR m_vShakeOriginPos;
 	MAT_PROJ m_type;
 
 	XMVECTOR m_vCameraPos;

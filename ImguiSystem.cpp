@@ -408,6 +408,21 @@ void ImguiSystem::Update()
                 ImGui::DragFloat3("cam_dir", cam_dir);
                 ImGui::DragFloat3("cam_up", cam_up);
             }
+            {
+                if (ImGui::Button("CameraShake"))
+                {
+                    _ToolSystemMap.GetCurrentCamera()->CameraShake();
+                }
+                ImGui::SameLine();
+                ImGui::PushItemWidth(50.0f);
+                ImGui::DragFloat("Apli", &_ToolSystemMap.GetCurrentCamera()->m_shakeAmplitude);
+                ImGui::PopItemWidth();
+                ImGui::SameLine();
+                ImGui::PushItemWidth(50.0f);
+                ImGui::DragFloat("Freq", &_ToolSystemMap.GetCurrentCamera()->m_shakeFrequency);
+                ImGui::PopItemWidth();
+            }
+            
             ImGui::Dummy({ 0, 10 });
             {
                 ImGui::PushItemWidth(50.0f);
