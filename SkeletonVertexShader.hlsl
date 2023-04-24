@@ -73,7 +73,7 @@ VS_OUTPUT vsmain(VS_INPUT input)
 	output.m_light_direction = float4(output.direction_to_camera, 1.0f);
 
 	// 선형 Fog 계산
-	float fogDist = distance(cameraPosition, vWorld.xyz);
+	float fogDist = distance(cameraPosition, vWorld);
 	output.linearFogAmount = (linearFogEnd - fogDist) / (linearFogEnd - linearFogStart);
 	output.linearFogAmount = saturate(output.linearFogAmount);
 

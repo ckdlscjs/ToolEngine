@@ -60,8 +60,8 @@ float4 psmain(PS_INPUT input) : SV_TARGET
 	//fog
 	float3 fogColor = float3(0.5f, 0.5f, 0.5f);
 
-	// 선형 Fog와 지수 Fog의 양을 결합하여 최종 Fog 양을 계산
-	float fogAmount = lerp(input.linearFogAmount, input.expFogAmount, 0.0f);
+	// 선형 Fog와 지수 Fog의 양을 결합하여 최종 Fog 양을 계산5
+	float fogAmount = lerp(input.linearFogAmount, input.expFogAmount, 0.5f);
 
 	// 개체의 색상에 Fog를 적용
 	float3 finalColor = lerp(tex.rgb, fogColor, fogAmount);
