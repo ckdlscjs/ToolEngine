@@ -207,10 +207,6 @@ void Camera::UpdateCameraShake()
 		m_vCameraPos += XMLoadFloat3(&noisePos);
 		m_shakeCurrent += g_fSecondPerFrame;
 	}
-	else
-	{
-		m_vCameraPos = XMVectorLerp(m_vCameraPos, m_vShakeOriginPos, g_fSecondPerFrame * 30.0f);
-	}
 }
 
 

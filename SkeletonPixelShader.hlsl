@@ -65,5 +65,5 @@ float4 psmain(PS_INPUT input) : SV_TARGET
 
 	// 개체의 색상에 Fog를 적용
 	float3 finalColor = lerp(tex.rgb, fogColor, fogAmount);
-	return float4(finalColor, 1.0f);
+	return float4(tex.rgb, 1.0f);
 }
