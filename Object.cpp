@@ -339,7 +339,7 @@ Object::~Object()
 	if (m_pPixelShader_Depth) delete m_pPixelShader_Depth;
 }
 
-std::ostream& operator<<(std::ostream& os, const Object* pObject)
+std::ostream& operator<<(std::ostream& os, Object* pObject)
 {
 	//os << pObject->m_szFullPath << ", ";
 	
@@ -348,6 +348,25 @@ std::ostream& operator<<(std::ostream& os, const Object* pObject)
 		os << GetSplitExtension(pObject->m_szFullPath);
 		std::wstring scriptExtension = L".Script";
 		os << scriptExtension;
+	}
+	else if (pObject->m_Specify == OBJECT_SPECIFY::OBJECT_FOLIAGE)
+	{
+		/*os << ", ";
+		os << "m_CullMode:" << pObject->m_CullMode << ", ";
+		os << "m_DrawMode:" << pObject->m_DrawMode << ", ";
+		os << "m_InteractiveMode:" << pObject->m_InteractiveMode << ", ";
+		os << "m_Specify:" << pObject->m_Specify << ", ";
+		os << pObject->m_Transform << ", ";
+		os << pObject->m_Box << ", ";
+		os << "m_FoliageList:" << dynamic_cast<Foliage*>(pObject)->m_ConstantData_Instance.m_iInstanceCount << std::endl;
+		for (int idx = 0; idx < dynamic_cast<Foliage*>(pObject)->m_ConstantData_Instance.m_iInstanceCount; idx++)
+		{
+			XMFLOAT3 pos = dynamic_cast<Foliage*>(pObject)->m_pMesh->GetMeshNodeList()[0]->m_ListInstanceData[idx];
+			os << "pos:" << pos.x << " " << pos.y << " " << pos.z;
+			if(idx != dynamic_cast<Foliage*>(pObject)->m_ConstantData_Instance.m_iInstanceCount -1)
+				os << std::endl;
+		}
+		return os;*/
 	}
 	else
 	{
@@ -361,6 +380,7 @@ std::ostream& operator<<(std::ostream& os, const Object* pObject)
 	os << "m_Specify:" << pObject->m_Specify << ", ";
 	os << pObject->m_Transform << ", ";
 	os << pObject->m_Box;
+
 	return os;
 }
 

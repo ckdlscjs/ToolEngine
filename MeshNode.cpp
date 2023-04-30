@@ -54,6 +54,14 @@ void MeshNode::SetListIW(void* iw, int iSize, int idx)
 	}
 }
 
+void MeshNode::SetListInstance(void* instances, int iSize, int idx)
+{
+	/*for (int i = 0; i < iSize; i++)
+	{
+		m_ListInstanceData[idx].push_back(*((IW*)iw + i));
+	}*/
+}
+
 void MeshNode::SetListVertexBufferPNCT(VertexBuffer* pVertexBuffer, int idx)
 {
 	m_ListVertexBufferPNCT[idx] = pVertexBuffer;
@@ -67,6 +75,16 @@ void MeshNode::SetListVertexBufferIW(VertexBuffer* pVertexBuffer, int idx)
 void MeshNode::SetListIndexBuffer(IndexBuffer* pIndexBuffer, int idx)
 {
 	m_ListIndexBuffer[idx] = pIndexBuffer;
+}
+
+void MeshNode::SetListInstanceBuffer(InstanceBuffer* pInstanceBuffer, int idx)
+{
+	m_ListInstanceBuffer[idx] = pInstanceBuffer;
+}
+
+std::vector<InstanceBuffer*>& MeshNode::GetListInstanceBuffer()
+{
+	return m_ListInstanceBuffer;
 }
 
 InputLayout* MeshNode::GetInputLayout()

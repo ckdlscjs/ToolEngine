@@ -28,7 +28,7 @@ void ImguiSystem::Update()
     //ImGui::DockSpaceOverViewport(ImGui::GetMainViewport());
 
     /*imgui sample Block*/
-   
+
     //// 0.∏ﬁ¿Œ
     //{
     //    ImGui::Begin("##main");
@@ -76,7 +76,7 @@ void ImguiSystem::Update()
     //        m_show_another_window = false;
     //    ImGui::End();
     //}
-     
+
 
     static std::wstring szCurrentSplat;
     static std::wstring szCurrentImage;
@@ -94,10 +94,10 @@ void ImguiSystem::Update()
     static int iSliceCount = 0;
     static int iStackCount = 0;
 
-   
+
     static bool bSimpleObj = false;
     static bool bSimple = false;
-    static float fSimpleObjLength = 1.0f; 
+    static float fSimpleObjLength = 1.0f;
     static char buff[255];
     static std::wstring szSimpleObjName = L"";
     static bool bCollider = false;
@@ -108,6 +108,8 @@ void ImguiSystem::Update()
     static bool bFbxObj = false;
 
     static bool bSculpt = false;
+
+    static bool bFoliage = false;
 
     static bool bSplatting = false;
     static float fSculptRadius = 10.0f;
@@ -136,7 +138,7 @@ void ImguiSystem::Update()
                 if (ImGui::Checkbox("WireFrame", &g_bWireFrame))
                     ~g_bWireFrame;
             }
-            
+
             //SimpleObjPicking
             {
                 if (ImGui::Checkbox("CreateSimpleObj", &bSimpleObj))
@@ -145,7 +147,7 @@ void ImguiSystem::Update()
                 if (bSimpleObj && _ToolSystemMap.GetCurrentQuadTree() != nullptr)
                 {
                     ImGui::InputFloat("length", &fSimpleObjLength);
-                    
+
                     if (ImGui::InputText("objName", buff, 255))
                         szSimpleObjName = _tomw(buff);
 
@@ -153,7 +155,7 @@ void ImguiSystem::Update()
                     {
                         ~bSimple;
                         bCollider = bTrigger = bSpawn = false;
-                        
+
                     }
                     ImGui::SameLine();
                     if (ImGui::Checkbox("Collider", &bCollider))
@@ -180,8 +182,8 @@ void ImguiSystem::Update()
                     }
                     if ((_InputSystem.GetKey(VK_RBUTTON) == KEY_STATE::KEY_DOWN) && _ToolSystemMap.GetInterSection())
                     {
-                        if(bSimple)
-                            _ToolSystemMap.CreateSimpleBox(OBJECT_SPECIFY::OBJECT_SIMPLE, _PhysicsSystem.GetSelect().m_vIntersection, { 0, 0, 0, 0 }, { fSimpleObjLength, fSimpleObjLength , fSimpleObjLength , 0});
+                        if (bSimple)
+                            _ToolSystemMap.CreateSimpleBox(OBJECT_SPECIFY::OBJECT_SIMPLE, _PhysicsSystem.GetSelect().m_vIntersection, { 0, 0, 0, 0 }, { fSimpleObjLength, fSimpleObjLength , fSimpleObjLength , 0 });
                         else if (bCollider)
                             _ToolSystemMap.CreateSimpleBox(OBJECT_SPECIFY::OBJECT_COLLIDER, _PhysicsSystem.GetSelect().m_vIntersection, { 0, 0, 0, 0 }, { fSimpleObjLength, fSimpleObjLength , fSimpleObjLength , 0 });
                         else if (bSpawn)
@@ -191,10 +193,10 @@ void ImguiSystem::Update()
                         else if (bEffect)
                             _ToolSystemMap.CreateSimpleBox(OBJECT_SPECIFY::OBJECT_EFFECT, _PhysicsSystem.GetSelect().m_vIntersection, { 0, 0, 0, 0 }, { fSimpleObjLength, fSimpleObjLength , fSimpleObjLength , 0 }, szSimpleObjName);
                     }
-                        
+
                 }
             }
-            
+
             //FbxObjPicking
             {
                 if (ImGui::Checkbox("CreateFbxObj", &bFbxObj))
@@ -208,7 +210,7 @@ void ImguiSystem::Update()
                     }
                 }
             }
-            
+
             //OjbectPicking
             {
                 if (ImGui::Checkbox("OjbectPicking", &bOjbectPicking))
@@ -219,7 +221,7 @@ void ImguiSystem::Update()
                         pObject = _ToolSystemMap.ObjectPicking();
                 }
             }
-            
+
             //SculptPicking
             {
                 if (ImGui::Checkbox("SculptPicking", &bSculpt))
@@ -235,7 +237,7 @@ void ImguiSystem::Update()
                     }
                 }
             }
-           
+
             //Splatting
             {
                 if (ImGui::Checkbox("Splatting", &bSplatting))
@@ -254,11 +256,25 @@ void ImguiSystem::Update()
 
                     if (_InputSystem.GetKey(VK_RBUTTON) && _ToolSystemMap.GetInterSection())
                     {
-                        _ToolSystemMap.Splatting(_PhysicsSystem.GetSelect().m_vIntersection, fSplatRadius , fSplatIntensity, szCurrentSplat);
+                        _ToolSystemMap.Splatting(_PhysicsSystem.GetSelect().m_vIntersection, fSplatRadius, fSplatIntensity, szCurrentSplat);
                     }
                 }
             }
-            
+
+            //FbxObjPicking
+            {
+                if (ImGui::Checkbox("SetFoliage", &bFoliage))
+                    ~bFoliage;
+
+                if (bFoliage && _ToolSystemMap.GetCurrentQuadTree() != nullptr)
+                {
+                    if ((_InputSystem.GetKey(VK_RBUTTON)) && _ToolSystemMap.GetInterSection())
+                    {
+                        _ToolSystemMap.CreateFoliage(_PhysicsSystem.GetSelect().m_vIntersection);
+                    }
+                }
+            }
+
             ImGui::Dummy({ 0, 10 });
 
             if (ImGui::Button("Open SplatImage"))
@@ -321,6 +337,15 @@ void ImguiSystem::Update()
         }
         ImGui::Dummy({ 0, 10 });
         
+        static int iInstCount;
+        
+        if (ImGui::Button("CreateInstanceObject"))
+        {
+            _ToolSystemMap.CreateInstanceObject(szCurrentImage, iInstCount);
+        }
+        ImGui::InputInt("InstCount", &iInstCount);
+
+        ImGui::Dummy({ 0, 10 });
         if (ImGui::Button("Open ImgFile"))
             ifd::FileDialog::Instance().Open("ImageOpenDialog", "Open a Image", "Image file (*.png;*.jpg;*.jpeg;*.bmp;*.tga){.png,.jpg,.jpeg,.bmp,.tga},.*", true);
 
@@ -342,7 +367,7 @@ void ImguiSystem::Update()
             }
             ImGui::EndListBox();
         }
-       
+
         {
             if (ImGui::Button("LoadMap"))
             {
@@ -354,42 +379,43 @@ void ImguiSystem::Update()
                 ifd::FileDialog::Instance().Save("SaveMapDialog", "Save a map", "*.map {.map}");
             }
         }
-        ImGui::Dummy({ 0, 10 });
-
     }
     ImGui::End();
-   
+
     // Simple window
     ImGui::Begin("Control Panel");
     {
-        if (ImGui::Button("CreateObject"))
-            pObjectAnim = dynamic_cast<FBXObject*>(_ToolSystemMap.CreateFbxObject(szCurrentFbx, _CameraSystem.GetCurrentCamera()->m_vCameraPos));
-    }
-    ImGui::Dummy({ 0, 10 });
-
-    if (ImGui::Button("Open Fbxfile"))
-        ifd::FileDialog::Instance().Open("FbxOpenDialog", "Open a Fbx", "Fbx file (*.fbx;*.FBX){.fbx,.FBX},.*", true);
-
-    if (ImGui::BeginListBox("listboxFbx"))
-    {
-        for (const auto& fbx : _ToolSystemMap.GetListFbx())
         {
-            std::wstring fullpath = fbx;
-
-            std::wstring content = GetSplitName(fullpath);
-
-            const bool is_selected = (szCurrentFbx == fullpath);
-            if (ImGui::Selectable(_towm(content).c_str(), is_selected))
-            {
-                szCurrentFbx = fullpath;
-            }
-
-            // Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
-            if (is_selected)
-                ImGui::SetItemDefaultFocus();
+            if (ImGui::Button("CreateObject"))
+                pObjectAnim = dynamic_cast<FBXObject*>(_ToolSystemMap.CreateFbxObject(szCurrentFbx, _CameraSystem.GetCurrentCamera()->m_vCameraPos));
         }
-        ImGui::EndListBox();
+        ImGui::Dummy({ 0, 10 });
+
+        if (ImGui::Button("Open Fbxfile"))
+            ifd::FileDialog::Instance().Open("FbxOpenDialog", "Open a Fbx", "Fbx file (*.fbx;*.FBX){.fbx,.FBX},.*", true);
+
+        if (ImGui::BeginListBox("listboxFbx"))
+        {
+            for (const auto& fbx : _ToolSystemMap.GetListFbx())
+            {
+                std::wstring fullpath = fbx;
+
+                std::wstring content = GetSplitName(fullpath);
+
+                const bool is_selected = (szCurrentFbx == fullpath);
+                if (ImGui::Selectable(_towm(content).c_str(), is_selected))
+                {
+                    szCurrentFbx = fullpath;
+                }
+
+                // Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
+                if (is_selected)
+                    ImGui::SetItemDefaultFocus();
+            }
+            ImGui::EndListBox();
+        }
     }
+    
     ImGui::End();
 
     // Simple window

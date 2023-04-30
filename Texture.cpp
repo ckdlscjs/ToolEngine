@@ -24,6 +24,8 @@ Texture::Texture(std::wstring szFullPath) : Resource(szFullPath), m_szFullPath(s
 		throw std::exception("Coninitialize not successfully");
 	if (GetSplitFile(_towm(szFullPath.c_str())) == "tga")
 		result = DirectX::LoadFromTGAFile(szFullPath.c_str(), nullptr, image_data);
+	else if (GetSplitFile(_towm(szFullPath)) == "dds")
+		result = DirectX::LoadFromDDSFile(szFullPath.c_str(), DDS_FLAGS_NONE, nullptr, image_data);
 	else
 		result = DirectX::LoadFromWICFile(szFullPath.c_str(), DirectX::WIC_FLAGS_IGNORE_SRGB, nullptr, image_data);
 

@@ -17,6 +17,12 @@ InputLayout::InputLayout(ID3D11Device* pDevice, void* pCodeShader, UINT iSizeSha
 			layout_desc = layoutPNCTIW;
 			iSizeLayout = size_layoutPNCTIW;
 		}break;
+
+		case INPUT_LAYOUT::PNCTINST:
+		{
+			layout_desc = layoutPNCTInstance;
+			iSizeLayout = size_layoutPNCTInstance;
+		}break;
 	}
 
 	if (FAILED(pDevice->CreateInputLayout(layout_desc, iSizeLayout, pCodeShader, iSizeShader, &m_pInputLayout)))

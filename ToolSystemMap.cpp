@@ -326,6 +326,96 @@ FQuadTree* ToolSystemMap::GetCurrentQuadTree()
     return m_pQuadTree;
 }
 
+
+Object* ToolSystemMap::CreateInstanceObject(std::wstring szFullPath, UINT iCount)//, XMVECTOR vPos, XMVECTOR vRot, XMVECTOR vScale)
+{
+    Foliage* pObject = new Foliage(szFullPath);
+    pFoliage = pObject;
+    _ObjectSystem.AddObject(pObject);
+    PNCTVertex vertex_list[] =
+    {
+        //FrontFace
+        {XMFLOAT3(-1.0f, -1.0f, 0.0f),	XMFLOAT3(0, 0, 1),  XMFLOAT4(1, 1, 1, 1),   XMFLOAT2(0,1)},
+        {XMFLOAT3(-1.0f, 1.0f, 0.0f), 	XMFLOAT3(0, 0, 1),  XMFLOAT4(1, 1, 1, 1),   XMFLOAT2(0,0)},
+        {XMFLOAT3(1.0f, 1.0f, 0.0f), 	XMFLOAT3(0, 0, 1),  XMFLOAT4(1, 1, 1, 1),   XMFLOAT2(1,0)},
+        {XMFLOAT3(1.0f, -1.0f, 0.0f),	XMFLOAT3(0, 0, 1),  XMFLOAT4(1, 1, 1, 1),   XMFLOAT2(1,1)}
+    };
+    UINT size_vertex_list = ARRAYSIZE(vertex_list);
+
+    unsigned int index_list[] =
+    {
+        //Front
+        0, 1, 2,
+        2, 3, 0,
+    };
+    UINT size_index_list = ARRAYSIZE(index_list);
+
+    ConstantData_Transform cc;
+    cc.matWorld = XMMatrixIdentity();
+    cc.matView = m_pCamera->m_matCamera;
+    cc.matProj = m_pCamera->m_matProj;
+
+    Mesh* pMesh = _EngineSystem.GetMeshSystem()->CreateMeshFromFile(szFullPath);
+
+    void* shader_byte_code_vs = nullptr;
+    void* shader_byte_code_ps = nullptr;
+    size_t size_shader_vs = 0;
+    size_t size_shader_ps = 0;
+    std::wstring szVSPath = L"FoliageVertexShader.hlsl";
+    std::wstring szPSPath = L"FoliagePixelShader.hlsl";
+    _EngineSystem.GetRenderSystem()->CompileVertexShader(szVSPath.c_str(), "vsmain", "vs_5_0", &shader_byte_code_vs, &size_shader_vs);
+    VertexShader* pVertexShader = _EngineSystem.GetRenderSystem()->CreateVertexShader(shader_byte_code_vs, size_shader_vs);
+    _EngineSystem.GetRenderSystem()->CompilePixelShader(szPSPath.c_str(), "psmain", "ps_5_0", &shader_byte_code_ps, &size_shader_ps);
+    PixelShader* pPixelShader = _EngineSystem.GetRenderSystem()->CreatePixelShader(shader_byte_code_ps, size_shader_ps);
+
+    if (pMesh->IsEmpty())
+    {
+        MeshNode* pMeshNode = new MeshNode();
+        pMeshNode->GetListPNCT().resize(1);
+        pMeshNode->GetListVertexBufferPNCT().resize(1);
+        pMeshNode->GetListIndex().resize(1);
+        pMeshNode->GetListIndexBuffer().resize(1);
+        pMeshNode->GetListInstanceBuffer().resize(1);
+       
+        pMeshNode->SetListPNCT(vertex_list, size_vertex_list);
+        pMeshNode->SetListVertexBufferPNCT(_EngineSystem.GetRenderSystem()->CreateVertexBuffer(&pMeshNode->GetListPNCT()[0][0], sizeof(PNCTVertex), pMeshNode->GetListPNCT()[0].size()));
+
+        pMeshNode->SetListIndex(index_list, size_index_list);
+        pMeshNode->SetListIndexBuffer(_EngineSystem.GetRenderSystem()->CreateIndexBuffer(&pMeshNode->GetListIndex()[0][0], pMeshNode->GetListIndex()[0].size()));
+
+        pMeshNode->m_ListInstanceData.resize(iCount);
+        pMeshNode->SetListInstanceBuffer(_EngineSystem.GetRenderSystem()->CreateInstanceBuffer(&pMeshNode->m_ListInstanceData[0], sizeof(InstanceData), iCount));
+
+        pMeshNode->SetInputLayout(_EngineSystem.GetRenderSystem()->CreateInputLayout(shader_byte_code_vs, size_shader_vs, INPUT_LAYOUT::PNCTINST));
+
+        pMesh->SetMeshNode(pMeshNode);
+    }
+
+    _EngineSystem.GetRenderSystem()->ReleaseBlob();
+
+    pObject->m_pTexture = _EngineSystem.GetTextureSystem()->GetTexture(szFullPath);
+    pObject->SetShader(pVertexShader, pPixelShader);
+    pObject->SetConstantData(cc);
+    pObject->SetMesh(pMesh);
+    //pObject->SetTransform({ vPos , vRot, vScale });
+    pObject->SetDrawMode(DRAW_MODE::MODE_SOLID);
+    pObject->SetSpecify(OBJECT_SPECIFY::OBJECT_FOLIAGE);
+
+    if (m_pQuadTree)
+        m_pQuadTree->AddObject(pObject);
+
+    return pObject;
+}
+
+void ToolSystemMap::CreateFoliage(XMVECTOR vPos, XMVECTOR vRot, XMVECTOR vScale)
+{
+    UINT idx = pFoliage->m_ConstantData_Instance.m_iInstanceCount;
+    pFoliage->GetMesh()->GetMeshNodeList()[0]->m_ListInstanceData[idx].matInstance = XMMatrixIdentity();
+    pFoliage->GetMesh()->GetMeshNodeList()[0]->m_ListInstanceData[idx].matInstance *= XMMatrixTranslationFromVector(vPos);
+ /*   XMStoreFloat3(&, vPos);*/
+    pFoliage->m_ConstantData_Instance.m_iInstanceCount++;
+}
+
 #include "FBXObject.h"
 #include "FBXMesh.h"
 #include "FBXMeshNode.h"

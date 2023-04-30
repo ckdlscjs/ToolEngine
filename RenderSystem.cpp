@@ -100,6 +100,11 @@ ConstantBuffer* RenderSystem::CreateConstantBuffer(void* pBuffer, UINT iSizeBuff
 	return new ConstantBuffer(m_pCDevice->m_pDevice, pBuffer, iSizeBuffer);
 }
 
+InstanceBuffer* RenderSystem::CreateInstanceBuffer(void* pBuffer, UINT iSizeInstance, UINT iSizeList)
+{
+	return new InstanceBuffer(m_pCDevice->m_pDevice, pBuffer, iSizeInstance, iSizeList);
+}
+
 void RenderSystem::SetFullScreen(bool bFullscreen, unsigned int iWidth, unsigned int iHeight)
 {
 	Resize(iWidth, iHeight);
@@ -238,6 +243,15 @@ void RenderSystem::SetVertexBuffer(VertexBuffer* pVertexBuffer, int iStartSlot)
 	m_pCDevice->m_pImmediateContext->IASetVertexBuffers(iStartSlot, 1, &pVertexBuffer->m_pBuffer, &stride, &offset);	// VertexBuffer를 세팅, 1은 버퍼의갯수
 }
 
+void RenderSystem::SetInstanceBuffer(InstanceBuffer* pInstanceBuffer, int iStartSlot)
+{
+	if (!pInstanceBuffer)
+		return;
+	UINT stride = pInstanceBuffer->m_iSizeInstance; //정점의크기
+	UINT offset = 0;                            //정점의오프셋
+	m_pCDevice->m_pImmediateContext->IASetVertexBuffers(iStartSlot, 1, &pInstanceBuffer->m_pBuffer, &stride, &offset);	// VertexBuffer를 세팅, 1은 버퍼의갯수
+}
+
 void RenderSystem::SetIndexBuffer(IndexBuffer* pIndexBuffer)
 {
 	m_pCDevice->m_pImmediateContext->IASetIndexBuffer(pIndexBuffer->m_pBuffer, DXGI_FORMAT_R32_UINT, 0);
@@ -272,6 +286,11 @@ void RenderSystem::UpdateVertexBuffer(VertexBuffer* pVertexBuffer, void* pBuffer
 void RenderSystem::UpdateConstantBuffer(ConstantBuffer* pConstantBuffer, void* pBuffer)
 {
 	m_pCDevice->m_pImmediateContext->UpdateSubresource(pConstantBuffer->m_pBuffer, NULL, NULL, pBuffer, NULL, NULL);
+}
+
+void RenderSystem::UpdateInstanceBuffer(InstanceBuffer* pInstanceBuffer, void* pBuffer)
+{
+	m_pCDevice->m_pImmediateContext->UpdateSubresource(pInstanceBuffer->m_pBuffer, NULL, NULL, pBuffer, NULL, NULL);
 }
 
 void RenderSystem::SetVertexShader(VertexShader* pVertexShader)
@@ -351,6 +370,12 @@ void RenderSystem::drawIndexedTriangleList(UINT iCountIndex, UINT iStartIndexLoc
 {
 	m_pCDevice->m_pImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);		//TrangleList를 Index로그린다
 	m_pCDevice->m_pImmediateContext->DrawIndexed(iCountIndex, iStartIndexLocation, iBaseVertexLocation);
+}
+
+void RenderSystem::drawInstancedTriangleList(UINT iCountIndex, UINT iInstanceCount)
+{
+	m_pCDevice->m_pImmediateContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);		//TrangleList를 Index로그린다
+	m_pCDevice->m_pImmediateContext->DrawIndexedInstanced(iCountIndex, iInstanceCount, 0, 0, 0);
 }
 
 void RenderSystem::Reset()

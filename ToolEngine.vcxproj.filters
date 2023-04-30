@@ -304,6 +304,12 @@
     <ClInclude Include="RenderTexture.h">
       <Filter>EngineSystem\RenderySystem\RenderTextrue</Filter>
     </ClInclude>
+    <ClInclude Include="InstanceBuffer.h">
+      <Filter>EngineSystem\RenderySystem</Filter>
+    </ClInclude>
+    <ClInclude Include="Foliage.h">
+      <Filter>ToolSystem\ToolSystemMap\MapObject</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WindowSystem.cpp">
@@ -475,6 +481,12 @@
     <ClCompile Include="RenderTexture.cpp">
       <Filter>EngineSystem\RenderySystem\RenderTextrue</Filter>
     </ClCompile>
+    <ClCompile Include="InstanceBuffer.cpp">
+      <Filter>EngineSystem\RenderySystem</Filter>
+    </ClCompile>
+    <ClCompile Include="Foliage.cpp">
+      <Filter>ToolSystem\ToolSystemMap\MapObject</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="imgui.ini">
@@ -519,6 +531,12 @@
     </FxCompile>
     <FxCompile Include="DepthPixelShader.hlsl">
       <Filter>Shaders\Shadow</Filter>
+    </FxCompile>
+    <FxCompile Include="FoliageVertexShader.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="FoliagePixelShader.hlsl">
+      <Filter>Shaders</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>

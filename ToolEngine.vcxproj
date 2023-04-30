@@ -34,6 +34,7 @@
     <ClInclude Include="FBXSystem.h" />
     <ClInclude Include="FileSystem.h" />
     <ClInclude Include="FNode.h" />
+    <ClInclude Include="Foliage.h" />
     <ClInclude Include="FQuadTree.h" />
     <ClInclude Include="Frustum.h" />
     <ClInclude Include="FSelect.h" />
@@ -50,6 +51,7 @@
     <ClInclude Include="IndexBuffer.h" />
     <ClInclude Include="InputLayout.h" />
     <ClInclude Include="InputSystem.h" />
+    <ClInclude Include="InstanceBuffer.h" />
     <ClInclude Include="Material.h" />
     <ClInclude Include="MaterialSystem.h" />
     <ClInclude Include="MeshMap.h" />
@@ -95,6 +97,7 @@
     <ClCompile Include="FBXSystem.cpp" />
     <ClCompile Include="FileSystem.cpp" />
     <ClCompile Include="FNode.cpp" />
+    <ClCompile Include="Foliage.cpp" />
     <ClCompile Include="FQuadTree.cpp" />
     <ClCompile Include="Frustum.cpp" />
     <ClCompile Include="FSelect.cpp" />
@@ -110,6 +113,7 @@
     <ClCompile Include="IndexBuffer.cpp" />
     <ClCompile Include="InputLayout.cpp" />
     <ClCompile Include="InputSystem.cpp" />
+    <ClCompile Include="InstanceBuffer.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Material.cpp" />
     <ClCompile Include="MaterialSystem.cpp" />
@@ -155,6 +159,12 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="DepthVertexShader.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="FoliagePixelShader.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="FoliageVertexShader.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="SkeletonPixelShader.hlsl">

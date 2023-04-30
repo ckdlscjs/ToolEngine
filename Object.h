@@ -32,7 +32,7 @@ public:
 	DRAW_MODE GetDrawMode();
 	OBJECT_SPECIFY GetSpecify();
 
-	friend std::ostream& operator<<(std::ostream& os, const Object* pObject);
+	friend std::ostream& operator<<(std::ostream& os, Object* pObject);
 	//friend std::ifstream& operator>>(std::ifstream& is, Object* pObject);
 
 public:

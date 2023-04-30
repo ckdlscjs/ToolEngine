@@ -7,6 +7,7 @@
 #include "InputLayout.h"
 #include "IndexBuffer.h"
 #include "ConstantBuffer.h"
+#include "InstanceBuffer.h"
 #include "VertexShader.h"
 #include "PixelShader.h"
 #include "Texture.h"
@@ -35,6 +36,7 @@ public:
 	InputLayout* CreateInputLayout(void* pCodeShader, UINT iSizeShader, INPUT_LAYOUT layout = INPUT_LAYOUT::PNCT);
 	IndexBuffer* CreateIndexBuffer(void* pIndices, UINT iSizeList);
 	ConstantBuffer* CreateConstantBuffer(void* pBuffer, UINT iSizeBuffer);
+	InstanceBuffer* CreateInstanceBuffer(void* pBuffer, UINT iSizeInstance, UINT iSizeList);
 
 public:
 	/*Set Block*/
@@ -47,12 +49,14 @@ public:
 	void ReloadBuffer(unsigned int iWidth, unsigned int iHeight);
 	void SetInputLayout(InputLayout* pInputLayout);
 	void SetVertexBuffer(VertexBuffer* pVertexBuffer, int iStartSlot = 0);
+	void SetInstanceBuffer(InstanceBuffer* pInstanceBuffer, int iStartSlot = 0);
 	void SetIndexBuffer(IndexBuffer* pIndexBuffer);
 	void SetConstantBuffer(VertexShader* pVertexShader, ConstantBuffer* pConstantBuffer, UINT iStartSlot = 0);
 	void SetConstantBuffer(PixelShader* pPixelShader, ConstantBuffer* pConstantBuffer, UINT iStartSlot = 0);
 	void UpdateIndexBuffer(IndexBuffer* pIndexBuffer, void* pBuffer);
 	void UpdateVertexBuffer(VertexBuffer* pVertexBuffer, void* pBuffer);
 	void UpdateConstantBuffer(ConstantBuffer* pConstantBuffer, void* pBuffer);
+	void UpdateInstanceBuffer(InstanceBuffer* pInstanceBuffer, void* pBuffer);
 	void SetVertexShader(VertexShader* pVertexShader);
 	void SetPixelShader(PixelShader* pPixelShader);
 	void setTexture(const VertexShader* pVertexShader, const std::vector<Texture*>& pListTex, unsigned int iNumTextures, unsigned int iNumStart = 0);
@@ -64,6 +68,7 @@ public:
 	void drawTriangleList(UINT iCountVertex, UINT iStartVertexLocation);
 	void drawTriangleStrip(UINT iCountVertex, UINT iStartVertexLocation);
 	void drawIndexedTriangleList(UINT iCountIndex, UINT iStartIndexLocation, UINT iBaseVertexLocation);
+	void drawInstancedTriangleList(UINT iCountIndex, UINT iInstanceCount);
 
 public:
 	void Reset();
