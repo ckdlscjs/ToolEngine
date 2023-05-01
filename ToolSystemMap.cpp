@@ -407,7 +407,7 @@ Object* ToolSystemMap::CreateInstanceObject(std::wstring szFullPath, UINT iCount
     return nullptr;
 }
 
-Object* ToolSystemMap::CreateInstanceFbxObject(std::wstring szFullPath, UINT iCount)
+Object* ToolSystemMap::CreateInstanceFbxObject(std::wstring szFullPath, UINT iCount, std::vector<InstanceData>* instOrigin)
 {
     if (szFullPath.empty())
         return nullptr;
@@ -497,10 +497,6 @@ Object* ToolSystemMap::CreateInstanceFbxObject(std::wstring szFullPath, UINT iCo
                 pMeshNode->SetInputLayout(_EngineSystem.GetRenderSystem()->CreateInputLayout(shader_byte_code_vs, size_shader_vs, INPUT_LAYOUT::PNCTINST));
             }
         }
-        /* for (const auto& animLayer : pFBXFile->m_ListAnimLayer)
-         {
-             pMesh->SetAnimScene(animLayer);
-         }*/
     }
 
 
@@ -532,28 +528,33 @@ Object* ToolSystemMap::CreateInstanceFbxObject(std::wstring szFullPath, UINT iCo
     pObject->SetShader(pVertexShader, pPixelShader);
     pObject->SetConstantData(constantData);
     pObject->SetMesh(pMesh);
-    //pObject->SetTransform({ vPos , vRot, vScale });
     pObject->SetMaterial(pMaterial);
     pObject->SetDrawMode(DRAW_MODE::MODE_SOLID);
     pObject->SetSpecify(OBJECT_SPECIFY::OBJECT_FOLIAGE);
-  /*  pObject->UpdateBoundigBox(box);
-    if (!pMesh->GetListAnim().empty())
-        pObject->SetCurrentAnim(pMesh->GetListAnim()[0]);*/
+
+    if (instOrigin)
+    {
+        for (int idx = 0; idx < instOrigin->size(); idx++)
+        {
+            pObject->GetMesh()->GetMeshNodeList()[1]->m_ListInstanceData[idx].matInstance = instOrigin->at(idx).matInstance;
+        }
+        pObject->m_ConstantData_Instance.iInstanceCount = iCount;
+    }
     if (m_pQuadTree)
         m_pQuadTree->AddObject(pObject);
 
     return pObject;
 }
 
-void ToolSystemMap::CreateFoliage(XMVECTOR vPos, XMVECTOR vRot, XMVECTOR vScale)
+void ToolSystemMap::CreateFoliage(XMVECTOR vPos, XMVECTOR vRot, XMVECTOR vScale, XMFLOAT4 color)
 {
-    UINT idx = m_pFoliage->m_ConstantData_Instance.m_iInstanceCount;
+    UINT idx = m_pFoliage->m_ConstantData_Instance.iInstanceCount;
+    m_pFoliage->GetMesh()->GetMeshNodeList()[1]->m_ListInstanceData[idx].fInstanceColor = color;
     m_pFoliage->GetMesh()->GetMeshNodeList()[1]->m_ListInstanceData[idx].matInstance = XMMatrixIdentity();
     m_pFoliage->GetMesh()->GetMeshNodeList()[1]->m_ListInstanceData[idx].matInstance *= XMMatrixScalingFromVector(vScale);
     m_pFoliage->GetMesh()->GetMeshNodeList()[1]->m_ListInstanceData[idx].matInstance *= XMMatrixRotationQuaternion(XMQuaternionRotationRollPitchYawFromVector(vRot));
     m_pFoliage->GetMesh()->GetMeshNodeList()[1]->m_ListInstanceData[idx].matInstance *= XMMatrixTranslationFromVector(vPos);
- /*   XMStoreFloat3(&, vPos);*/
-    m_pFoliage->m_ConstantData_Instance.m_iInstanceCount++;
+    m_pFoliage->m_ConstantData_Instance.iInstanceCount++;
 }
 
 Object* ToolSystemMap::CreateFbxObject(std::wstring szFullPath, XMVECTOR vPos, XMVECTOR vRot, XMVECTOR vScale, T_BOX box)
@@ -1095,7 +1096,7 @@ void ToolSystemMap::OpenFile(std::wstring szFullPath)
     std::vector<Cinema> CinemaList;
     /*std::vector<CameraMove> CamMoveList;
     float fCamMoveDuration = 0.0f;*/
-
+    std::vector<InstanceData> InstanceList;
     MeshMap* pMapMesh = new MeshMap();
     std::unordered_set<Object*> allObjectList;
     BYTE* fAlphaData = nullptr;
@@ -1215,15 +1216,8 @@ void ToolSystemMap::OpenFile(std::wstring szFullPath)
                     float fRadius;
                     UINT iSliceCount;
                     UINT iStackCount;
-                    //if (specifyMode == OBJECT_SPECIFY::OBJECT_COLLIDER || specifyMode == OBJECT_SPECIFY::OBJECT_SIMPLE)
-                    //{
-                    //    // Length 값을 추출합니다.
-                    //    size_t length_start = texturesStream.str().find("m_fLength:") + strlen("m_fLength:");
-                    //    size_t length_end = texturesStream.str().find(",", length_start);
-                    //    std::string length_str = texturesStream.str().substr(length_start, length_end - length_start);
-                    //    std::istringstream length_stream(length_str);
-                    //    length_stream >> fLength;
-                    //}
+
+                    UINT iInstanceCount;
                     if (specifyMode == OBJECT_SPECIFY::OBJECT_SKYDOME)
                     {
                         // radius 값을 추출합니다.
@@ -1247,6 +1241,49 @@ void ToolSystemMap::OpenFile(std::wstring szFullPath)
                         std::istringstream stack_stream(stack_str);
                         stack_stream >> iStackCount;
                     }
+                    else if (specifyMode == OBJECT_SPECIFY::OBJECT_FOLIAGE)
+                    {
+                        // InstanceCount 값을 추출합니다.
+                        size_t inst_start = texturesStream.str().find("m_FoliageList:") + strlen("m_FoliageList:");
+                        size_t inst_end = texturesStream.str().find(",", inst_start);
+                        std::string inst_str = texturesStream.str().substr(inst_start, inst_end - inst_start);
+                        std::istringstream inst_stream(inst_str);
+                        inst_stream >> iInstanceCount;
+                        for (int idx = 0; idx < iInstanceCount; idx++)
+                        {
+                            std::getline(is, str);
+                            std::stringstream texturesStream(str);
+                            std::string strName;
+                            std::getline(texturesStream, strName, ',');
+
+                            //pos값을추출
+                            size_t pos_start = texturesStream.str().find("pos:") + strlen("pos:");
+                            size_t pos_end = texturesStream.str().find(",", pos_start);
+                            std::string pos_str = texturesStream.str().substr(pos_start, pos_end - pos_start);
+                            std::istringstream pos_stream(pos_str);
+                            XMFLOAT3 position;
+                            pos_stream >> position.x >> position.y >> position.z;
+              
+                            //rot
+                            size_t rot_start = texturesStream.str().find("rot:") + strlen("rot:");
+                            size_t rot_end = texturesStream.str().find(",", rot_start);
+                            std::string rot_str = texturesStream.str().substr(rot_start, rot_end - rot_start);
+                            std::istringstream rot_stream(rot_str);
+                            XMFLOAT3 rotation;
+                            rot_stream >> rotation.x >> rotation.y >> rotation.z;
+
+                            //scale
+                            size_t scale_start = texturesStream.str().find("scale:") + strlen("scale:");
+                            size_t scale_end = texturesStream.str().find(",", scale_start);
+                            std::string scale_str = texturesStream.str().substr(scale_start, scale_end - scale_start);
+                            std::istringstream scale_stream(scale_str);
+                            XMFLOAT3 scale;
+                            scale_stream >> scale.x >> scale.y >> scale.z;
+                            InstanceData inst;
+                            inst.matInstance = XMMatrixAffineTransformation(XMLoadFloat3(&scale), { 0,0,0,0 }, XMLoadFloat3(&rotation), XMLoadFloat3(&position));
+                            InstanceList.push_back(inst);
+                        }
+                    }
 
                     std::string delim = "Assets";
                     strName = CutStringDelim(strName, delim);
@@ -1256,18 +1293,18 @@ void ToolSystemMap::OpenFile(std::wstring szFullPath)
                     relativeStr += _tomw(strName);
 
                     Object* pObject = nullptr;
-                    if (specifyMode == OBJECT_SPECIFY::OBJECT_COLLIDER || 
-                        specifyMode == OBJECT_SPECIFY::OBJECT_SIMPLE || 
+                    if (specifyMode == OBJECT_SPECIFY::OBJECT_COLLIDER ||
+                        specifyMode == OBJECT_SPECIFY::OBJECT_SIMPLE ||
                         specifyMode == OBJECT_SPECIFY::OBJECT_SPAWN ||
                         specifyMode == OBJECT_SPECIFY::OBJECT_TRIGGER ||
                         specifyMode == OBJECT_SPECIFY::OBJECT_EFFECT)
                         pObject = CreateSimpleBox(specifyMode, transform.position, transform.rotation, transform.scale, _tomw(strName), box);
                     else if (specifyMode == OBJECT_SPECIFY::OBJECT_STATIC || specifyMode == OBJECT_SPECIFY::OBJECT_SKELETON)
                         pObject = CreateFbxObject(relativeStr, transform.position, transform.rotation, transform.scale, box);
-                   /* else if (specifyMode == OBJECT_SPECIFY::OBJECT_SKELETON)
-                        pObject = CreateFbxObject(_tomw(str), transform.position, transform.rotation, transform.scale);*/
                     else if (specifyMode == OBJECT_SPECIFY::OBJECT_SKYDOME)
                         pObject = CreateSimpleSphere(fRadius, iSliceCount, iStackCount, specifyMode, relativeStr, transform.position, transform.rotation, transform.scale);
+                    else if (specifyMode == OBJECT_SPECIFY::OBJECT_FOLIAGE)
+                        pObject = CreateInstanceFbxObject(relativeStr, iInstanceCount, &InstanceList);
 
                     allObjectList.insert(pObject);
                     prevPos = is.tellg();
@@ -1319,7 +1356,7 @@ void ToolSystemMap::OpenFile(std::wstring szFullPath)
 
     for (const auto& obj : allObjectList)
     {
-        if (obj->GetSpecify() == OBJECT_SPECIFY::OBJECT_STATIC || obj->GetSpecify() == OBJECT_SPECIFY::OBJECT_SKELETON)
+        if (obj->GetSpecify() == OBJECT_SPECIFY::OBJECT_STATIC || obj->GetSpecify() == OBJECT_SPECIFY::OBJECT_SKELETON || obj->GetSpecify() == OBJECT_SPECIFY::OBJECT_FOLIAGE)
             m_ListFbx.insert(obj->GetObjectName());
         m_pQuadTree->AddObject(obj);
     }

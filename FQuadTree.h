@@ -38,7 +38,7 @@ public:
 private:
 	int m_iMaxDepth;
 	FNode* m_pRootNode;
-
+public:
 	MeshMap* m_pMap = nullptr;
 	Texture* m_pTexture;
 	std::vector<Texture*> m_ListTextureSplatting;

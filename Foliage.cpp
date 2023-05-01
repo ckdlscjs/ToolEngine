@@ -4,7 +4,7 @@
 void Foliage::Update()
 {
 	m_ConstantData_Transform.matView = _CameraSystem.GetCurrentCamera()->m_matCamera;
-	for (int i = 0; i < m_ConstantData_Instance.m_iInstanceCount; i++)
+	for (int i = 0; i < m_ConstantData_Instance.iInstanceCount; i++)
 	{
 		//// 현재 인스턴스의 위치를 벡터로 변환
 		//XMVECTOR vPos = m_pMesh->GetMeshNodeList()[0]->m_ListInstanceData[i].matInstacne.r[3];
@@ -72,7 +72,7 @@ void Foliage::Render()
 			_EngineSystem.GetRenderSystem()->SetInstanceBuffer(pMeshNode->GetListInstanceBuffer()[idxSub], 1);
 			_EngineSystem.GetRenderSystem()->SetIndexBuffer(pMeshNode->GetListIndexBuffer()[idxSub]);
 			_EngineSystem.GetRenderSystem()->setTexture(m_pPixelShader, m_pTexture);
-			_EngineSystem.GetRenderSystem()->drawInstancedTriangleList(pMeshNode->GetListIndexBuffer()[idxSub]->getSizeIndexList(), m_ConstantData_Instance.m_iInstanceCount);
+			_EngineSystem.GetRenderSystem()->drawInstancedTriangleList(pMeshNode->GetListIndexBuffer()[idxSub]->getSizeIndexList(), m_ConstantData_Instance.iInstanceCount);
 		}
 	}
 }
@@ -81,7 +81,7 @@ void Foliage::Render()
 
 Foliage::Foliage(std::wstring szFullPath) : Object(szFullPath)
 {
-	m_ConstantData_Instance.m_iInstanceCount = 0;
+	m_ConstantData_Instance.iInstanceCount = 0;
 	m_pConstantBuffer_Instance = _EngineSystem.GetRenderSystem()->CreateConstantBuffer(&m_ConstantData_Instance, sizeof(m_ConstantData_Instance));
 }
 

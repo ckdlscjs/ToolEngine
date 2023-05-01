@@ -33,14 +33,14 @@ void FbxFoliage::Render()
 			{
 				_EngineSystem.GetRenderSystem()->setTexture(m_pPixelShader, m_pMaterial->GetListTexture(idxNode)[idxSub]);
 			}
-			_EngineSystem.GetRenderSystem()->drawInstancedTriangleList(pMeshNode->GetListIndexBuffer()[idxSub]->getSizeIndexList(), m_ConstantData_Instance.m_iInstanceCount);
+			_EngineSystem.GetRenderSystem()->drawInstancedTriangleList(pMeshNode->GetListIndexBuffer()[idxSub]->getSizeIndexList(), m_ConstantData_Instance.iInstanceCount);
 		}
 	}
 }
 
 FbxFoliage::FbxFoliage(std::wstring szFullPath) : FBXObject(szFullPath)
 {
-	m_ConstantData_Instance.m_iInstanceCount = 0;
+	m_ConstantData_Instance.iInstanceCount = 0;
 	m_pConstantBuffer_Instance = _EngineSystem.GetRenderSystem()->CreateConstantBuffer(&m_ConstantData_Instance, sizeof(m_ConstantData_Instance));
 }
 

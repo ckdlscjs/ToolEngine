@@ -261,7 +261,9 @@ void ImguiSystem::Update()
                 }
             }
 
-            static float fFoliageScale = 1.0f;
+            static float fFoliageRadius = 1.0f;
+            static int iFoliCount = 1;
+            static float fFoliageColor[4] = { 255,255,255,255 };
             //FbxObjPicking
             {
                 if (ImGui::Checkbox("SetFoliage", &bFoliage))
@@ -269,11 +271,25 @@ void ImguiSystem::Update()
 
                 if (bFoliage && _ToolSystemMap.GetCurrentQuadTree() != nullptr)
                 {
-                    ImGui::InputFloat("foliScale", &fFoliageScale);
+                    ImGui::PushItemWidth(100.0f);
+                    ImGui::InputFloat("foliRadius", &fFoliageRadius);
+                    ImGui::PopItemWidth();
+                    ImGui::SameLine();
+                    ImGui::PushItemWidth(100.0f);
+                    ImGui::InputInt("foliInt", &iFoliCount);
+                    ImGui::PopItemWidth();
+                    ImGui::InputFloat4("foliageColor", fFoliageColor);
                     if ((_InputSystem.GetKey(VK_RBUTTON)) && _ToolSystemMap.GetInterSection())
                     {
-                        _ToolSystemMap.CreateFoliage(_PhysicsSystem.GetSelect().m_vIntersection, { 0, randstep(0.0f, 1.0f), 0, 0 }, {fFoliageScale, fFoliageScale, fFoliageScale , 0 });
-                    
+                        for (int idx = 0; idx < iFoliCount; idx++)
+                        {
+                            XMFLOAT3 vPos;
+                            XMStoreFloat3(&vPos, _PhysicsSystem.GetSelect().m_vIntersection + RandomPos(fFoliageRadius));
+                            vPos.y = _ToolSystemMap.GetCurrentQuadTree()->m_pMap->GetHeight(vPos.x, vPos.z);
+                               
+                            _ToolSystemMap.CreateFoliage(XMLoadFloat3(&vPos) , { 0, randstep(0.0f, 1.0f), 0, 0 }, { randstep(0.5f, 1.0f), randstep(0.5f, 1.0f), randstep(0.5f, 1.0f) , 0 }, XMFLOAT4(fFoliageColor[0]/255.0f, fFoliageColor[1]/255.0f, fFoliageColor[2]/255.0f, fFoliageColor[3]/255.0f));
+                        }
+                       
                     }
                 }
             }

@@ -35,8 +35,8 @@ public:
 
 	/*CreateBlock*/
 	Object* CreateInstanceObject(std::wstring szFullPath, UINT iCount);//, XMVECTOR vPos, XMVECTOR vRot = { 0, 0, 0, 0 }, XMVECTOR vScale = { 1, 1, 1, 0 });
-	Object* CreateInstanceFbxObject(std::wstring szFullPath, UINT iCount);
-	void CreateFoliage(XMVECTOR vPos, XMVECTOR vRot = { 0, 0, 0, 0 }, XMVECTOR vScale = { 1, 1, 1, 0 });
+	Object* CreateInstanceFbxObject(std::wstring szFullPath, UINT iCount, std::vector<InstanceData>* instOrigin = 0);
+	void CreateFoliage(XMVECTOR vPos, XMVECTOR vRot = { 0, 0, 0, 0 }, XMVECTOR vScale = { 1, 1, 1, 0 }, XMFLOAT4 color = {1,1,1,1});
 	Object* CreateFbxObject(std::wstring szFullPath, XMVECTOR vPos, XMVECTOR vRot = { 0, 0, 0, 0 }, XMVECTOR vScale = { 1, 1, 1, 0 }, T_BOX box = {});
 	Object* CreateSimpleBox(OBJECT_SPECIFY specify, XMVECTOR vPos, XMVECTOR vRot = { 0, 0, 0, 0 }, XMVECTOR vScale = { 1, 1, 1, 0 }, std::wstring szObjName = L"", T_BOX box = {});
 	Object* CreateSimpleSphere(float radius, UINT sliceCount, UINT stackCount, OBJECT_SPECIFY specify, std::wstring szCurrentImage = L"", XMVECTOR vPos = { 0, 0, 0, 0 }, XMVECTOR vRot = { 0, 0, 0, 0 }, XMVECTOR vScale = { 1, 1, 1, 0 });

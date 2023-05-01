@@ -341,32 +341,11 @@ Object::~Object()
 
 std::ostream& operator<<(std::ostream& os, Object* pObject)
 {
-	//os << pObject->m_szFullPath << ", ";
-	
-	if (pObject->m_Specify == OBJECT_SPECIFY::OBJECT_STATIC || pObject->m_Specify == OBJECT_SPECIFY::OBJECT_SKELETON)
+	if (pObject->m_Specify == OBJECT_SPECIFY::OBJECT_STATIC || pObject->m_Specify == OBJECT_SPECIFY::OBJECT_SKELETON || pObject->m_Specify == OBJECT_SPECIFY::OBJECT_FOLIAGE)
 	{
 		os << GetSplitExtension(pObject->m_szFullPath);
 		std::wstring scriptExtension = L".Script";
 		os << scriptExtension;
-	}
-	else if (pObject->m_Specify == OBJECT_SPECIFY::OBJECT_FOLIAGE)
-	{
-		/*os << ", ";
-		os << "m_CullMode:" << pObject->m_CullMode << ", ";
-		os << "m_DrawMode:" << pObject->m_DrawMode << ", ";
-		os << "m_InteractiveMode:" << pObject->m_InteractiveMode << ", ";
-		os << "m_Specify:" << pObject->m_Specify << ", ";
-		os << pObject->m_Transform << ", ";
-		os << pObject->m_Box << ", ";
-		os << "m_FoliageList:" << dynamic_cast<Foliage*>(pObject)->m_ConstantData_Instance.m_iInstanceCount << std::endl;
-		for (int idx = 0; idx < dynamic_cast<Foliage*>(pObject)->m_ConstantData_Instance.m_iInstanceCount; idx++)
-		{
-			XMFLOAT3 pos = dynamic_cast<Foliage*>(pObject)->m_pMesh->GetMeshNodeList()[0]->m_ListInstanceData[idx];
-			os << "pos:" << pos.x << " " << pos.y << " " << pos.z;
-			if(idx != dynamic_cast<Foliage*>(pObject)->m_ConstantData_Instance.m_iInstanceCount -1)
-				os << std::endl;
-		}
-		return os;*/
 	}
 	else
 	{
@@ -381,6 +360,24 @@ std::ostream& operator<<(std::ostream& os, Object* pObject)
 	os << pObject->m_Transform << ", ";
 	os << pObject->m_Box;
 
+	if (pObject->m_Specify == OBJECT_SPECIFY::OBJECT_FOLIAGE)
+	{
+		os << ", ";
+		os << "m_FoliageList:" << dynamic_cast<FbxFoliage*>(pObject)->m_ConstantData_Instance.iInstanceCount << std::endl;
+		for (int idx = 0; idx < dynamic_cast<FbxFoliage*>(pObject)->m_ConstantData_Instance.iInstanceCount; idx++)
+		{
+			XMMATRIX matWorld = dynamic_cast<FbxFoliage*>(pObject)->m_pMesh->GetMeshNodeList()[1]->m_ListInstanceData[idx].matInstance;
+			XMVECTOR vPos;
+			XMVECTOR vRot;
+			XMVECTOR vScale;
+			XMMatrixDecompose(&vScale, &vRot, &vPos, matWorld);
+			os << "pos:" << XMVectorGetX(vPos) << " " << XMVectorGetY(vPos) << " " << XMVectorGetZ(vPos) << ", ";
+			os << "rot:" << XMVectorGetX(vRot) << " " << XMVectorGetY(vRot) << " " << XMVectorGetZ(vRot) << ", ";
+			os << "scale:" << XMVectorGetX(vScale) << " " << XMVectorGetY(vScale) << " " << XMVectorGetZ(vScale);
+			if (idx != dynamic_cast<FbxFoliage*>(pObject)->m_ConstantData_Instance.iInstanceCount - 1)
+				os << std::endl;
+		}
+	}
 	return os;
 }
 

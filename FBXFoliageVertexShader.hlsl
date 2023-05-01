@@ -7,6 +7,7 @@ struct VS_INPUT
 
 	//float3 positionInstance : POSITION1;
 	row_major float4x4 worldInstance : WORLD;
+	float4 colorInstance : COLOR1;
 	uint id : SV_InstanceID;
 };
 
@@ -16,6 +17,7 @@ struct VS_OUTPUT
 	float3 normal : NORMAL0;
 	float4 color : COLOR0;
 	float2 tex : TEXCOORD0;
+	float4 colorInstance : COLOR1;
 };
 
 //if using row_major, not transpose in cpp
@@ -43,6 +45,6 @@ VS_OUTPUT vsmain(VS_INPUT input)
 	output.position = vProj;
 	output.tex = input.tex;
 	output.color = input.color;
-
+	output.colorInstance = input.colorInstance;
 	return output;
 }

@@ -360,6 +360,37 @@ static std::stringstream& operator>>(std::stringstream& is, OBJECT_SPECIFY& mode
 //		}
 //	};
 //}
+#include <random>
+
+static double RandomStep(double dMin, double dMax = 1.0)
+{
+	double d1 = min(dMin, dMax);
+	double d2 = max(dMin, dMax);
+	std::random_device rd;
+	std::mt19937 gen(rd());
+	std::uniform_real_distribution<>	 dist(d1, d2);
+	return dist(gen);
+}
+static XMVECTOR RandomPos(float radius)
+{
+	float u = RandomStep(0.0);
+	float v = RandomStep(0.0);
+	float theta = u * 2.0 * XM_PI;
+	float phi = acos(2.0 * v - 1.0);
+	float sinTheta = sin(theta);
+	float cosTheta = cos(theta);
+	float sinPhi = sin(phi);
+	float cosPhi = cos(phi);
+
+	float absX = abs(radius);
+	float absY = abs(radius);
+	float absZ = abs(radius);
+
+	float x = RandomStep(-absX, absX) * sinPhi * cosTheta;
+	float y = RandomStep(-absY, absY) * sinPhi * sinTheta;
+	float z = RandomStep(-absZ, absZ) * cosPhi;
+	return XMLoadFloat3(&XMFLOAT3(x, 0, z));
+}
 
 enum class INPUT_LAYOUT
 {
@@ -403,6 +434,7 @@ static D3D11_INPUT_ELEMENT_DESC layoutPNCTInstance[] =
 	{"WORLD", 1, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
 	{"WORLD", 2, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
 	{"WORLD", 3, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
+	{"COLOR", 1, DXGI_FORMAT_R32G32B32A32_FLOAT, 1, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_INSTANCE_DATA, 1},
 };
 static UINT size_layoutPNCTInstance = ARRAYSIZE(layoutPNCTInstance);
 
@@ -737,7 +769,7 @@ struct ConstantData_Fog
 __declspec(align(16))
 struct ConstantData_Instance
 {
-	UINT m_iInstanceCount;
+	UINT iInstanceCount;
 };
 
 struct IWData

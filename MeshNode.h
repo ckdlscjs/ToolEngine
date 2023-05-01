@@ -8,6 +8,7 @@ struct InstanceData
 {
 	//XMFLOAT3 vPos;
 	XMMATRIX matInstance;
+	XMFLOAT4 fInstanceColor;
 };
 class MeshNode
 {
