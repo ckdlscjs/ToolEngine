@@ -7,7 +7,12 @@
 #include "FBXSystem.h"
 #include "MeshMap.h"
 #include "FQuadTree.h"
+#include "FBXObject.h"
+#include "FBXMesh.h"
+#include "FBXMeshNode.h"
 #include "Foliage.h"
+#include "FbxFoliage.h"
+
 
 class ToolSystemMap : public Singleton<ToolSystemMap>
 {
@@ -30,6 +35,7 @@ public:
 
 	/*CreateBlock*/
 	Object* CreateInstanceObject(std::wstring szFullPath, UINT iCount);//, XMVECTOR vPos, XMVECTOR vRot = { 0, 0, 0, 0 }, XMVECTOR vScale = { 1, 1, 1, 0 });
+	Object* CreateInstanceFbxObject(std::wstring szFullPath, UINT iCount);
 	void CreateFoliage(XMVECTOR vPos, XMVECTOR vRot = { 0, 0, 0, 0 }, XMVECTOR vScale = { 1, 1, 1, 0 });
 	Object* CreateFbxObject(std::wstring szFullPath, XMVECTOR vPos, XMVECTOR vRot = { 0, 0, 0, 0 }, XMVECTOR vScale = { 1, 1, 1, 0 }, T_BOX box = {});
 	Object* CreateSimpleBox(OBJECT_SPECIFY specify, XMVECTOR vPos, XMVECTOR vRot = { 0, 0, 0, 0 }, XMVECTOR vScale = { 1, 1, 1, 0 }, std::wstring szObjName = L"", T_BOX box = {});
@@ -53,7 +59,7 @@ private:
 	std::set<std::wstring> m_ListTexture;
 	std::set<std::wstring> m_ListFbx;
 	/*std::vector<AnimLayer> m_ListAnim;*/
-	Foliage* pFoliage;
+	FbxFoliage* m_pFoliage;
 public:
 	bool bDrawBox = false;
 };

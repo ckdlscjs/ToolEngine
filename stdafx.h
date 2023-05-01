@@ -41,6 +41,10 @@
 using namespace DirectX;
 #define _DegreeToRadian(X) X*(XM_PI/180.0f)
 #define _RadianToDegree(X) X*(180.0f/XM_PI)
+#define randf(x) (x*rand()/(float)RAND_MAX)
+#define randf2(x,off) (off+x*rand()/(float)RAND_MAX)
+#define randstep(fMin,fMax) (fMin+((float)fMax-(float)fMin)*rand()/(float)RAND_MAX)
+//#define clamp(x,MinX,MaxX) if (x>MaxX) x=MaxX; else if (x<MinX) x=MinX;
 constexpr auto _PI = 3.141592f;
 constexpr auto _Epsilon = 0.001f;
 
@@ -728,6 +732,12 @@ struct ConstantData_Fog
 	float linearFogStart;
 	float linearFogEnd;
 	float expFogDensity;
+};
+
+__declspec(align(16))
+struct ConstantData_Instance
+{
+	UINT m_iInstanceCount;
 };
 
 struct IWData

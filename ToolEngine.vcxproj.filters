@@ -310,6 +310,9 @@
     <ClInclude Include="Foliage.h">
       <Filter>ToolSystem\ToolSystemMap\MapObject</Filter>
     </ClInclude>
+    <ClInclude Include="FbxFoliage.h">
+      <Filter>ToolSystem\ToolSystemMap\MapObject</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="WindowSystem.cpp">
@@ -487,6 +490,9 @@
     <ClCompile Include="Foliage.cpp">
       <Filter>ToolSystem\ToolSystemMap\MapObject</Filter>
     </ClCompile>
+    <ClCompile Include="FbxFoliage.cpp">
+      <Filter>ToolSystem\ToolSystemMap\MapObject</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="imgui.ini">
@@ -536,6 +542,12 @@
       <Filter>Shaders</Filter>
     </FxCompile>
     <FxCompile Include="FoliagePixelShader.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="FBXFoliageVertexShader.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="FBXFoliagePixelShader.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
   </ItemGroup>

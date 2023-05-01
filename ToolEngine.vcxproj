@@ -26,6 +26,7 @@
     <ClInclude Include="EngineSystem.h" />
     <ClInclude Include="EntrySystem.h" />
     <ClInclude Include="FBXFile.h" />
+    <ClInclude Include="FbxFoliage.h" />
     <ClInclude Include="FBXMesh.h" />
     <ClInclude Include="FBXMeshNode.h" />
     <ClInclude Include="FBXNode.h" />
@@ -89,6 +90,7 @@
     <ClCompile Include="EngineSystem.cpp" />
     <ClCompile Include="EntrySystem.cpp" />
     <ClCompile Include="FBXFile.cpp" />
+    <ClCompile Include="FbxFoliage.cpp" />
     <ClCompile Include="FBXMesh.cpp" />
     <ClCompile Include="FBXMeshNode.cpp" />
     <ClCompile Include="FBXNode.cpp" />
@@ -159,6 +161,12 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="DepthVertexShader.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="FBXFoliagePixelShader.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="FBXFoliageVertexShader.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="FoliagePixelShader.hlsl">

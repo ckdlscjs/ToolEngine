@@ -261,6 +261,7 @@ void ImguiSystem::Update()
                 }
             }
 
+            static float fFoliageScale = 1.0f;
             //FbxObjPicking
             {
                 if (ImGui::Checkbox("SetFoliage", &bFoliage))
@@ -268,9 +269,11 @@ void ImguiSystem::Update()
 
                 if (bFoliage && _ToolSystemMap.GetCurrentQuadTree() != nullptr)
                 {
+                    ImGui::InputFloat("foliScale", &fFoliageScale);
                     if ((_InputSystem.GetKey(VK_RBUTTON)) && _ToolSystemMap.GetInterSection())
                     {
-                        _ToolSystemMap.CreateFoliage(_PhysicsSystem.GetSelect().m_vIntersection);
+                        _ToolSystemMap.CreateFoliage(_PhysicsSystem.GetSelect().m_vIntersection, { 0, randstep(0.0f, 1.0f), 0, 0 }, {fFoliageScale, fFoliageScale, fFoliageScale , 0 });
+                    
                     }
                 }
             }
@@ -341,7 +344,7 @@ void ImguiSystem::Update()
         
         if (ImGui::Button("CreateInstanceObject"))
         {
-            _ToolSystemMap.CreateInstanceObject(szCurrentImage, iInstCount);
+            _ToolSystemMap.CreateInstanceFbxObject(szCurrentFbx, iInstCount);
         }
         ImGui::InputInt("InstCount", &iInstCount);
 

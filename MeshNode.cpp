@@ -107,6 +107,13 @@ MeshNode::~MeshNode()
 	if (m_pVertexBufferIW) delete m_pVertexBufferIW;
 	if (m_pIndexBuffer) delete m_pIndexBuffer;*/
 
+	for (auto iter = m_ListInstanceBuffer.begin(); iter != m_ListInstanceBuffer.end(); )
+	{
+		delete* iter;
+		iter = m_ListInstanceBuffer.erase(iter);
+	}
+	m_ListInstanceBuffer.clear();
+
 	for (auto iter = m_ListVertexBufferPNCT.begin(); iter != m_ListVertexBufferPNCT.end(); )
 	{
 		delete *iter;

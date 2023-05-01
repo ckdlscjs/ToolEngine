@@ -2,6 +2,7 @@
 #include "stdafx.h"
 class InstanceBuffer
 {
+public:
 	InstanceBuffer(ID3D11Device* pDevice, void* pBuffer, UINT iSizeInstance, UINT iSizeCount);
 	virtual ~InstanceBuffer();
 private:
