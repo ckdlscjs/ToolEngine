@@ -287,7 +287,7 @@ void ImguiSystem::Update()
                             XMStoreFloat3(&vPos, _PhysicsSystem.GetSelect().m_vIntersection + RandomPos(fFoliageRadius));
                             vPos.y = _ToolSystemMap.GetCurrentQuadTree()->m_pMap->GetHeight(vPos.x, vPos.z);
                                
-                            _ToolSystemMap.CreateFoliage(XMLoadFloat3(&vPos) , { 0, randstep(0.0f, 1.0f), 0, 0 }, { randstep(0.5f, 1.0f), randstep(0.5f, 1.0f), randstep(0.5f, 1.0f) , 0 }, XMFLOAT4(fFoliageColor[0]/255.0f, fFoliageColor[1]/255.0f, fFoliageColor[2]/255.0f, fFoliageColor[3]/255.0f));
+                            _ToolSystemMap.CreateFoliage(XMLoadFloat3(&vPos) , { 0, randstep(0.0f, 1.0f), 0, 0 }, { randstep(0.5f, 2.0f), randstep(0.2f, 1.0f), randstep(0.5f, 2.0f) , 0 }, XMFLOAT4(fFoliageColor[0]/255.0f, fFoliageColor[1]/255.0f, fFoliageColor[2]/255.0f, fFoliageColor[3]/255.0f));
                         }
                        
                     }
