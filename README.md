@@ -27,6 +27,8 @@ SingletonManager들을 이용해 해당 객체들을 생성/삭제 하고 Frame,
 - 베지어커브를 이용한 시네마틱 카메라 시스템
 - FBXSDK를 이용한 메쉬 로드 및 Vertex/Index중복정점 제거를 통한 리소스 최적화
 - FBXSDK를 이용한 스키닝 애니메이션 재생 및 관리
+- IMGUI를 이용한 맵툴 기능 프로그램화
+- .map파일명으로 별도의확장자를 통한 맵 세이브/로드 구현
 
 ## 동영상
 https://youtu.be/_ik09B4ptmo?si=l5gQW1pp_IqxO2Hu (MapTools)
